@@ -1,3 +1,7 @@
+
+import { removeToken } from "../../services/authStorage";
+import { useNavigation } from "@react-navigation/native";
+
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -27,10 +31,21 @@ export default function ProfileScreen() {
     loadUser();
   }, []);
 
-  const handleLogout = () => {
-    Alert.alert("Logged Out", "You have been logged out.");
-    // TODO: remove token + navigate to Login screen
+  const navigation = useNavigation();
+
+  const handleLogout = async () => {
+    try {
+      await removeToken();
+      Alert.alert("Logged Out", "You have been logged out.");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Welcome" }],
+      });
+    } catch (err) {
+      console.error("❌ Logout failed:", err.message);
+    }
   };
+  
 
   return (
     <View style={styles.container}>
