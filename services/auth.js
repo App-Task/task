@@ -30,3 +30,12 @@ export const loginUser = async (credentials) => {
     throw new Error(msg);
   }
 };
+import { getToken } from "./authStorage";
+
+export const fetchCurrentUser = async () => {
+  const token = await getToken();
+  const response = await axios.get(`${API_URL}/me`, {
+    headers: { Authorization: token },
+  });
+  return response.data; // returns { name, email }
+};

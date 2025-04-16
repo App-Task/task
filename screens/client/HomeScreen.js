@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { fetchCurrentUser } from "../../services/auth";
 
 const { width } = Dimensions.get("window");
 
@@ -17,10 +18,28 @@ const sampleTasks = [
 ];
 
 export default function ClientHomeScreen({ navigation }) {
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const user = await fetchCurrentUser();
+        setUserName(user.name);
+        console.log("✅ User loaded:", user);
+      } catch (err) {
+        console.error("❌ Could not fetch user:", err.message);
+      }
+    };
+
+    loadUser();
+  }, []);
+
   return (
     <View style={styles.container}>
       {/* Greeting */}
-      <Text style={styles.hello}>Hi Yosuf 👋</Text>
+      <Text style={styles.hello}>
+        {userName ? `Hi ${userName} 👋` : "Loading..."}
+      </Text>
       <Text style={styles.sub}>What do you need help with today?</Text>
 
       {/* Post Task Button */}
