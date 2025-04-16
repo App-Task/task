@@ -11,8 +11,8 @@ const Stack = createNativeStackNavigator();
 export default function MainNavigator() {
   return (
     <Stack.Navigator
-      initialRouteName="ClientHome"
-      //initialRouteName="Splash"
+      //initialRouteName="ClientHome"
+      initialRouteName="Splash"
       screenOptions={{ headerShown: false }}
     >
       {/* 👇 Tab navigator as the ClientHomeScreen */}

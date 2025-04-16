@@ -15,8 +15,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { loginUser } from "../../services/auth";
 import { storeToken } from "../../services/authStorage";
 
-
-
 const { width } = Dimensions.get("window");
 
 export default function LoginScreen({ navigation }) {
@@ -25,16 +23,28 @@ export default function LoginScreen({ navigation }) {
   const [secure, setSecure] = useState(true);
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Missing Info", "Please enter both email and password.");
+      return;
+    }
+  
     try {
       const response = await loginUser({ email, password });
-      await storeToken(response.token); // ✅ save it
-      console.log("✅ Token stored:", response.token);
-      Alert.alert("Welcome", `Logged in as ${response.user.name}`);
-      navigation.replace("ClientHome"); // or Dashboard
+  
+      if (response?.token) {
+        await storeToken(response.token);
+        Alert.alert("Welcome", `Logged in as ${response.user.name}`);
+        navigation.replace("ClientHome");
+      } else {
+        throw new Error("Login failed. Please try again.");
+      }
     } catch (err) {
-      Alert.alert("Login Failed", err.toString());
+      console.log("❌ Login Error:", err.message); // log error for debugging
+      Alert.alert("Login Failed", err.message);
     }
   };
+  
+
   
 
   return (

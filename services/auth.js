@@ -1,26 +1,32 @@
 import axios from "axios";
-import { storeToken } from "./authStorage";
 
-const API_URL = "https://a59d-41-45-81-142.ngrok-free.app/api/auth";
+// 👇 Replace with your actual local IP address
+const API_URL = "http://192.168.1.228:5000/api/auth";
 
-
-
-
-export const registerUser = async (data) => {
+/**
+ * Sends user registration data to the backend.
+ * @param {Object} userData - { name, email, password }
+ * @returns {Object} - Response data from backend
+ */
+export const registerUser = async (userData) => {
   try {
-    const res = await axios.post(`${API_URL}/register`, data);
-    return res.data;
-  } catch (err) {
-    throw err.response?.data?.msg || "Registration failed";
+    const response = await axios.post(`${API_URL}/register`, userData);
+    return response.data;
+  } catch (error) {
+    // Forward a cleaner error message for alerts
+    const message =
+      error?.response?.data?.msg || "Something went wrong during registration.";
+    throw new Error(message);
   }
 };
 
-export const loginUser = async (data) => {
+export const loginUser = async (credentials) => {
   try {
-    const res = await axios.post(`${API_URL}/login`, data);
-    await storeToken(res.data.token); // ✅ Save the token securely
-    return res.data;
-  } catch (err) {
-    throw err.response?.data?.msg || "Login failed";
+    const response = await axios.post(`${API_URL}/login`, credentials);
+    return response.data;
+  } catch (error) {
+    // Forward backend error to frontend catch
+    const msg = error.response?.data?.msg || "Server error";
+    throw new Error(msg);
   }
 };
