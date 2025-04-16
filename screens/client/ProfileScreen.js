@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,14 +7,25 @@ import {
   Dimensions,
   Alert,
 } from "react-native";
+import { fetchCurrentUser } from "../../services/auth"; // 👈 use same function
 
 const { width } = Dimensions.get("window");
 
 export default function ProfileScreen() {
-  const user = {
-    name: "Yosuf Al Awadi",
-    email: "yosuf@example.com",
-  };
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const fetched = await fetchCurrentUser();
+        setUser(fetched);
+      } catch (err) {
+        console.error("❌ Failed to load profile:", err.message);
+      }
+    };
+
+    loadUser();
+  }, []);
 
   const handleLogout = () => {
     Alert.alert("Logged Out", "You have been logged out.");
@@ -24,12 +35,18 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.avatarPlaceholder}>
-        <Text style={styles.avatarInitials}>YA</Text>
+        <Text style={styles.avatarInitials}>
+          {user?.name ? user.name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase() : "?"}
+        </Text>
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.name}>{user.name}</Text>
-        <Text style={styles.email}>{user.email}</Text>
+        <Text style={styles.name}>{user?.name || "Loading..."}</Text>
+        <Text style={styles.email}>{user?.email || " "}</Text>
       </View>
 
       <View style={styles.buttonGroup}>
@@ -41,7 +58,10 @@ export default function ProfileScreen() {
           <Text style={styles.buttonText}>Change Password</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={handleLogout}>
+        <TouchableOpacity
+          style={[styles.button, styles.logoutButton]}
+          onPress={handleLogout}
+        >
           <Text style={[styles.buttonText, styles.logoutText]}>Log Out</Text>
         </TouchableOpacity>
       </View>
@@ -57,7 +77,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
     alignItems: "center",
-    justifyContent: "space-evenly", // ✅ Even vertical spacing
+    justifyContent: "space-evenly",
   },
   avatarPlaceholder: {
     width: width * 0.35,
