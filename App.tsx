@@ -1,34 +1,71 @@
-import "react-native-get-random-values"; // ✅ must be first
+import "react-native-get-random-values";
 import "./i18n/config";
-import React, { useCallback } from "react";
-import { View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { View, I18nManager, Platform } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
+import * as SecureStore from "expo-secure-store";
+import * as Updates from "expo-updates";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import MainNavigator from "./navigation/MainNavigator";
+import Toast from "react-native-toast-message";
+import i18n from "./i18n/config";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  const [appReady, setAppReady] = useState(false);
+
   const [fontsLoaded] = useFonts({
     Inter: require("./assets/fonts/Inter-Regular.ttf"),
     InterBold: require("./assets/fonts/Inter-Bold.ttf"),
     InterSemiBold: require("./assets/fonts/Inter-SemiBold.ttf"),
   });
 
+  useEffect(() => {
+    const initLanguageAndLayout = async () => {
+      try {
+        const savedLang = await SecureStore.getItemAsync("appLanguage");
+        const savedRTL = await SecureStore.getItemAsync("appRTL");
+
+        if (savedLang) {
+          await i18n.changeLanguage(savedLang);
+        }
+
+        const shouldBeRTL = savedRTL === "true";
+        const isRTLNow = I18nManager.isRTL;
+
+        // 🚨 Only force reload in production builds to avoid infinite reload in Expo Go/dev
+        if (shouldBeRTL !== isRTLNow && !__DEV__) {
+          I18nManager.forceRTL(shouldBeRTL);
+          Updates.reloadAsync();
+          return;
+        }
+
+        setAppReady(true);
+      } catch (err) {
+        console.error("Language init error:", err);
+        setAppReady(true);
+      }
+    };
+
+    initLanguageAndLayout();
+  }, []);
+
   const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
+    if (fontsLoaded && appReady) {
       await SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, appReady]);
 
-  if (!fontsLoaded) return null;
+  if (!fontsLoaded || !appReady) return null;
 
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <NavigationContainer>
         <MainNavigator />
       </NavigationContainer>
+      <Toast />
     </View>
   );
 }

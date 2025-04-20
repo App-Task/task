@@ -8,15 +8,18 @@ import {
   Dimensions,
   ActivityIndicator,
   Alert,
-  Platform,
   I18nManager,
+  Platform,
 } from "react-native";
 import { Asset } from "expo-asset";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import * as Updates from "expo-updates";
+import * as SecureStore from "expo-secure-store";
 import { useTranslation } from "react-i18next";
 import i18n from "i18next";
+import { Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
 
 const { width } = Dimensions.get("window");
 
@@ -53,7 +56,16 @@ export default function WelcomeScreen({ navigation }) {
     const newLang = i18n.language === "en" ? "ar" : "en";
     const isRTL = newLang === "ar";
 
+    await SecureStore.setItemAsync("appLanguage", newLang);
+    await SecureStore.setItemAsync("appRTL", JSON.stringify(isRTL));
     await i18n.changeLanguage(newLang);
+
+    Toast.show({
+      type: "success",
+      text1: newLang === "en" ? "Language changed to English" : "تم تغيير اللغة إلى العربية",
+      position: "bottom",
+      visibilityTime: 2000,
+    });
 
     if (I18nManager.isRTL !== isRTL) {
       I18nManager.forceRTL(isRTL);
@@ -70,38 +82,45 @@ export default function WelcomeScreen({ navigation }) {
   }
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require("../../assets/images/1.png")}
-        style={styles.logo}
-        resizeMode="contain"
-      />
+    <>
+      <View style={styles.container}>
+        <Image
+          source={require("../../assets/images/1.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
 
-      <Text style={styles.title}>{t("welcome")}</Text>
+        <Text style={styles.title}>{t("welcome")}</Text>
 
-      <TouchableOpacity onPress={toggleLanguage} style={styles.langSwitch}>
-        <Text style={styles.langSwitchText}>
-          🌐 {i18n.language === "en" ? "العربية" : "English"}
-        </Text>
-      </TouchableOpacity>
-
-      <Text style={styles.rolePrompt}>{t("chooseRole")}</Text>
-      <View style={styles.roleButtons}>
-        <TouchableOpacity
-          style={styles.roleBtn}
-          onPress={() => navigation.navigate("Login", { role: "client" })}
-        >
-          <Text style={styles.roleText}>{t("role.client")}</Text>
+        <TouchableOpacity onPress={toggleLanguage} style={styles.langSwitch}>
+          <View style={styles.langBadge}>
+            <Ionicons name="globe-outline" size={18} color="#213729" style={{ marginRight: 6 }} />
+            <Text style={styles.langSwitchText}>
+              {i18n.language === "en" ? "العربية" : "English"}
+            </Text>
+          </View>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.roleBtn}
-          onPress={() => navigation.navigate("Login", { role: "tasker" })}
-        >
-          <Text style={styles.roleText}>{t("role.tasker")}</Text>
-        </TouchableOpacity>
+        <Text style={styles.rolePrompt}>{t("chooseRole")}</Text>
+        <View style={styles.roleButtons}>
+          <TouchableOpacity
+            style={[styles.roleBtn, { marginRight: 12 }]} // ✅ spacing instead of "gap"
+            onPress={() => navigation.navigate("Login", { role: "client" })}
+          >
+            <Text style={styles.roleText}>{t("role.client")}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.roleBtn}
+            onPress={() => navigation.navigate("Login", { role: "tasker" })}
+          >
+            <Text style={styles.roleText}>{t("role.tasker")}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+
+      <Toast />
+    </>
   );
 }
 
@@ -130,19 +149,18 @@ const styles = StyleSheet.create({
     color: "#215432",
     marginBottom: 30,
   },
-  brand: {
-    fontFamily: "InterBold",
-    fontSize: 42,
-    color: "#213729",
-    marginBottom: 6,
-    letterSpacing: 1,
-  },
   langSwitch: {
     marginBottom: 30,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 20,
+    borderRadius: 30,
     backgroundColor: "#f2f2f2",
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  langBadge: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   langSwitchText: {
     fontFamily: "InterBold",
@@ -158,7 +176,6 @@ const styles = StyleSheet.create({
   roleButtons: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 12,
     marginBottom: 20,
   },
   roleBtn: {
