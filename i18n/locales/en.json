@@ -126,5 +126,143 @@
   },
   "paymentMethods": {
     "title": "Payment Method Screen"
+  },
+  "tabs": {
+  "explore": "Explore",
+  "myTasks": "My Tasks",
+  "messages": "Messages",
+  "notifications": "Notifications",
+  "profile": "Profile"
+},
+"explore": {
+  "header": "Explore Tasks",
+  "location": "Location",
+  "price": "Price",
+  "bids": "Bids",
+  "viewDetails": "View Details",
+  "noTasks": "No tasks available at the moment."
+},
+"details": {
+  "location": "Location",
+  "price": "Offered Price",
+  "enterBid": "Place Your Bid",
+  "bidAmount": "Your Bid (SAR)",
+  "bidMessage": "Message to client (max 150 chars)",
+  "submitBid": "Submit Bid",
+  "errorTitle": "Missing Info",
+  "fillFields": "Please enter both bid amount and message.",
+  "successTitle": "Success",
+  "bidSent": "Your bid has been submitted!"
+},
+"tasker": {
+  "active": "Active",
+  "past": "Past",
+  "noTasks": "No tasks to show.",
+  "client": "Client",
+  "status": "Status",
+  "statusTypes": {
+    "started": "Started",
+    "completed": "Completed"
+  },
+  "chat": "Chat",
+  "report": "Report",
+  "cancel": "Cancel Task"
+},
+"chatt": {
+  "title": "Chat",
+  "placeholder": "Type a message...",
+  "reported": "Client reported successfully"
+},
+"notify": {
+  "title": "Notifications",
+  "empty": "No notifications at the moment.",
+  "types": {
+    "hired": "Hired",
+    "message": "New Message"
   }
+},
+"profilee": {
+  "edit": "Edit Profile",
+  "documents": "Documents",
+  "bank": "Bank Account",
+  "payments": "My Payments",
+  "reviews": "My Reviews",
+  "settings": "Settings",
+  "logout": "Log Out",
+  "loggedOut": "You have been logged out."
+},
+"editProfilee": {
+  "title": "Edit Profile",
+  "name": "Full Name",
+  "email": "Email (non-editable)",
+  "gender": "Gender",
+  "location": "Location",
+  "experience": "Experience",
+  "skills": "Skills (max 10)",
+  "about": "About You (max 150 characters)",
+  "save": "Save Changes",
+  "savedTitle": "Profile Updated",
+  "savedMessage": "Your changes have been saved."
+},
+"documents": {
+  "title": "Uploaded Documents",
+  "empty": "No documents uploaded yet.",
+  "uploadBtn": "Upload Document",
+  "uploadedTitle": "Uploaded",
+  "uploadedMessage": "Document uploaded successfully."
+},
+"bank": {
+  "title": "Bank Account",
+  "bankName": "Bank Name",
+  "accountNumber": "Account Number",
+  "iban": "IBAN",
+  "save": "Save Changes",
+  "savedTitle": "Saved",
+  "savedMessage": "Bank details have been saved."
+},
+"payments": {
+  "title": "My Payments",
+  "all": "All",
+  "recent": "Recent",
+  "empty": "No payment records available."
+},
+"reviews": {
+  "title": "My Reviews",
+  "average": "Average Rating",
+  "empty": "You haven't received any reviews yet."
+},
+"settings": {
+  "title": "Settings",
+  "about": "About Us",
+  "privacy": "Privacy Policy",
+  "terms": "Terms & Conditions",
+  "faq": "FAQs",
+  "contact": "Contact Admin",
+  "logout": "Log Out",
+  "logoutMsg": "You have been logged out.",
+  "open": "Open"
+},
+"chooseRole": "Continue as...",
+"role": {
+  "client": "Client",
+  "tasker": "Tasker"
+},
+"messagess": {
+  "title": "Messages"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

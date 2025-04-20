@@ -5,7 +5,10 @@ import SplashScreen from "../screens/common/SplashScreen";
 import WelcomeScreen from "../screens/common/WelcomeScreen";
 import LoginScreen from "../screens/common/LoginScreen";
 import RegisterScreen from "../screens/common/RegisterScreen";
-import BottomTabNavigator from "./BottomTabNavigator"; // Tab layout for Client side
+
+import BottomTabNavigator from "./BottomTabNavigator"; // Client-side bottom tabs
+import TaskerBottomTabNavigator from "./TaskerBottomTabNavigator"; // Tasker-side bottom tabs
+
 import TaskDetailsScreen from "../screens/clients/TaskDetailsScreen";
 import EditTaskScreen from "../screens/clients/EditTaskScreen";
 import ViewBidsScreen from "../screens/clients/ViewBidsScreen";
@@ -15,12 +18,17 @@ import ChangePasswordScreen from "../screens/clients/ChangePasswordScreen";
 import MyPaymentsScreen from "../screens/clients/MyPaymentsScreen";
 import PaymentMethodsScreen from "../screens/clients/PaymentMethodsScreen";
 
+import DocumentsScreen from "../screens/tasker/DocumentsScreen";
+import BankAccountScreen from "../screens/tasker/BankAccountScreen";
+import MyReviewsScreen from "../screens/tasker/MyReviewsScreen";
+import SettingsScreen from "../screens/tasker/SettingsScreen";
+
 const Stack = createNativeStackNavigator();
 
 export default function MainNavigator() {
   return (
     <Stack.Navigator
-      initialRouteName="Splash" // ✅ Start at splash for full onboarding flow
+      initialRouteName="Splash"
       screenOptions={{ headerShown: false }}
     >
       {/* Onboarding & Auth */}
@@ -29,7 +37,7 @@ export default function MainNavigator() {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
 
-      {/* Full client-side app after login */}
+      {/* Client Home & Subscreens */}
       <Stack.Screen name="ClientHome" component={BottomTabNavigator} />
       <Stack.Screen name="TaskDetails" component={TaskDetailsScreen} />
       <Stack.Screen name="EditTask" component={EditTaskScreen} />
@@ -39,6 +47,13 @@ export default function MainNavigator() {
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
       <Stack.Screen name="MyPayments" component={MyPaymentsScreen} />
       <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
+
+      {/* Tasker Home & Subscreens */}
+      <Stack.Screen name="TaskerHome" component={TaskerBottomTabNavigator} />
+      <Stack.Screen name="Documents" component={DocumentsScreen} />
+      <Stack.Screen name="BankAccount" component={BankAccountScreen} />
+      <Stack.Screen name="Reviews" component={MyReviewsScreen} />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
     </Stack.Navigator>
   );
 }

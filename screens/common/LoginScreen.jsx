@@ -18,8 +18,10 @@ import { storeToken } from "../../services/authStorage";
 
 const { width } = Dimensions.get("window");
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({ navigation, route }) {
   const { t } = useTranslation();
+  const role = route?.params?.role || "client";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [secure, setSecure] = useState(true);
@@ -36,7 +38,7 @@ export default function LoginScreen({ navigation }) {
       if (response?.token) {
         await storeToken(response.token);
         Alert.alert(t("login.successTitle"), `${t("login.loggedInAs")} ${response.user.name}`);
-        navigation.replace("ClientHome");
+        navigation.replace(role === "tasker" ? "TaskerHome" : "ClientHome");
       } else {
         throw new Error(t("login.failedGeneric"));
       }
@@ -93,7 +95,7 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.buttonText}>{t("login.loginBtn")}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Register", { role })}>
           <Text style={styles.register}>
             {t("login.noAccount")}{" "}
             <Text style={styles.registerLink}>{t("login.registerLink")}</Text>

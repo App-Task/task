@@ -78,7 +78,6 @@ export default function WelcomeScreen({ navigation }) {
       />
 
       <Text style={styles.title}>{t("welcome")}</Text>
-      <Text style={styles.brand}>TASK</Text>
 
       <TouchableOpacity onPress={toggleLanguage} style={styles.langSwitch}>
         <Text style={styles.langSwitchText}>
@@ -86,21 +85,22 @@ export default function WelcomeScreen({ navigation }) {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Login")}
-      >
-        <Text style={styles.buttonText}>{t("login.loginBtn")}</Text>
-      </TouchableOpacity>
+      <Text style={styles.rolePrompt}>{t("chooseRole")}</Text>
+      <View style={styles.roleButtons}>
+        <TouchableOpacity
+          style={styles.roleBtn}
+          onPress={() => navigation.navigate("Login", { role: "client" })}
+        >
+          <Text style={styles.roleText}>{t("role.client")}</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.button, styles.secondaryButton]}
-        onPress={() => navigation.navigate("Register")}
-      >
-        <Text style={[styles.buttonText, styles.secondaryText]}>
-          {t("register.registerBtn")}
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.roleBtn}
+          onPress={() => navigation.navigate("Login", { role: "tasker" })}
+        >
+          <Text style={styles.roleText}>{t("role.tasker")}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -125,16 +125,16 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   title: {
-    fontFamily: "Inter",
-    fontSize: 24,
+    fontFamily: "InterBold",
+    fontSize: 30,
     color: "#215432",
-    marginBottom: 5,
+    marginBottom: 30,
   },
   brand: {
     fontFamily: "InterBold",
     fontSize: 42,
     color: "#213729",
-    marginBottom: 20,
+    marginBottom: 6,
     letterSpacing: 1,
   },
   langSwitch: {
@@ -149,26 +149,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#213729",
   },
-  button: {
-    backgroundColor: "#213729",
-    paddingVertical: 14,
-    paddingHorizontal: 40,
-    borderRadius: 30,
-    width: "100%",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  buttonText: {
-    color: "#ffffff",
-    fontFamily: "InterBold",
+  rolePrompt: {
     fontSize: 16,
+    fontFamily: "InterBold",
+    color: "#215432",
+    marginBottom: 10,
   },
-  secondaryButton: {
-    backgroundColor: "transparent",
-    borderWidth: 2,
-    borderColor: "#213729",
+  roleButtons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 12,
+    marginBottom: 20,
   },
-  secondaryText: {
+  roleBtn: {
+    backgroundColor: "#c1ff72",
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 20,
+  },
+  roleText: {
+    fontFamily: "InterBold",
     color: "#213729",
+    fontSize: 14,
   },
 });

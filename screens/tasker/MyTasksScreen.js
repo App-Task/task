@@ -1,0 +1,203 @@
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Dimensions,
+  I18nManager,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
+import { useTranslation } from "react-i18next";
+import Animated, { FadeInUp } from "react-native-reanimated";
+
+const { width } = Dimensions.get("window");
+
+const dummyTasks = {
+  active: [
+    {
+      id: "1",
+      title: "Assemble Furniture",
+      client: "Ahmed Ali",
+      status: "Started",
+    },
+  ],
+  past: [
+    {
+      id: "2",
+      title: "Fix garden light",
+      client: "Mona Saleh",
+      status: "Completed",
+    },
+  ],
+};
+
+export default function TaskerMyTasksScreen() {
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState("active");
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 800);
+  }, []);
+
+  const renderTask = ({ item }) => (
+    <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
+      <Text style={styles.title}>{item.title}</Text>
+      <Text style={styles.sub}>{t("tasker.client")}: {item.client}</Text>
+      <Text style={styles.sub}>{t("tasker.status")}: {t(`tasker.statusTypes.${item.status.toLowerCase()}`)}</Text>
+
+      <View style={styles.actions}>
+        {tab === "active" && (
+          <TouchableOpacity style={styles.btn} onPress={() => Alert.alert("Chat", "Open chat with client")}>
+            <Text style={styles.btnText}>{t("tasker.chat")}</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={[styles.btn, styles.secondaryBtn]}
+          onPress={() => Alert.alert("Report", "Report client")}
+        >
+          <Text style={[styles.btnText, styles.secondaryText]}>{t("tasker.report")}</Text>
+        </TouchableOpacity>
+        {tab === "active" && (
+          <TouchableOpacity
+            style={[styles.btn, styles.dangerBtn]}
+            onPress={() => Alert.alert("Cancel", "Cancel task?")}
+          >
+            <Text style={[styles.btnText, styles.dangerText]}>{t("tasker.cancel")}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </Animated.View>
+  );
+
+  return (
+    <View style={styles.container}>
+      {/* Tabs */}
+      <View style={styles.tabs}>
+        <TouchableOpacity onPress={() => setTab("active")} style={[styles.tab, tab === "active" && styles.activeTab]}>
+          <Text style={[styles.tabText, tab === "active" && styles.activeTabText]}>
+            {t("tasker.active")}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setTab("past")} style={[styles.tab, tab === "past" && styles.activeTab]}>
+          <Text style={[styles.tabText, tab === "past" && styles.activeTabText]}>
+            {t("tasker.past")}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Task list */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
+      ) : dummyTasks[tab].length === 0 ? (
+        <Text style={styles.empty}>{t("tasker.noTasks")}</Text>
+      ) : (
+        <FlatList
+          data={dummyTasks[tab]}
+          keyExtractor={(item) => item.id}
+          renderItem={renderTask}
+          contentContainerStyle={{ paddingBottom: 60 }}
+        />
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+    paddingTop: 60,
+    paddingHorizontal: 20,
+  },
+  tabs: {
+    flexDirection: "row",
+    marginBottom: 20,
+    justifyContent: "center",
+  },
+  tab: {
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 20,
+    marginHorizontal: 10,
+    backgroundColor: "#f0f0f0",
+  },
+  tabText: {
+    fontFamily: "Inter",
+    fontSize: 15,
+    color: "#666",
+  },
+  activeTab: {
+    backgroundColor: "#c1ff72",
+  },
+  activeTabText: {
+    color: "#213729",
+    fontFamily: "InterBold",
+  },
+  empty: {
+    textAlign: "center",
+    marginTop: 80,
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#999",
+  },
+  card: {
+    backgroundColor: "#f9f9f9",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  title: {
+    fontFamily: "InterBold",
+    fontSize: 18,
+    color: "#213729",
+    marginBottom: 6,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
+  sub: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#444",
+    marginBottom: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
+  actions: {
+    marginTop: 12,
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  btn: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    backgroundColor: "#213729",
+    borderRadius: 30,
+    marginTop: 10,
+  },
+  btnText: {
+    color: "#ffffff",
+    fontFamily: "InterBold",
+    fontSize: 14,
+  },
+  secondaryBtn: {
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#213729",
+  },
+  secondaryText: {
+    color: "#213729",
+  },
+  dangerBtn: {
+    backgroundColor: "#fff5f5",
+    borderColor: "#ff5a5a",
+    borderWidth: 1,
+  },
+  dangerText: {
+    color: "#ff5a5a",
+  },
+});

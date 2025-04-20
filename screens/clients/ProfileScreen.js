@@ -9,6 +9,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
@@ -37,61 +38,54 @@ export default function ProfileScreen({ navigation }) {
       </View>
 
       <View style={styles.buttonGroup}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("EditProfile")}
-        >
-          <Text style={styles.buttonText}>{t("profile.editProfile")}</Text>
+        <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("EditProfile")}>
+          <Text style={styles.rowText}>{t("profile.editProfile")}</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("ChangePassword")}
-        >
-          <Text style={styles.buttonText}>{t("profile.changePassword")}</Text>
+        <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("ChangePassword")}>
+          <Text style={styles.rowText}>{t("profile.changePassword")}</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("MyPayments")}
-        >
-          <Text style={styles.buttonText}>{t("profile.myPayments")}</Text>
+        <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("MyPayments")}>
+          <Text style={styles.rowText}>{t("profile.myPayments")}</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("PaymentMethods")}
-        >
-          <Text style={styles.buttonText}>{t("profile.paymentMethods")}</Text>
+        <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("PaymentMethods")}>
+          <Text style={styles.rowText}>{t("profile.paymentMethods")}</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>{t("profile.aboutUs")}</Text>
+        <TouchableOpacity style={styles.rowItem}>
+          <Text style={styles.rowText}>{t("profile.aboutUs")}</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>{t("profile.privacyPolicy")}</Text>
+        <TouchableOpacity style={styles.rowItem}>
+          <Text style={styles.rowText}>{t("profile.privacyPolicy")}</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>{t("profile.terms")}</Text>
+        <TouchableOpacity style={styles.rowItem}>
+          <Text style={styles.rowText}>{t("profile.terms")}</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>{t("profile.faqs")}</Text>
+        <TouchableOpacity style={styles.rowItem}>
+          <Text style={styles.rowText}>{t("profile.faqs")}</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>{t("profile.contactAdmin")}</Text>
+        <TouchableOpacity style={styles.rowItem}>
+          <Text style={styles.rowText}>{t("profile.contactAdmin")}</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.button, styles.logoutButton]}
-          onPress={handleLogout}
-        >
-          <Text style={[styles.buttonText, styles.logoutText]}>
-            {t("profile.logout")}
-          </Text>
+        <TouchableOpacity style={[styles.rowItem, styles.logoutRow]} onPress={handleLogout}>
+          <Text style={[styles.rowText, styles.logoutText]}>{t("profile.logout")}</Text>
+          <Ionicons name="log-out-outline" size={20} color="#213729" />
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -138,22 +132,27 @@ const styles = StyleSheet.create({
   buttonGroup: {
     width: "100%",
   },
-  button: {
-    backgroundColor: "#213729",
-    paddingVertical: 14,
-    borderRadius: 12,
+  rowItem: {
+    width: "100%",
+    flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
+    justifyContent: "space-between",
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    marginBottom: 10,
   },
-  buttonText: {
-    fontFamily: "InterBold",
+  rowText: {
+    fontFamily: "Inter",
     fontSize: 16,
-    color: "#ffffff",
+    color: "#213729",
   },
-  logoutButton: {
+  logoutRow: {
     backgroundColor: "#c1ff72",
   },
   logoutText: {
+    fontFamily: "InterBold",
     color: "#213729",
   },
 });

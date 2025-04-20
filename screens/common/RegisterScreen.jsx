@@ -16,8 +16,10 @@ import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
 
-export default function RegisterScreen({ navigation }) {
+export default function RegisterScreen({ navigation, route }) {
   const { t } = useTranslation();
+  const role = route?.params?.role || "client";
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -110,7 +112,7 @@ export default function RegisterScreen({ navigation }) {
           <Text style={styles.buttonText}>{t("register.registerBtn")}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Login", { role })}>
           <Text style={styles.loginRedirect}>
             {t("register.alreadyHave")}{" "}
             <Text style={styles.loginLink}>{t("register.loginLink")}</Text>
