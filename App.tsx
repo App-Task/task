@@ -1,3 +1,5 @@
+import "react-native-get-random-values"; // ✅ must be first
+import "./i18n/config";
 import React, { useCallback } from "react";
 import { View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
@@ -8,12 +10,11 @@ import MainNavigator from "./navigation/MainNavigator";
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-    const [fontsLoaded] = useFonts({
-        Inter: require("./assets/fonts/Inter-Regular.ttf"),
-        InterBold: require("./assets/fonts/Inter-Bold.ttf"),
-        InterSemiBold: require("./assets/fonts/Inter-SemiBold.ttf"),
-      });
-      
+  const [fontsLoaded] = useFonts({
+    Inter: require("./assets/fonts/Inter-Regular.ttf"),
+    InterBold: require("./assets/fonts/Inter-Bold.ttf"),
+    InterSemiBold: require("./assets/fonts/Inter-SemiBold.ttf"),
+  });
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {

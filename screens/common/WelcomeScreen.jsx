@@ -7,21 +7,59 @@ import {
   Image,
   Dimensions,
   ActivityIndicator,
+  Alert,
+  Platform,
+  I18nManager,
 } from "react-native";
 import { Asset } from "expo-asset";
+import * as Location from "expo-location";
+import * as Notifications from "expo-notifications";
+import * as Updates from "expo-updates";
+import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 
 const { width } = Dimensions.get("window");
 
 export default function WelcomeScreen({ navigation }) {
   const [ready, setReady] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const preload = async () => {
       await Asset.loadAsync(require("../../assets/images/1.png"));
+      await requestPermissions();
       setReady(true);
     };
     preload();
   }, []);
+
+  const requestPermissions = async () => {
+    try {
+      const { status: locationStatus } = await Location.requestForegroundPermissionsAsync();
+      if (locationStatus !== "granted") {
+        Alert.alert("Location Access", "Location permission denied.");
+      }
+
+      const { status: notifStatus } = await Notifications.requestPermissionsAsync();
+      if (notifStatus !== "granted") {
+        Alert.alert("Notifications", "Notifications permission denied.");
+      }
+    } catch (err) {
+      console.error("Permission error:", err);
+    }
+  };
+
+  const toggleLanguage = async () => {
+    const newLang = i18n.language === "en" ? "ar" : "en";
+    const isRTL = newLang === "ar";
+
+    await i18n.changeLanguage(newLang);
+
+    if (I18nManager.isRTL !== isRTL) {
+      I18nManager.forceRTL(isRTL);
+      await Updates.reloadAsync();
+    }
+  };
 
   if (!ready) {
     return (
@@ -33,30 +71,35 @@ export default function WelcomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Logo */}
       <Image
         source={require("../../assets/images/1.png")}
         style={styles.logo}
         resizeMode="contain"
       />
 
-      {/* Title */}
-      <Text style={styles.title}>Welcome to</Text>
+      <Text style={styles.title}>{t("welcome")}</Text>
       <Text style={styles.brand}>TASK</Text>
 
-      {/* Buttons */}
+      <TouchableOpacity onPress={toggleLanguage} style={styles.langSwitch}>
+        <Text style={styles.langSwitchText}>
+          🌐 {i18n.language === "en" ? "العربية" : "English"}
+        </Text>
+      </TouchableOpacity>
+
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Login")}
       >
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>{t("login.loginBtn")}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={[styles.button, styles.secondaryButton]}
         onPress={() => navigation.navigate("Register")}
       >
-        <Text style={[styles.buttonText, styles.secondaryText]}>Register</Text>
+        <Text style={[styles.buttonText, styles.secondaryText]}>
+          {t("register.registerBtn")}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -91,8 +134,20 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 42,
     color: "#213729",
-    marginBottom: 40,
+    marginBottom: 20,
     letterSpacing: 1,
+  },
+  langSwitch: {
+    marginBottom: 30,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: "#f2f2f2",
+  },
+  langSwitchText: {
+    fontFamily: "InterBold",
+    fontSize: 14,
+    color: "#213729",
   },
   button: {
     backgroundColor: "#213729",

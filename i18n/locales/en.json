@@ -1,0 +1,130 @@
+{
+  "welcome": "Welcome to TASK",
+  "login": {
+    "welcomeBack": "Welcome Back 👋",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "loginBtn": "Login",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Register"
+  },
+  "register": {
+    "title": "Create an Account 📝",
+    "fullName": "Full Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "registerBtn": "Register",
+    "alreadyHave": "Already have an account?",
+    "loginLink": "Login"
+  },
+  "home": {
+    "greeting": "Hello, {{name}} 👋",
+    "subtitle": "Here’s what’s going on today",
+    "postTaskBtn": "Post New Task",
+    "yourTasks": "Your Tasks",
+    "status": {
+      "pending": "Pending",
+      "started": "In Progress"
+    },
+    "noTasks": "You don’t have any tasks yet."
+  },
+  "post": {
+    "title": "Post a Task",
+    "taskTitlePlaceholder": "Task Title (max 15 chars)",
+    "taskDescPlaceholder": "Describe your task (max 150 chars)",
+    "selectCategory": "Select Category",
+    "enterAddress": "Enter Address",
+    "budget": "Budget (SAR)",
+    "uploadImage": "Upload Image",
+    "postBtn": "Post Task",
+    "cancel": "Cancel",
+    "missingTitle": "Missing Info",
+    "fillAllFields": "Please fill in all fields.",
+    "successTitle": "Success",
+    "successMessage": "Your task has been posted!",
+    "limitTitle": "Limit Reached",
+    "limitMsg": "You can upload a maximum of 3 images.",
+    "categories": {
+      "cleaning": "Cleaning",
+      "moving": "Moving",
+      "delivery": "Delivery",
+      "repairs": "Repairs",
+      "other": "Other"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "changePassword": "Change Password",
+    "myPayments": "My Payments",
+    "paymentMethods": "Payment Methods",
+    "aboutUs": "About Us",
+    "privacyPolicy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "faqs": "FAQs",
+    "contactAdmin": "Contact Admin",
+    "logout": "Log Out",
+    "logoutAlertTitle": "Logged Out",
+    "logoutAlertMessage": "You have been logged out."
+  },
+  "mytasks": {
+    "pending": "Pending",
+    "started": "Started",
+    "completed": "Completed",
+    "noTasks": "No tasks in {{status}}"
+  },
+  "messages": {
+    "placeholder": "Your messages will appear here."
+  },
+  "notifications": {
+    "none": "You have no notifications."
+  },
+  "taskDetails": {
+    "description": "Description",
+    "address": "Address",
+    "offeredPrice": "Offered Price",
+    "editTask": "Edit Task",
+    "viewBids": "View Bids",
+    "cancelTask": "Cancel Task"
+  },
+  "editTask": {
+    "heading": "Edit Task",
+    "titlePlaceholder": "Task Title",
+    "descriptionPlaceholder": "Description",
+    "pricePlaceholder": "Price (SAR)",
+    "save": "Save Changes",
+    "missingTitle": "Missing Fields",
+    "missingFields": "Please fill in all fields.",
+    "updatedTitle": "Updated",
+    "updatedMessage": "Your task has been updated."
+  },
+  "viewBids": {
+    "title": "View Bids",
+    "noBids": "No bids yet.",
+    "accept": "Accept",
+    "chat": "Chat",
+    "acceptedTitle": "Bid Accepted",
+    "acceptedMessage": "You accepted {{name}}'s offer."
+  },
+  "chat": {
+    "chatWith": "Chat with {{name}}",
+    "placeholder": "Type a message",
+    "typing": "{{name}} is typing...",
+    "mock1": "Hi, I saw your task!",
+    "mock2": "Thanks! When can you start?"
+  },
+  "editProfile": {
+    "title": "Edit Profile Screen"
+  },
+  "changePassword": {
+    "title": "Change Password"
+  },
+  "myPayments": {
+    "title": "My Payments Screen"
+  },
+  "paymentMethods": {
+    "title": "Payment Method Screen"
+  }
+}

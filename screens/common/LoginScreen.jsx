@@ -5,65 +5,65 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Image,
   Dimensions,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { loginUser } from "../../services/auth";
 import { storeToken } from "../../services/authStorage";
 
 const { width } = Dimensions.get("window");
 
 export default function LoginScreen({ navigation }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [secure, setSecure] = useState(true);
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Missing Info", "Please enter both email and password.");
+      Alert.alert(t("login.missingTitle"), t("login.missingFields"));
       return;
     }
-  
+
     try {
       const response = await loginUser({ email, password });
-  
+
       if (response?.token) {
         await storeToken(response.token);
-        Alert.alert("Welcome", `Logged in as ${response.user.name}`);
+        Alert.alert(t("login.successTitle"), `${t("login.loggedInAs")} ${response.user.name}`);
         navigation.replace("ClientHome");
       } else {
-        throw new Error("Login failed. Please try again.");
+        throw new Error(t("login.failedGeneric"));
       }
     } catch (err) {
-      console.log("❌ Login Error:", err.message); // log error for debugging
-      Alert.alert("Login Failed", err.message);
+      console.log("❌ Login Error:", err.message);
+      Alert.alert(t("login.failedTitle"), err.message);
     }
   };
-  
-
-  
 
   return (
     <KeyboardAvoidingView
-      style={styles.wrapper}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={styles.wrapper}
     >
-      <View style={styles.container}>
-        <Image
-          source={require("../../assets/images/1.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        {/* Back Button */}
+        <View style={styles.topBar}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+            <Ionicons name="arrow-back" size={24} color="#213729" />
+          </TouchableOpacity>
+        </View>
 
-        <Text style={styles.title}>Welcome Back 👋</Text>
+        <Text style={styles.title}>{t("login.welcomeBack")}</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder={t("login.email")}
           placeholderTextColor="#999"
           value={email}
           onChangeText={setEmail}
@@ -74,34 +74,32 @@ export default function LoginScreen({ navigation }) {
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
-            placeholder="Password"
+            placeholder={t("login.password")}
             placeholderTextColor="#999"
             secureTextEntry={secure}
             value={password}
             onChangeText={setPassword}
           />
-          <TouchableOpacity
-            onPress={() => setSecure(!secure)}
-            style={styles.eyeWrapper}
-          >
+          <TouchableOpacity onPress={() => setSecure(!secure)} style={styles.eyeWrapper}>
             <Ionicons name={secure ? "eye-off" : "eye"} size={20} color="#999" />
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity>
-          <Text style={styles.forgot}>Forgot Password?</Text>
+          <Text style={styles.forgot}>{t("login.forgotPassword")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={styles.buttonText}>{t("login.loginBtn")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => navigation.navigate("Register")}>
           <Text style={styles.register}>
-            Don't have an account? <Text style={styles.registerLink}>Register</Text>
+            {t("login.noAccount")}{" "}
+            <Text style={styles.registerLink}>{t("login.registerLink")}</Text>
           </Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -112,21 +110,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
   container: {
-    flex: 1,
-    justifyContent: "center",
     alignItems: "center",
+    paddingTop: 60,
     paddingHorizontal: 30,
+    paddingBottom: 40,
   },
-  logo: {
-    width: width * 0.3,
-    height: width * 0.3,
-    marginBottom: 30,
+  topBar: {
+    width: "100%",
+    alignItems: "flex-start",
+    marginBottom: 20,
+  },
+  backBtn: {
+    padding: 10,
   },
   title: {
     fontSize: 26,
     fontFamily: "InterBold",
     color: "#213729",
-    marginBottom: 30,
+    marginBottom: 40,
   },
   input: {
     width: "100%",
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f2f2f2",
     borderRadius: 12,
-    marginBottom: 8,
+    marginBottom: 10,
   },
   passwordInput: {
     flex: 1,
@@ -162,8 +163,8 @@ const styles = StyleSheet.create({
   forgot: {
     alignSelf: "flex-end",
     fontFamily: "Inter",
-    color: "#215432",
     fontSize: 14,
+    color: "#666",
     marginBottom: 30,
   },
   button: {
