@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // 👇 Replace with your actual local IP address
-const API_URL = "http://192.168.1.228:5000/api/auth";
+const API_URL = "http://192.168.0.99:5000/api/auth";
 
 /**
  * Sends user registration data to the backend.

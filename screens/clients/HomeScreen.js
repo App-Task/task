@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import Animated, { FadeInRight } from "react-native-reanimated";
+import { fetchCurrentUser } from "../../services/auth";
 
 const { width } = Dimensions.get("window");
 
@@ -18,9 +19,21 @@ export default function ClientHomeScreen({ navigation }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    // Simulate loading
+    const loadUser = async () => {
+      try {
+        const user = await fetchCurrentUser();
+        setUserName(user.name);
+      } catch (err) {
+        console.error("❌ Failed to fetch user:", err.message);
+      }
+    };
+
+    loadUser();
+
+    // Simulate loading tasks
     setTimeout(() => {
       setTasks([
         { id: "1", title: "Fix my sink", status: "Pending" },
@@ -63,14 +76,14 @@ export default function ClientHomeScreen({ navigation }) {
     <View style={styles.container}>
       {/* Header */}
       <Text style={styles.hello}>
-        {t("home.greeting", { name: "Yosuf" })}
+        {t("home.greeting", { name: userName || t("home.defaultName") })}
       </Text>
       <Text style={styles.sub}>{t("home.subtitle")}</Text>
 
       {/* Add Task Button */}
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate("ClientHome", { screen: "Post" })} // ✅ fixed
+        onPress={() => navigation.navigate("ClientHome", { screen: "Post" })}
       >
         <Text style={styles.buttonText}>+ {t("home.postTaskBtn")}</Text>
       </TouchableOpacity>

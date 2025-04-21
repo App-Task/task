@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,32 +6,65 @@ import {
   TouchableOpacity,
   Dimensions,
   I18nManager,
+  Alert,
+  ScrollView,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
+import { fetchCurrentUser } from "../../services/auth";
+import { removeToken } from "../../services/authStorage";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
 export default function TaskerProfileScreen({ navigation }) {
   const { t } = useTranslation();
+  const [user, setUser] = useState({ name: "", email: "" });
+  const nav = useNavigation();
 
-  const user = {
-    name: "Yosuf Al Awadi",
-    email: "yosuf@example.com",
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const fetched = await fetchCurrentUser();
+        setUser(fetched);
+      } catch (err) {
+        console.error("❌ Failed to load user:", err.message);
+      }
+    };
+
+    loadUser();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await removeToken();
+      Alert.alert(t("profilee.loggedOut"));
+      nav.reset({
+        index: 0,
+        routes: [{ name: "Welcome" }],
+      });
+    } catch (err) {
+      console.error("❌ Logout failed:", err.message);
+    }
   };
 
-  const handleLogout = () => {
-    alert(t("profilee.loggedOut"));
+  const getInitials = (name) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.avatar}>
-        <Text style={styles.initials}>YA</Text>
+        <Text style={styles.initials}>{getInitials(user.name)}</Text>
       </View>
 
-      <Text style={styles.name}>{user.name}</Text>
-      <Text style={styles.email}>{user.email}</Text>
+      <Text style={styles.name}>{user.name || "Loading..."}</Text>
+      <Text style={styles.email}>{user.email || " "}</Text>
 
       <View style={styles.buttonGroup}>
         <TouchableOpacity
@@ -90,17 +123,17 @@ export default function TaskerProfileScreen({ navigation }) {
           <Ionicons name="log-out-outline" size={20} color="#213729" />
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    paddingTop: 60,
+    paddingBottom: 60,
+    paddingHorizontal: 24,
     backgroundColor: "#ffffff",
     alignItems: "center",
-    paddingTop: 60,
-    paddingHorizontal: 24,
   },
   avatar: {
     width: width * 0.3,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,31 +10,60 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
+import { removeToken } from "../../services/authStorage";
+import { useNavigation } from "@react-navigation/native";
+import { fetchCurrentUser } from "../../services/auth";
 
 const { width } = Dimensions.get("window");
 
 export default function ProfileScreen({ navigation }) {
   const { t } = useTranslation();
+  const nav = useNavigation();
+  const [user, setUser] = useState({ name: "", email: "" });
 
-  const user = {
-    name: "Yosuf Al Awadi",
-    email: "yosuf@example.com",
-  };
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const fetched = await fetchCurrentUser();
+        setUser(fetched);
+      } catch (err) {
+        console.error("❌ Failed to load user:", err.message);
+      }
+    };
 
-  const handleLogout = () => {
-    Alert.alert(t("profile.logoutAlertTitle"), t("profile.logoutAlertMessage"));
-    // TODO: remove token + navigate to Login screen
+    loadUser();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await removeToken();
+      Alert.alert(t("profile.logoutAlertTitle"), t("profile.logoutAlertMessage"));
+      nav.reset({
+        index: 0,
+        routes: [{ name: "Welcome" }],
+      });
+    } catch (err) {
+      console.error("❌ Logout failed:", err.message);
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.avatarPlaceholder}>
-        <Text style={styles.avatarInitials}>YA</Text>
+        <Text style={styles.avatarInitials}>
+          {user?.name
+            ? user.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase()
+            : "?"}
+        </Text>
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.name}>{user.name}</Text>
-        <Text style={styles.email}>{user.email}</Text>
+        <Text style={styles.name}>{user.name || "Loading..."}</Text>
+        <Text style={styles.email}>{user.email || " "}</Text>
       </View>
 
       <View style={styles.buttonGroup}>
