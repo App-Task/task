@@ -10,9 +10,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { registerUser } from "../../services/auth";
 
 const { width } = Dimensions.get("window");
 
@@ -27,13 +29,32 @@ export default function RegisterScreen({ navigation, route }) {
   const [secure1, setSecure1] = useState(true);
   const [secure2, setSecure2] = useState(true);
 
+  const handleRegister = async () => {
+    if (!name || !email || !password || !confirm) {
+      Alert.alert(t("register.missingFields"), t("register.fillAllFields"));
+      return;
+    }
+
+    if (password !== confirm) {
+      Alert.alert(t("register.mismatchTitle"), t("register.passwordMismatch"));
+      return;
+    }
+
+    try {
+      await registerUser({ name, email, password });
+      Alert.alert(t("register.successTitle"), t("register.successMessage"));
+      navigation.replace("Login", { role });
+    } catch (err) {
+      Alert.alert(t("register.errorTitle"), err.message || "Something went wrong");
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={styles.wrapper}
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        {/* Back Button */}
         <View style={styles.topBar}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={24} color="#213729" />
@@ -79,11 +100,7 @@ export default function RegisterScreen({ navigation, route }) {
             onPress={() => setSecure1(!secure1)}
             style={styles.eyeWrapper}
           >
-            <Ionicons
-              name={secure1 ? "eye-off" : "eye"}
-              size={20}
-              color="#999"
-            />
+            <Ionicons name={secure1 ? "eye-off" : "eye"} size={20} color="#999" />
           </TouchableOpacity>
         </View>
 
@@ -100,22 +117,17 @@ export default function RegisterScreen({ navigation, route }) {
             onPress={() => setSecure2(!secure2)}
             style={styles.eyeWrapper}
           >
-            <Ionicons
-              name={secure2 ? "eye-off" : "eye"}
-              size={20}
-              color="#999"
-            />
+            <Ionicons name={secure2 ? "eye-off" : "eye"} size={20} color="#999" />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>{t("register.registerBtn")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => navigation.navigate("Login", { role })}>
           <Text style={styles.loginRedirect}>
-            {t("register.alreadyHave")}{" "}
-            <Text style={styles.loginLink}>{t("register.loginLink")}</Text>
+            {t("register.alreadyHave")} <Text style={styles.loginLink}>{t("register.loginLink")}</Text>
           </Text>
         </TouchableOpacity>
       </ScrollView>
