@@ -7,6 +7,7 @@ import * as SecureStore from "expo-secure-store";
 import * as Updates from "expo-updates";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar"; // ✅ Add this
 import MainNavigator from "./navigation/MainNavigator";
 import Toast from "react-native-toast-message";
 import i18n from "./i18n/config";
@@ -35,7 +36,6 @@ export default function App() {
         const shouldBeRTL = savedRTL === "true";
         const isRTLNow = I18nManager.isRTL;
 
-        // 🚨 Only force reload in production builds to avoid infinite reload in Expo Go/dev
         if (shouldBeRTL !== isRTLNow && !__DEV__) {
           I18nManager.forceRTL(shouldBeRTL);
           Updates.reloadAsync();
@@ -62,10 +62,13 @@ export default function App() {
 
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      {/* ✅ Global status bar */}
+      <StatusBar style="dark" backgroundColor="#ffffff" />
       <NavigationContainer>
         <MainNavigator />
       </NavigationContainer>
       <Toast />
     </View>
   );
+  
 }
