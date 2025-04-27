@@ -22,6 +22,7 @@ import DocumentsScreen from "../screens/tasker/DocumentsScreen";
 import BankAccountScreen from "../screens/tasker/BankAccountScreen";
 import MyReviewsScreen from "../screens/tasker/MyReviewsScreen";
 import SettingsScreen from "../screens/tasker/SettingsScreen";
+import TaskerTaskDetailsScreen from "../screens/tasker/TaskerTaskDetailsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -53,6 +54,7 @@ export default function MainNavigator() {
       <Stack.Screen name="Documents" component={DocumentsScreen} />
       <Stack.Screen name="BankAccount" component={BankAccountScreen} />
       <Stack.Screen name="Reviews" component={MyReviewsScreen} />
+      <Stack.Screen name="TaskerTaskDetails" component={TaskerTaskDetailsScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
     </Stack.Navigator>
   );

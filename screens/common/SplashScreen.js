@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Asset } from "expo-asset";
-import { Video } from "expo-av"; // ✅ Import video component
-
-const { width, height } = Dimensions.get("window");
+import { Video } from "expo-av";
 
 export default function SplashScreen() {
   const [ready, setReady] = useState(false);
@@ -12,7 +10,7 @@ export default function SplashScreen() {
 
   useEffect(() => {
     const preloadAssets = async () => {
-      await Asset.loadAsync(require("../../assets/animation.mp4")); // ✅ preload animation
+      await Asset.loadAsync(require("../../assets/animation.mp4"));
       setReady(true);
     };
     preloadAssets();
@@ -23,7 +21,7 @@ export default function SplashScreen() {
 
     const timer = setTimeout(() => {
       navigation.replace("Welcome");
-    }, 3500); // ✅ after animation finishes (~3.5 sec)
+    }, 3500);
 
     return () => clearTimeout(timer);
   }, [ready]);
@@ -34,14 +32,16 @@ export default function SplashScreen() {
 
   return (
     <View style={styles.container}>
-      <Video
-        source={require("../../assets/animation.mp4")}
-        style={styles.video}
-        resizeMode="contain" // ✅ Keep proportion
-        shouldPlay
-        isLooping={false} // ✅ Play only once
-        isMuted
-      />
+      <View style={styles.videoWrapper}>
+        <Video
+          source={require("../../assets/animation.mp4")}
+          style={styles.video}
+          resizeMode="cover" // ✅ Important: change to "cover" so it fills!
+          shouldPlay
+          isLooping={false}
+          isMuted
+        />
+      </View>
     </View>
   );
 }
@@ -49,18 +49,23 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    backgroundColor: "rgba(30,47,36,255)", // ✅ Your requested color
+    backgroundColor: "rgba(31, 42, 36, 1)",
     justifyContent: "center",
     alignItems: "center",
   },
   container: {
     flex: 1,
-    backgroundColor: "rgba(30,47,36,255)", // ✅ Your requested color
+    backgroundColor: "rgba(31, 42, 36, 1)",
     justifyContent: "center",
     alignItems: "center",
   },
+  videoWrapper: {
+    backgroundColor: "rgba(31, 42, 36, 1)", // background for any small gaps
+    width: "100%",
+    height: "100%",
+  },
   video: {
-    width: width * 0.8,   // ✅ Make it bigger (80% of screen width)
-    height: height * 0.8, // ✅ Also make it taller
+    width: "100%",
+    height: "100%",
   },
 });

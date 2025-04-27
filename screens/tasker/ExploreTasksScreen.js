@@ -66,7 +66,7 @@ export default function ExploreTasksScreen({ navigation }) {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("TaskDetails", { task: item })}
+          onPress={() => navigation.navigate("TaskerTaskDetails", { task: item })}
         >
           <Text style={styles.buttonText}>{t("explore.viewDetails")}</Text>
         </TouchableOpacity>
