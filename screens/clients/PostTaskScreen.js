@@ -33,51 +33,48 @@ export default function PostTaskScreen() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
 
-  const handlePost = () => {
+  const handlePost = async () => {
     if (!title || !description || !location || !budget || !selectedCategory) {
       Alert.alert(t("post.missingTitle"), t("post.fillAllFields"));
       return;
     }
-
-    console.log({ title, description, location, budget, category: selectedCategory, images });
-
-    Alert.alert(t("post.successTitle"), t("post.successMessage"));
-    setTitle("");
-    setDescription("");
-    setLocation("");
-    setBudget("");
-    setImages([]);
-    setSelectedCategory(null);
-  };
-
-  const pickImages = async () => {
-    if (images.length >= 3) {
-      Alert.alert(t("post.limitTitle"), t("post.limitMsg"));
-      return;
+  
+    const taskData = {
+      title,
+      description,
+      location,
+      budget,
+      category: selectedCategory,
+      images,
+    };
+  
+    try {
+      const response = await fetch("https://task-kq94.onrender.com/api/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(taskData),
+      });
+  
+      if (!response.ok) throw new Error("Failed to post task");
+  
+      const result = await response.json();
+      console.log("✅ Task saved:", result);
+  
+      Alert.alert(t("post.successTitle"), t("post.successMessage"));
+      setTitle("");
+      setDescription("");
+      setLocation("");
+      setBudget("");
+      setImages([]);
+      setSelectedCategory(null);
+    } catch (error) {
+      console.error("❌ Error posting task:", error.message);
+      Alert.alert("Error", "Could not post task. Please try again.");
     }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsMultipleSelection: false,
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.5,
-    });
-
-    if (!result.canceled) {
-      setImages([...images, result.assets[0].uri]);
-    }
   };
-
-  const renderCategoryItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.categoryItem}
-      onPress={() => {
-        setSelectedCategory(item);
-        setCategoryModalVisible(false);
-      }}
-    >
-      <Text style={styles.categoryText}>{t(`post.categories.${item.toLowerCase()}`)}</Text>
-    </TouchableOpacity>
-  );
+  
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
@@ -113,24 +110,15 @@ export default function PostTaskScreen() {
             </Text>
           </TouchableOpacity>
 
-          <View style={styles.placesWrapper}>
-            <GooglePlacesAutocomplete
-              placeholder={t("post.enterAddress")}
-              onPress={(data) => {
-                setLocation(data.description);
-              }}
-              query={{
-                key: "YOUR_GOOGLE_PLACES_API_KEY",
-                language: "en",
-              }}
-              styles={{
-                textInput: styles.placesInput,
-                listView: styles.placesListView,
-              }}
-              fetchDetails={true}
-              enablePoweredByContainer={false}
-            />
-          </View>
+          <TextInput
+  style={styles.input}
+  placeholder={t("post.enterAddress")}
+  placeholderTextColor="#999"
+  value={location}
+  onChangeText={setLocation}
+  textAlign={I18nManager.isRTL ? "right" : "left"}
+/>
+
 
           <TextInput
             style={styles.input}
