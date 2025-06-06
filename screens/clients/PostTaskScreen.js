@@ -93,6 +93,25 @@ export default function PostTaskScreen() {
     </TouchableOpacity>
   );
 
+
+  const pickImages = async () => {
+    if (images.length >= 3) {
+      Alert.alert(t("post.limitTitle"), t("post.limitMsg"));
+      return;
+    }
+  
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsMultipleSelection: false,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.5,
+    });
+  
+    if (!result.canceled) {
+      setImages([...images, result.assets[0].uri]);
+    }
+  };
+  
+
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.container}>
