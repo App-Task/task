@@ -22,26 +22,27 @@ export default function ClientHomeScreen({ navigation }) {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    const loadUser = async () => {
+    const loadData = async () => {
       try {
         const user = await fetchCurrentUser();
         setUserName(user.name);
+  
+        const res = await fetch("https://task-kq94.onrender.com/api/tasks");
+        const data = await res.json();
+  
+        // Optionally filter tasks by user ID if needed later
+        setTasks(data.reverse()); // show newest first
       } catch (err) {
-        console.error("❌ Failed to fetch user:", err.message);
+        console.error("❌ Failed to fetch tasks:", err.message);
+        Alert.alert("Error", "Could not load tasks.");
+      } finally {
+        setLoading(false);
       }
     };
-
-    loadUser();
-
-    // Simulate loading tasks
-    setTimeout(() => {
-      setTasks([
-        { id: "1", title: "Fix my sink", status: "Pending" },
-        { id: "2", title: "Grocery pickup", status: "Started" },
-      ]);
-      setLoading(false);
-    }, 1200);
+  
+    loadData();
   }, []);
+  
 
   const renderTask = ({ item }) => (
     <Animated.View
@@ -96,7 +97,8 @@ export default function ClientHomeScreen({ navigation }) {
       ) : (
         <FlatList
           data={tasks}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
+
           renderItem={renderTask}
           ListEmptyComponent={
             <Text style={styles.emptyText}>{t("home.noTasks")}</Text>

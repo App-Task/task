@@ -14,5 +14,15 @@ router.post("/", async (req, res) => {
   }
 });
 
-// (optional: GET /api/tasks later)
+// ✅ GET /api/tasks - fetch all tasks
+router.get("/", async (req, res) => {
+  try {
+    const tasks = await Task.find().sort({ createdAt: -1 });
+    res.json(tasks);
+  } catch (err) {
+    console.error("❌ Task fetch error:", err.message);
+    res.status(500).json({ error: "Failed to fetch tasks" });
+  }
+});
+
 module.exports = router;
