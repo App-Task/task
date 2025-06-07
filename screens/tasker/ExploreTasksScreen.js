@@ -3,17 +3,14 @@ import {
   View,
   Text,
   FlatList,
-  StyleSheet,
-  Dimensions,
   TouchableOpacity,
   Image,
   I18nManager,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import Animated, { FadeInUp } from "react-native-reanimated";
-
-const { width } = Dimensions.get("window");
 
 const dummyTasks = [
   {
@@ -55,20 +52,20 @@ export default function ExploreTasksScreen({ navigation }) {
       <View style={styles.info}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.sub}>
-          {t("explore.location")}: {item.location}
+          {t("taskerExplore.location")}: {item.location}
         </Text>
         <Text style={styles.sub}>
-          {t("explore.price")}: {item.price} SAR
+          {t("taskerExplore.price")}: {item.price} SAR
         </Text>
         <Text style={styles.sub}>
-          {t("explore.bids")}: {item.bids}
+          {t("taskerExplore.bids")}: {item.bids}
         </Text>
 
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("TaskerTaskDetails", { task: item })}
         >
-          <Text style={styles.buttonText}>{t("explore.viewDetails")}</Text>
+          <Text style={styles.buttonText}>{t("taskerExplore.viewDetails")}</Text>
         </TouchableOpacity>
       </View>
     </Animated.View>
@@ -76,12 +73,12 @@ export default function ExploreTasksScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{t("explore.header")}</Text>
+      <Text style={styles.header}>{t("taskerExplore.header")}</Text>
 
       {loading ? (
         <ActivityIndicator size="large" color="#213729" />
       ) : tasks.length === 0 ? (
-        <Text style={styles.empty}>{t("explore.noTasks")}</Text>
+        <Text style={styles.empty}>{t("taskerExplore.noTasks")}</Text>
       ) : (
         <FlatList
           data={tasks}
@@ -94,6 +91,7 @@ export default function ExploreTasksScreen({ navigation }) {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

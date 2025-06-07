@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  I18nManager,
+  Dimensions,
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
@@ -24,7 +26,7 @@ export default function EditTaskScreen({ route, navigation }) {
 
   const handleUpdate = () => {
     if (!title || !description || !price) {
-      Alert.alert(t("editTask.missingTitle"), t("editTask.missingFields"));
+      Alert.alert(t("clientEditTask.missingTitle"), t("clientEditTask.missingFields"));
       return;
     }
 
@@ -35,8 +37,8 @@ export default function EditTaskScreen({ route, navigation }) {
       price: parseFloat(price),
     };
 
-    Alert.alert(t("editTask.updatedTitle"), t("editTask.updatedMessage"));
-    navigation.navigate("TaskDetails", { task: updatedTask }); // ✅ Navigate forward
+    Alert.alert(t("clientEditTask.updatedTitle"), t("clientEditTask.updatedMessage"));
+    navigation.navigate("TaskDetails", { task: updatedTask });
   };
 
   return (
@@ -51,17 +53,17 @@ export default function EditTaskScreen({ route, navigation }) {
           <View style={styles.headerRow}>
             <TouchableOpacity
               style={styles.backBtn}
-              onPress={() => navigation.goBack()} // ✅ Go back with left-slide
+              onPress={() => navigation.goBack()}
             >
               <Ionicons name="arrow-back" size={24} color="#213729" />
             </TouchableOpacity>
-            <Text style={styles.heading}>{t("editTask.heading")}</Text>
+            <Text style={styles.heading}>{t("clientEditTask.heading")}</Text>
             <View style={styles.backBtn} />
           </View>
 
           <TextInput
             style={styles.input}
-            placeholder={t("editTask.titlePlaceholder")}
+            placeholder={t("clientEditTask.titlePlaceholder")}
             value={title}
             onChangeText={setTitle}
             maxLength={15}
@@ -69,7 +71,7 @@ export default function EditTaskScreen({ route, navigation }) {
 
           <TextInput
             style={[styles.input, styles.textarea]}
-            placeholder={t("editTask.descriptionPlaceholder")}
+            placeholder={t("clientEditTask.descriptionPlaceholder")}
             value={description}
             onChangeText={setDescription}
             multiline
@@ -78,14 +80,14 @@ export default function EditTaskScreen({ route, navigation }) {
 
           <TextInput
             style={styles.input}
-            placeholder={t("editTask.pricePlaceholder")}
+            placeholder={t("clientEditTask.pricePlaceholder")}
             value={price}
             onChangeText={setPrice}
             keyboardType="numeric"
           />
 
           <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-            <Text style={styles.buttonText}>{t("editTask.save")}</Text>
+            <Text style={styles.buttonText}>{t("clientEditTask.save")}</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>

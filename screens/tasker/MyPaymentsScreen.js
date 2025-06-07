@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
   TouchableOpacity,
   I18nManager,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -38,7 +38,7 @@ export default function MyPaymentsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{t("payments.title")}</Text>
+      <Text style={styles.header}>{t("taskerPayments.title")}</Text>
 
       <View style={styles.filters}>
         <TouchableOpacity
@@ -51,7 +51,7 @@ export default function MyPaymentsScreen() {
               filter === "all" && styles.activeFilterText,
             ]}
           >
-            {t("payments.all")}
+            {t("taskerPayments.all")}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -64,7 +64,7 @@ export default function MyPaymentsScreen() {
               filter === "recent" && styles.activeFilterText,
             ]}
           >
-            {t("payments.recent")}
+            {t("taskerPayments.recent")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -72,7 +72,7 @@ export default function MyPaymentsScreen() {
       {loading ? (
         <ActivityIndicator color="#213729" size="large" style={{ marginTop: 40 }} />
       ) : payments.length === 0 ? (
-        <Text style={styles.empty}>{t("payments.empty")}</Text>
+        <Text style={styles.empty}>{t("taskerPayments.empty")}</Text>
       ) : (
         <FlatList
           data={payments}
@@ -84,6 +84,7 @@ export default function MyPaymentsScreen() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

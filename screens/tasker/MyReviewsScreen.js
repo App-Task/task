@@ -2,16 +2,14 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
-  Dimensions,
   I18nManager,
   ActivityIndicator,
+  TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-
-const { width } = Dimensions.get("window");
 
 const dummyReviews = [
   {
@@ -28,7 +26,7 @@ const dummyReviews = [
   },
 ];
 
-export default function MyReviewsScreen() {
+export default function MyReviewsScreen({ navigation }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState([]);
@@ -66,10 +64,21 @@ export default function MyReviewsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{t("reviews.title")}</Text>
+      {/* Back Header */}
+      <View style={styles.headerRow}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+          <Ionicons
+            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+            size={24}
+            color="#213729"
+          />
+        </TouchableOpacity>
+        <Text style={styles.header}>{t("taskerReviews.title")}</Text>
+        <View style={{ width: 24 }} />
+      </View>
 
       <View style={styles.averageBox}>
-        <Text style={styles.averageLabel}>{t("reviews.average")}:</Text>
+        <Text style={styles.averageLabel}>{t("taskerReviews.average")}:</Text>
         <Text style={styles.averageValue}>{averageRating}</Text>
         <Ionicons name="star" size={22} color="#c1ff72" />
       </View>
@@ -77,7 +86,7 @@ export default function MyReviewsScreen() {
       {loading ? (
         <ActivityIndicator color="#213729" size="large" style={{ marginTop: 40 }} />
       ) : reviews.length === 0 ? (
-        <Text style={styles.empty}>{t("reviews.empty")}</Text>
+        <Text style={styles.empty}>{t("taskerReviews.empty")}</Text>
       ) : (
         <FlatList
           data={reviews}
@@ -91,6 +100,7 @@ export default function MyReviewsScreen() {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -98,12 +108,21 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
   },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  backBtn: {
+    padding: 4,
+  },
   header: {
     fontFamily: "InterBold",
     fontSize: 22,
     color: "#213729",
-    marginBottom: 20,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    textAlign: "center",
+    flex: 1,
   },
   averageBox: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",

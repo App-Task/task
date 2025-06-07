@@ -1,7 +1,7 @@
 {
   "welcome": "Welcome to TASK",
   "login": {
-    "welcomeBack": "Welcome Back 👋",
+    "welcomeBack": "Welcome Back ",
     "email": "Email",
     "password": "Password",
     "forgotPassword": "Forgot Password?",
@@ -10,7 +10,7 @@
     "registerLink": "Register"
   },
   "register": {
-    "title": "Create an Account 📝",
+    "title": "Create an Account ",
     "fullName": "Full Name",
     "email": "Email",
     "password": "Password",
@@ -19,33 +19,121 @@
     "alreadyHave": "Already have an account?",
     "loginLink": "Login"
   },
-  "home": {
-    "greeting": "Hello, {{name}} 👋",
-    "subtitle": "Here’s what’s going on today",
-    "postTaskBtn": "Post New Task",
+  "TaskBottomNav": {
+  "explore": "Explore",
+  "myTasks": "My Tasks",
+  "messages": "Messages",
+  "notifications": "Notifications",
+  "profile": "Profile"
+},
+
+
+
+
+
+
+
+
+
+  "clientChangePassword": {
+    "title": "Change Password",
+    "old": "Old Password",
+    "new": "New Password",
+    "confirm": "Confirm New Password",
+    "submit": "Update Password",
+    "updated": "Password updated successfully"
+  },
+  "clientChat": {
+    "chatWith": "Chat with {{name}}",
+    "placeholder": "Type a message...",
+    "typing": "{{name}} is typing...",
+    "mock1": "Hi, I saw your task and I'm interested.",
+    "mock2": "Great! When are you available?"
+  },
+  "clientEditProfile": {
+    "title": "Edit Profile",
+    "name": "Full Name",
+    "gender": "Gender",
+    "location": "Location",
+    "experience": "Experience",
+    "skills": "Skills",
+    "about": "About (Max 150 characters)",
+    "save": "Save Changes",
+    "updated": "Profile updated successfully"
+  },
+  "clientEditTask": {
+    "heading": "Edit Task",
+    "titlePlaceholder": "Enter task title (max 15 chars)",
+    "descriptionPlaceholder": "Describe the task (max 150 chars)",
+    "pricePlaceholder": "Enter your budget",
+    "save": "Save Changes",
+    "missingTitle": "Incomplete",
+    "missingFields": "Please fill all the fields to continue.",
+    "updatedTitle": "Task Updated",
+    "updatedMessage": "Your task has been successfully updated."
+  },
+  "clientHome": {
+    "greeting": "Hello, {{name}}!",
+    "defaultName": "Guest",
+    "subtitle": "Welcome back, here's your latest activity.",
+    "postTaskBtn": "Post a Task",
     "yourTasks": "Your Tasks",
+    "noTasks": "You haven’t posted any tasks yet.",
     "status": {
       "pending": "Pending",
-      "started": "In Progress"
-    },
-    "noTasks": "You don’t have any tasks yet."
+      "started": "In Progress",
+      "completed": "Completed"
+    }
   },
-  "post": {
+  "clientMessages": {
+    "title": "Messages",
+    "placeholder": "No messages yet."
+  },
+  "clientPayments": {
+    "title": "My Payments",
+    "total": "Total Received",
+    "date": "Date",
+    "status": "Status",
+    "completed": "Completed",
+    "pending": "Pending"
+  },
+  "clientMyTasks": {
+    "pending": "Pending",
+    "started": "In Progress",
+    "completed": "Completed",
+    "noTasks": "No {{status}} tasks available."
+  },
+  "clientNotifications": {
+    "title": "Notifications",
+    "none": "You have no notifications.",
+    "taskHired": "You’ve been hired!",
+    "taskHiredDesc": "A client has hired you for a task.",
+    "newMessage": "New message received",
+    "newMessageDesc": "You’ve got a new message in your chat.",
+    "paymentSent": "Payment sent",
+    "paymentSentDesc": "Your payment has been processed successfully."
+  },
+  "clientPaymentMethods": {
+    "title": "Payment Methods",
+    "add": "Add New Card",
+    "default": "Default Card"
+  },
+  "clientPostTask": {
     "title": "Post a Task",
-    "taskTitlePlaceholder": "Task Title (max 15 chars)",
-    "taskDescPlaceholder": "Describe your task (max 150 chars)",
+    "taskTitlePlaceholder": "Enter task title (max 15 characters)",
+    "taskDescPlaceholder": "Describe your task (max 150 characters)",
     "selectCategory": "Select Category",
-    "enterAddress": "Enter Address",
-    "budget": "Budget (SAR)",
+    "enterAddress": "Enter address or location",
+    "budget": "Enter your budget",
     "uploadImage": "Upload Image",
     "postBtn": "Post Task",
     "cancel": "Cancel",
-    "missingTitle": "Missing Info",
-    "fillAllFields": "Please fill in all fields.",
-    "successTitle": "Success",
-    "successMessage": "Your task has been posted!",
-    "limitTitle": "Limit Reached",
+    "limitTitle": "Image Limit Reached",
     "limitMsg": "You can upload a maximum of 3 images.",
+    "missingTitle": "Missing Information",
+    "fillAllFields": "Please fill all fields to continue.",
+    "successTitle": "Task Posted",
+    "successMessage": "Your task has been successfully posted.",
     "categories": {
       "cleaning": "Cleaning",
       "moving": "Moving",
@@ -54,8 +142,7 @@
       "other": "Other"
     }
   },
-  "profile": {
-    "title": "Profile",
+  "clientProfile": {
     "editProfile": "Edit Profile",
     "changePassword": "Change Password",
     "myPayments": "My Payments",
@@ -67,21 +154,9 @@
     "contactAdmin": "Contact Admin",
     "logout": "Log Out",
     "logoutAlertTitle": "Logged Out",
-    "logoutAlertMessage": "You have been logged out."
+    "logoutAlertMessage": "You have been successfully logged out."
   },
-  "mytasks": {
-    "pending": "Pending",
-    "started": "Started",
-    "completed": "Completed",
-    "noTasks": "No tasks in {{status}}"
-  },
-  "messages": {
-    "placeholder": "Your messages will appear here."
-  },
-  "notifications": {
-    "none": "You have no notifications."
-  },
-  "taskDetails": {
+  "clientTaskDetails": {
     "description": "Description",
     "address": "Address",
     "offeredPrice": "Offered Price",
@@ -89,101 +164,104 @@
     "viewBids": "View Bids",
     "cancelTask": "Cancel Task"
   },
-  "editTask": {
-    "heading": "Edit Task",
-    "titlePlaceholder": "Task Title",
-    "descriptionPlaceholder": "Description",
-    "pricePlaceholder": "Price (SAR)",
-    "save": "Save Changes",
-    "missingTitle": "Missing Fields",
-    "missingFields": "Please fill in all fields.",
-    "updatedTitle": "Updated",
-    "updatedMessage": "Your task has been updated."
-  },
-  "viewBids": {
-    "title": "View Bids",
-    "noBids": "No bids yet.",
-    "accept": "Accept",
+  "clientViewBids": {
+    "title": "Bids Received",
     "chat": "Chat",
+    "accept": "Accept",
+    "noBids": "No bids received yet.",
     "acceptedTitle": "Bid Accepted",
-    "acceptedMessage": "You accepted {{name}}'s offer."
+    "acceptedMessage": "You have accepted {{name}}'s bid."
   },
-  "chat": {
-    "chatWith": "Chat with {{name}}",
-    "placeholder": "Type a message",
-    "typing": "{{name}} is typing...",
-    "mock1": "Hi, I saw your task!",
-    "mock2": "Thanks! When can you start?"
+
+
+
+
+
+
+
+
+
+  "taskerBankAccount": {
+    "title": "Bank Account",
+    "bankName": "Bank Name",
+    "accountNumber": "Account Number",
+    "iban": "IBAN",
+    "save": "Save Changes",
+    "savedTitle": "Saved",
+    "savedMessage": "Your bank details have been saved."
   },
-  "editProfile": {
-    "title": "Edit Profile Screen"
+  "taskerChat": {
+    "title": "Chat",
+    "placeholder": "Type a message...",
+    "reported": "This user has been reported."
   },
-  "changePassword": {
-    "title": "Change Password"
+  "taskerDocuments": {
+    "title": "Documents",
+    "uploadBtn": "Upload Document",
+    "empty": "No documents uploaded yet.",
+    "uploadedTitle": "Uploaded",
+    "uploadedMessage": "Your document has been uploaded successfully."
   },
-  "myPayments": {
-    "title": "My Payments Screen"
+  "taskerEditProfile": {
+    "title": "Edit Profile",
+    "name": "Full Name",
+    "email": "Email Address",
+    "gender": "Gender",
+    "location": "Location",
+    "experience": "Experience",
+    "skills": "Skills",
+    "about": "About (max 150 characters)",
+    "save": "Save Changes",
+    "savedTitle": "Profile Updated",
+    "savedMessage": "Your profile has been successfully updated."
   },
-  "paymentMethods": {
-    "title": "Payment Method Screen"
+  "taskerExplore": {
+    "header": "Explore Tasks",
+    "location": "Location",
+    "price": "Price",
+    "bids": "Bids",
+    "viewDetails": "View Details",
+    "noTasks": "No tasks available right now."
   },
-  "tabs": {
-  "explore": "Explore",
-  "myTasks": "My Tasks",
-  "messages": "Messages",
-  "notifications": "Notifications",
-  "profile": "Profile"
-},
-"explore": {
-  "header": "Explore Tasks",
-  "location": "Location",
-  "price": "Price",
-  "bids": "Bids",
-  "viewDetails": "View Details",
-  "noTasks": "No tasks available at the moment."
-},
-"details": {
-  "location": "Location",
-  "price": "Offered Price",
-  "enterBid": "Place Your Bid",
-  "bidAmount": "Your Bid (SAR)",
-  "bidMessage": "Message to client (max 150 chars)",
-  "submitBid": "Submit Bid",
-  "errorTitle": "Missing Info",
-  "fillFields": "Please enter both bid amount and message.",
-  "successTitle": "Success",
-  "bidSent": "Your bid has been submitted!"
-},
-"tasker": {
-  "active": "Active",
-  "past": "Past",
-  "noTasks": "No tasks to show.",
-  "client": "Client",
-  "status": "Status",
-  "statusTypes": {
-    "started": "Started",
-    "completed": "Completed"
+  "taskerMessages": {
+    "title": "Messages"
   },
-  "chat": "Chat",
-  "report": "Report",
-  "cancel": "Cancel Task"
-},
-"chatt": {
-  "title": "Chat",
-  "placeholder": "Type a message...",
-  "reported": "Client reported successfully"
-},
-"notify": {
-  "title": "Notifications",
-  "empty": "No notifications at the moment.",
-  "types": {
-    "hired": "Hired",
-    "message": "New Message"
-  }
-},
-"profilee": {
+  "taskerPayments": {
+    "title": "My Payments",
+    "all": "All",
+    "recent": "Recent",
+    "empty": "No payments available."
+  },
+  "taskerReviews": {
+    "title": "My Reviews",
+    "average": "Average Rating",
+    "empty": "You have not received any reviews yet."
+  },
+  "taskerMyTasks": {
+    "active": "Active",
+    "past": "Past",
+    "noTasks": "No tasks available.",
+    "client": "Client",
+    "status": "Status",
+    "chat": "Chat",
+    "report": "Report",
+    "cancel": "Cancel Task",
+    "statusTypes": {
+      "started": "In Progress",
+      "completed": "Completed"
+    }
+  },
+  "taskerNotifications": {
+    "title": "Notifications",
+    "empty": "No notifications at the moment.",
+    "types": {
+      "hired": "You've been hired",
+      "message": "New message"
+    }
+  },
+  "taskerProfile": {
   "edit": "Edit Profile",
-  "documents": "Documents",
+  "documents": "Uploaded Documents",
   "bank": "Bank Account",
   "payments": "My Payments",
   "reviews": "My Reviews",
@@ -191,75 +269,29 @@
   "logout": "Log Out",
   "loggedOut": "You have been logged out."
 },
-"editProfilee": {
-  "title": "Edit Profile",
-  "name": "Full Name",
-  "email": "Email (non-editable)",
-  "gender": "Gender",
-  "location": "Location",
-  "experience": "Experience",
-  "skills": "Skills (max 10)",
-  "about": "About You (max 150 characters)",
-  "save": "Save Changes",
-  "savedTitle": "Profile Updated",
-  "savedMessage": "Your changes have been saved."
-},
-"documents": {
-  "title": "Uploaded Documents",
-  "empty": "No documents uploaded yet.",
-  "uploadBtn": "Upload Document",
-  "uploadedTitle": "Uploaded",
-  "uploadedMessage": "Document uploaded successfully."
-},
-"bank": {
-  "title": "Bank Account",
-  "bankName": "Bank Name",
-  "accountNumber": "Account Number",
-  "iban": "IBAN",
-  "save": "Save Changes",
-  "savedTitle": "Saved",
-  "savedMessage": "Bank details have been saved."
-},
-"payments": {
-  "title": "My Payments",
-  "all": "All",
-  "recent": "Recent",
-  "empty": "No payment records available."
-},
-"reviews": {
-  "title": "My Reviews",
-  "average": "Average Rating",
-  "empty": "You haven't received any reviews yet."
-},
-"settings": {
+"taskerSettings": {
   "title": "Settings",
+  "open": "Opening",
   "about": "About Us",
   "privacy": "Privacy Policy",
   "terms": "Terms & Conditions",
   "faq": "FAQs",
-  "contact": "Contact Admin",
+  "contact": "Contact Support",
   "logout": "Log Out",
-  "logoutMsg": "You have been logged out.",
-  "open": "Open"
+  "logoutMsg": "You’ve been logged out successfully."
 },
-"chooseRole": "Continue as...",
-"role": {
-  "client": "Client",
-  "tasker": "Tasker"
-},
-"messagess": {
-  "title": "Messages"
+"taskerTaskDetails": {
+  "location": "Location",
+  "price": "Offered Price",
+  "enterBid": "Enter Your Bid",
+  "bidAmount": "Your Offer (SAR)",
+  "bidMessage": "Add a message...",
+  "submitBid": "Submit Bid",
+  "errorTitle": "Missing Info",
+  "fillFields": "Please enter both bid and message.",
+  "successTitle": "Bid Sent",
+  "bidSent": "Your bid has been submitted."
 }
-
-
-
-
-
-
-
-
-
-
 
 
 

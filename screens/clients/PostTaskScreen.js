@@ -3,11 +3,11 @@ import {
   View,
   Text,
   TextInput,
-  StyleSheet,
   TouchableOpacity,
   ScrollView,
   Dimensions,
   Alert,
+  StyleSheet,
   KeyboardAvoidingView,
   Platform,
   Modal,
@@ -16,7 +16,6 @@ import {
   I18nManager,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { useTranslation } from "react-i18next";
 
 const { width, height } = Dimensions.get("window");
@@ -35,10 +34,10 @@ export default function PostTaskScreen() {
 
   const handlePost = async () => {
     if (!title || !description || !location || !budget || !selectedCategory) {
-      Alert.alert(t("post.missingTitle"), t("post.fillAllFields"));
+      Alert.alert(t("clientPostTask.missingTitle"), t("clientPostTask.fillAllFields"));
       return;
     }
-  
+
     const taskData = {
       title,
       description,
@@ -47,7 +46,7 @@ export default function PostTaskScreen() {
       category: selectedCategory,
       images,
     };
-  
+
     try {
       const response = await fetch("https://task-kq94.onrender.com/api/tasks", {
         method: "POST",
@@ -56,18 +55,17 @@ export default function PostTaskScreen() {
         },
         body: JSON.stringify(taskData),
       });
-  
+
       const result = await response.json();
-  
+
       if (!response.ok) {
         console.log("❌ Backend error:", result.error);
         throw new Error("Failed to save task.");
       }
-  
+
       console.log("✅ Task posted:", result);
-      Alert.alert(t("post.successTitle"), t("post.successMessage"));
-  
-      // Clear form
+      Alert.alert(t("clientPostTask.successTitle"), t("clientPostTask.successMessage"));
+
       setTitle("");
       setDescription("");
       setLocation("");
@@ -79,7 +77,23 @@ export default function PostTaskScreen() {
       Alert.alert("Error", "Could not post task. Try again.");
     }
   };
-  
+
+  const pickImages = async () => {
+    if (images.length >= 3) {
+      Alert.alert(t("clientPostTask.limitTitle"), t("clientPostTask.limitMsg"));
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsMultipleSelection: false,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      setImages([...images, result.assets[0].uri]);
+    }
+  };
 
   const renderCategoryItem = ({ item }) => (
     <TouchableOpacity
@@ -89,38 +103,19 @@ export default function PostTaskScreen() {
         setCategoryModalVisible(false);
       }}
     >
-      <Text style={styles.categoryText}>{t(`post.categories.${item.toLowerCase()}`)}</Text>
+      <Text style={styles.categoryText}>{t(`clientPostTask.categories.${item.toLowerCase()}`)}</Text>
     </TouchableOpacity>
   );
-
-
-  const pickImages = async () => {
-    if (images.length >= 3) {
-      Alert.alert(t("post.limitTitle"), t("post.limitMsg"));
-      return;
-    }
-  
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsMultipleSelection: false,
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.5,
-    });
-  
-    if (!result.canceled) {
-      setImages([...images, result.assets[0].uri]);
-    }
-  };
-  
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.heading}>{t("post.title")}</Text>
+        <Text style={styles.heading}>{t("clientPostTask.title")}</Text>
 
         <View style={styles.formSection}>
           <TextInput
             style={styles.input}
-            placeholder={t("post.taskTitlePlaceholder")}
+            placeholder={t("clientPostTask.taskTitlePlaceholder")}
             maxLength={15}
             placeholderTextColor="#999"
             value={title}
@@ -130,7 +125,7 @@ export default function PostTaskScreen() {
 
           <TextInput
             style={[styles.input, styles.textarea]}
-            placeholder={t("post.taskDescPlaceholder")}
+            placeholder={t("clientPostTask.taskDescPlaceholder")}
             placeholderTextColor="#999"
             value={description}
             onChangeText={setDescription}
@@ -142,23 +137,24 @@ export default function PostTaskScreen() {
 
           <TouchableOpacity style={styles.categoryPicker} onPress={() => setCategoryModalVisible(true)}>
             <Text style={styles.uploadText}>
-              {selectedCategory ? t(`post.categories.${selectedCategory.toLowerCase()}`) : t("post.selectCategory")}
+              {selectedCategory
+                ? t(`clientPostTask.categories.${selectedCategory.toLowerCase()}`)
+                : t("clientPostTask.selectCategory")}
             </Text>
           </TouchableOpacity>
 
           <TextInput
-  style={styles.input}
-  placeholder={t("post.enterAddress")}
-  placeholderTextColor="#999"
-  value={location}
-  onChangeText={setLocation}
-  textAlign={I18nManager.isRTL ? "right" : "left"}
-/>
-
+            style={styles.input}
+            placeholder={t("clientPostTask.enterAddress")}
+            placeholderTextColor="#999"
+            value={location}
+            onChangeText={setLocation}
+            textAlign={I18nManager.isRTL ? "right" : "left"}
+          />
 
           <TextInput
             style={styles.input}
-            placeholder={t("post.budget")}
+            placeholder={t("clientPostTask.budget")}
             placeholderTextColor="#999"
             value={budget}
             onChangeText={setBudget}
@@ -170,7 +166,7 @@ export default function PostTaskScreen() {
         <View style={styles.imageSection}>
           <TouchableOpacity style={styles.uploadBox} onPress={pickImages}>
             <Text style={styles.uploadText}>
-              + {t("post.uploadImage")} ({images.length}/3)
+              + {t("clientPostTask.uploadImage")} ({images.length}/3)
             </Text>
           </TouchableOpacity>
 
@@ -182,10 +178,9 @@ export default function PostTaskScreen() {
         </View>
 
         <TouchableOpacity style={styles.button} onPress={handlePost}>
-          <Text style={styles.buttonText}>{t("post.postBtn")}</Text>
+          <Text style={styles.buttonText}>{t("clientPostTask.postBtn")}</Text>
         </TouchableOpacity>
 
-        {/* Category Modal */}
         <Modal visible={categoryModalVisible} animationType="slide" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalBox}>
@@ -195,7 +190,7 @@ export default function PostTaskScreen() {
                 renderItem={renderCategoryItem}
               />
               <TouchableOpacity onPress={() => setCategoryModalVisible(false)} style={styles.modalCancel}>
-                <Text style={styles.modalCancelText}>{t("post.cancel")}</Text>
+                <Text style={styles.modalCancelText}>{t("clientPostTask.cancel")}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -206,6 +201,7 @@ export default function PostTaskScreen() {
     </KeyboardAvoidingView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

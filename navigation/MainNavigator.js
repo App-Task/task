@@ -29,7 +29,7 @@ const Stack = createNativeStackNavigator();
 export default function MainNavigator() {
   return (
     <Stack.Navigator
-      initialRouteName="Splash"
+      initialRouteName="TaskerHome" // Default to Tasker home for taskers, change as needed
       screenOptions={{ headerShown: false }}
     >
       {/* Onboarding & Auth */}

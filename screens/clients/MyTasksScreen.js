@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   FlatList,
   Dimensions,
+  StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -54,7 +54,7 @@ export default function MyTasksScreen({ navigation }) {
                 activeTab === tabKey && styles.activeTabText,
               ]}
             >
-              {t(`mytasks.${tabKey.toLowerCase()}`)}
+              {t(`clientMyTasks.${tabKey.toLowerCase()}`)}
             </Text>
           </TouchableOpacity>
         ))}
@@ -67,7 +67,9 @@ export default function MyTasksScreen({ navigation }) {
         renderItem={renderTask}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
-            {t("mytasks.noTasks", { status: t(`mytasks.${activeTab.toLowerCase()}`) })}
+            {t("clientMyTasks.noTasks", {
+              status: t(`clientMyTasks.${activeTab.toLowerCase()}`),
+            })}
           </Text>
         }
         contentContainerStyle={{
@@ -78,6 +80,7 @@ export default function MyTasksScreen({ navigation }) {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

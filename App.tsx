@@ -7,7 +7,7 @@ import * as SecureStore from "expo-secure-store";
 import * as Updates from "expo-updates";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
-import { StatusBar } from "expo-status-bar"; // ✅ Add this
+import { StatusBar } from "expo-status-bar"; 
 import MainNavigator from "./navigation/MainNavigator";
 import Toast from "react-native-toast-message";
 import i18n from "./i18n/config";

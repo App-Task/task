@@ -2,18 +2,16 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
   FlatList,
-  Dimensions,
   I18nManager,
   ActivityIndicator,
+  TouchableOpacity,
   Alert,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import { StyleSheet } from "react-native";
 
-const { width } = Dimensions.get("window");
 
 const dummyTasks = {
   active: [
@@ -48,27 +46,31 @@ export default function TaskerMyTasksScreen() {
   const renderTask = ({ item }) => (
     <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
       <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.sub}>{t("tasker.client")}: {item.client}</Text>
-      <Text style={styles.sub}>{t("tasker.status")}: {t(`tasker.statusTypes.${item.status.toLowerCase()}`)}</Text>
+      <Text style={styles.sub}>
+        {t("taskerMyTasks.client")}: {item.client}
+      </Text>
+      <Text style={styles.sub}>
+        {t("taskerMyTasks.status")}: {t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
+      </Text>
 
       <View style={styles.actions}>
         {tab === "active" && (
           <TouchableOpacity style={styles.btn} onPress={() => Alert.alert("Chat", "Open chat with client")}>
-            <Text style={styles.btnText}>{t("tasker.chat")}</Text>
+            <Text style={styles.btnText}>{t("taskerMyTasks.chat")}</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity
           style={[styles.btn, styles.secondaryBtn]}
           onPress={() => Alert.alert("Report", "Report client")}
         >
-          <Text style={[styles.btnText, styles.secondaryText]}>{t("tasker.report")}</Text>
+          <Text style={[styles.btnText, styles.secondaryText]}>{t("taskerMyTasks.report")}</Text>
         </TouchableOpacity>
         {tab === "active" && (
           <TouchableOpacity
             style={[styles.btn, styles.dangerBtn]}
             onPress={() => Alert.alert("Cancel", "Cancel task?")}
           >
-            <Text style={[styles.btnText, styles.dangerText]}>{t("tasker.cancel")}</Text>
+            <Text style={[styles.btnText, styles.dangerText]}>{t("taskerMyTasks.cancel")}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -81,12 +83,12 @@ export default function TaskerMyTasksScreen() {
       <View style={styles.tabs}>
         <TouchableOpacity onPress={() => setTab("active")} style={[styles.tab, tab === "active" && styles.activeTab]}>
           <Text style={[styles.tabText, tab === "active" && styles.activeTabText]}>
-            {t("tasker.active")}
+            {t("taskerMyTasks.active")}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setTab("past")} style={[styles.tab, tab === "past" && styles.activeTab]}>
           <Text style={[styles.tabText, tab === "past" && styles.activeTabText]}>
-            {t("tasker.past")}
+            {t("taskerMyTasks.past")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -95,7 +97,7 @@ export default function TaskerMyTasksScreen() {
       {loading ? (
         <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
       ) : dummyTasks[tab].length === 0 ? (
-        <Text style={styles.empty}>{t("tasker.noTasks")}</Text>
+        <Text style={styles.empty}>{t("taskerMyTasks.noTasks")}</Text>
       ) : (
         <FlatList
           data={dummyTasks[tab]}
@@ -107,6 +109,7 @@ export default function TaskerMyTasksScreen() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

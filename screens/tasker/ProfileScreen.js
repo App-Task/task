@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   Dimensions,
   I18nManager,
   Alert,
+  StyleSheet,
   ScrollView,
 } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -38,7 +38,7 @@ export default function TaskerProfileScreen({ navigation }) {
   const handleLogout = async () => {
     try {
       await removeToken();
-      Alert.alert(t("profilee.loggedOut"));
+      Alert.alert(t("taskerProfile.loggedOut"));
       nav.reset({
         index: 0,
         routes: [{ name: "Welcome" }],
@@ -71,7 +71,7 @@ export default function TaskerProfileScreen({ navigation }) {
           style={styles.rowItem}
           onPress={() => navigation.navigate("EditProfile")}
         >
-          <Text style={styles.rowText}>{t("profilee.edit")}</Text>
+          <Text style={styles.rowText}>{t("taskerProfile.edit")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
@@ -79,7 +79,7 @@ export default function TaskerProfileScreen({ navigation }) {
           style={styles.rowItem}
           onPress={() => navigation.navigate("Documents")}
         >
-          <Text style={styles.rowText}>{t("profilee.documents")}</Text>
+          <Text style={styles.rowText}>{t("taskerProfile.documents")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
@@ -87,15 +87,15 @@ export default function TaskerProfileScreen({ navigation }) {
           style={styles.rowItem}
           onPress={() => navigation.navigate("BankAccount")}
         >
-          <Text style={styles.rowText}>{t("profilee.bank")}</Text>
+          <Text style={styles.rowText}>{t("taskerProfile.bank")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.rowItem}
-          onPress={() => navigation.navigate("Payments")}
+          onPress={() => navigation.navigate("MyPayments")}
         >
-          <Text style={styles.rowText}>{t("profilee.payments")}</Text>
+          <Text style={styles.rowText}>{t("taskerProfile.payments")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
@@ -103,7 +103,7 @@ export default function TaskerProfileScreen({ navigation }) {
           style={styles.rowItem}
           onPress={() => navigation.navigate("Reviews")}
         >
-          <Text style={styles.rowText}>{t("profilee.reviews")}</Text>
+          <Text style={styles.rowText}>{t("taskerProfile.reviews")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
@@ -111,7 +111,7 @@ export default function TaskerProfileScreen({ navigation }) {
           style={styles.rowItem}
           onPress={() => navigation.navigate("Settings")}
         >
-          <Text style={styles.rowText}>{t("profilee.settings")}</Text>
+          <Text style={styles.rowText}>{t("taskerProfile.settings")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
@@ -119,13 +119,16 @@ export default function TaskerProfileScreen({ navigation }) {
           style={[styles.rowItem, styles.logoutRow]}
           onPress={handleLogout}
         >
-          <Text style={[styles.rowText, styles.logoutText]}>{t("profilee.logout")}</Text>
+          <Text style={[styles.rowText, styles.logoutText]}>
+            {t("taskerProfile.logout")}
+          </Text>
           <Ionicons name="log-out-outline" size={20} color="#213729" />
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

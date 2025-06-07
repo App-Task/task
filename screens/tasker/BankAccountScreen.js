@@ -2,16 +2,17 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
   ScrollView,
   I18nManager,
   Alert,
+  StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import { Ionicons } from "@expo/vector-icons";
 
-export default function BankAccountScreen() {
+export default function BankAccountScreen({ navigation }) {
   const { t } = useTranslation();
 
   const [bankName, setBankName] = useState("Al Rajhi Bank");
@@ -19,17 +20,28 @@ export default function BankAccountScreen() {
   const [iban, setIban] = useState("SA1234567890123456789012");
 
   const handleSave = () => {
-    // Placeholder: later submit to backend
-    Alert.alert(t("bank.savedTitle"), t("bank.savedMessage"));
+    Alert.alert(t("taskerBankAccount.savedTitle"), t("taskerBankAccount.savedMessage"));
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>{t("bank.title")}</Text>
+      {/* Header with Back Button */}
+      <View style={styles.headerRow}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+          <Ionicons
+            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+            size={24}
+            color="#213729"
+          />
+        </TouchableOpacity>
+        <Text style={styles.headerText}>{t("taskerBankAccount.title")}</Text>
+        <View style={{ width: 24 }} />
+      </View>
 
+      {/* Inputs */}
       <TextInput
         style={styles.input}
-        placeholder={t("bank.bankName")}
+        placeholder={t("taskerBankAccount.bankName")}
         value={bankName}
         onChangeText={setBankName}
         textAlign={I18nManager.isRTL ? "right" : "left"}
@@ -38,7 +50,7 @@ export default function BankAccountScreen() {
 
       <TextInput
         style={styles.input}
-        placeholder={t("bank.accountNumber")}
+        placeholder={t("taskerBankAccount.accountNumber")}
         value={accountNumber}
         onChangeText={setAccountNumber}
         keyboardType="number-pad"
@@ -48,15 +60,16 @@ export default function BankAccountScreen() {
 
       <TextInput
         style={styles.input}
-        placeholder={t("bank.iban")}
+        placeholder={t("taskerBankAccount.iban")}
         value={iban}
         onChangeText={setIban}
         textAlign={I18nManager.isRTL ? "right" : "left"}
         placeholderTextColor="#999"
       />
 
+      {/* Save Button */}
       <TouchableOpacity style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>{t("bank.save")}</Text>
+        <Text style={styles.buttonText}>{t("taskerBankAccount.save")}</Text>
       </TouchableOpacity>
 
       <View style={{ height: 40 }} />
@@ -64,19 +77,30 @@ export default function BankAccountScreen() {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     paddingTop: 60,
     paddingBottom: 40,
     paddingHorizontal: 24,
     backgroundColor: "#ffffff",
   },
-  header: {
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 30,
+  },
+  backBtn: {
+    padding: 4,
+  },
+  headerText: {
     fontFamily: "InterBold",
     fontSize: 22,
     color: "#213729",
-    marginBottom: 30,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    textAlign: "center",
+    flex: 1,
   },
   input: {
     backgroundColor: "#f2f2f2",

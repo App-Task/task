@@ -3,13 +3,13 @@ import {
   View,
   Text,
   Image,
-  StyleSheet,
   ScrollView,
   TextInput,
   TouchableOpacity,
   Alert,
-  Dimensions,
   I18nManager,
+  StyleSheet,
+  Dimensions, 
 } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -24,12 +24,11 @@ export default function TaskDetailsScreen({ route }) {
 
   const handleBid = () => {
     if (!bidAmount || !message) {
-      Alert.alert(t("details.errorTitle"), t("details.fillFields"));
+      Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.fillFields"));
       return;
     }
 
-    // Submit logic here
-    Alert.alert(t("details.successTitle"), t("details.bidSent"));
+    Alert.alert(t("taskerTaskDetails.successTitle"), t("taskerTaskDetails.bidSent"));
     setBidAmount("");
     setMessage("");
   };
@@ -46,16 +45,16 @@ export default function TaskDetailsScreen({ route }) {
 
       <Text style={styles.title}>{task.title}</Text>
 
-      <Text style={styles.label}>{t("details.location")}</Text>
+      <Text style={styles.label}>{t("taskerTaskDetails.location")}</Text>
       <Text style={styles.text}>{task.location}</Text>
 
-      <Text style={styles.label}>{t("details.price")}</Text>
+      <Text style={styles.label}>{t("taskerTaskDetails.price")}</Text>
       <Text style={styles.text}>{task.price} SAR</Text>
 
-      <Text style={styles.label}>{t("details.enterBid")}</Text>
+      <Text style={styles.label}>{t("taskerTaskDetails.enterBid")}</Text>
       <TextInput
         style={styles.input}
-        placeholder={t("details.bidAmount")}
+        placeholder={t("taskerTaskDetails.bidAmount")}
         value={bidAmount}
         onChangeText={setBidAmount}
         keyboardType="numeric"
@@ -65,7 +64,7 @@ export default function TaskDetailsScreen({ route }) {
 
       <TextInput
         style={[styles.input, styles.textarea]}
-        placeholder={t("details.bidMessage")}
+        placeholder={t("taskerTaskDetails.bidMessage")}
         value={message}
         onChangeText={setMessage}
         multiline
@@ -76,7 +75,7 @@ export default function TaskDetailsScreen({ route }) {
       />
 
       <TouchableOpacity style={styles.button} onPress={handleBid}>
-        <Text style={styles.buttonText}>{t("details.submitBid")}</Text>
+        <Text style={styles.buttonText}>{t("taskerTaskDetails.submitBid")}</Text>
       </TouchableOpacity>
 
       <View style={{ height: 40 }} />

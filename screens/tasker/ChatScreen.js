@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
+  StyleSheet,
   FlatList,
   I18nManager,
-  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { Dimensions } from "react-native";
 
 const { width } = Dimensions.get("window");
 
@@ -59,8 +59,8 @@ export default function ChatScreen({ navigation }) {
             color="#213729"
           />
         </TouchableOpacity>
-        <Text style={styles.title}>{t("chatt.title")}</Text>
-        <TouchableOpacity onPress={() => alert(t("chatt.reported"))}>
+        <Text style={styles.title}>{t("taskerChat.title")}</Text>
+        <TouchableOpacity onPress={() => alert(t("taskerChat.reported"))}>
           <Ionicons name="alert-circle-outline" size={24} color="#213729" />
         </TouchableOpacity>
       </View>
@@ -78,7 +78,7 @@ export default function ChatScreen({ navigation }) {
       <View style={styles.inputRow}>
         <TextInput
           style={styles.input}
-          placeholder={t("chatt.placeholder")}
+          placeholder={t("taskerChat.placeholder")}
           placeholderTextColor="#aaa"
           value={input}
           onChangeText={setInput}

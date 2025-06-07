@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   Dimensions,
   Alert,
+  StyleSheet,
   ScrollView,
 } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -37,7 +37,7 @@ export default function ProfileScreen({ navigation }) {
   const handleLogout = async () => {
     try {
       await removeToken();
-      Alert.alert(t("profile.logoutAlertTitle"), t("profile.logoutAlertMessage"));
+      Alert.alert(t("clientProfile.logoutAlertTitle"), t("clientProfile.logoutAlertMessage"));
       nav.reset({
         index: 0,
         routes: [{ name: "Welcome" }],
@@ -68,58 +68,59 @@ export default function ProfileScreen({ navigation }) {
 
       <View style={styles.buttonGroup}>
         <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("EditProfile")}>
-          <Text style={styles.rowText}>{t("profile.editProfile")}</Text>
+          <Text style={styles.rowText}>{t("clientProfile.editProfile")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("ChangePassword")}>
-          <Text style={styles.rowText}>{t("profile.changePassword")}</Text>
+          <Text style={styles.rowText}>{t("clientProfile.changePassword")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("MyPayments")}>
-          <Text style={styles.rowText}>{t("profile.myPayments")}</Text>
+          <Text style={styles.rowText}>{t("clientProfile.myPayments")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("PaymentMethods")}>
-          <Text style={styles.rowText}>{t("profile.paymentMethods")}</Text>
+          <Text style={styles.rowText}>{t("clientProfile.paymentMethods")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.rowItem}>
-          <Text style={styles.rowText}>{t("profile.aboutUs")}</Text>
+          <Text style={styles.rowText}>{t("clientProfile.aboutUs")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.rowItem}>
-          <Text style={styles.rowText}>{t("profile.privacyPolicy")}</Text>
+          <Text style={styles.rowText}>{t("clientProfile.privacyPolicy")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.rowItem}>
-          <Text style={styles.rowText}>{t("profile.terms")}</Text>
+          <Text style={styles.rowText}>{t("clientProfile.terms")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.rowItem}>
-          <Text style={styles.rowText}>{t("profile.faqs")}</Text>
+          <Text style={styles.rowText}>{t("clientProfile.faqs")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.rowItem}>
-          <Text style={styles.rowText}>{t("profile.contactAdmin")}</Text>
+          <Text style={styles.rowText}>{t("clientProfile.contactAdmin")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.rowItem, styles.logoutRow]} onPress={handleLogout}>
-          <Text style={[styles.rowText, styles.logoutText]}>{t("profile.logout")}</Text>
+          <Text style={[styles.rowText, styles.logoutText]}>{t("clientProfile.logout")}</Text>
           <Ionicons name="log-out-outline" size={20} color="#213729" />
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

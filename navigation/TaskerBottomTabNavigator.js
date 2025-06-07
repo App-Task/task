@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 
-// Placeholder screens
+// Tasker Screens
 import ExploreTasksScreen from "../screens/tasker/ExploreTasksScreen";
 import TaskerMyTasksScreen from "../screens/tasker/MyTasksScreen";
 import TaskerMessagesScreen from "../screens/tasker/MessagesScreen";
@@ -12,7 +12,7 @@ import TaskerProfileScreen from "../screens/tasker/ProfileScreen";
 
 const Tab = createBottomTabNavigator();
 
-export default function TaskerBottomTabNavigator() {
+export default function TaskBottomNav() {
   const { t } = useTranslation();
 
   return (
@@ -27,7 +27,7 @@ export default function TaskerBottomTabNavigator() {
           height: 70,
           paddingBottom: 10,
         },
-        tabBarIcon: ({ color, size }) => {
+        tabBarIcon: ({ color }) => {
           let icon;
           switch (route.name) {
             case "Explore":
@@ -53,27 +53,27 @@ export default function TaskerBottomTabNavigator() {
       <Tab.Screen
         name="Explore"
         component={ExploreTasksScreen}
-        options={{ tabBarLabel: t("tabs.explore") }}
+        options={{ tabBarLabel: t("TaskBottomNav.explore") }}
       />
       <Tab.Screen
         name="MyTasks"
         component={TaskerMyTasksScreen}
-        options={{ tabBarLabel: t("tabs.myTasks") }}
+        options={{ tabBarLabel: t("TaskBottomNav.myTasks") }}
       />
       <Tab.Screen
         name="Messages"
         component={TaskerMessagesScreen}
-        options={{ tabBarLabel: t("tabs.messages") }}
+        options={{ tabBarLabel: t("TaskBottomNav.messages") }}
       />
       <Tab.Screen
         name="Notifications"
         component={TaskerNotificationsScreen}
-        options={{ tabBarLabel: t("tabs.notifications") }}
+        options={{ tabBarLabel: t("TaskBottomNav.notifications") }}
       />
       <Tab.Screen
         name="Profile"
         component={TaskerProfileScreen}
-        options={{ tabBarLabel: t("tabs.profile") }}
+        options={{ tabBarLabel: t("TaskBottomNav.profile") }}
       />
     </Tab.Navigator>
   );

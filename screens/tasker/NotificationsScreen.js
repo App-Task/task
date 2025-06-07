@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
   I18nManager,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import Animated, { FadeInRight } from "react-native-reanimated";
@@ -39,19 +39,21 @@ export default function TaskerNotificationsScreen() {
 
   const renderItem = ({ item }) => (
     <Animated.View entering={FadeInRight.duration(400)} style={styles.card}>
-      <Text style={styles.message}>{t(`notify.types.${item.type}`)}: {item.message}</Text>
+      <Text style={styles.message}>
+        {t(`taskerNotifications.types.${item.type}`)}: {item.message}
+      </Text>
       <Text style={styles.time}>{item.time}</Text>
     </Animated.View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{t("notify.title")}</Text>
+      <Text style={styles.header}>{t("taskerNotifications.title")}</Text>
 
       {loading ? (
         <ActivityIndicator color="#213729" size="large" style={{ marginTop: 40 }} />
       ) : notifications.length === 0 ? (
-        <Text style={styles.empty}>{t("notify.empty")}</Text>
+        <Text style={styles.empty}>{t("taskerNotifications.empty")}</Text>
       ) : (
         <FlatList
           data={notifications}
@@ -64,6 +66,7 @@ export default function TaskerNotificationsScreen() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

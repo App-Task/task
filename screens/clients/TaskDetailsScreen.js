@@ -2,11 +2,11 @@ import React from "react";
 import {
   View,
   Text,
-  StyleSheet,
   Image,
   ScrollView,
   Dimensions,
   TouchableOpacity,
+  StyleSheet,
   SafeAreaView,
 } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -26,7 +26,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
         <View style={styles.headerRow}>
           <TouchableOpacity
             style={styles.backBtn}
-            onPress={() => navigation.goBack()} // ✅ Go back with left-slide animation
+            onPress={() => navigation.goBack()}
           >
             <Ionicons name="arrow-back" size={24} color="#213729" />
           </TouchableOpacity>
@@ -48,16 +48,16 @@ export default function TaskDetailsScreen({ route, navigation }) {
         )}
 
         {/* Description */}
-        <Text style={styles.label}>{t("taskDetails.description")}</Text>
+        <Text style={styles.label}>{t("clientTaskDetails.description")}</Text>
         <Text style={styles.text}>{description}</Text>
 
         {/* Address */}
-        <Text style={styles.label}>{t("taskDetails.address")}</Text>
+        <Text style={styles.label}>{t("clientTaskDetails.address")}</Text>
         <Text style={styles.text}>{address}</Text>
 
         {/* Price */}
         <View style={styles.priceBox}>
-          <Text style={styles.priceLabel}>{t("taskDetails.offeredPrice")}</Text>
+          <Text style={styles.priceLabel}>{t("clientTaskDetails.offeredPrice")}</Text>
           <Text style={styles.price}>{price} SAR</Text>
         </View>
 
@@ -67,19 +67,19 @@ export default function TaskDetailsScreen({ route, navigation }) {
             style={styles.button}
             onPress={() => navigation.navigate("EditTask", { task })}
           >
-            <Text style={styles.buttonText}>{t("taskDetails.editTask")}</Text>
+            <Text style={styles.buttonText}>{t("clientTaskDetails.editTask")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate("ViewBids", { bids })}
           >
-            <Text style={styles.buttonText}>{t("taskDetails.viewBids")}</Text>
+            <Text style={styles.buttonText}>{t("clientTaskDetails.viewBids")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.secondaryButton}>
             <Text style={styles.secondaryButtonText}>
-              {t("taskDetails.cancelTask")}
+              {t("clientTaskDetails.cancelTask")}
             </Text>
           </TouchableOpacity>
         </View>

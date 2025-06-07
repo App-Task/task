@@ -2,11 +2,11 @@ import React from "react";
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
   TouchableOpacity,
   Dimensions,
   Alert,
+  StyleSheet,
   SafeAreaView,
 } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -19,7 +19,7 @@ export default function ViewBidsScreen({ route, navigation }) {
   const { bids } = route.params;
 
   const handleAccept = (bidder) => {
-    Alert.alert(t("viewBids.acceptedTitle"), t("viewBids.acceptedMessage", { name: bidder.name }));
+    Alert.alert(t("clientViewBids.acceptedTitle"), t("clientViewBids.acceptedMessage", { name: bidder.name }));
     // TODO: Navigate to payment or task progress flow
   };
 
@@ -37,10 +37,10 @@ export default function ViewBidsScreen({ route, navigation }) {
 
       <View style={styles.buttons}>
         <TouchableOpacity style={styles.chatBtn} onPress={() => handleChat(item)}>
-          <Text style={styles.chatText}>{t("viewBids.chat")}</Text>
+          <Text style={styles.chatText}>{t("clientViewBids.chat")}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.acceptBtn} onPress={() => handleAccept(item)}>
-          <Text style={styles.acceptText}>{t("viewBids.accept")}</Text>
+          <Text style={styles.acceptText}>{t("clientViewBids.accept")}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -54,7 +54,7 @@ export default function ViewBidsScreen({ route, navigation }) {
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="#213729" />
           </TouchableOpacity>
-          <Text style={styles.title}>{t("viewBids.title")}</Text>
+          <Text style={styles.title}>{t("clientViewBids.title")}</Text>
           <View style={styles.backBtn} />
         </View>
 
@@ -63,7 +63,7 @@ export default function ViewBidsScreen({ route, navigation }) {
           keyExtractor={(item) => item.id}
           renderItem={renderBid}
           ListEmptyComponent={
-            <Text style={styles.empty}>{t("viewBids.noBids")}</Text>
+            <Text style={styles.empty}>{t("clientViewBids.noBids")}</Text>
           }
           contentContainerStyle={styles.listContent}
         />

@@ -21,13 +21,13 @@ export default function ChatScreen({ route, navigation }) {
   const [messages, setMessages] = useState([
     {
       id: "1",
-      text: t("chat.mock1"),
+      text: t("clientChat.mock1"),
       sender: "other",
       timestamp: "10:02 AM",
     },
     {
       id: "2",
-      text: t("chat.mock2"),
+      text: t("clientChat.mock2"),
       sender: "me",
       timestamp: "10:05 AM",
     },
@@ -89,7 +89,7 @@ export default function ChatScreen({ route, navigation }) {
           <Ionicons name="arrow-back" size={24} color="#213729" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {t("chat.chatWith", { name })}
+          {t("clientChat.chatWith", { name })}
         </Text>
       </View>
 
@@ -103,7 +103,7 @@ export default function ChatScreen({ route, navigation }) {
 
       {isTyping && (
         <Text style={styles.typingIndicator}>
-          {t("chat.typing", { name })}
+          {t("clientChat.typing", { name })}
         </Text>
       )}
 
@@ -115,7 +115,7 @@ export default function ChatScreen({ route, navigation }) {
             setIsTyping(true);
           }}
           style={styles.input}
-          placeholder={t("chat.placeholder")}
+          placeholder={t("clientChat.placeholder")}
         />
         <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
           <Ionicons name="send" size={20} color="#ffffff" />
@@ -124,6 +124,9 @@ export default function ChatScreen({ route, navigation }) {
     </KeyboardAvoidingView>
   );
 }
+
+// Styles remain unchanged...
+
 
 const styles = StyleSheet.create({
   container: {

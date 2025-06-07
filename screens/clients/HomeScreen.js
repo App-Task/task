@@ -2,18 +2,16 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   FlatList,
-  Dimensions,
+  StyleSheet,
   I18nManager,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import Animated, { FadeInRight } from "react-native-reanimated";
 import { fetchCurrentUser } from "../../services/auth";
-
-const { width } = Dimensions.get("window");
 
 export default function ClientHomeScreen({ navigation }) {
   const { t } = useTranslation();
@@ -26,12 +24,11 @@ export default function ClientHomeScreen({ navigation }) {
       try {
         const user = await fetchCurrentUser();
         setUserName(user.name);
-  
+
         const res = await fetch("https://task-kq94.onrender.com/api/tasks");
         const data = await res.json();
-  
-        // Optionally filter tasks by user ID if needed later
-        setTasks(data.reverse()); // show newest first
+
+        setTasks(data.reverse()); // newest first
       } catch (err) {
         console.error("❌ Failed to fetch tasks:", err.message);
         Alert.alert("Error", "Could not load tasks.");
@@ -39,10 +36,9 @@ export default function ClientHomeScreen({ navigation }) {
         setLoading(false);
       }
     };
-  
+
     loadData();
   }, []);
-  
 
   const renderTask = ({ item }) => (
     <Animated.View
@@ -67,7 +63,7 @@ export default function ClientHomeScreen({ navigation }) {
             },
           ]}
         >
-          {t(`home.status.${item.status.toLowerCase()}`)}
+          {t(`clientHome.status.${item.status.toLowerCase()}`)}
         </Text>
       </View>
     </Animated.View>
@@ -77,19 +73,19 @@ export default function ClientHomeScreen({ navigation }) {
     <View style={styles.container}>
       {/* Header */}
       <Text style={styles.hello}>
-        {t("home.greeting", { name: userName || t("home.defaultName") })}
+        {t("clientHome.greeting", { name: userName || t("clientHome.defaultName") })}
       </Text>
-      <Text style={styles.sub}>{t("home.subtitle")}</Text>
+      <Text style={styles.sub}>{t("clientHome.subtitle")}</Text>
 
       {/* Add Task Button */}
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("ClientHome", { screen: "Post" })}
       >
-        <Text style={styles.buttonText}>+ {t("home.postTaskBtn")}</Text>
+        <Text style={styles.buttonText}>+ {t("clientHome.postTaskBtn")}</Text>
       </TouchableOpacity>
 
-      <Text style={styles.sectionTitle}>{t("home.yourTasks")}</Text>
+      <Text style={styles.sectionTitle}>{t("clientHome.yourTasks")}</Text>
 
       {/* Loading State */}
       {loading ? (
@@ -98,10 +94,9 @@ export default function ClientHomeScreen({ navigation }) {
         <FlatList
           data={tasks}
           keyExtractor={(item) => item._id}
-
           renderItem={renderTask}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>{t("home.noTasks")}</Text>
+            <Text style={styles.emptyText}>{t("clientHome.noTasks")}</Text>
           }
           contentContainerStyle={{ paddingBottom: 40 }}
           style={{ width: "100%" }}

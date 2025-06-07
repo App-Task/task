@@ -3,16 +3,13 @@ import {
   View,
   Text,
   TextInput,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
   I18nManager,
   Alert,
+  StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
-
-const { width } = Dimensions.get("window");
 
 export default function EditProfileScreen() {
   const { t } = useTranslation();
@@ -25,19 +22,19 @@ export default function EditProfileScreen() {
   const [about, setAbout] = useState("Reliable tasker with attention to detail.");
 
   const handleSave = () => {
-    Alert.alert(t("editProfilee.savedTitle"), t("editProfilee.savedMessage"));
+    Alert.alert(t("taskerEditProfile.savedTitle"), t("taskerEditProfile.savedMessage"));
     // TODO: send updated data to backend
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>{t("editProfilee.title")}</Text>
+      <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>
 
       <TextInput
         style={styles.input}
         value={name}
         onChangeText={setName}
-        placeholder={t("editProfilee.name")}
+        placeholder={t("taskerEditProfile.name")}
         textAlign={I18nManager.isRTL ? "right" : "left"}
         placeholderTextColor="#999"
       />
@@ -46,7 +43,7 @@ export default function EditProfileScreen() {
         style={styles.input}
         value="yosuf@example.com"
         editable={false}
-        placeholder={t("editProfilee.email")}
+        placeholder={t("taskerEditProfile.email")}
         textAlign={I18nManager.isRTL ? "right" : "left"}
         placeholderTextColor="#999"
       />
@@ -55,7 +52,7 @@ export default function EditProfileScreen() {
         style={styles.input}
         value={gender}
         onChangeText={setGender}
-        placeholder={t("editProfilee.gender")}
+        placeholder={t("taskerEditProfile.gender")}
         textAlign={I18nManager.isRTL ? "right" : "left"}
         placeholderTextColor="#999"
       />
@@ -64,7 +61,7 @@ export default function EditProfileScreen() {
         style={styles.input}
         value={location}
         onChangeText={setLocation}
-        placeholder={t("editProfilee.location")}
+        placeholder={t("taskerEditProfile.location")}
         textAlign={I18nManager.isRTL ? "right" : "left"}
         placeholderTextColor="#999"
       />
@@ -73,7 +70,7 @@ export default function EditProfileScreen() {
         style={styles.input}
         value={experience}
         onChangeText={setExperience}
-        placeholder={t("editProfilee.experience")}
+        placeholder={t("taskerEditProfile.experience")}
         textAlign={I18nManager.isRTL ? "right" : "left"}
         placeholderTextColor="#999"
       />
@@ -82,7 +79,7 @@ export default function EditProfileScreen() {
         style={styles.input}
         value={skills}
         onChangeText={setSkills}
-        placeholder={t("editProfilee.skills")}
+        placeholder={t("taskerEditProfile.skills")}
         textAlign={I18nManager.isRTL ? "right" : "left"}
         placeholderTextColor="#999"
       />
@@ -91,7 +88,7 @@ export default function EditProfileScreen() {
         style={[styles.input, styles.textarea]}
         value={about}
         onChangeText={setAbout}
-        placeholder={t("editProfilee.about")}
+        placeholder={t("taskerEditProfile.about")}
         textAlign={I18nManager.isRTL ? "right" : "left"}
         textAlignVertical="top"
         placeholderTextColor="#999"
@@ -100,11 +97,12 @@ export default function EditProfileScreen() {
       />
 
       <TouchableOpacity style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>{t("editProfilee.save")}</Text>
+        <Text style={styles.buttonText}>{t("taskerEditProfile.save")}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

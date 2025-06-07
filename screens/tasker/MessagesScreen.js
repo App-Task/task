@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
   TouchableOpacity,
   I18nManager,
+  StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
@@ -32,7 +32,6 @@ export default function TaskerMessagesScreen({ navigation }) {
   const [conversations, setConversations] = useState([]);
 
   useEffect(() => {
-    // Simulate loading
     setTimeout(() => {
       setConversations(dummyConversations);
     }, 500);
@@ -68,7 +67,7 @@ export default function TaskerMessagesScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{t("messagess.title")}</Text>
+      <Text style={styles.header}>{t("taskerMessages.title")}</Text>
 
       <FlatList
         data={conversations}
