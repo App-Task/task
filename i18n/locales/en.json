@@ -1,5 +1,14 @@
 {
-  "welcome": "Welcome to TASK",
+  "welcome": "Welcome to Task!",
+"chooseRole": "Choose your role:",
+"role": {
+  "client": "Client",
+  "tasker": "Tasker"
+},
+"language": {
+  "changedEn": "Language changed to English",
+  "changedAr": "تم تغيير اللغة إلى العربية"
+},
   "login": {
     "welcomeBack": "Welcome Back ",
     "email": "Email",

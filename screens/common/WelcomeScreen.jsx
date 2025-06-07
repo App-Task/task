@@ -62,7 +62,7 @@ export default function WelcomeScreen({ navigation }) {
 
     Toast.show({
       type: "success",
-      text1: newLang === "en" ? "Language changed to English" : "تم تغيير اللغة إلى العربية",
+      text1: newLang === "en" ? t("language.changedEn") : t("language.changedAr"),
       position: "bottom",
       visibilityTime: 2000,
     });
@@ -102,9 +102,10 @@ export default function WelcomeScreen({ navigation }) {
         </TouchableOpacity>
 
         <Text style={styles.rolePrompt}>{t("chooseRole")}</Text>
+
         <View style={styles.roleButtons}>
           <TouchableOpacity
-            style={[styles.roleBtn, { marginRight: 12 }]} // ✅ spacing instead of "gap"
+            style={[styles.roleBtn, { marginRight: 12 }]}
             onPress={() => navigation.navigate("Login", { role: "client" })}
           >
             <Text style={styles.roleText}>{t("role.client")}</Text>
@@ -123,6 +124,7 @@ export default function WelcomeScreen({ navigation }) {
     </>
   );
 }
+
 
 const styles = StyleSheet.create({
   loadingContainer: {
