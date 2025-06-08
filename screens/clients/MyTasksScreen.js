@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,31 +6,49 @@ import {
   FlatList,
   Dimensions,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import * as SecureStore from "expo-secure-store";
 
 const { width } = Dimensions.get("window");
-
-const fakeTasks = {
-  Pending: [
-    { id: "1", title: "Fix Kitchen Tap", price: 100 },
-    { id: "2", title: "Move Furniture", price: 250 },
-  ],
-  Started: [
-    { id: "3", title: "Paint Living Room", price: 400 },
-  ],
-  Completed: [],
-};
 
 export default function MyTasksScreen({ navigation }) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("Pending");
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const userId = await SecureStore.getItemAsync("userId");
+      if (!userId) throw new Error("User not logged in");
+
+      const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
+      const data = await res.json();
+      setTasks(data);
+    } catch (err) {
+      console.error("❌ Failed to fetch user tasks:", err.message);
+      setTasks([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const filteredTasks = tasks.filter(
+    (task) => task.status.toLowerCase() === activeTab.toLowerCase()
+  );
 
   const renderTask = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate("TaskDetails", { task: item })}>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardPrice}>{item.price} SAR</Text>
+        <Text style={styles.cardPrice}>{item.budget} SAR</Text>
       </View>
     </TouchableOpacity>
   );
@@ -42,10 +60,7 @@ export default function MyTasksScreen({ navigation }) {
         {["Pending", "Started", "Completed"].map((tabKey) => (
           <TouchableOpacity
             key={tabKey}
-            style={[
-              styles.tab,
-              activeTab === tabKey && styles.activeTab,
-            ]}
+            style={[styles.tab, activeTab === tabKey && styles.activeTab]}
             onPress={() => setActiveTab(tabKey)}
           >
             <Text
@@ -61,26 +76,29 @@ export default function MyTasksScreen({ navigation }) {
       </View>
 
       {/* Task List */}
-      <FlatList
-        data={fakeTasks[activeTab]}
-        keyExtractor={(item) => item.id}
-        renderItem={renderTask}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            {t("clientMyTasks.noTasks", {
-              status: t(`clientMyTasks.${activeTab.toLowerCase()}`),
-            })}
-          </Text>
-        }
-        contentContainerStyle={{
-          paddingTop: 20,
-          paddingBottom: 40,
-        }}
-      />
+      {loading ? (
+        <ActivityIndicator color="#213729" size="large" style={{ marginTop: 50 }} />
+      ) : (
+        <FlatList
+          data={filteredTasks}
+          keyExtractor={(item) => item._id}
+          renderItem={renderTask}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              {t("clientMyTasks.noTasks", {
+                status: t(`clientMyTasks.${activeTab.toLowerCase()}`),
+              })}
+            </Text>
+          }
+          contentContainerStyle={{
+            paddingTop: 20,
+            paddingBottom: 40,
+          }}
+        />
+      )}
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

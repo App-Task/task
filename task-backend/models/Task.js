@@ -9,12 +9,18 @@ const TaskSchema = new mongoose.Schema({
   images: [String],
   status: {
     type: String,
-    default: "open", // other options later: "assigned", "completed"
+    default: "open",
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
+
 
 module.exports = mongoose.model("Task", TaskSchema);

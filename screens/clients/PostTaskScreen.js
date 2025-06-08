@@ -16,6 +16,7 @@ import {
   I18nManager,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import * as SecureStore from "expo-secure-store";
 import { useTranslation } from "react-i18next";
 
 const { width, height } = Dimensions.get("window");
@@ -37,17 +38,25 @@ export default function PostTaskScreen() {
       Alert.alert(t("clientPostTask.missingTitle"), t("clientPostTask.fillAllFields"));
       return;
     }
-
-    const taskData = {
-      title,
-      description,
-      location,
-      budget,
-      category: selectedCategory,
-      images,
-    };
-
+  
     try {
+      const userId = await SecureStore.getItemAsync("userId");
+  
+      if (!userId) {
+        Alert.alert("Error", "User not logged in. Please sign in again.");
+        return;
+      }
+  
+      const taskData = {
+        title,
+        description,
+        location,
+        budget,
+        category: selectedCategory,
+        images,
+        userId, // ✅ Attach userId
+      };
+  
       const response = await fetch("https://task-kq94.onrender.com/api/tasks", {
         method: "POST",
         headers: {
@@ -55,17 +64,17 @@ export default function PostTaskScreen() {
         },
         body: JSON.stringify(taskData),
       });
-
+  
       const result = await response.json();
-
+  
       if (!response.ok) {
         console.log("❌ Backend error:", result.error);
         throw new Error("Failed to save task.");
       }
-
+  
       console.log("✅ Task posted:", result);
       Alert.alert(t("clientPostTask.successTitle"), t("clientPostTask.successMessage"));
-
+  
       setTitle("");
       setDescription("");
       setLocation("");
@@ -77,6 +86,7 @@ export default function PostTaskScreen() {
       Alert.alert("Error", "Could not post task. Try again.");
     }
   };
+  
 
   const pickImages = async () => {
     if (images.length >= 3) {
