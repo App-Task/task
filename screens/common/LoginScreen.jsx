@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { loginUser } from "../../services/auth";
 import { storeToken } from "../../services/authStorage";
-import * as SecureStore from "expo-secure-store"; // ✅ needed for storing ID/name
+import * as SecureStore from "expo-secure-store";
 
 const { width } = Dimensions.get("window");
 
@@ -37,10 +37,16 @@ export default function LoginScreen({ navigation, route }) {
       const response = await loginUser({ email, password });
 
       if (response?.token && response?.user) {
-        // ✅ Save values as strings
-        await storeToken(response.token);
-        await SecureStore.setItemAsync("userId", String(response.user._id));
-        await SecureStore.setItemAsync("userName", String(response.user.name));
+        console.log("✅ userId being saved:", response.user.id); // ✅ Use .id, not ._id
+
+        // ✅ Save only if valid ObjectId
+        if (response.user.id && String(response.user.id).length === 24) {
+          await storeToken(response.token);
+          await SecureStore.setItemAsync("userId", String(response.user.id)); // ✅ Corrected
+          await SecureStore.setItemAsync("userName", String(response.user.name));
+        } else {
+          console.warn("⚠️ Invalid userId format. Skipping SecureStore save.");
+        }
 
         Alert.alert(
           t("login.successTitle"),
@@ -63,7 +69,6 @@ export default function LoginScreen({ navigation, route }) {
       style={styles.wrapper}
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        {/* Back Button */}
         <View style={styles.topBar}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={24} color="#213729" />
