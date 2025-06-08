@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { loginUser } from "../../services/auth";
 import { storeToken } from "../../services/authStorage";
-import * as SecureStore from "expo-secure-store"; // ✅ added import
+import * as SecureStore from "expo-secure-store"; // ✅ needed for storing ID/name
 
 const { width } = Dimensions.get("window");
 
@@ -37,10 +37,10 @@ export default function LoginScreen({ navigation, route }) {
       const response = await loginUser({ email, password });
 
       if (response?.token && response?.user) {
-        // ✅ Save to SecureStore
+        // ✅ Save values as strings
         await storeToken(response.token);
-        await SecureStore.setItemAsync("userId", response.user._id);
-        await SecureStore.setItemAsync("userName", response.user.name);
+        await SecureStore.setItemAsync("userId", String(response.user._id));
+        await SecureStore.setItemAsync("userName", String(response.user.name));
 
         Alert.alert(
           t("login.successTitle"),
