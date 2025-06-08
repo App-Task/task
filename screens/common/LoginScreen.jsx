@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { loginUser } from "../../services/auth";
 import { storeToken } from "../../services/authStorage";
+import * as SecureStore from "expo-secure-store"; // ✅ added import
 
 const { width } = Dimensions.get("window");
 
@@ -35,9 +36,17 @@ export default function LoginScreen({ navigation, route }) {
     try {
       const response = await loginUser({ email, password });
 
-      if (response?.token) {
+      if (response?.token && response?.user) {
+        // ✅ Save to SecureStore
         await storeToken(response.token);
-        Alert.alert(t("login.successTitle"), `${t("login.loggedInAs")} ${response.user.name}`);
+        await SecureStore.setItemAsync("userId", response.user._id);
+        await SecureStore.setItemAsync("userName", response.user.name);
+
+        Alert.alert(
+          t("login.successTitle"),
+          `${t("login.loggedInAs")} ${response.user.name}`
+        );
+
         navigation.replace(role === "tasker" ? "TaskerHome" : "ClientHome");
       } else {
         throw new Error(t("login.failedGeneric"));
