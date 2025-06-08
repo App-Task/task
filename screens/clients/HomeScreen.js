@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import Animated, { FadeInRight } from "react-native-reanimated";
-import { fetchCurrentUser } from "../../services/auth";
+import * as SecureStore from "expo-secure-store";
 
 export default function ClientHomeScreen({ navigation }) {
   const { t } = useTranslation();
@@ -22,13 +22,20 @@ export default function ClientHomeScreen({ navigation }) {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const user = await fetchCurrentUser();
-        setUserName(user.name);
+        setLoading(true);
+        const userId = await SecureStore.getItemAsync("userId");
+        const userName = await SecureStore.getItemAsync("userName");
 
-        const res = await fetch("https://task-kq94.onrender.com/api/tasks");
+        if (!userId) {
+          throw new Error("User not logged in");
+        }
+
+        setUserName(userName || "");
+
+        const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
         const data = await res.json();
 
-        setTasks(data.reverse()); // newest first
+        setTasks(data);
       } catch (err) {
         console.error("❌ Failed to fetch tasks:", err.message);
         Alert.alert("Error", "Could not load tasks.");
@@ -71,13 +78,11 @@ export default function ClientHomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <Text style={styles.hello}>
         {t("clientHome.greeting", { name: userName || t("clientHome.defaultName") })}
       </Text>
       <Text style={styles.sub}>{t("clientHome.subtitle")}</Text>
 
-      {/* Add Task Button */}
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("ClientHome", { screen: "Post" })}
@@ -87,7 +92,6 @@ export default function ClientHomeScreen({ navigation }) {
 
       <Text style={styles.sectionTitle}>{t("clientHome.yourTasks")}</Text>
 
-      {/* Loading State */}
       {loading ? (
         <ActivityIndicator color="#213729" size="large" />
       ) : (
