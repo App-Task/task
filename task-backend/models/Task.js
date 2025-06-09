@@ -9,8 +9,10 @@ const TaskSchema = new mongoose.Schema({
   images: [String],
   status: {
     type: String,
-    default: "open",
+    enum: ["Pending", "Started", "Completed"],
+    default: "Pending",
   },
+  
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

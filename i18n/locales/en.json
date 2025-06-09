@@ -106,12 +106,14 @@
     "completed": "Completed",
     "pending": "Pending"
   },
-  "clientMyTasks": {
-    "pending": "Pending",
-    "started": "In Progress",
-    "completed": "Completed",
-    "noTasks": "No {{status}} tasks available."
-  },
+"clientMyTasks": {
+  "pending": "Pending",
+  "started": "In Progress",
+  "completed": "Completed",
+  "noTasks": "No {{status}} tasks available.",
+  "fetchError": "Could not load your tasks. Please try again."
+}
+,
   "clientNotifications": {
     "title": "Notifications",
     "none": "You have no notifications.",

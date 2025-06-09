@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,31 +6,59 @@ import {
   FlatList,
   Dimensions,
   StyleSheet,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import * as SecureStore from "expo-secure-store";
 
 const { width } = Dimensions.get("window");
-
-const fakeTasks = {
-  Pending: [
-    { id: "1", title: "Fix Kitchen Tap", price: 100 },
-    { id: "2", title: "Move Furniture", price: 250 },
-  ],
-  Started: [
-    { id: "3", title: "Paint Living Room", price: 400 },
-  ],
-  Completed: [],
-};
 
 export default function MyTasksScreen({ navigation }) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("Pending");
+  const [groupedTasks, setGroupedTasks] = useState({
+    Pending: [],
+    Started: [],
+    Completed: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        setLoading(true);
+        const userId = await SecureStore.getItemAsync("userId");
+        if (!userId) throw new Error("No user ID");
+
+        const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
+        const allTasks = await res.json();
+
+        // Group tasks by status
+        const grouped = { Pending: [], Started: [], Completed: [] };
+        allTasks.forEach((task) => {
+          if (grouped[task.status]) {
+            grouped[task.status].push(task);
+          }
+        });
+
+        setGroupedTasks(grouped);
+      } catch (err) {
+        console.error("❌ Failed to fetch tasks:", err.message);
+        Alert.alert("Error", t("clientMyTasks.fetchError"));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []);
 
   const renderTask = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate("TaskDetails", { task: item })}>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardPrice}>{item.price} SAR</Text>
+        <Text style={styles.cardPrice}>{item.budget} SAR</Text>
       </View>
     </TouchableOpacity>
   );
@@ -42,18 +70,10 @@ export default function MyTasksScreen({ navigation }) {
         {["Pending", "Started", "Completed"].map((tabKey) => (
           <TouchableOpacity
             key={tabKey}
-            style={[
-              styles.tab,
-              activeTab === tabKey && styles.activeTab,
-            ]}
+            style={[styles.tab, activeTab === tabKey && styles.activeTab]}
             onPress={() => setActiveTab(tabKey)}
           >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === tabKey && styles.activeTabText,
-              ]}
-            >
+            <Text style={[styles.tabText, activeTab === tabKey && styles.activeTabText]}>
               {t(`clientMyTasks.${tabKey.toLowerCase()}`)}
             </Text>
           </TouchableOpacity>
@@ -61,26 +81,26 @@ export default function MyTasksScreen({ navigation }) {
       </View>
 
       {/* Task List */}
-      <FlatList
-        data={fakeTasks[activeTab]}
-        keyExtractor={(item) => item.id}
-        renderItem={renderTask}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            {t("clientMyTasks.noTasks", {
-              status: t(`clientMyTasks.${activeTab.toLowerCase()}`),
-            })}
-          </Text>
-        }
-        contentContainerStyle={{
-          paddingTop: 20,
-          paddingBottom: 40,
-        }}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
+      ) : (
+        <FlatList
+          data={groupedTasks[activeTab]}
+          keyExtractor={(item) => item._id}
+          renderItem={renderTask}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              {t("clientMyTasks.noTasks", {
+                status: t(`clientMyTasks.${activeTab.toLowerCase()}`),
+              })}
+            </Text>
+          }
+          contentContainerStyle={{ paddingTop: 20, paddingBottom: 40 }}
+        />
+      )}
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

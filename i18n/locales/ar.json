@@ -109,12 +109,14 @@
     "completed": "مكتمل",
     "pending": "قيد الانتظار"
   },
-  "clientMyTasks": {
-    "pending": "قيد الانتظار",
-    "started": "قيد التنفيذ",
-    "completed": "مكتملة",
-    "noTasks": "لا توجد مهام {{status}} حاليًا."
-  },
+"clientMyTasks": {
+  "pending": "قيد الانتظار",
+  "started": "قيد التنفيذ",
+  "completed": "مكتملة",
+  "noTasks": "لا توجد مهام {{status}} حاليًا.",
+  "fetchError": "تعذر تحميل المهام. يرجى المحاولة مرة أخرى."
+}
+,
   "clientNotifications": {
     "title": "الإشعارات",
     "none": "ليس لديك إشعارات.",
