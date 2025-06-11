@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const Message = require("../models/Message");
-const User = require("../models/User"); // if you want to check if receiver exists
+const User = require("../models/User");
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
@@ -19,7 +19,63 @@ const verifyToken = (req) => {
   }
 };
 
-// POST /api/messages — send message
+// ✅ GET /api/messages/conversations — fetch recent conversations
+router.get("/conversations", async (req, res) => {
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const userId = decoded.userId;
+
+    const latestMessages = await Message.aggregate([
+      {
+        $match: {
+          $or: [{ sender: userId }, { receiver: userId }],
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: {
+            $cond: [{ $eq: ["$sender", userId] }, "$receiver", "$sender"],
+          },
+          lastMessage: { $first: "$text" },
+          createdAt: { $first: "$createdAt" },
+        },
+      },
+      {
+        $lookup: {
+          from: "users", // ✅ matches Mongoose model name "User"
+          localField: "_id",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      { $unwind: "$userInfo" },
+      {
+        $project: {
+          otherUserId: "$_id",
+          name: "$userInfo.name",
+          lastMessage: 1,
+          time: {
+            $dateToString: {
+              format: "%H:%M",
+              date: "$createdAt",
+              timezone: "Asia/Riyadh",
+            },
+          },
+        },
+      },
+    ]);
+
+    res.json(latestMessages);
+  } catch (err) {
+    console.error("Conversation fetch error:", err);
+    res.status(500).json({ error: "Failed to fetch conversations" });
+  }
+});
+
+// ✅ POST /api/messages — send a message
 router.post("/", async (req, res) => {
   const decoded = verifyToken(req);
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
@@ -42,7 +98,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// GET /api/messages/:userId — get all messages with a user
+// ✅ GET /api/messages/:userId — get all messages with a specific user
 router.get("/:userId", async (req, res) => {
   const decoded = verifyToken(req);
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
@@ -64,68 +120,3 @@ router.get("/:userId", async (req, res) => {
 });
 
 module.exports = router;
-
-// GET /api/messages/conversations — fetch recent conversations
-router.get("/conversations", async (req, res) => {
-    const decoded = verifyToken(req);
-    if (!decoded) return res.status(401).json({ error: "Unauthorized" });
-  
-    try {
-      const userId = decoded.userId;
-  
-      const latestMessages = await Message.aggregate([
-        {
-          $match: {
-            $or: [{ sender: userId }, { receiver: userId }],
-          },
-        },
-        {
-          $sort: { createdAt: -1 },
-        },
-        {
-          $group: {
-            _id: {
-              $cond: [
-                { $eq: ["$sender", userId] },
-                "$receiver",
-                "$sender",
-              ],
-            },
-            lastMessage: { $first: "$text" },
-            createdAt: { $first: "$createdAt" },
-          },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "_id",
-            foreignField: "_id",
-            as: "userInfo",
-          },
-        },
-        {
-          $unwind: "$userInfo",
-        },
-        {
-          $project: {
-            otherUserId: "$_id",
-            name: "$userInfo.name",
-            lastMessage: 1,
-            time: {
-              $dateToString: {
-                format: "%H:%M",
-                date: "$createdAt",
-                timezone: "Asia/Riyadh", // adjust as needed
-              },
-            },
-          },
-        },
-      ]);
-  
-      res.json(latestMessages);
-    } catch (err) {
-      console.error("Conversation fetch error:", err);
-      res.status(500).json({ error: "Failed to fetch conversations" });
-    }
-  });
-  
