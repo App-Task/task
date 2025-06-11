@@ -120,3 +120,27 @@ router.get("/:userId", async (req, res) => {
 });
 
 module.exports = router;
+
+
+
+
+
+
+// TEMPPPPPPPPPPPPPPPPP
+
+// TEMP: insert a fake message between June7 and iPad
+router.get("/test/insert", async (req, res) => {
+    try {
+      const message = await Message.create({
+        sender: "68435959d384004bae5271e5", // June7
+        receiver: "68436ab15b79eca542a6508a", // iPad
+        text: "Hey iPad! This is a test message from June7 💬",
+      });
+  
+      res.json({ success: true, message });
+    } catch (err) {
+      console.error("Insert test message failed:", err);
+      res.status(500).json({ error: "Failed to insert test message" });
+    }
+  });
+  
