@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,54 +12,87 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import { getToken } from "../../services/authStorage"; // your working JWT fetcher
 
 export default function ChatScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { name } = route.params;
+  const { name, otherUserId } = route.params;
+
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      id: "1",
-      text: t("clientChat.mock1"),
-      sender: "other",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: "2",
-      text: t("clientChat.mock2"),
-      sender: "me",
-      timestamp: "10:05 AM",
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
 
-  const sendMessage = () => {
-    if (!message.trim()) return;
-    const timestamp = new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    setMessages([
-      ...messages,
-      {
-        id: Date.now().toString(),
-        text: message,
-        sender: "me",
-        timestamp,
-      },
-    ]);
-    setMessage("");
-    setIsTyping(false);
+  const fetchMessages = async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get(
+        `https://task-kq94.onrender.com/api/messages/${otherUserId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setMessages(res.data.reverse());
+    } catch (err) {
+      console.error("Error fetching messages:", err.message);
+    }
   };
+
+  const sendMessage = async () => {
+    if (!message.trim()) return;
+
+    try {
+      const token = await getToken();
+      const res = await axios.post(
+        `https://task-kq94.onrender.com/api/messages`,
+        {
+          receiver: otherUserId,
+          text: message,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const timestamp = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      setMessages((prev) => [
+        {
+          ...res.data,
+          sender: "me", // temporary label for UI
+          timestamp,
+        },
+        ...prev,
+      ]);
+
+      setMessage("");
+      setIsTyping(false);
+    } catch (err) {
+      console.error("Error sending message:", err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchMessages();
+  }, []);
 
   const renderItem = ({ item }) => (
     <View
       style={[
         styles.messageRow,
-        item.sender === "me" ? styles.rowRight : styles.rowLeft,
+        item.sender === "me" || item.sender._id === otherUserId
+          ? styles.rowRight
+          : styles.rowLeft,
       ]}
     >
-      {item.sender === "other" && (
+      {item.sender === "me" || item.sender._id !== otherUserId ? null : (
         <Image
           source={require("../../assets/images/profile.png")}
           style={styles.avatar}
@@ -68,11 +101,13 @@ export default function ChatScreen({ route, navigation }) {
       <View
         style={[
           styles.messageBubble,
-          item.sender === "me" ? styles.me : styles.other,
+          item.sender === "me" || item.sender._id === otherUserId
+            ? styles.me
+            : styles.other,
         ]}
       >
         <Text style={styles.messageText}>{item.text}</Text>
-        <Text style={styles.timestamp}>{item.timestamp}</Text>
+        <Text style={styles.timestamp}>{item.timestamp || ""}</Text>
       </View>
     </View>
   );
@@ -83,7 +118,6 @@ export default function ChatScreen({ route, navigation }) {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={90}
     >
-      {/* Header with back button */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#213729" />
@@ -94,9 +128,9 @@ export default function ChatScreen({ route, navigation }) {
       </View>
 
       <FlatList
-        data={messages.slice().reverse()}
+        data={messages}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id || item.id}
         contentContainerStyle={styles.chatBox}
         inverted
       />
@@ -124,9 +158,6 @@ export default function ChatScreen({ route, navigation }) {
     </KeyboardAvoidingView>
   );
 }
-
-// Styles remain unchanged...
-
 
 const styles = StyleSheet.create({
   container: {
@@ -223,4 +254,3 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
 });
-//

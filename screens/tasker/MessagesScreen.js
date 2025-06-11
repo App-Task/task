@@ -8,39 +8,41 @@ import {
   StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
-import { Ionicons } from "@expo/vector-icons";
-
-const dummyConversations = [
-  {
-    id: "1",
-    name: "Ahmed Khaled",
-    lastMessage: "Can we start tomorrow?",
-    time: "2:30 PM",
-    unread: true,
-  },
-  {
-    id: "2",
-    name: "Mona Saeed",
-    lastMessage: "Thanks for the great work!",
-    time: "9:00 AM",
-    unread: false,
-  },
-];
+import axios from "axios";
+import { getToken } from "../../services/authStorage";
 
 export default function TaskerMessagesScreen({ navigation }) {
   const { t } = useTranslation();
   const [conversations, setConversations] = useState([]);
 
+  const fetchConversations = async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get(
+        "https://task-kq94.onrender.com/api/messages/conversations",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setConversations(res.data);
+    } catch (err) {
+      console.error("Failed to load conversations:", err.message);
+    }
+  };
+
   useEffect(() => {
-    setTimeout(() => {
-      setConversations(dummyConversations);
-    }, 500);
+    fetchConversations();
   }, []);
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate("Chat", { user: item })}
+      onPress={() =>
+        navigation.navigate("Chat", {
+          name: item.name,
+          otherUserId: item.otherUserId,
+        })
+      }
     >
       <View style={styles.avatar}>
         <Text style={styles.avatarInitials}>
@@ -55,12 +57,15 @@ export default function TaskerMessagesScreen({ navigation }) {
 
       <View style={styles.textGroup}>
         <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.preview}>{item.lastMessage}</Text>
+        <Text style={styles.preview} numberOfLines={1}>
+          {item.lastMessage}
+        </Text>
       </View>
 
       <View style={styles.rightGroup}>
         <Text style={styles.time}>{item.time}</Text>
-        {item.unread && <View style={styles.unreadDot} />}
+        {/* Uncomment when you add unread logic */}
+        {/* item.unread && <View style={styles.unreadDot} /> */}
       </View>
     </TouchableOpacity>
   );
@@ -69,12 +74,18 @@ export default function TaskerMessagesScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.header}>{t("taskerMessages.title")}</Text>
 
-      <FlatList
-        data={conversations}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={{ paddingBottom: 40 }}
-      />
+      {conversations.length === 0 ? (
+        <Text style={{ textAlign: "center", marginTop: 40, color: "#888" }}>
+          {t("taskerMessages.empty")}
+        </Text>
+      ) : (
+        <FlatList
+          data={conversations}
+          keyExtractor={(item) => item.otherUserId}
+          renderItem={renderItem}
+          contentContainerStyle={{ paddingBottom: 40 }}
+        />
+      )}
     </View>
   );
 }

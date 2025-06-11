@@ -64,3 +64,68 @@ router.get("/:userId", async (req, res) => {
 });
 
 module.exports = router;
+
+// GET /api/messages/conversations — fetch recent conversations
+router.get("/conversations", async (req, res) => {
+    const decoded = verifyToken(req);
+    if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+  
+    try {
+      const userId = decoded.userId;
+  
+      const latestMessages = await Message.aggregate([
+        {
+          $match: {
+            $or: [{ sender: userId }, { receiver: userId }],
+          },
+        },
+        {
+          $sort: { createdAt: -1 },
+        },
+        {
+          $group: {
+            _id: {
+              $cond: [
+                { $eq: ["$sender", userId] },
+                "$receiver",
+                "$sender",
+              ],
+            },
+            lastMessage: { $first: "$text" },
+            createdAt: { $first: "$createdAt" },
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "_id",
+            foreignField: "_id",
+            as: "userInfo",
+          },
+        },
+        {
+          $unwind: "$userInfo",
+        },
+        {
+          $project: {
+            otherUserId: "$_id",
+            name: "$userInfo.name",
+            lastMessage: 1,
+            time: {
+              $dateToString: {
+                format: "%H:%M",
+                date: "$createdAt",
+                timezone: "Asia/Riyadh", // adjust as needed
+              },
+            },
+          },
+        },
+      ]);
+  
+      res.json(latestMessages);
+    } catch (err) {
+      console.error("Conversation fetch error:", err);
+      res.status(500).json({ error: "Failed to fetch conversations" });
+    }
+  });
+  

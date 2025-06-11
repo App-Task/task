@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,46 +7,101 @@ import {
   StyleSheet,
   FlatList,
   I18nManager,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { Dimensions } from "react-native";
+import axios from "axios";
+import { getToken } from "../../services/authStorage";
 
 const { width } = Dimensions.get("window");
 
-const initialMessages = [
-  { id: "1", sender: "client", text: "Hello, can you start today?", time: "10:15 AM" },
-  { id: "2", sender: "tasker", text: "Yes, I’m available after 5 PM.", time: "10:17 AM" },
-];
-
-export default function ChatScreen({ navigation }) {
+export default function ChatScreen({ navigation, route }) {
   const { t } = useTranslation();
-  const [messages, setMessages] = useState(initialMessages);
+  const { name, otherUserId } = route.params;
+
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
-    const newMessage = {
-      id: Date.now().toString(),
-      sender: "tasker",
-      text: input.trim(),
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-    setInput("");
+  const fetchMessages = async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get(
+        `https://task-kq94.onrender.com/api/messages/${otherUserId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // reverse for FlatList inverted
+      setMessages(res.data.reverse());
+    } catch (err) {
+      console.error("Error loading messages:", err.message);
+    }
   };
 
-  const renderMessage = ({ item }) => (
-    <View
-      style={[
-        styles.bubble,
-        item.sender === "tasker" ? styles.myMessage : styles.theirMessage,
-      ]}
-    >
-      <Text style={styles.messageText}>{item.text}</Text>
-      <Text style={styles.time}>{item.time}</Text>
-    </View>
-  );
+  const sendMessage = async () => {
+    if (!input.trim()) return;
+
+    try {
+      const token = await getToken();
+      const res = await axios.post(
+        `https://task-kq94.onrender.com/api/messages`,
+        {
+          receiver: otherUserId,
+          text: input.trim(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const newMessage = {
+        ...res.data,
+        sender: "me",
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+
+      setMessages((prev) => [newMessage, ...prev]);
+      setInput("");
+    } catch (err) {
+      console.error("Error sending message:", err.message);
+    }
+  };
+
+  const renderMessage = ({ item }) => {
+    const isMe =
+      item.sender === "me" ||
+      item.sender === route.params.currentUserId || // optional
+      item.sender._id === otherUserId;
+
+    return (
+      <View
+        style={[
+          styles.bubble,
+          isMe ? styles.myMessage : styles.theirMessage,
+        ]}
+      >
+        <Text style={styles.messageText}>{item.text}</Text>
+        <Text style={styles.time}>
+          {item.time || new Date(item.createdAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </Text>
+      </View>
+    );
+  };
+
+  useEffect(() => {
+    fetchMessages();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -59,7 +114,7 @@ export default function ChatScreen({ navigation }) {
             color="#213729"
           />
         </TouchableOpacity>
-        <Text style={styles.title}>{t("taskerChat.title")}</Text>
+        <Text style={styles.title}>{name}</Text>
         <TouchableOpacity onPress={() => alert(t("taskerChat.reported"))}>
           <Ionicons name="alert-circle-outline" size={24} color="#213729" />
         </TouchableOpacity>
@@ -68,7 +123,7 @@ export default function ChatScreen({ navigation }) {
       {/* Chat */}
       <FlatList
         data={messages}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id || item.id}
         renderItem={renderMessage}
         contentContainerStyle={styles.messageContainer}
         inverted
@@ -93,10 +148,7 @@ export default function ChatScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-  },
+  container: { flex: 1, backgroundColor: "#ffffff" },
   header: {
     flexDirection: "row",
     alignItems: "center",

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,35 +8,41 @@ import {
   StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import { getToken } from "../../services/authStorage";
 
 export default function MessagesScreen({ navigation }) {
   const { t } = useTranslation();
+  const [conversations, setConversations] = useState([]);
 
-  const [conversations] = useState([
-    {
-      id: "1",
-      name: "Sarah Hassan",
-      lastMessage: "Thanks! I’ll be there on time.",
-      time: "1h ago",
-    },
-    {
-      id: "2",
-      name: "Mohammed Al-Faraj",
-      lastMessage: "Can you confirm your availability?",
-      time: "3h ago",
-    },
-    {
-      id: "3",
-      name: "Ali Tarek",
-      lastMessage: "Task completed. Thanks!",
-      time: "1d ago",
-    },
-  ]);
+  const fetchConversations = async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get(
+        "https://task-kq94.onrender.com/api/messages/conversations",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setConversations(res.data);
+    } catch (err) {
+      console.error("Failed to load conversations:", err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchConversations();
+  }, []);
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate("Chat", { name: item.name })}
+      onPress={() =>
+        navigation.navigate("Chat", {
+          name: item.name,
+          otherUserId: item.otherUserId,
+        })
+      }
     >
       <Text style={styles.name}>{item.name}</Text>
       <Text style={styles.message} numberOfLines={1}>
@@ -55,7 +61,7 @@ export default function MessagesScreen({ navigation }) {
       ) : (
         <FlatList
           data={conversations}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.otherUserId}
           renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
@@ -64,7 +70,6 @@ export default function MessagesScreen({ navigation }) {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
