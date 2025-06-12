@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   empty: {
     fontFamily: "Inter",
     fontSize: 16,
-    color: "#999",
+    color: "#999", //
     textAlign: "center",
     marginTop: 40,
   },
