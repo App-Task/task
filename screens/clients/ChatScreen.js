@@ -13,7 +13,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import { getToken } from "../../services/authStorage"; // your working JWT fetcher
+import { getToken } from "../../services/authStorage";
+import * as SecureStore from "expo-secure-store";
 
 export default function ChatScreen({ route, navigation }) {
   const { t } = useTranslation();
@@ -22,6 +23,7 @@ export default function ChatScreen({ route, navigation }) {
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState("");
 
   const fetchMessages = async () => {
     try {
@@ -66,8 +68,9 @@ export default function ChatScreen({ route, navigation }) {
       setMessages((prev) => [
         {
           ...res.data,
-          sender: "me", // temporary label for UI
+          sender: currentUserId,
           timestamp,
+          status: "delivered",
         },
         ...prev,
       ]);
@@ -80,37 +83,43 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   useEffect(() => {
+    const loadUserId = async () => {
+      const id = await SecureStore.getItemAsync("user_id");
+      setCurrentUserId(id);
+    };
+
+    loadUserId();
     fetchMessages();
+    const interval = setInterval(fetchMessages, 5000); // 🔁 Poll every 5 sec
+
+    return () => clearInterval(interval); // Clean up
   }, []);
 
-  const renderItem = ({ item }) => (
-    <View
-      style={[
-        styles.messageRow,
-        item.sender === "me" || item.sender._id === otherUserId
-          ? styles.rowRight
-          : styles.rowLeft,
-      ]}
-    >
-      {item.sender === "me" || item.sender._id !== otherUserId ? null : (
-        <Image
-          source={require("../../assets/images/profile.png")}
-          style={styles.avatar}
-        />
-      )}
-      <View
-        style={[
-          styles.messageBubble,
-          item.sender === "me" || item.sender._id === otherUserId
-            ? styles.me
-            : styles.other,
-        ]}
-      >
-        <Text style={styles.messageText}>{item.text}</Text>
-        <Text style={styles.timestamp}>{item.timestamp || ""}</Text>
+  const renderItem = ({ item }) => {
+    const isMine = item.sender === currentUserId || item.sender._id === currentUserId;
+
+    return (
+      <View style={[styles.messageRow, isMine ? styles.rowRight : styles.rowLeft]}>
+        {!isMine && (
+          <Image
+            source={require("../../assets/images/profile.png")}
+            style={styles.avatar}
+          />
+        )}
+        <View
+          style={[
+            styles.messageBubble,
+            isMine ? styles.me : styles.other,
+          ]}
+        >
+          <Text style={styles.messageText}>{item.text}</Text>
+          <Text style={styles.timestamp}>
+            {item.timestamp || ""} {isMine && (item.status || "✓")}
+          </Text>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <KeyboardAvoidingView
@@ -160,10 +169,7 @@ export default function ChatScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-  },
+  container: { flex: 1, backgroundColor: "#ffffff" },
   header: {
     flexDirection: "row",
     alignItems: "center",
