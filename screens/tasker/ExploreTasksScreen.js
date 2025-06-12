@@ -8,12 +8,11 @@ import {
   I18nManager,
   ActivityIndicator,
   StyleSheet,
-  Alert,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import axios from "axios";
-import { getToken } from "../../services/authStorage";
+import { getToken } from "../../services/authStorage"; // ✅ adjust path if needed
 
 export default function ExploreTasksScreen({ navigation }) {
   const { t } = useTranslation();
@@ -24,12 +23,13 @@ export default function ExploreTasksScreen({ navigation }) {
     try {
       const token = await getToken();
       const res = await axios.get("https://task-kq94.onrender.com/api/tasks", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       setTasks(res.data);
     } catch (err) {
-      console.error("Error fetching tasks:", err.message);
-      Alert.alert("Error", "Unable to fetch tasks. Please try again later.");
+      console.error("❌ Error fetching tasks:", err.message);
     } finally {
       setLoading(false);
     }
@@ -54,7 +54,7 @@ export default function ExploreTasksScreen({ navigation }) {
           {t("taskerExplore.price")}: {item.budget} SAR
         </Text>
         <Text style={styles.sub}>
-          {t("taskerExplore.bids")}: {item.bids?.length || 0}
+          {t("taskerExplore.bids")}: 0 {/* Replace with real bid count if available */}
         </Text>
 
         <TouchableOpacity
