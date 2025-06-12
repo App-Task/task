@@ -6,7 +6,7 @@ const User = require("../models/User");
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
-// Inline JWT auth helper
+// ✅ Extract and verify JWT
 const verifyToken = (req) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
@@ -18,27 +18,39 @@ const verifyToken = (req) => {
     return null;
   }
 };
+const mongoose = require("mongoose");
 
-// ✅ GET /api/messages/conversations — recent convos
 router.get("/conversations", async (req, res) => {
   const decoded = verifyToken(req);
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const userId = decoded.userId || decoded.id;
+    const userId = new mongoose.Types.ObjectId(decoded.userId || decoded.id);
 
     const latestMessages = await Message.aggregate([
       {
         $match: {
-          $or: [{ sender: userId }, { receiver: userId }],
+          $or: [
+            { sender: userId },
+            { receiver: userId },
+          ],
         },
       },
       { $sort: { createdAt: -1 } },
       {
-        $group: {
-          _id: {
-            $cond: [{ $eq: ["$sender", userId] }, "$receiver", "$sender"],
+        $addFields: {
+          otherUserId: {
+            $cond: [
+              { $eq: ["$sender", userId] },
+              "$receiver",
+              "$sender",
+            ],
           },
+        },
+      },
+      {
+        $group: {
+          _id: "$otherUserId",
           lastMessage: { $first: "$text" },
           createdAt: { $first: "$createdAt" },
         },
@@ -75,7 +87,8 @@ router.get("/conversations", async (req, res) => {
   }
 });
 
-// ✅ POST /api/messages — send a message
+
+// ✅ POST /api/messages
 router.post("/", async (req, res) => {
   const decoded = verifyToken(req);
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
@@ -105,7 +118,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ✅ GET /api/messages/:userId — fetch chat with one user
+// ✅ GET /api/messages/:userId
 router.get("/:userId", async (req, res) => {
   const decoded = verifyToken(req);
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
@@ -128,12 +141,12 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-// ✅ TEMP: Insert test message
+// ✅ TEMP: Add test message manually (for dev)
 router.get("/test/insert", async (req, res) => {
   try {
     const message = await Message.create({
-      sender: "68435959d384004bae5271e5", // June7
-      receiver: "68436ab15b79eca542a6508a", // iPad
+      sender: "68435959d384004bae5271e5", // Example sender ID
+      receiver: "68436ab15b79eca542a6508a", // Example receiver ID
       text: "Hey iPad! This is a test message from June7 💬",
     });
 

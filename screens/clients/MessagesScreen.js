@@ -1,3 +1,5 @@
+
+
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -11,6 +13,9 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
 
+
+
+
 export default function MessagesScreen({ navigation }) {
   const { t } = useTranslation();
   const [conversations, setConversations] = useState([]);
@@ -18,40 +23,51 @@ export default function MessagesScreen({ navigation }) {
   const fetchConversations = async () => {
     try {
       const token = await getToken();
+  
       const res = await axios.get(
         "https://task-kq94.onrender.com/api/messages/conversations",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+  
+      console.log("✅ Conversations from API:", res.data); // <--- ADD THIS
+  
       setConversations(res.data);
     } catch (err) {
       console.error("Failed to load conversations:", err.message);
     }
   };
+  
 
   useEffect(() => {
     fetchConversations();
   }, []);
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() =>
-        navigation.navigate("Chat", {
-          name: item.name,
-          otherUserId: item.otherUserId,
-        })
-      }
-    >
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.message} numberOfLines={1}>
-        {item.lastMessage}
-      </Text>
-      <Text style={styles.time}>{item.time}</Text>
-    </TouchableOpacity>
-  );
+  const renderItem = ({ item }) => {
+    console.log("🔍 Conversation item:", item); // ✅
+  
+    return (
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() =>
+          navigation.navigate("Chat", {
+            name: item.name,
+            otherUserId: item.otherUserId,
+          })
+        }
+      >
+        <Text style={styles.name}>{item.name || "Unnamed User"}</Text>
+        <Text style={styles.message} numberOfLines={1}>
+          {item.lastMessage}
+        </Text>
+        <Text style={styles.time}>{item.time}</Text>
+      </TouchableOpacity>
+    );
+  };
+  
 
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t("clientMessages.title")}</Text>
