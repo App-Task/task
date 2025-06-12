@@ -1,121 +1,138 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  I18nManager,
-  StyleSheet,
-} from "react-native";
-import { useTranslation } from "react-i18next";
-import axios from "axios";
-import { getToken } from "../../services/authStorage";
+const express = require("express");
+const router = express.Router();
+const jwt = require("jsonwebtoken");
+const Message = require("../models/Message");
+const User = require("../models/User");
 
-export default function MessagesScreen({ navigation }) {
-  const { t } = useTranslation();
-  const [conversations, setConversations] = useState([]);
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
-  const fetchConversations = async () => {
-    try {
-      const token = await getToken();
-      const res = await axios.get(
-        "https://task-kq94.onrender.com/api/messages/conversations",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setConversations(res.data);
-    } catch (err) {
-      console.error("Failed to load conversations:", err.message);
-    }
-  };
+// Inline JWT auth check
+const verifyToken = (req) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
 
-  useEffect(() => {
-    fetchConversations();
-  }, []);
+  const token = authHeader.split(" ")[1];
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch {
+    return null;
+  }
+};
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() =>
-        navigation.navigate("Chat", {
-          name: item.name,
-          otherUserId: item.otherUserId,
-        })
-      }
-    >
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.message} numberOfLines={1}>
-        {item.lastMessage}
-      </Text>
-      <Text style={styles.time}>{item.time}</Text>
-    </TouchableOpacity>
-  );
+// ✅ GET /api/messages/conversations — fetch recent conversations
+router.get("/conversations", async (req, res) => {
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{t("clientMessages.title")}</Text>
+  try {
+    const userId = decoded.id; // ✅ fixed
 
-      {conversations.length === 0 ? (
-        <Text style={styles.empty}>{t("clientMessages.placeholder")}</Text>
-      ) : (
-        <FlatList
-          data={conversations}
-          keyExtractor={(item) => item.otherUserId}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 40 }}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
-    </View>
-  );
-}
+    const latestMessages = await Message.aggregate([
+      {
+        $match: {
+          $or: [{ sender: userId }, { receiver: userId }],
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: {
+            $cond: [{ $eq: ["$sender", userId] }, "$receiver", "$sender"],
+          },
+          lastMessage: { $first: "$text" },
+          createdAt: { $first: "$createdAt" },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      { $unwind: "$userInfo" },
+      {
+        $project: {
+          otherUserId: "$_id",
+          name: "$userInfo.name",
+          lastMessage: 1,
+          time: {
+            $dateToString: {
+              format: "%H:%M",
+              date: "$createdAt",
+              timezone: "Asia/Riyadh",
+            },
+          },
+        },
+      },
+    ]);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-    paddingTop: 60,
-    paddingHorizontal: 24,
-  },
-  title: {
-    fontFamily: "InterBold",
-    fontSize: 24,
-    color: "#213729",
-    marginBottom: 30,
-    textAlign: "center",
-  },
-  card: {
-    backgroundColor: "#f2f2f2",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  name: {
-    fontFamily: "InterBold",
-    fontSize: 16,
-    color: "#213729",
-    marginBottom: 4,
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  message: {
-    fontFamily: "Inter",
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 6,
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  time: {
-    fontFamily: "Inter",
-    fontSize: 12,
-    color: "#999",
-    textAlign: I18nManager.isRTL ? "left" : "right",
-  },
-  empty: {
-    fontFamily: "Inter",
-    fontSize: 16,
-    color: "#999",
-    textAlign: "center",
-    marginTop: 40,
-  },
+    res.json(latestMessages);
+  } catch (err) {
+    console.error("Conversation fetch error:", err);
+    res.status(500).json({ error: "Failed to fetch conversations" });
+  }
 });
+
+// ✅ POST /api/messages — send a message
+router.post("/", async (req, res) => {
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+
+  const { receiver, text, taskId } = req.body;
+  if (!receiver || !text) {
+    return res.status(400).json({ error: "Receiver and text required" });
+  }
+
+  try {
+    const message = await Message.create({
+      sender: decoded.id, // ✅ fixed
+      receiver,
+      text,
+      taskId,
+    });
+    res.status(201).json(message);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to send message" });
+  }
+});
+
+// ✅ GET /api/messages/:userId — get all messages with a specific user
+router.get("/:userId", async (req, res) => {
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+
+  const { userId } = req.params;
+
+  try {
+    const messages = await Message.find({
+      $or: [
+        { sender: decoded.id, receiver: userId }, // ✅ fixed
+        { sender: userId, receiver: decoded.id }, // ✅ fixed
+      ],
+    }).sort({ createdAt: 1 });
+
+    res.json(messages);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch messages" });
+  }
+});
+
+// TEMP: insert a fake message between June7 and iPad
+router.get("/test/insert", async (req, res) => {
+  try {
+    const message = await Message.create({
+      sender: "68435959d384004bae5271e5", // June7
+      receiver: "68436ab15b79eca542a6508a", // iPad
+      text: "Hey iPad! This is a test message from June7 💬",
+    });
+
+    res.json({ success: true, message });
+  } catch (err) {
+    console.error("Insert test message failed:", err);
+    res.status(500).json({ error: "Failed to insert test message" });
+  }
+});
+
+module.exports = router;
