@@ -6,7 +6,7 @@ const User = require("../models/User");
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
-// Inline JWT auth check
+// Inline JWT auth helper
 const verifyToken = (req) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
@@ -19,13 +19,13 @@ const verifyToken = (req) => {
   }
 };
 
-// ✅ GET /api/messages/conversations — fetch recent conversations
+// ✅ GET /api/messages/conversations — recent convos
 router.get("/conversations", async (req, res) => {
   const decoded = verifyToken(req);
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const userId = decoded.userId;
+    const userId = decoded.userId || decoded.id;
 
     const latestMessages = await Message.aggregate([
       {
@@ -45,7 +45,7 @@ router.get("/conversations", async (req, res) => {
       },
       {
         $lookup: {
-          from: "users", // ✅ matches Mongoose model name "User"
+          from: "users",
           localField: "_id",
           foreignField: "_id",
           as: "userInfo",
@@ -80,67 +80,68 @@ router.post("/", async (req, res) => {
   const decoded = verifyToken(req);
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
 
+  const senderId = decoded.userId || decoded.id;
   const { receiver, text, taskId } = req.body;
+
   if (!receiver || !text) {
     return res.status(400).json({ error: "Receiver and text required" });
   }
 
   try {
+    const receiverExists = await User.findById(receiver);
+    if (!receiverExists) return res.status(404).json({ error: "Receiver not found" });
+
     const message = await Message.create({
-      sender: decoded.userId,
+      sender: senderId,
       receiver,
       text,
       taskId,
     });
+
     res.status(201).json(message);
   } catch (err) {
+    console.error("Message send error:", err);
     res.status(500).json({ error: "Failed to send message" });
   }
 });
 
-// ✅ GET /api/messages/:userId — get all messages with a specific user
+// ✅ GET /api/messages/:userId — fetch chat with one user
 router.get("/:userId", async (req, res) => {
   const decoded = verifyToken(req);
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
 
-  const { userId } = req.params;
+  const myId = decoded.userId || decoded.id;
+  const otherId = req.params.userId;
 
   try {
     const messages = await Message.find({
       $or: [
-        { sender: decoded.userId, receiver: userId },
-        { sender: userId, receiver: decoded.userId },
+        { sender: myId, receiver: otherId },
+        { sender: otherId, receiver: myId },
       ],
     }).sort({ createdAt: 1 });
 
     res.json(messages);
   } catch (err) {
+    console.error("Fetch chat error:", err);
     res.status(500).json({ error: "Failed to fetch messages" });
   }
 });
 
-module.exports = router;
-
-
-
-
-
-
-// TEMPPPPPPPPPPPPPPPPP
-
-// TEMP: insert a fake message between June7 and iPad
+// ✅ TEMP: Insert test message
 router.get("/test/insert", async (req, res) => {
-    try {
-      const message = await Message.create({
-        sender: "68435959d384004bae5271e5", // June7
-        receiver: "68436ab15b79eca542a6508a", // iPad
-        text: "Hey iPad! This is a test message from June7 💬",
-      });
-  
-      res.json({ success: true, message });
-    } catch (err) {
-      console.error("Insert test message failed:", err);
-      res.status(500).json({ error: "Failed to insert test message" });
-    }
-  });
-  
+  try {
+    const message = await Message.create({
+      sender: "68435959d384004bae5271e5", // June7
+      receiver: "68436ab15b79eca542a6508a", // iPad
+      text: "Hey iPad! This is a test message from June7 💬",
+    });
+
+    res.json({ success: true, message });
+  } catch (err) {
+    console.error("Insert test message failed:", err);
+    res.status(500).json({ error: "Failed to insert test message" });
+  }
+});
+
+module.exports = router;

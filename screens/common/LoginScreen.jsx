@@ -42,6 +42,10 @@ export default function LoginScreen({ navigation, route }) {
         // ✅ Save only if valid ObjectId
         if (response.user.id && String(response.user.id).length === 24) {
           await storeToken(response.token);
+          
+          console.log("🔥 JWT Token:", response.token);
+
+
           await SecureStore.setItemAsync("userId", String(response.user.id)); // ✅ Corrected
           await SecureStore.setItemAsync("userName", String(response.user.name));
         } else {
