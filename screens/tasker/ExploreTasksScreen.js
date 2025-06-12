@@ -8,44 +8,40 @@ import {
   I18nManager,
   ActivityIndicator,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import Animated, { FadeInUp } from "react-native-reanimated";
-
-const dummyTasks = [
-  {
-    id: "1",
-    title: "Fix Washing Machine",
-    location: "Riyadh",
-    price: 200,
-    images: ["https://via.placeholder.com/150"],
-    bids: 2,
-  },
-  {
-    id: "2",
-    title: "Paint my room",
-    location: "Jeddah",
-    price: 350,
-    images: [],
-    bids: 5,
-  },
-];
+import axios from "axios";
+import { getToken } from "../../services/authStorage";
 
 export default function ExploreTasksScreen({ navigation }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setTasks(dummyTasks);
+  const fetchTasks = async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get("https://task-kq94.onrender.com/api/tasks", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTasks(res.data);
+    } catch (err) {
+      console.error("Error fetching tasks:", err.message);
+      Alert.alert("Error", "Unable to fetch tasks. Please try again later.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
   }, []);
 
   const renderTask = ({ item }) => (
     <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
-      {item.images.length > 0 && (
+      {item.images?.length > 0 && (
         <Image source={{ uri: item.images[0] }} style={styles.image} />
       )}
 
@@ -55,10 +51,10 @@ export default function ExploreTasksScreen({ navigation }) {
           {t("taskerExplore.location")}: {item.location}
         </Text>
         <Text style={styles.sub}>
-          {t("taskerExplore.price")}: {item.price} SAR
+          {t("taskerExplore.price")}: {item.budget} SAR
         </Text>
         <Text style={styles.sub}>
-          {t("taskerExplore.bids")}: {item.bids}
+          {t("taskerExplore.bids")}: {item.bids?.length || 0}
         </Text>
 
         <TouchableOpacity
@@ -82,7 +78,7 @@ export default function ExploreTasksScreen({ navigation }) {
       ) : (
         <FlatList
           data={tasks}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           renderItem={renderTask}
           contentContainerStyle={{ paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
@@ -91,7 +87,6 @@ export default function ExploreTasksScreen({ navigation }) {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
