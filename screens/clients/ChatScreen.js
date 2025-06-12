@@ -83,21 +83,26 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   useEffect(() => {
-    const loadUserId = async () => {
+    const initialize = async () => {
       const id = await SecureStore.getItemAsync("user_id");
       setCurrentUserId(id);
+  
+      // ✅ wait until currentUserId is set, then fetch messages
+      setTimeout(fetchMessages, 100);
+      setInterval(fetchMessages, 5000);
     };
-
-    loadUserId();
-    fetchMessages();
-    const interval = setInterval(fetchMessages, 5000); // 🔁 Poll every 5 sec
-
-    return () => clearInterval(interval); // Clean up
+  
+    initialize();
   }, []);
-
+  
   const renderItem = ({ item }) => {
-    const isMine = item.sender === currentUserId || item.sender._id === currentUserId;
-
+    // ✅ Safely extract sender ID whether it's a string or an object
+    const senderId =
+      typeof item.sender === "string" ? item.sender : item.sender?._id;
+  
+    // ✅ Compare consistently using string form
+    const isMine = senderId?.toString() === currentUserId?.toString();
+  
     return (
       <View style={[styles.messageRow, isMine ? styles.rowRight : styles.rowLeft]}>
         {!isMine && (
@@ -106,12 +111,7 @@ export default function ChatScreen({ route, navigation }) {
             style={styles.avatar}
           />
         )}
-        <View
-          style={[
-            styles.messageBubble,
-            isMine ? styles.me : styles.other,
-          ]}
-        >
+        <View style={[styles.messageBubble, isMine ? styles.me : styles.other]}>
           <Text style={styles.messageText}>{item.text}</Text>
           <Text style={styles.timestamp}>
             {item.timestamp || ""} {isMine && (item.status || "✓")}
@@ -120,7 +120,7 @@ export default function ChatScreen({ route, navigation }) {
       </View>
     );
   };
-
+  
   return (
     <KeyboardAvoidingView
       style={styles.container}

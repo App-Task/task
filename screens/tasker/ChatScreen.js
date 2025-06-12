@@ -34,10 +34,9 @@ export default function ChatScreen({ navigation, route }) {
           },
         }
       );
-      // reverse for FlatList inverted
       setMessages(res.data.reverse());
     } catch (err) {
-      console.error("Error loading messages:", err.message);
+      console.error("❌ Error loading messages:", err.message);
     }
   };
 
@@ -71,15 +70,16 @@ export default function ChatScreen({ navigation, route }) {
       setMessages((prev) => [newMessage, ...prev]);
       setInput("");
     } catch (err) {
-      console.error("Error sending message:", err.message);
+      console.error("❌ Error sending message:", err.message);
     }
   };
 
   const renderMessage = ({ item }) => {
     const isMe =
-      item.sender === "me" ||
-      item.sender === route.params.currentUserId || // optional
-      item.sender._id === otherUserId;
+    item.sender === "me" || // newly sent
+    item.sender?._id === route.params.currentUserId || // fetched from API
+    item.sender === route.params.currentUserId; // fallback if already just ID
+  
 
     return (
       <View
@@ -90,10 +90,11 @@ export default function ChatScreen({ navigation, route }) {
       >
         <Text style={styles.messageText}>{item.text}</Text>
         <Text style={styles.time}>
-          {item.time || new Date(item.createdAt).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          {item.time ||
+            new Date(item.createdAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
         </Text>
       </View>
     );
@@ -101,6 +102,8 @@ export default function ChatScreen({ navigation, route }) {
 
   useEffect(() => {
     fetchMessages();
+    const interval = setInterval(fetchMessages, 5000); // auto-refresh every 5s
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -115,7 +118,7 @@ export default function ChatScreen({ navigation, route }) {
           />
         </TouchableOpacity>
         <Text style={styles.title}>{name}</Text>
-        <TouchableOpacity onPress={() => alert(t("taskerChat.reported"))}>
+        <TouchableOpacity onPress={() => alert(t("clientChat.reported"))}>
           <Ionicons name="alert-circle-outline" size={24} color="#213729" />
         </TouchableOpacity>
       </View>
@@ -133,7 +136,7 @@ export default function ChatScreen({ navigation, route }) {
       <View style={styles.inputRow}>
         <TextInput
           style={styles.input}
-          placeholder={t("taskerChat.placeholder")}
+          placeholder={t("clientChat.placeholder")}
           placeholderTextColor="#aaa"
           value={input}
           onChangeText={setInput}
