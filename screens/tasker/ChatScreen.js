@@ -25,6 +25,8 @@ export default function ChatScreen({ navigation, route }) {
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [currentUserId, setCurrentUserId] = useState("");
+
 
   const fetchMessages = async () => {
     try {
@@ -79,9 +81,10 @@ export default function ChatScreen({ navigation, route }) {
 
   const renderMessage = ({ item }) => {
     const isMe =
-    item.sender === "me" || // newly sent
-    item.sender?._id === route.params.currentUserId || // fetched from API
-    item.sender === route.params.currentUserId; // fallback if already just ID
+    item.sender === "me" || // just sent
+    item.sender?._id === currentUserId || // fetched
+    item.sender === currentUserId;
+  
   
 
     return (
@@ -104,10 +107,18 @@ export default function ChatScreen({ navigation, route }) {
   };
 
   useEffect(() => {
-    fetchMessages();
-    const interval = setInterval(fetchMessages, 5000); // auto-refresh every 5s
-    return () => clearInterval(interval);
+    const initialize = async () => {
+      const id = await SecureStore.getItemAsync("userId");
+      setCurrentUserId(id);
+      setTimeout(fetchMessages, 100);
+      setInterval(fetchMessages, 5000);
+    };
+  
+    initialize();
+  
+    return () => clearInterval(); // cleanup
   }, []);
+  
 
   return (
     <SafeAreaView style={styles.safeArea}>
