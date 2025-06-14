@@ -85,7 +85,7 @@ export default function ChatScreen({ route, navigation }) {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { //
     const initialize = async () => {
       const id = await SecureStore.getItemAsync("userId");
       setCurrentUserId(id);
