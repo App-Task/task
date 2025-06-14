@@ -1,5 +1,8 @@
 import axios from "axios";
 
+import * as SecureStore from "expo-secure-store";
+
+
 // 👇 Replace with your actual local IP address
 const API_URL = "https://task-kq94.onrender.com/api/auth";
 /**
@@ -22,13 +25,19 @@ export const registerUser = async (userData) => {
 export const loginUser = async (credentials) => {
   try {
     const response = await axios.post(`${API_URL}/login`, credentials);
+
+    // ✅ Save user ID securely for message alignment later
+    if (response.data?.user?.id) {
+      await SecureStore.setItemAsync("user_id", response.data.user.id.toString());
+    }
+
     return response.data;
   } catch (error) {
-    // Forward backend error to frontend catch
     const msg = error.response?.data?.msg || "Server error";
     throw new Error(msg);
   }
 };
+
 import { getToken } from "./authStorage";
 
 export const fetchCurrentUser = async () => {

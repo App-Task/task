@@ -87,7 +87,7 @@ export default function ChatScreen({ route, navigation }) {
 
   useEffect(() => {
     const initialize = async () => {
-      const id = await SecureStore.getItemAsync("user_id");
+      const id = await SecureStore.getItemAsync("userId");
       setCurrentUserId(id);
   
       // ✅ wait until currentUserId is set, then fetch messages
@@ -99,22 +99,32 @@ export default function ChatScreen({ route, navigation }) {
   }, []);
   
   const renderItem = ({ item }) => {
-    // ✅ Safely extract sender ID whether it's a string or an object
     const senderId =
       typeof item.sender === "string" ? item.sender : item.sender?._id;
   
-    // ✅ Compare consistently using string form
     const isMine = senderId?.toString() === currentUserId?.toString();
   
     return (
-      <View style={[styles.messageRow, isMine ? styles.rowRight : styles.rowLeft]}>
+      <View
+        style={[
+          styles.messageRow,
+          isMine ? styles.rowRight : styles.rowLeft,
+        ]}
+      >
         {!isMine && (
           <Image
             source={require("../../assets/images/profile.png")}
             style={styles.avatar}
           />
         )}
-        <View style={[styles.messageBubble, isMine ? styles.me : styles.other]}>
+  
+        <View
+          style={[
+            styles.messageBubble,
+            isMine ? styles.me : styles.other,
+            isMine ? { borderTopRightRadius: 0 } : { borderTopLeftRadius: 0 },
+          ]}
+        >
           <Text style={styles.messageText}>{item.text}</Text>
           <Text style={styles.timestamp}>
             {item.timestamp || ""} {isMine && (item.status || "✓")}
@@ -199,14 +209,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-end",
     marginBottom: 12,
+    maxWidth: "100%",
   },
+  
   rowLeft: {
     justifyContent: "flex-start",
+    alignSelf: "flex-start",
   },
+  
   rowRight: {
+    flexDirection: "row-reverse",
     justifyContent: "flex-end",
     alignSelf: "flex-end",
   },
+  
   avatar: {
     width: 30,
     height: 30,
