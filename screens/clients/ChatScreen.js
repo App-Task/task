@@ -24,7 +24,6 @@ export default function ChatScreen({ route, navigation }) {
   const { name, otherUserId } = route.params;
 
   const [message, setMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState([]);
   const [currentUserId, setCurrentUserId] = useState("");
 
@@ -79,7 +78,7 @@ export default function ChatScreen({ route, navigation }) {
       ]);
 
       setMessage("");
-      setIsTyping(false);
+
     } catch (err) {
       console.error("Error sending message:", err.message);
     }
@@ -159,19 +158,12 @@ export default function ChatScreen({ route, navigation }) {
         inverted
       />
 
-      {isTyping && (
-        <Text style={styles.typingIndicator}>
-          {t("clientChat.typing", { name })}
-        </Text>
-      )}
 
       <View style={styles.inputRow}>
         <TextInput
           value={message}
-          onChangeText={(text) => {
-            setMessage(text);
-            setIsTyping(true);
-          }}
+          onChangeText={(text) => setMessage(text)}
+
           style={styles.input}
           placeholder={t("clientChat.placeholder")}
         />
@@ -251,13 +243,6 @@ const styles = StyleSheet.create({
     color: "#666",
     marginTop: 4,
     textAlign: "right",
-  },
-  typingIndicator: {
-    fontFamily: "Inter",
-    fontSize: 13,
-    color: "#999",
-    marginLeft: 20,
-    marginBottom: 5,
   },
   inputRow: {
     flexDirection: "row",
