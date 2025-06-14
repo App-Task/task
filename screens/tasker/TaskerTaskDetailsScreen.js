@@ -9,15 +9,19 @@ import {
   Alert,
   I18nManager,
   StyleSheet,
-  Dimensions, 
+  Dimensions,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
+import { Ionicons } from "@expo/vector-icons"; // ✅ icon package
+import { useNavigation } from "@react-navigation/native"; // ✅ for back navigation
 
 const { width } = Dimensions.get("window");
 
 export default function TaskDetailsScreen({ route }) {
   const { task } = route.params;
   const { t } = useTranslation();
+  const navigation = useNavigation();
 
   const [bidAmount, setBidAmount] = useState("");
   const [message, setMessage] = useState("");
@@ -34,56 +38,70 @@ export default function TaskDetailsScreen({ route }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {task.images?.length > 0 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
-          {task.images.map((uri, i) => (
-            <Image key={i} source={{ uri }} style={styles.image} />
-          ))}
-        </ScrollView>
-      )}
-
-      <Text style={styles.title}>{task.title}</Text>
-
-      <Text style={styles.label}>{t("taskerTaskDetails.location")}</Text>
-      <Text style={styles.text}>{task.location}</Text>
-
-      <Text style={styles.label}>{t("taskerTaskDetails.price")}</Text>
-      <Text style={styles.text}>{task.price} SAR</Text>
-
-      <Text style={styles.label}>{t("taskerTaskDetails.enterBid")}</Text>
-      <TextInput
-        style={styles.input}
-        placeholder={t("taskerTaskDetails.bidAmount")}
-        value={bidAmount}
-        onChangeText={setBidAmount}
-        keyboardType="numeric"
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-        placeholderTextColor="#999"
-      />
-
-      <TextInput
-        style={[styles.input, styles.textarea]}
-        placeholder={t("taskerTaskDetails.bidMessage")}
-        value={message}
-        onChangeText={setMessage}
-        multiline
-        maxLength={150}
-        textAlignVertical="top"
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-        placeholderTextColor="#999"
-      />
-
-      <TouchableOpacity style={styles.button} onPress={handleBid}>
-        <Text style={styles.buttonText}>{t("taskerTaskDetails.submitBid")}</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#213729" />
       </TouchableOpacity>
 
-      <View style={{ height: 40 }} />
-    </ScrollView>
+      <ScrollView contentContainerStyle={styles.container}>
+        {task.images?.length > 0 && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
+            {task.images.map((uri, i) => (
+              <Image key={i} source={{ uri }} style={styles.image} />
+            ))}
+          </ScrollView>
+        )}
+
+        <Text style={styles.title}>{task.title}</Text>
+
+        <Text style={styles.label}>{t("taskerTaskDetails.location")}</Text>
+        <Text style={styles.text}>{task.location}</Text>
+
+        <Text style={styles.label}>{t("taskerTaskDetails.price")}</Text>
+        <Text style={styles.text}>{task.price} SAR</Text>
+
+        <Text style={styles.label}>{t("taskerTaskDetails.enterBid")}</Text>
+        <TextInput
+          style={styles.input}
+          placeholder={t("taskerTaskDetails.bidAmount")}
+          value={bidAmount}
+          onChangeText={setBidAmount}
+          keyboardType="numeric"
+          textAlign={I18nManager.isRTL ? "right" : "left"}
+          placeholderTextColor="#999"
+        />
+
+        <TextInput
+          style={[styles.input, styles.textarea]}
+          placeholder={t("taskerTaskDetails.bidMessage")}
+          value={message}
+          onChangeText={setMessage}
+          multiline
+          maxLength={150}
+          textAlignVertical="top"
+          textAlign={I18nManager.isRTL ? "right" : "left"}
+          placeholderTextColor="#999"
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleBid}>
+          <Text style={styles.buttonText}>{t("taskerTaskDetails.submitBid")}</Text>
+        </TouchableOpacity>
+
+        <View style={{ height: 40 }} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  backButton: {
+    paddingHorizontal: 16,
+    paddingTop: 10,
+  },
   container: {
     backgroundColor: "#ffffff",
     padding: 24,
