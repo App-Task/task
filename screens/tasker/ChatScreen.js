@@ -14,6 +14,9 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
+
 const { width } = Dimensions.get("window");
 
 export default function ChatScreen({ navigation, route }) {
@@ -107,7 +110,9 @@ export default function ChatScreen({ navigation, route }) {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+  
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -146,7 +151,9 @@ export default function ChatScreen({ navigation, route }) {
           <Ionicons name="send" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
-    </View>
+      </View>
+  </SafeAreaView>
+
   );
 }
 
@@ -225,4 +232,9 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 30,
   },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  
 });

@@ -16,6 +16,9 @@ import axios from "axios";
 import { getToken } from "../../services/authStorage";
 import * as SecureStore from "expo-secure-store";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
+
 export default function ChatScreen({ route, navigation }) {
   const { t } = useTranslation();
   const { name, otherUserId } = route.params;
@@ -122,11 +125,13 @@ export default function ChatScreen({ route, navigation }) {
   };
   
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={90}
-    >
+<SafeAreaView style={styles.safeArea}>
+  <KeyboardAvoidingView
+    style={styles.container}
+    behavior={Platform.OS === "ios" ? "padding" : undefined}
+    keyboardVerticalOffset={90}
+  >
+
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#213729" />
@@ -164,7 +169,9 @@ export default function ChatScreen({ route, navigation }) {
           <Ionicons name="send" size={20} color="#ffffff" />
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+</SafeAreaView>
+
   );
 }
 
@@ -259,4 +266,9 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 30,
   },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  
 });
