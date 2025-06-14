@@ -16,36 +16,50 @@ import * as SecureStore from "expo-secure-store";
 export default function ClientHomeScreen({ navigation }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [userName, setUserName] = useState("");
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
+  const loadData = async (isRefresh = false) => {
+    try {
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
         setLoading(true);
-        const userId = await SecureStore.getItemAsync("userId");
-        const userName = await SecureStore.getItemAsync("userName");
+      }
 
-        if (!userId) {
-          throw new Error("User not logged in");
-        }
+      const userId = await SecureStore.getItemAsync("userId");
+      const userName = await SecureStore.getItemAsync("userName");
 
-        setUserName(userName || "");
+      if (!userId) {
+        throw new Error("User not logged in");
+      }
 
-        const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
-        const data = await res.json();
+      setUserName(userName || "");
 
-        setTasks(data);
-      } catch (err) {
-        console.error("❌ Failed to fetch tasks:", err.message);
-        Alert.alert("Error", "Could not load tasks.");
-      } finally {
+      const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
+      const data = await res.json();
+
+      setTasks(data);
+    } catch (err) {
+      console.error("❌ Failed to fetch tasks:", err.message);
+      Alert.alert("Error", "Could not load tasks.");
+    } finally {
+      if (isRefresh) {
+        setRefreshing(false);
+      } else {
         setLoading(false);
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     loadData();
   }, []);
+
+  const handleRefresh = () => {
+    loadData(true);
+  };
 
   const renderTask = ({ item }) => (
     <Animated.View
@@ -104,6 +118,8 @@ export default function ClientHomeScreen({ navigation }) {
           }
           contentContainerStyle={{ paddingBottom: 40 }}
           style={{ width: "100%" }}
+          onRefresh={handleRefresh}
+          refreshing={refreshing}
         />
       )}
     </View>

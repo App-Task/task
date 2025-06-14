@@ -22,7 +22,7 @@ import { useTranslation } from "react-i18next";
 const { width, height } = Dimensions.get("window");
 const rawCategories = ["Cleaning", "Moving", "Delivery", "Repairs", "Other"];
 
-export default function PostTaskScreen() {
+export default function PostTaskScreen({ navigation }) {
   const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -37,25 +37,25 @@ export default function PostTaskScreen() {
       Alert.alert(t("clientPostTask.missingTitle"), t("clientPostTask.fillAllFields"));
       return;
     }
-
+  
     try {
       const userId = await SecureStore.getItemAsync("userId");
-
+  
       if (!userId) {
         Alert.alert("Error", "User not logged in. Please sign in again.");
         return;
       }
-
+  
       const taskData = {
         title,
         description,
         location,
-        budget: parseFloat(budget), // ✅ Convert budget to number
+        budget: parseFloat(budget),
         category: selectedCategory,
         images,
         userId,
       };
-
+  
       const response = await fetch("https://task-kq94.onrender.com/api/tasks", {
         method: "POST",
         headers: {
@@ -63,18 +63,38 @@ export default function PostTaskScreen() {
         },
         body: JSON.stringify(taskData),
       });
-
+  
       const result = await response.json();
-
+  
       if (!response.ok) {
-        console.log("❌ Backend error:", result); // ✅ Log full response for debugging
+        console.log("❌ Backend error:", result);
         throw new Error(result.error || "Failed to save task.");
       }
-
+  
       console.log("✅ Task posted:", result);
-      Alert.alert(t("clientPostTask.successTitle"), t("clientPostTask.successMessage"));
-
-      // Clear form
+  
+      // ✅ Log current nav state
+      console.log("🧭 Navigation state:", navigation.getState());
+  
+      Alert.alert(
+        t("clientPostTask.successTitle"),
+        t("clientPostTask.successMessage"),
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              setTimeout(() => {
+                navigation.navigate("Home"); // ✅ NOT getParent(), just direct
+              }, 100);
+            },
+          },
+        ]
+      );
+      
+      
+      
+  
+      // ✅ Clear form after submission
       setTitle("");
       setDescription("");
       setLocation("");
@@ -86,7 +106,7 @@ export default function PostTaskScreen() {
       Alert.alert("Error", "Could not post task. Try again.");
     }
   };
-
+  
   const pickImages = async () => {
     if (images.length >= 3) {
       Alert.alert(t("clientPostTask.limitTitle"), t("clientPostTask.limitMsg"));
