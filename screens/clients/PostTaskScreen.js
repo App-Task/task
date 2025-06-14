@@ -218,23 +218,41 @@ export default function PostTaskScreen({ navigation }) {
           <Text style={styles.buttonText}>{t("clientPostTask.postBtn")}</Text>
         </TouchableOpacity>
 
-        <Modal visible={categoryModalVisible} animationType="slide" transparent={true}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalBox}>
-              <FlatList
-                data={rawCategories}
-                keyExtractor={(item) => item}
-                renderItem={renderCategoryItem}
-              />
-              <TouchableOpacity
-                onPress={() => setCategoryModalVisible(false)}
-                style={styles.modalCancel}
-              >
-                <Text style={styles.modalCancelText}>{t("clientPostTask.cancel")}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
+        <Modal
+  visible={categoryModalVisible}
+  animationType="fade"
+  transparent
+  onRequestClose={() => setCategoryModalVisible(false)}
+>
+  <TouchableOpacity
+    activeOpacity={1}
+    onPressOut={() => setCategoryModalVisible(false)}
+    style={styles.modalOverlay}
+  >
+    <TouchableOpacity
+      activeOpacity={1}
+      style={styles.bottomSheet}
+      onPress={() => {}} // prevents dismiss when tapping inside
+    >
+      <Text style={styles.modalTitle}>{t("clientPostTask.selectCategory")}</Text>
+      <FlatList
+        data={rawCategories}
+        keyExtractor={(item) => item}
+        renderItem={renderCategoryItem}
+        style={{ maxHeight: 300 }}
+        showsVerticalScrollIndicator={false}
+      />
+      <TouchableOpacity
+        onPress={() => setCategoryModalVisible(false)}
+        style={styles.modalCancel}
+      >
+        <Text style={styles.modalCancelText}>{t("clientPostTask.cancel")}</Text>
+      </TouchableOpacity>
+    </TouchableOpacity>
+  </TouchableOpacity>
+</Modal>
+
+
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -344,4 +362,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#999",
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  
+  bottomSheet: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "60%",
+  },
+  
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: "InterBold",
+    marginBottom: 12,
+    color: "#213729",
+  },
+  
+  modalCancel: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  
+  modalCancelText: {
+    fontSize: 16,
+    fontFamily: "InterBold",
+    color: "#999",
+  },
+  
 });
