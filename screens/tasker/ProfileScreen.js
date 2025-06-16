@@ -76,6 +76,15 @@ export default function TaskerProfileScreen({ navigation }) {
         </TouchableOpacity>
 
         <TouchableOpacity
+  style={styles.rowItem}
+  onPress={() => navigation.navigate("ChangePassword")}
+>
+  <Text style={styles.rowText}>Change Password</Text>
+  <Ionicons name="chevron-forward" size={20} color="#999" />
+</TouchableOpacity>
+
+
+        <TouchableOpacity
           style={styles.rowItem}
           onPress={() => navigation.navigate("Documents")}
         >
