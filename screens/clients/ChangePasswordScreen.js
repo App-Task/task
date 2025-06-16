@@ -11,6 +11,11 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 
+import axios from "axios";
+import { getToken } from "../../services/authStorage";
+import { Alert } from "react-native";
+
+
 const { width } = Dimensions.get("window");
 
 export default function ChangePasswordScreen({ navigation }) {
@@ -23,9 +28,42 @@ export default function ChangePasswordScreen({ navigation }) {
   const [secure2, setSecure2] = useState(true);
   const [secure3, setSecure3] = useState(true);
 
-  const handleSubmit = () => {
-    alert(t("clientChangePassword.updated"));
+  const handleSubmit = async () => {
+    if (!oldPass || !newPass || !confirmPass) {
+      Alert.alert("Missing fields", "Please fill in all fields.");
+      return;
+    }
+  
+    if (newPass !== confirmPass) {
+      Alert.alert("Mismatch", "New passwords do not match.");
+      return;
+    }
+  
+    try {
+      const token = await getToken();
+  
+      const res = await axios.put(
+        "https://task-kq94.onrender.com/api/auth/change-password",
+        {
+          oldPassword: oldPass,
+          newPassword: newPass,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      Alert.alert("Success", res.data.msg || "Password changed successfully.");
+      navigation.goBack();
+    } catch (err) {
+      const msg =
+        err?.response?.data?.msg || "Something went wrong. Try again later.";
+      Alert.alert("Error", msg);
+    }
   };
+  
 
   return (
     <View style={styles.container}>
