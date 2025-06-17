@@ -159,19 +159,24 @@
     }
   },
   "clientProfile": {
-    "editProfile": "تعديل الملف الشخصي",
-    "changePassword": "تغيير كلمة المرور",
-    "myPayments": "مدفوعاتي",
-    "paymentMethods": "طرق الدفع",
-    "aboutUs": "معلومات عنا",
-    "privacyPolicy": "سياسة الخصوصية",
-    "terms": "الشروط والأحكام",
-    "faqs": "الأسئلة الشائعة",
-    "contactAdmin": "اتصل بالإدارة",
-    "logout": "تسجيل الخروج",
-    "logoutAlertTitle": "تم تسجيل الخروج",
-    "logoutAlertMessage": "تم تسجيل الخروج بنجاح."
-  },
+  "editProfile": "تعديل الملف الشخصي",
+  "changePassword": "تغيير كلمة المرور",
+  "myPayments": "مدفوعاتي",
+  "paymentMethods": "طرق الدفع",
+  "aboutUs": "معلومات عنا",
+  "privacyPolicy": "سياسة الخصوصية",
+  "terms": "الشروط والأحكام",
+  "faqs": "الأسئلة الشائعة",
+  "contactAdmin": "الاتصال بالإدارة",
+  "logout": "تسجيل الخروج",
+  "logoutAlertTitle": "تم تسجيل الخروج",
+  "logoutAlertMessage": "لقد تم تسجيل خروجك بنجاح.",
+  "managePhotoTitle": "إدارة صورة الملف الشخصي",
+  "chooseNewPhoto": "اختر صورة جديدة",
+  "removePhoto": "إزالة الصورة",
+  "cancel": "إلغاء"
+},
+
   "clientTaskDetails": {
     "description": "الوصف",
     "address": "العنوان",
@@ -286,7 +291,11 @@
   "reviews": "تقييماتي",
   "settings": "الإعدادات",
   "logout": "تسجيل الخروج",
-  "loggedOut": "تم تسجيل الخروج."
+  "loggedOut": "تم تسجيل الخروج.",
+  "managePhotoTitle": "إدارة صورة الملف الشخصي",
+  "chooseNewPhoto": "اختر صورة جديدة",
+  "removePhoto": "إزالة الصورة",
+  "cancel": "إلغاء"
 },
 "taskerSettings": {
   "title": "الإعدادات",

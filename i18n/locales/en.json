@@ -167,7 +167,11 @@
     "contactAdmin": "Contact Admin",
     "logout": "Log Out",
     "logoutAlertTitle": "Logged Out",
-    "logoutAlertMessage": "You have been successfully logged out."
+    "logoutAlertMessage": "You have been successfully logged out.",
+    "managePhotoTitle": "Manage Profile Picture",
+  "chooseNewPhoto": "Choose New Photo",
+  "removePhoto": "Remove Photo",
+  "cancel": "Cancel"
   },
   "clientTaskDetails": {
     "description": "Description",
@@ -280,7 +284,11 @@
   "reviews": "My Reviews",
   "settings": "Settings",
   "logout": "Log Out",
-  "loggedOut": "You have been logged out."
+  "loggedOut": "You have been logged out.",
+  "managePhotoTitle": "Manage Profile Picture",
+  "chooseNewPhoto": "Choose New Photo",
+  "removePhoto": "Remove Photo",
+  "cancel": "Cancel"
 },
 "taskerSettings": {
   "title": "Settings",

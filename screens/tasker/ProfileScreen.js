@@ -4,22 +4,24 @@ import {
   Text,
   TouchableOpacity,
   Dimensions,
-  I18nManager,
   Alert,
   StyleSheet,
   ScrollView,
+  Image,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { fetchCurrentUser } from "../../services/auth";
 import { removeToken } from "../../services/authStorage";
 import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
 
 const { width } = Dimensions.get("window");
 
 export default function TaskerProfileScreen({ navigation }) {
   const { t } = useTranslation();
   const [user, setUser] = useState({ name: "", email: "" });
+  const [profileImage, setProfileImage] = useState(null);
   const nav = useNavigation();
 
   useEffect(() => {
@@ -48,6 +50,36 @@ export default function TaskerProfileScreen({ navigation }) {
     }
   };
 
+  const handleChangeProfilePicture = async () => {
+    Alert.alert(
+      t("taskerProfile.managePhotoTitle"),
+      "",
+      [
+        {
+          text: t("taskerProfile.chooseNewPhoto"),
+          onPress: async () => {
+            const result = await ImagePicker.launchImageLibraryAsync({
+              allowsEditing: true,
+              aspect: [1, 1],
+              quality: 0.5,
+            });
+
+            if (!result.canceled) {
+              setProfileImage(result.assets[0].uri);
+            }
+          },
+        },
+        {
+          text: t("taskerProfile.removePhoto"),
+          style: "destructive",
+          onPress: () => setProfileImage(null),
+        },
+        { text: t("taskerProfile.cancel"), style: "cancel" },
+      ],
+      { cancelable: true }
+    );
+  };
+
   const getInitials = (name) => {
     if (!name) return "?";
     return name
@@ -59,9 +91,21 @@ export default function TaskerProfileScreen({ navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.avatar}>
-        <Text style={styles.initials}>{getInitials(user.name)}</Text>
-      </View>
+      <TouchableOpacity onPress={handleChangeProfilePicture} style={styles.avatarWrapper}>
+        <View style={styles.avatar}>
+          {profileImage ? (
+            <Image
+              source={{ uri: profileImage }}
+              style={{ width: "100%", height: "100%", borderRadius: 100 }}
+            />
+          ) : (
+            <Text style={styles.initials}>{getInitials(user.name)}</Text>
+          )}
+          <View style={styles.editIconWrapper}>
+            <Ionicons name="pencil" size={16} color="#fff" />
+          </View>
+        </View>
+      </TouchableOpacity>
 
       <Text style={styles.name}>{user.name || "Loading..."}</Text>
       <Text style={styles.email}>{user.email || " "}</Text>
@@ -76,13 +120,12 @@ export default function TaskerProfileScreen({ navigation }) {
         </TouchableOpacity>
 
         <TouchableOpacity
-  style={styles.rowItem}
-  onPress={() => navigation.navigate("ChangePassword")}
->
-  <Text style={styles.rowText}>Change Password</Text>
-  <Ionicons name="chevron-forward" size={20} color="#999" />
-</TouchableOpacity>
-
+          style={styles.rowItem}
+          onPress={() => navigation.navigate("ChangePassword")}
+        >
+          <Text style={styles.rowText}>Change Password</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.rowItem}
@@ -138,7 +181,6 @@ export default function TaskerProfileScreen({ navigation }) {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     paddingTop: 60,
@@ -146,6 +188,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     backgroundColor: "#ffffff",
     alignItems: "center",
+  },
+  avatarWrapper: {
+    position: "relative",
   },
   avatar: {
     width: width * 0.3,
@@ -155,6 +200,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
+    overflow: "hidden",
+  },
+  editIconWrapper: {
+    position: "absolute",
+    bottom: 6,
+    left: "50%",
+    transform: [{ translateX: -13 }],
+    backgroundColor: "#215432",
+    borderRadius: 20,
+    padding: 6,
+    zIndex: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
   initials: {
     fontSize: 28,

@@ -7,12 +7,14 @@ import {
   Alert,
   StyleSheet,
   ScrollView,
+  Image,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { removeToken } from "../../services/authStorage";
 import { useNavigation } from "@react-navigation/native";
 import { fetchCurrentUser } from "../../services/auth";
+import * as ImagePicker from "expo-image-picker";
 
 const { width } = Dimensions.get("window");
 
@@ -20,6 +22,7 @@ export default function ProfileScreen({ navigation }) {
   const { t } = useTranslation();
   const nav = useNavigation();
   const [user, setUser] = useState({ name: "", email: "" });
+  const [profileImage, setProfileImage] = useState(null); // ✅ added
 
   useEffect(() => {
     const loadUser = async () => {
@@ -47,19 +50,62 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
+  const handleChangeProfilePicture = async () => {
+    Alert.alert(
+      t("clientProfile.managePhotoTitle"),
+      "",
+      [
+        {
+          text: t("clientProfile.chooseNewPhoto"),
+          onPress: async () => {
+            const result = await ImagePicker.launchImageLibraryAsync({
+              allowsEditing: true,
+              aspect: [1, 1],
+              quality: 0.5,
+            });
+
+            if (!result.canceled) {
+              setProfileImage(result.assets[0].uri);
+            }
+          },
+        },
+        {
+          text: t("clientProfile.removePhoto"),
+          style: "destructive",
+          onPress: () => setProfileImage(null),
+        },
+        { text: t("clientProfile.cancel"), style: "cancel" },
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.avatarPlaceholder}>
-        <Text style={styles.avatarInitials}>
-          {user?.name
-            ? user.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-            : "?"}
-        </Text>
-      </View>
+      <TouchableOpacity onPress={handleChangeProfilePicture} style={styles.avatarWrapper}>
+  <View style={styles.avatarPlaceholder}>
+    {profileImage ? (
+      <Image
+        source={{ uri: profileImage }}
+        style={{ width: "100%", height: "100%", borderRadius: 100 }}
+      />
+    ) : (
+      <Text style={styles.avatarInitials}>
+        {user?.name
+          ? user.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .toUpperCase()
+          : "?"}
+      </Text>
+    )}
+    <View style={styles.editIconWrapper}>
+    <Ionicons name="pencil" size={16} color="#fff" />
+    </View>
+  </View>
+</TouchableOpacity>
+
 
       <View style={styles.info}>
         <Text style={styles.name}>{user.name || "Loading..."}</Text>
@@ -121,8 +167,25 @@ export default function ProfileScreen({ navigation }) {
   );
 }
 
-
 const styles = StyleSheet.create({
+
+  avatarWrapper: {
+    position: "relative",
+  },
+  
+  editIconWrapper: {
+    position: "absolute",
+    bottom: 6,
+    left: "50%",
+    transform: [{ translateX: -15 }], // Adjusted from -12 to -13 for better visual centering
+    backgroundColor: "#215432",
+    borderRadius: 20,
+    padding: 6,
+    zIndex: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  
   container: {
     paddingTop: 60,
     paddingBottom: 60,
@@ -138,6 +201,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
+    overflow: "hidden",
   },
   avatarInitials: {
     fontFamily: "InterBold",
