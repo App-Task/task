@@ -101,21 +101,23 @@ export default function WelcomeScreen({ navigation }) {
           </View>
         </TouchableOpacity>
 
-        <Text style={styles.rolePrompt}>{t("chooseRole")}</Text>
-
-        <View style={styles.roleButtons}>
+        <View style={styles.sectionsContainer}>
           <TouchableOpacity
-            style={[styles.roleBtn, { marginRight: 12 }]}
+            style={styles.sectionCard}
             onPress={() => navigation.navigate("Login", { role: "client" })}
           >
-            <Text style={styles.roleText}>{t("role.client")}</Text>
+            <Ionicons name="person-outline" size={36} color="#215432" />
+            <Text style={styles.sectionTitle}>{t("role.client")}</Text>
+            <Text style={styles.sectionDesc}>{t("clientDescription")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.roleBtn}
+            style={styles.sectionCard}
             onPress={() => navigation.navigate("Login", { role: "tasker" })}
           >
-            <Text style={styles.roleText}>{t("role.tasker")}</Text>
+            <Ionicons name="construct-outline" size={36} color="#215432" />
+            <Text style={styles.sectionTitle}>{t("role.tasker")}</Text>
+            <Text style={styles.sectionDesc}>{t("taskerDescription")}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -124,7 +126,6 @@ export default function WelcomeScreen({ navigation }) {
     </>
   );
 }
-
 
 const styles = StyleSheet.create({
   loadingContainer: {
@@ -169,26 +170,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#213729",
   },
-  rolePrompt: {
-    fontSize: 16,
-    fontFamily: "InterBold",
-    color: "#215432",
-    marginBottom: 10,
+  sectionsContainer: {
+    width: "100%",
+    gap: 20,
   },
-  roleButtons: {
-    flexDirection: "row",
+  sectionCard: {
+    backgroundColor: "#f2f2f2",
+    borderRadius: 16,
+    padding: 20,
+    alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  roleBtn: {
-    backgroundColor: "#c1ff72",
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: 20,
-  },
-  roleText: {
+  sectionTitle: {
     fontFamily: "InterBold",
+    fontSize: 18,
+    marginTop: 12,
     color: "#213729",
-    fontSize: 14,
+  },
+  sectionDesc: {
+    fontFamily: "Inter",
+    fontSize: 13,
+    color: "#215432",
+    textAlign: "center",
+    marginTop: 8,
   },
 });

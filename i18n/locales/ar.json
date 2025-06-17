@@ -3,8 +3,10 @@
 "chooseRole": "اختر دورك:",
 "role": {
   "client": "عميل",
-  "tasker": "مزود خدمة"
+  "tasker": "مقدم خدمة"
 },
+"clientDescription": "ابحث عن مقدمي خدمات موثوقين لإنجاز مهامك.",
+"taskerDescription": "احصل على عملاء يبحثون عن خدماتك.",
 "language": {
   "changedEn": "Language changed to English",
   "changedAr": "تم تغيير اللغة إلى العربية"

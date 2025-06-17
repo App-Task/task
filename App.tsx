@@ -12,6 +12,7 @@ import MainNavigator from "./navigation/MainNavigator";
 import Toast from "react-native-toast-message";
 import i18n from "./i18n/config";
 
+
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {

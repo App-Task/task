@@ -5,6 +5,8 @@
   "client": "Client",
   "tasker": "Tasker"
 },
+"clientDescription": "Find trusted taskers to get your chores done.",
+"taskerDescription": "Get hired by clients looking for your services.",
 "language": {
   "changedEn": "Language changed to English",
   "changedAr": "تم تغيير اللغة إلى العربية"
