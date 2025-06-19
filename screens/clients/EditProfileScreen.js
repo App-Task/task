@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,27 +7,43 @@ import {
   ScrollView,
   TouchableOpacity,
   I18nManager,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { fetchCurrentUser, updateUserProfile } from "../../services/auth";
+
 
 export default function EditProfileScreen({ navigation }) {
   const { t } = useTranslation();
-
   const [name, setName] = useState("");
-  const [gender, setGender] = useState("");
-  const [location, setLocation] = useState("");
-  const [experience, setExperience] = useState("");
-  const [skills, setSkills] = useState("");
-  const [about, setAbout] = useState("");
+  const [email, setEmail] = useState("");
 
-  const handleUpdate = () => {
-    alert(t("clientEditProfile.updated"));
+  // Load current user data
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const user = await fetchCurrentUser();
+        setName(user.name || "");
+        setEmail(user.email || "");
+      } catch (err) {
+        Alert.alert("Error", "Failed to load user info");
+      }
+    };
+    loadUser();
+  }, []);
+
+  const handleUpdate = async () => {
+    try {
+      await updateUserProfile({ name, email });
+      Alert.alert("Success", "Profile updated");
+    } catch (err) {
+      Alert.alert("Error", "Failed to update profile");
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Back Button */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
           <Ionicons
@@ -40,10 +56,9 @@ export default function EditProfileScreen({ navigation }) {
         <View style={{ width: 24 }} />
       </View>
 
-      {/* Inputs */}
       <TextInput
         style={styles.input}
-        placeholder={t("clientEditProfile.name")}
+        placeholder="Name"
         placeholderTextColor="#999"
         value={name}
         onChangeText={setName}
@@ -52,49 +67,11 @@ export default function EditProfileScreen({ navigation }) {
 
       <TextInput
         style={styles.input}
-        placeholder={t("clientEditProfile.gender")}
+        placeholder="Email"
         placeholderTextColor="#999"
-        value={gender}
-        onChangeText={setGender}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder={t("clientEditProfile.location")}
-        placeholderTextColor="#999"
-        value={location}
-        onChangeText={setLocation}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder={t("clientEditProfile.experience")}
-        placeholderTextColor="#999"
-        value={experience}
-        onChangeText={setExperience}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder={t("clientEditProfile.skills")}
-        placeholderTextColor="#999"
-        value={skills}
-        onChangeText={setSkills}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-      />
-
-      <TextInput
-        style={[styles.input, styles.textarea]}
-        placeholder={t("clientEditProfile.about")}
-        placeholderTextColor="#999"
-        value={about}
-        onChangeText={setAbout}
-        multiline
-        maxLength={150}
-        textAlignVertical="top"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
         textAlign={I18nManager.isRTL ? "right" : "left"}
       />
 
@@ -136,9 +113,6 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     color: "#333",
     marginBottom: 16,
-  },
-  textarea: {
-    height: 120,
   },
   button: {
     backgroundColor: "#213729",

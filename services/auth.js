@@ -47,3 +47,11 @@ export const fetchCurrentUser = async () => {
   });
   return response.data; // returns { name, email }
 };
+
+export const updateUserProfile = async (data) => {
+  const token = await getToken();
+  const response = await axios.put(`${API_URL}/me`, data, {
+    headers: { Authorization: token },
+  });
+  return response.data;
+};

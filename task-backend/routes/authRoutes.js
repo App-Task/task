@@ -61,3 +61,27 @@ router.put("/change-password", async (req, res) => {
 });
 
 module.exports = router;
+
+// ✅ Update profile route
+router.put("/me", async (req, res) => {
+  const rawToken = req.header("Authorization");
+  if (!rawToken) return res.status(401).json({ msg: "No token provided" });
+
+  const token = rawToken.startsWith("Bearer ") ? rawToken.slice(7) : rawToken;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    const { name, email } = req.body;
+    if (name) user.name = name;
+    if (email) user.email = email;
+
+    await user.save();
+    res.json({ msg: "Profile updated", user: { name: user.name, email: user.email } });
+  } catch (err) {
+    console.error("❌ Error updating profile:", err.message);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
