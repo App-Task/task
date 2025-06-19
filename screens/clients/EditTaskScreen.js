@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
-import { fetchTaskById, updateTask, deleteTask } from "../../services/task";
+import { fetchTaskById, updateTask } from "../../services/task";
 
 export default function EditTaskScreen({ route, navigation }) {
   const { t } = useTranslation();
@@ -52,37 +52,10 @@ export default function EditTaskScreen({ route, navigation }) {
         description,
         budget: price,
       });
-      Alert.alert(t("clientEditTask.updatedTitle"), t("clientEditTask.updatedMessage"));
-      navigation.goBack(); // ✅ auto-refresh should trigger
+      navigation.navigate("MyTasks"); // 👈 Navigates back and auto-refreshes
     } catch (err) {
       Alert.alert("Error", "Failed to update task");
     }
-  };
-
-  const handleDelete = async () => {
-    Alert.alert(
-      t("clientEditTask.deleteConfirmTitle"),
-      t("clientEditTask.deleteConfirmText"),
-      [
-        {
-          text: t("clientEditTask.cancel"),
-          style: "cancel",
-        },
-        {
-          text: t("clientEditTask.delete"),
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteTask(taskId);
-              Alert.alert(t("clientEditTask.deletedTitle"), t("clientEditTask.deletedMessage"));
-              navigation.goBack(); // ✅ goes back and auto-refresh
-            } catch (err) {
-              Alert.alert("Error", "Failed to delete task");
-            }
-          },
-        },
-      ]
-    );
   };
 
   if (loading) return <Text style={{ marginTop: 100, textAlign: "center" }}>Loading...</Text>;
@@ -129,10 +102,6 @@ export default function EditTaskScreen({ route, navigation }) {
 
           <TouchableOpacity style={styles.button} onPress={handleUpdate}>
             <Text style={styles.buttonText}>{t("clientEditTask.save")}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-            <Text style={styles.deleteButtonText}>{t("clientEditTask.delete")}</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -190,17 +159,5 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 16,
     color: "#fff",
-  },
-  deleteButton: {
-    backgroundColor: "#ffdad8",
-    paddingVertical: 16,
-    borderRadius: 30,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  deleteButtonText: {
-    fontFamily: "InterBold",
-    fontSize: 16,
-    color: "#b00020",
   },
 });

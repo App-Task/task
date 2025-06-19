@@ -1,5 +1,5 @@
 import axios from "axios";
-import authStorage from "./authStorage";
+import * as authStorage from "./authStorage";
 
 const API_URL = "https://task-kq94.onrender.com/api/tasks";
 

@@ -24,39 +24,48 @@ export default function TaskDetailsScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("🔍 Initial Task ID:", initialTask?._id); // ✅ Add this debug log
+  
     const fetchTask = async () => {
       try {
         const freshTask = await getTaskById(initialTask._id);
         setTask(freshTask);
       } catch (err) {
+        console.error("❌ Task fetch failed:", err.message); // ✅ Also log the error
         Alert.alert("Error", "Failed to load task.");
       } finally {
         setLoading(false);
       }
     };
+  
     fetchTask();
   }, []);
+  
 
   const handleDelete = async () => {
-    Alert.alert(
-      t("clientTaskDetails.cancelTask"),
-      t("clientTaskDetails.confirmCancel"),
-      [
-        { text: t("common.no") },
-        {
-          text: t("common.yes"),
-          onPress: async () => {
-            try {
-              await deleteTaskById(task._id);
-              Alert.alert(t("clientTaskDetails.cancelled"));
-              navigation.goBack();
-            } catch (err) {
-              Alert.alert("Error", "Failed to cancel task.");
-            }
-          },
-        },
-      ]
-    );
+Alert.alert(
+  "Cancel Task",
+  "Are you sure you want to cancel this task?",
+  [
+    { text: "No" },
+    {
+      text: "Yes",
+      onPress: async () => {
+        try {
+          await deleteTaskById(task._id);
+          Alert.alert("Task Cancelled");
+
+          // 👇 Auto-refresh MyTasksScreen
+          navigation.goBack();
+
+        } catch (err) {
+          Alert.alert("Error", "Failed to cancel task.");
+        }
+      },
+    },
+  ]
+);
+
   };
 
   if (loading) {

@@ -12,6 +12,10 @@ import {
 import { useTranslation } from "react-i18next";
 import * as SecureStore from "expo-secure-store";
 
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+
+
 const { width } = Dimensions.get("window");
 
 export default function MyTasksScreen({ navigation }) {
@@ -24,35 +28,38 @@ export default function MyTasksScreen({ navigation }) {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        setLoading(true);
-        const userId = await SecureStore.getItemAsync("userId");
-        if (!userId) throw new Error("No user ID");
-
-        const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
-        const allTasks = await res.json();
-
-        // Group tasks by status
-        const grouped = { Pending: [], Started: [], Completed: [] };
-        allTasks.forEach((task) => {
-          if (grouped[task.status]) {
-            grouped[task.status].push(task);
-          }
-        });
-
-        setGroupedTasks(grouped);
-      } catch (err) {
-        console.error("❌ Failed to fetch tasks:", err.message);
-        Alert.alert("Error", t("clientMyTasks.fetchError"));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTasks();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchTasks = async () => {
+        try {
+          setLoading(true);
+          const userId = await SecureStore.getItemAsync("userId");
+          if (!userId) throw new Error("No user ID");
+  
+          const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
+          const allTasks = await res.json();
+  
+          // Group tasks by status
+          const grouped = { Pending: [], Started: [], Completed: [] };
+          allTasks.forEach((task) => {
+            if (grouped[task.status]) {
+              grouped[task.status].push(task);
+            }
+          });
+  
+          setGroupedTasks(grouped);
+        } catch (err) {
+          console.error("❌ Failed to fetch tasks:", err.message);
+          Alert.alert("Error", t("clientMyTasks.fetchError"));
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchTasks();
+    }, [])
+  );
+  
 
   const renderTask = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate("TaskDetails", { task: item })}>
