@@ -65,7 +65,6 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
-module.exports = router;
 // ✅ GET /api/tasks/:id - fetch single task by ID
 router.get("/:id", async (req, res) => {
   try {
@@ -103,3 +102,4 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to delete task" });
   }
 });
+module.exports = router;
