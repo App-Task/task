@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,39 +7,85 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  I18nManager,
-  Dimensions,
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
+import { fetchTaskById, updateTask, deleteTask } from "../../services/task";
 
 export default function EditTaskScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { task } = route.params;
+  const { taskId } = route.params;
 
-  const [title, setTitle] = useState(task?.title || "");
-  const [description, setDescription] = useState(task?.description || "");
-  const [price, setPrice] = useState(task?.price?.toString() || "");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const handleUpdate = () => {
+  useEffect(() => {
+    const loadTask = async () => {
+      try {
+        const task = await fetchTaskById(taskId);
+        setTitle(task.title || "");
+        setDescription(task.description || "");
+        setPrice(task.budget?.toString() || "");
+        setLoading(false);
+      } catch (err) {
+        Alert.alert("Error", "Failed to load task");
+        setLoading(false);
+      }
+    };
+    loadTask();
+  }, [taskId]);
+
+  const handleUpdate = async () => {
     if (!title || !description || !price) {
       Alert.alert(t("clientEditTask.missingTitle"), t("clientEditTask.missingFields"));
       return;
     }
 
-    const updatedTask = {
-      ...task,
-      title,
-      description,
-      price: parseFloat(price),
-    };
-
-    Alert.alert(t("clientEditTask.updatedTitle"), t("clientEditTask.updatedMessage"));
-    navigation.navigate("TaskDetails", { task: updatedTask });
+    try {
+      await updateTask(taskId, {
+        title,
+        description,
+        budget: price,
+      });
+      Alert.alert(t("clientEditTask.updatedTitle"), t("clientEditTask.updatedMessage"));
+      navigation.goBack(); // ✅ auto-refresh should trigger
+    } catch (err) {
+      Alert.alert("Error", "Failed to update task");
+    }
   };
+
+  const handleDelete = async () => {
+    Alert.alert(
+      t("clientEditTask.deleteConfirmTitle"),
+      t("clientEditTask.deleteConfirmText"),
+      [
+        {
+          text: t("clientEditTask.cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("clientEditTask.delete"),
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteTask(taskId);
+              Alert.alert(t("clientEditTask.deletedTitle"), t("clientEditTask.deletedMessage"));
+              navigation.goBack(); // ✅ goes back and auto-refresh
+            } catch (err) {
+              Alert.alert("Error", "Failed to delete task");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  if (loading) return <Text style={{ marginTop: 100, textAlign: "center" }}>Loading...</Text>;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -49,12 +95,9 @@ export default function EditTaskScreen({ route, navigation }) {
         keyboardVerticalOffset={80}
       >
         <ScrollView contentContainerStyle={styles.container}>
-          {/* Back Button Header */}
+          {/* Header */}
           <View style={styles.headerRow}>
-            <TouchableOpacity
-              style={styles.backBtn}
-              onPress={() => navigation.goBack()}
-            >
+            <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
               <Ionicons name="arrow-back" size={24} color="#213729" />
             </TouchableOpacity>
             <Text style={styles.heading}>{t("clientEditTask.heading")}</Text>
@@ -66,9 +109,8 @@ export default function EditTaskScreen({ route, navigation }) {
             placeholder={t("clientEditTask.titlePlaceholder")}
             value={title}
             onChangeText={setTitle}
-            maxLength={15}
+            maxLength={30}
           />
-
           <TextInput
             style={[styles.input, styles.textarea]}
             placeholder={t("clientEditTask.descriptionPlaceholder")}
@@ -77,7 +119,6 @@ export default function EditTaskScreen({ route, navigation }) {
             multiline
             maxLength={150}
           />
-
           <TextInput
             style={styles.input}
             placeholder={t("clientEditTask.pricePlaceholder")}
@@ -89,6 +130,10 @@ export default function EditTaskScreen({ route, navigation }) {
           <TouchableOpacity style={styles.button} onPress={handleUpdate}>
             <Text style={styles.buttonText}>{t("clientEditTask.save")}</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+            <Text style={styles.deleteButtonText}>{t("clientEditTask.delete")}</Text>
+          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -96,18 +141,13 @@ export default function EditTaskScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-  },
-  keyboardView: {
-    flex: 1,
-  },
+  safeArea: { flex: 1, backgroundColor: "#fff" },
+  keyboardView: { flex: 1 },
   container: {
     paddingHorizontal: 24,
     paddingBottom: 60,
     paddingTop: 40,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fff",
   },
   headerRow: {
     flexDirection: "row",
@@ -138,10 +178,7 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 20,
   },
-  textarea: {
-    textAlignVertical: "top",
-    height: 120,
-  },
+  textarea: { textAlignVertical: "top", height: 120 },
   button: {
     backgroundColor: "#213729",
     paddingVertical: 16,
@@ -152,6 +189,18 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#ffffff",
+    color: "#fff",
+  },
+  deleteButton: {
+    backgroundColor: "#ffdad8",
+    paddingVertical: 16,
+    borderRadius: 30,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  deleteButtonText: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#b00020",
   },
 });
