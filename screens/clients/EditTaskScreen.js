@@ -15,62 +15,52 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { getTaskById, updateTaskById } from "../../services/taskService";
 
-
 export default function EditTaskScreen({ route, navigation }) {
   const { t } = useTranslation();
   const { task } = route.params;
   const taskId = task._id;
-  console.log("📦 getTaskById is:", getTaskById);
-
-
-  
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
   const [price, setPrice] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadTask = async () => {
       try {
-        console.log("📦 Fetching task with ID:", taskId);
         const task = await getTaskById(taskId);
-        console.log("✅ Task fetched:", task);
-  
         setTitle(task.title || "");
         setDescription(task.description || "");
+        setLocation(task.location || "");
         setPrice(task.budget?.toString() || "");
       } catch (err) {
-        console.error("❌ Error while loading task:", err);
         Alert.alert("Error", "Failed to load task");
       } finally {
         setLoading(false);
       }
     };
-  
     loadTask();
   }, [taskId]);
-  
-  
+
   const handleUpdate = async () => {
-    if (!title || !description || !price) {
+    if (!title || !description || !location || !price) {
       Alert.alert(t("clientEditTask.missingTitle"), t("clientEditTask.missingFields"));
       return;
     }
-  
+
     try {
       await updateTaskById(taskId, {
         title,
         description,
+        location,
         budget: price,
       });
       navigation.goBack();
     } catch (err) {
-      console.error("❌ Failed to update task:", err);
       Alert.alert("Error", "Failed to update task");
     }
   };
-  
 
   if (loading) return <Text style={{ marginTop: 100, textAlign: "center" }}>Loading...</Text>;
 
@@ -93,25 +83,36 @@ export default function EditTaskScreen({ route, navigation }) {
 
           <TextInput
             style={styles.input}
-            placeholder={t("clientEditTask.titlePlaceholder")}
+            placeholder="Task name"
             value={title}
             onChangeText={setTitle}
             maxLength={30}
+            placeholderTextColor="#999"
           />
           <TextInput
             style={[styles.input, styles.textarea]}
-            placeholder={t("clientEditTask.descriptionPlaceholder")}
+            placeholder="Description"
             value={description}
             onChangeText={setDescription}
             multiline
             maxLength={150}
+            placeholderTextColor="#999"
           />
           <TextInput
             style={styles.input}
-            placeholder={t("clientEditTask.pricePlaceholder")}
+            placeholder="Address"
+            value={location}
+            onChangeText={setLocation}
+            maxLength={100}
+            placeholderTextColor="#999"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Price (SAR)"
             value={price}
             onChangeText={setPrice}
             keyboardType="numeric"
+            placeholderTextColor="#999"
           />
 
           <TouchableOpacity style={styles.button} onPress={handleUpdate}>

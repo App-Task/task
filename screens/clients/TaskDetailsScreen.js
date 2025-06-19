@@ -29,7 +29,6 @@ export default function TaskDetailsScreen({ route, navigation }) {
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        console.log("📦 [TaskDetails] Fetching task with ID:", initialTask._id);
         const freshTask = await getTaskById(initialTask._id);
         setTask(freshTask);
       } catch (err) {
