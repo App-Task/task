@@ -15,6 +15,9 @@ import { removeToken } from "../../services/authStorage";
 import { useNavigation } from "@react-navigation/native";
 import { fetchCurrentUser } from "../../services/auth";
 import * as ImagePicker from "expo-image-picker";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+
 
 const { width } = Dimensions.get("window");
 
@@ -24,18 +27,21 @@ export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState({ name: "", email: "" });
   const [profileImage, setProfileImage] = useState(null); // ✅ added
 
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const fetched = await fetchCurrentUser();
-        setUser(fetched);
-      } catch (err) {
-        console.error("❌ Failed to load user:", err.message);
-      }
-    };
-
-    loadUser();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        try {
+          const fetched = await fetchCurrentUser();
+          setUser(fetched);
+        } catch (err) {
+          console.error("❌ Failed to load user:", err.message);
+        }
+      };
+  
+      loadUser();
+    }, [])
+  );
+  
 
   const handleLogout = async () => {
     try {
