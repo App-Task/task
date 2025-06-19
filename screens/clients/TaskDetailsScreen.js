@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
-import { getTaskById, deleteTaskById } from "../../services/api";
+import { getTaskById, updateTaskById, deleteTaskById } from "../../services/taskService";
 
 const { width } = Dimensions.get("window");
 

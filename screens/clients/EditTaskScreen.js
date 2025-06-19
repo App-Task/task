@@ -13,11 +13,17 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
-import { fetchTaskById, updateTask } from "../../services/task";
+import { getTaskById, updateTaskById } from "../../services/taskService";
+
 
 export default function EditTaskScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { taskId } = route.params;
+  const { task } = route.params;
+  const taskId = task._id;
+  console.log("📦 getTaskById is:", getTaskById);
+
+
+  
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -27,36 +33,44 @@ export default function EditTaskScreen({ route, navigation }) {
   useEffect(() => {
     const loadTask = async () => {
       try {
-        const task = await fetchTaskById(taskId);
+        console.log("📦 Fetching task with ID:", taskId);
+        const task = await getTaskById(taskId);
+        console.log("✅ Task fetched:", task);
+  
         setTitle(task.title || "");
         setDescription(task.description || "");
         setPrice(task.budget?.toString() || "");
-        setLoading(false);
       } catch (err) {
+        console.error("❌ Error while loading task:", err);
         Alert.alert("Error", "Failed to load task");
+      } finally {
         setLoading(false);
       }
     };
+  
     loadTask();
   }, [taskId]);
-
+  
+  
   const handleUpdate = async () => {
     if (!title || !description || !price) {
       Alert.alert(t("clientEditTask.missingTitle"), t("clientEditTask.missingFields"));
       return;
     }
-
+  
     try {
-      await updateTask(taskId, {
+      await updateTaskById(taskId, {
         title,
         description,
         budget: price,
       });
-      navigation.navigate("MyTasks"); // 👈 Navigates back and auto-refreshes
+      navigation.goBack();
     } catch (err) {
+      console.error("❌ Failed to update task:", err);
       Alert.alert("Error", "Failed to update task");
     }
   };
+  
 
   if (loading) return <Text style={{ marginTop: 100, textAlign: "center" }}>Loading...</Text>;
 
