@@ -14,6 +14,8 @@ import {
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { getTaskById, updateTaskById, deleteTaskById } from "../../services/taskService";
+import { useIsFocused } from "@react-navigation/native";
+
 
 const { width } = Dimensions.get("window");
 
@@ -22,24 +24,27 @@ export default function TaskDetailsScreen({ route, navigation }) {
   const { task: initialTask } = route.params;
   const [task, setTask] = useState(initialTask);
   const [loading, setLoading] = useState(true);
+  const isFocused = useIsFocused(); // 👈 tracks when screen comes into focus
 
   useEffect(() => {
-    console.log("🔍 Initial Task ID:", initialTask?._id); // ✅ Add this debug log
-  
     const fetchTask = async () => {
       try {
+        console.log("📦 [TaskDetails] Fetching task with ID:", initialTask._id);
         const freshTask = await getTaskById(initialTask._id);
         setTask(freshTask);
       } catch (err) {
-        console.error("❌ Task fetch failed:", err.message); // ✅ Also log the error
+        console.error("❌ Task fetch failed:", err.message);
         Alert.alert("Error", "Failed to load task.");
       } finally {
         setLoading(false);
       }
     };
   
-    fetchTask();
-  }, []);
+    if (isFocused) {
+      fetchTask();
+    }
+  }, [isFocused]);
+  
   
 
   const handleDelete = async () => {
