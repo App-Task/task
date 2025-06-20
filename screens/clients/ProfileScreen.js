@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -12,36 +12,35 @@ import {
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { removeToken } from "../../services/authStorage";
-import { useNavigation } from "@react-navigation/native";
-import { fetchCurrentUser } from "../../services/auth";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { fetchCurrentUser, updateUserProfile } from "../../services/auth";
 import * as ImagePicker from "expo-image-picker";
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
-
 
 const { width } = Dimensions.get("window");
 
 export default function ProfileScreen({ navigation }) {
   const { t } = useTranslation();
   const nav = useNavigation();
-  const [user, setUser] = useState({ name: "", email: "" });
-  const [profileImage, setProfileImage] = useState(null); // ✅ added
+  const [user, setUser] = useState({ name: "", email: "", profileImage: null });
+  const [profileImage, setProfileImage] = useState(null);
+
+  const loadUser = async () => {
+    try {
+      const fetched = await fetchCurrentUser();
+      setUser(fetched);
+      if (fetched.profileImage) {
+        setProfileImage(fetched.profileImage);
+      }
+    } catch (err) {
+      console.error("❌ Failed to load user:", err.message);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
-      const loadUser = async () => {
-        try {
-          const fetched = await fetchCurrentUser();
-          setUser(fetched);
-        } catch (err) {
-          console.error("❌ Failed to load user:", err.message);
-        }
-      };
-  
       loadUser();
     }, [])
   );
-  
 
   const handleLogout = async () => {
     try {
@@ -71,14 +70,32 @@ export default function ProfileScreen({ navigation }) {
             });
 
             if (!result.canceled) {
-              setProfileImage(result.assets[0].uri);
+              const selectedUri = result.assets[0].uri;
+              setProfileImage(selectedUri);
+
+              try {
+                await updateUserProfile({ profileImage: selectedUri });
+                console.log("✅ Profile image updated");
+                loadUser(); // Refresh user info
+              } catch (err) {
+                console.error("❌ Failed to update profile image:", err.message);
+                Alert.alert("Error", "Could not save profile picture");
+              }
             }
           },
         },
         {
           text: t("clientProfile.removePhoto"),
           style: "destructive",
-          onPress: () => setProfileImage(null),
+          onPress: async () => {
+            setProfileImage(null);
+            try {
+              await updateUserProfile({ profileImage: null });
+              loadUser();
+            } catch (err) {
+              console.error("❌ Failed to remove profile image:", err.message);
+            }
+          },
         },
         { text: t("clientProfile.cancel"), style: "cancel" },
       ],
@@ -89,29 +106,28 @@ export default function ProfileScreen({ navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={handleChangeProfilePicture} style={styles.avatarWrapper}>
-  <View style={styles.avatarPlaceholder}>
-    {profileImage ? (
-      <Image
-        source={{ uri: profileImage }}
-        style={{ width: "100%", height: "100%", borderRadius: 100 }}
-      />
-    ) : (
-      <Text style={styles.avatarInitials}>
-        {user?.name
-          ? user.name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")
-              .toUpperCase()
-          : "?"}
-      </Text>
-    )}
-    <View style={styles.editIconWrapper}>
-    <Ionicons name="pencil" size={16} color="#fff" />
-    </View>
-  </View>
-</TouchableOpacity>
-
+        <View style={styles.avatarPlaceholder}>
+          {profileImage ? (
+            <Image
+              source={{ uri: profileImage }}
+              style={{ width: "100%", height: "100%", borderRadius: 100 }}
+            />
+          ) : (
+            <Text style={styles.avatarInitials}>
+              {user?.name
+                ? user.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()
+                : "?"}
+            </Text>
+          )}
+          <View style={styles.editIconWrapper}>
+            <Ionicons name="pencil" size={16} color="#fff" />
+          </View>
+        </View>
+      </TouchableOpacity>
 
       <View style={styles.info}>
         <Text style={styles.name}>{user.name || "Loading..."}</Text>
@@ -123,47 +139,38 @@ export default function ProfileScreen({ navigation }) {
           <Text style={styles.rowText}>{t("clientProfile.editProfile")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("ChangePassword")}>
           <Text style={styles.rowText}>{t("clientProfile.changePassword")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("MyPayments")}>
           <Text style={styles.rowText}>{t("clientProfile.myPayments")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("PaymentMethods")}>
           <Text style={styles.rowText}>{t("clientProfile.paymentMethods")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.rowItem}>
           <Text style={styles.rowText}>{t("clientProfile.aboutUs")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.rowItem}>
           <Text style={styles.rowText}>{t("clientProfile.privacyPolicy")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.rowItem}>
           <Text style={styles.rowText}>{t("clientProfile.terms")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.rowItem}>
           <Text style={styles.rowText}>{t("clientProfile.faqs")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.rowItem}>
           <Text style={styles.rowText}>{t("clientProfile.contactAdmin")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
-
         <TouchableOpacity style={[styles.rowItem, styles.logoutRow]} onPress={handleLogout}>
           <Text style={[styles.rowText, styles.logoutText]}>{t("clientProfile.logout")}</Text>
           <Ionicons name="log-out-outline" size={20} color="#213729" />
@@ -174,16 +181,14 @@ export default function ProfileScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-
   avatarWrapper: {
     position: "relative",
   },
-  
   editIconWrapper: {
     position: "absolute",
     bottom: 6,
     left: "50%",
-    transform: [{ translateX: -15 }], // Adjusted from -12 to -13 for better visual centering
+    transform: [{ translateX: -15 }],
     backgroundColor: "#215432",
     borderRadius: 20,
     padding: 6,
@@ -191,7 +196,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  
   container: {
     paddingTop: 60,
     paddingBottom: 60,

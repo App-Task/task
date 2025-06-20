@@ -20,7 +20,7 @@ router.get("/me", async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select("name email");
+    const user = await User.findById(decoded.id).select("name email profileImage");
     if (!user) return res.status(404).json({ msg: "User not found" });
     res.json(user);
   } catch (err) {
@@ -60,9 +60,7 @@ router.put("/change-password", async (req, res) => {
   }
 });
 
-module.exports = router;
-
-// ✅ Update profile route
+// ✅ Update profile route (name, email, and profileImage)
 router.put("/me", async (req, res) => {
   const rawToken = req.header("Authorization");
   if (!rawToken) return res.status(401).json({ msg: "No token provided" });
@@ -74,14 +72,24 @@ router.put("/me", async (req, res) => {
     const user = await User.findById(decoded.id);
     if (!user) return res.status(404).json({ msg: "User not found" });
 
-    const { name, email } = req.body;
+    const { name, email, profileImage } = req.body;
     if (name) user.name = name;
     if (email) user.email = email;
+    if (profileImage) user.profileImage = profileImage;
 
     await user.save();
-    res.json({ msg: "Profile updated", user: { name: user.name, email: user.email } });
+    res.json({
+      msg: "Profile updated",
+      user: {
+        name: user.name,
+        email: user.email,
+        profileImage: user.profileImage || null,
+      },
+    });
   } catch (err) {
     console.error("❌ Error updating profile:", err.message);
     res.status(500).json({ msg: "Server error" });
   }
 });
+
+module.exports = router;
