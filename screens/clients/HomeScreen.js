@@ -12,6 +12,9 @@ import {
 import { useTranslation } from "react-i18next";
 import Animated, { FadeInRight } from "react-native-reanimated";
 import * as SecureStore from "expo-secure-store";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+
 
 export default function ClientHomeScreen({ navigation }) {
   const { t } = useTranslation();
@@ -56,6 +59,13 @@ export default function ClientHomeScreen({ navigation }) {
   useEffect(() => {
     loadData();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [])
+  );
+  
 
   const handleRefresh = () => {
     loadData(true);
