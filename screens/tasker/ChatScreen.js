@@ -77,34 +77,47 @@ export default function ChatScreen({ navigation, route }) {
     } catch (err) {
       console.error("❌ Error sending message:", err.message);
     }
-  };
-
-  const renderMessage = ({ item }) => {
-    const isMe =
-    item.sender === "me" || // just sent
-    item.sender?._id === currentUserId || // fetched
-    item.sender === currentUserId;
+  };const renderItem = ({ item }) => {
+    const sender = typeof item.sender === "object" ? item.sender : {};
+    const senderId = sender._id || item.sender;
+    const isMe = senderId?.toString() === currentUserId?.toString();
   
-  
-
     return (
       <View
         style={[
-          styles.bubble,
-          isMe ? styles.myMessage : styles.theirMessage,
+          styles.bubbleRow,
+          isMe ? styles.rowRight : styles.rowLeft,
         ]}
       >
-        <Text style={styles.messageText}>{item.text}</Text>
-        <Text style={styles.time}>
-          {item.time ||
-            new Date(item.createdAt).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-        </Text>
+        {!isMe && (
+          <Image
+            source={
+              sender.profileImage
+                ? { uri: sender.profileImage }
+                : require("../../assets/images/profile.png")
+            }
+            style={styles.avatar}
+          />
+        )}
+        <View
+          style={[
+            styles.bubble,
+            isMe ? styles.myMessage : styles.theirMessage,
+          ]}
+        >
+          <Text style={styles.messageText}>{item.text}</Text>
+          <Text style={styles.time}>
+            {item.time ||
+              new Date(item.createdAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+          </Text>
+        </View>
       </View>
     );
   };
+  
 
   useEffect(() => {
     const initialize = async () => {
@@ -143,7 +156,7 @@ export default function ChatScreen({ navigation, route }) {
       <FlatList
         data={messages}
         keyExtractor={(item) => item._id || item.id}
-        renderItem={renderMessage}
+        renderItem={renderItem}
         contentContainerStyle={styles.messageContainer}
         inverted
       />
@@ -246,6 +259,27 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#ffffff",
+  },
+  bubbleRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    marginBottom: 12,
+    maxWidth: "100%",
+  },
+  rowLeft: {
+    justifyContent: "flex-start",
+    alignSelf: "flex-start",
+  },
+  rowRight: {
+    flexDirection: "row-reverse",
+    justifyContent: "flex-end",
+    alignSelf: "flex-end",
+  },
+  avatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginHorizontal: 6,
   },
   
 });
