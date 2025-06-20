@@ -90,17 +90,18 @@ export default function ChatScreen({ route, navigation }) {
       setCurrentUserId(id);
   
       // ✅ wait until currentUserId is set, then fetch messages
-      setTimeout(fetchMessages, 100);
-      setInterval(fetchMessages, 5000);
+      setTimeout(() => {
+        fetchMessages();
+      }, 200);
+            setInterval(fetchMessages, 5000);
     };
   
     initialize();
   }, []);
   
   const renderItem = ({ item }) => {
-    const senderId =
-      typeof item.sender === "string" ? item.sender : item.sender?._id;
-  
+    const sender = typeof item.sender === "object" ? item.sender : {};
+    const senderId = sender._id || item.sender;
     const isMine = senderId?.toString() === currentUserId?.toString();
   
     return (
@@ -112,7 +113,11 @@ export default function ChatScreen({ route, navigation }) {
       >
         {!isMine && (
           <Image
-            source={require("../../assets/images/profile.png")}
+            source={
+              sender.profileImage
+                ? { uri: sender.profileImage }
+                : require("../../assets/images/profile.png")
+            }
             style={styles.avatar}
           />
         )}
@@ -132,6 +137,7 @@ export default function ChatScreen({ route, navigation }) {
       </View>
     );
   };
+  
   
   return (
 <SafeAreaView style={styles.safeArea}>

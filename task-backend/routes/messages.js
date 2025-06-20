@@ -132,7 +132,10 @@ router.get("/:userId", async (req, res) => {
         { sender: myId, receiver: otherId },
         { sender: otherId, receiver: myId },
       ],
-    }).sort({ createdAt: 1 });
+    })
+      .sort({ createdAt: 1 })
+      .populate("sender", "name profileImage");
+    
 
     res.json(messages);
   } catch (err) {
