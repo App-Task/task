@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -11,40 +11,40 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
-import { fetchCurrentUser } from "../../services/auth";
+import { fetchCurrentUser, updateUserProfile } from "../../services/auth";
 import { removeToken } from "../../services/authStorage";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 
 const { width } = Dimensions.get("window");
 
 export default function TaskerProfileScreen({ navigation }) {
   const { t } = useTranslation();
-  const [user, setUser] = useState({ name: "", email: "" });
+  const [user, setUser] = useState({ name: "", email: "", profileImage: null });
   const [profileImage, setProfileImage] = useState(null);
   const nav = useNavigation();
 
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const fetched = await fetchCurrentUser();
-        setUser(fetched);
-      } catch (err) {
-        console.error("❌ Failed to load user:", err.message);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        try {
+          const fetched = await fetchCurrentUser();
+          setUser(fetched);
+          setProfileImage(fetched.profileImage || null);
+        } catch (err) {
+          console.error("❌ Failed to load user:", err.message);
+        }
+      };
 
-    loadUser();
-  }, []);
+      loadUser();
+    }, [])
+  );
 
   const handleLogout = async () => {
     try {
       await removeToken();
       Alert.alert(t("taskerProfile.loggedOut"));
-      nav.reset({
-        index: 0,
-        routes: [{ name: "Welcome" }],
-      });
+      nav.reset({ index: 0, routes: [{ name: "Welcome" }] });
     } catch (err) {
       console.error("❌ Logout failed:", err.message);
     }
@@ -65,14 +65,19 @@ export default function TaskerProfileScreen({ navigation }) {
             });
 
             if (!result.canceled) {
-              setProfileImage(result.assets[0].uri);
+              const uri = result.assets[0].uri;
+              setProfileImage(uri);
+              await updateUserProfile({ profileImage: uri });
             }
           },
         },
         {
           text: t("taskerProfile.removePhoto"),
           style: "destructive",
-          onPress: () => setProfileImage(null),
+          onPress: async () => {
+            setProfileImage(null);
+            await updateUserProfile({ profileImage: "" });
+          },
         },
         { text: t("taskerProfile.cancel"), style: "cancel" },
       ],
@@ -123,7 +128,7 @@ export default function TaskerProfileScreen({ navigation }) {
           style={styles.rowItem}
           onPress={() => navigation.navigate("ChangePassword")}
         >
-          <Text style={styles.rowText}>Change Password</Text>
+          <Text style={styles.rowText}>{t("taskerProfile.changePassword")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
@@ -167,10 +172,7 @@ export default function TaskerProfileScreen({ navigation }) {
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.rowItem, styles.logoutRow]}
-          onPress={handleLogout}
-        >
+        <TouchableOpacity style={[styles.rowItem, styles.logoutRow]} onPress={handleLogout}>
           <Text style={[styles.rowText, styles.logoutText]}>
             {t("taskerProfile.logout")}
           </Text>
