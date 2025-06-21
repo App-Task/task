@@ -21,12 +21,12 @@ export default function ViewBidsScreen({ route, navigation }) {
 
   const [bids, setBids] = useState([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
+    console.log("📦 Fetching bids for taskId:", taskId);
     const fetchBids = async () => {
       try {
         const res = await axios.get(`https://task-kq94.onrender.com/api/bids/task/${taskId}`);
-        console.log("✅ Bids fetched:", res.data);
+        console.log("✅ Bids fetched successfully:", res.data);
         setBids(res.data);
       } catch (err) {
         console.error("❌ Failed to load bids:", err.message);
@@ -41,51 +41,71 @@ export default function ViewBidsScreen({ route, navigation }) {
     };
   
     fetchBids();
-  }, []);
+  }, [taskId]);
   
-
+  
   const handleAccept = async (bid) => {
     try {
       const res = await axios.put(`https://task-kq94.onrender.com/api/bids/${bid._id}/accept`);
       console.log("✅ Bid accepted:", res.data);
-
+  
+      setAcceptedBidId(bid._id); // mark this one as accepted
+  
       Alert.alert(
         t("clientViewBids.acceptedTitle"),
         t("clientViewBids.acceptedMessage", {
           name: bid.taskerId?.name || "Tasker",
         })
       );
-
-      navigation.goBack(); // or navigate elsewhere
+  
+      // Optional: navigate.goBack();
     } catch (err) {
       console.error("❌ Accept bid error:", err.message);
       Alert.alert("Error", "Something went wrong while accepting the bid.");
     }
   };
-
   const handleChat = (bid) => {
     const name = bid.taskerId?.name || "Tasker";
-    navigation.navigate("Chat", { name });
+    const otherUserId = bid.taskerId?._id;
+    console.log("💬 Navigating to Chat with:", { name, otherUserId });
+    navigation.navigate("Chat", { name, otherUserId });
   };
-
-  const renderBid = ({ item }) => (
-    <View style={styles.card}>
-      <View style={styles.header}>
-        <Text style={styles.name}>{item.taskerId?.name || "Tasker"}</Text>
-        <Text style={styles.price}>{item.amount} SAR</Text>
+  
+  const renderBid = ({ item }) => {
+    console.log("🧾 Rendering bid from:", item.taskerId?.name, item);
+  
+    return (
+      <View style={styles.card}>
+        <View style={styles.header}>
+          <Text style={styles.name}>{item.taskerId?.name || "Tasker"}</Text>
+          <Text style={styles.price}>{item.amount} SAR</Text>
+        </View>
+        <Text style={styles.message}>{item.message}</Text>
+  
+        <View style={styles.buttons}>
+          <TouchableOpacity style={styles.chatBtn} onPress={() => handleChat(item)}>
+            <Text style={styles.chatText}>{t("clientViewBids.chat")}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.acceptBtn,
+              item.status === "Accepted" ? { backgroundColor: "gray" } : null,
+            ]}
+            onPress={() => {
+              console.log("✅ Accept pressed for bid:", item._id);
+              if (item.status !== "Accepted") handleAccept(item);
+            }}
+            disabled={item.status === "Accepted"}
+          >
+            <Text style={styles.acceptText}>
+              {item.status === "Accepted" ? "Accepted" : t("clientViewBids.accept")}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <Text style={styles.message}>{item.message}</Text>
-
-      <View style={styles.buttons}>
-        <TouchableOpacity style={styles.chatBtn} onPress={() => handleChat(item)}>
-          <Text style={styles.chatText}>{t("clientViewBids.chat")}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.acceptBtn} onPress={() => handleAccept(item)}>
-          <Text style={styles.acceptText}>{t("clientViewBids.accept")}</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+    );
+  };
+  
 
   return (
     <SafeAreaView style={styles.safeArea}>
