@@ -15,6 +15,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons"; // ✅ icon package
 import { useNavigation } from "@react-navigation/native"; // ✅ for back navigation
+import axios from "axios";
+import { fetchCurrentUser } from "../../services/auth"; // or your actual path
+
 
 const { width } = Dimensions.get("window");
 
@@ -26,17 +29,33 @@ export default function TaskDetailsScreen({ route }) {
   const [bidAmount, setBidAmount] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleBid = () => {
+  const handleBid = async () => {
     if (!bidAmount || !message) {
       Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.fillFields"));
       return;
     }
-
-    Alert.alert(t("taskerTaskDetails.successTitle"), t("taskerTaskDetails.bidSent"));
-    setBidAmount("");
-    setMessage("");
+  
+    try {
+      const user = await fetchCurrentUser();
+  
+      const res = await axios.post("https://task-kq94.onrender.com/api/bids", {
+        taskId: task._id,
+        taskerId: user._id,
+        amount: Number(bidAmount),
+        message,
+      });
+  
+      console.log("✅ Bid response:", res.data);
+  
+      Alert.alert(t("taskerTaskDetails.successTitle"), t("taskerTaskDetails.bidSent"));
+      setBidAmount("");
+      setMessage("");
+    } catch (err) {
+      console.error("❌ Bid error:", err.message);
+      Alert.alert("Error", "Something went wrong while submitting the bid.");
+    }
   };
-
+  
   return (
     <SafeAreaView style={styles.safeArea}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>

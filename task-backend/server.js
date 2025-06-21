@@ -35,3 +35,7 @@ app.listen(PORT, "0.0.0.0", () =>
 const messageRoutes = require("./routes/messages");
 app.use("/api/messages", messageRoutes);
 
+const bidRoutes = require("./routes/bidRoutes");
+app.use("/api/bids", bidRoutes);
+
+

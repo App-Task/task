@@ -11,16 +11,29 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
+
 
 const { width } = Dimensions.get("window");
 
 export default function ViewBidsScreen({ route, navigation }) {
   const { t } = useTranslation();
   const { bids } = route.params;
-
-  const handleAccept = (bidder) => {
-    Alert.alert(t("clientViewBids.acceptedTitle"), t("clientViewBids.acceptedMessage", { name: bidder.name }));
-    // TODO: Navigate to payment or task progress flow
+  const handleAccept = async (bid) => {
+    try {
+      const res = await axios.put(`https://task-kq94.onrender.com/api/bids/${bid._id}/accept`);
+      console.log("✅ Bid accepted:", res.data);
+  
+      Alert.alert(
+        t("clientViewBids.acceptedTitle"),
+        t("clientViewBids.acceptedMessage", { name: bid.taskerId.name })
+      );
+  
+      navigation.goBack(); // or navigate to confirmation screen
+    } catch (err) {
+      console.error("❌ Accept bid error:", err.message);
+      Alert.alert("Error", "Something went wrong while accepting the bid.");
+    }
   };
 
   const handleChat = (bidder) => {
