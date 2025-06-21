@@ -47,7 +47,12 @@ export default function TaskDetailsScreen({ route }) {
   
       console.log("✅ Bid response:", res.data);
   
-      Alert.alert(t("taskerTaskDetails.successTitle"), t("taskerTaskDetails.bidSent"));
+      Alert.alert(
+        t("taskerTaskDetails.successTitle"),
+        t("taskerTaskDetails.bidSent"),
+        [{ text: "OK", onPress: () => navigation.goBack() }] // ✅ Go back after alert dismiss
+      );
+  
       setBidAmount("");
       setMessage("");
     } catch (err) {
@@ -55,6 +60,7 @@ export default function TaskDetailsScreen({ route }) {
       Alert.alert("Error", "Something went wrong while submitting the bid.");
     }
   };
+  
   
   return (
     <SafeAreaView style={styles.safeArea}>

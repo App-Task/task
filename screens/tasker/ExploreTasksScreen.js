@@ -16,6 +16,8 @@ import { useTranslation } from "react-i18next";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
+import { useFocusEffect } from "@react-navigation/native";
+
 
 const JOB_TYPES = [
   "Cleaning",
@@ -32,6 +34,8 @@ export default function ExploreTasksScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [jobType, setJobType] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
 
   const fetchTasks = async () => {
     try {
@@ -49,10 +53,18 @@ export default function ExploreTasksScreen({ navigation }) {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchTasks();
-  }, []);
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchTasks();
+    setRefreshing(false);
+  };
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchTasks();
+    }, [])
+  );
+  
 
   useEffect(() => {
     filterTasks();
