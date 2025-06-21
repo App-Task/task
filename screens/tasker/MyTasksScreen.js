@@ -11,44 +11,50 @@ import {
 import { useTranslation } from "react-i18next";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { StyleSheet } from "react-native";
-
-
-const dummyTasks = {
-  active: [
-    {
-      id: "1",
-      title: "Assemble Furniture",
-      client: "Ahmed Ali",
-      status: "Started",
-    },
-  ],
-  past: [
-    {
-      id: "2",
-      title: "Fix garden light",
-      client: "Mona Saleh",
-      status: "Completed",
-    },
-  ],
-};
+import axios from "axios";
+import { fetchCurrentUser } from "../../services/auth";
 
 export default function TaskerMyTasksScreen() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("active");
+  const [tasks, setTasks] = useState([]);
+  const [taskerId, setTaskerId] = useState("");
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 800);
-  }, []);
+    const loadTasks = async () => {
+      setLoading(true);
+      try {
+        const user = await fetchCurrentUser();
+        setTaskerId(user._id);
+  
+        const url = `https://task-kq94.onrender.com/api/tasks/tasker/${user._id}?type=${tab}`;
+        console.log("🔍 Fetching tasks from:", url); // ✅ log URL
+  
+        const res = await axios.get(url);
+        console.log("✅ Response data:", res.data); // ✅ log response
+        setTasks(res.data);
+      } catch (err) {
+        console.error("❌ Error fetching tasks:", err.message);
+        if (err.response) {
+          console.log("❌ Backend response error:", err.response.data); // ✅ backend message
+          console.log("❌ Status code:", err.response.status); // ✅ 404, 500, etc.
+        } else {
+          console.log("❌ General error object:", err); // ✅ fallback
+        }
+        Alert.alert("Error", "Failed to load tasks.");
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    loadTasks();
+  }, [tab]);
+  
 
   const renderTask = ({ item }) => (
     <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
       <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.sub}>
-        {t("taskerMyTasks.client")}: {item.client}
-      </Text>
       <Text style={styles.sub}>
         {t("taskerMyTasks.status")}: {t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
       </Text>
@@ -96,12 +102,12 @@ export default function TaskerMyTasksScreen() {
       {/* Task list */}
       {loading ? (
         <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
-      ) : dummyTasks[tab].length === 0 ? (
+      ) : tasks.length === 0 ? (
         <Text style={styles.empty}>{t("taskerMyTasks.noTasks")}</Text>
       ) : (
         <FlatList
-          data={dummyTasks[tab]}
-          keyExtractor={(item) => item.id}
+          data={tasks}
+          keyExtractor={(item) => item._id}
           renderItem={renderTask}
           contentContainerStyle={{ paddingBottom: 60 }}
         />
@@ -109,6 +115,8 @@ export default function TaskerMyTasksScreen() {
     </View>
   );
 }
+
+
 
 
 const styles = StyleSheet.create({

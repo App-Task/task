@@ -102,4 +102,36 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to delete task" });
   }
 });
+
+// ✅ GET /api/tasks/tasker/:taskerId?type=active|past
+router.get("/tasker/:taskerId", async (req, res) => {
+  try {
+    const { taskerId } = req.params;
+    const { type } = req.query;
+
+    if (!mongoose.Types.ObjectId.isValid(taskerId)) {
+      return res.status(400).json({ error: "Invalid taskerId format." });
+    }
+
+    let statusFilter = {};
+
+    if (type === "active") {
+      statusFilter.status = { $in: ["Pending", "Started"] };
+    } else if (type === "past") {
+      statusFilter.status = { $in: ["Completed", "Cancelled"] };
+    }
+
+    const tasks = await Task.find({
+      taskerId,
+      ...statusFilter,
+    }).sort({ createdAt: -1 });
+
+    res.json(tasks);
+  } catch (err) {
+    console.error("❌ Tasker task fetch error:", err.message);
+    res.status(500).json({ error: "Failed to fetch tasker tasks" });
+  }
+});
+
+
 module.exports = router;

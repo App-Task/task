@@ -9,20 +9,22 @@ const TaskSchema = new mongoose.Schema({
   images: [String],
   status: {
     type: String,
-    enum: ["Pending", "Started", "Completed"],
+    enum: ["Pending", "Started", "Completed", "Cancelled"],
     default: "Pending",
   },
-  
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    required: true, // client
+  },
+  taskerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // new field for tasker
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
-
 
 module.exports = mongoose.model("Task", TaskSchema);
