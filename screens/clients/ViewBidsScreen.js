@@ -12,6 +12,8 @@ import {
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
+import { useFocusEffect } from "@react-navigation/native";
+
 
 const { width } = Dimensions.get("window");
 
@@ -20,28 +22,47 @@ export default function ViewBidsScreen({ route, navigation }) {
   const { taskId } = route.params;
 
   const [bids, setBids] = useState([]);
+  const [acceptedBidId, setAcceptedBidId] = useState(null);
+
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    console.log("📦 Fetching bids for taskId:", taskId);
-    const fetchBids = async () => {
-      try {
-        const res = await axios.get(`https://task-kq94.onrender.com/api/bids/task/${taskId}`);
-        console.log("✅ Bids fetched successfully:", res.data);
-        setBids(res.data);
-      } catch (err) {
-        console.error("❌ Failed to load bids:", err.message);
-        if (err.response) {
-          console.log("❌ Backend response:", err.response.data);
-          console.log("❌ Status code:", err.response.status);
-          console.log("❌ Full error object:", err.toJSON());
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("📦 Fetching bids for taskId:", taskId);
+      const fetchBids = async () => {
+        try {
+          const res = await axios.get(`https://task-kq94.onrender.com/api/bids/task/${taskId}`);
+          console.log("✅ Bids fetched successfully:", res.data);
   
-    fetchBids();
-  }, [taskId]);
+          setBids(res.data);
+  
+          const accepted = res.data.find((bid) => bid.status === "Accepted");
+          if (accepted) {
+            console.log("🔒 Already accepted bid:", accepted._id);
+            setAcceptedBidId(accepted._id);
+          } else {
+            setAcceptedBidId(null); // reset if none accepted
+          }
+        } catch (err) {
+          console.error("❌ Failed to load bids:", err.message);
+          if (err.response) {
+            console.log("❌ Backend response:", err.response.data);
+            console.log("❌ Status code:", err.response.status);
+            console.log("❌ Full error object:", err.toJSON());
+          }
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchBids();
+  
+      return () => {
+        // Cleanup if needed
+      };
+    }, [taskId])
+  );
+  
+  
   
   
   const handleAccept = async (bid) => {
@@ -69,10 +90,9 @@ export default function ViewBidsScreen({ route, navigation }) {
     const otherUserId = bid.taskerId?._id;
     console.log("💬 Navigating to Chat with:", { name, otherUserId });
     navigation.navigate("Chat", { name, otherUserId });
-  };
-  
-  const renderBid = ({ item }) => {
-    console.log("🧾 Rendering bid from:", item.taskerId?.name, item);
+  };const renderBid = ({ item }) => {
+    const isThisAccepted = item._id === acceptedBidId || item.status === "Accepted";
+    const alreadyPicked = acceptedBidId && item._id !== acceptedBidId;
   
     return (
       <View style={styles.card}>
@@ -86,25 +106,36 @@ export default function ViewBidsScreen({ route, navigation }) {
           <TouchableOpacity style={styles.chatBtn} onPress={() => handleChat(item)}>
             <Text style={styles.chatText}>{t("clientViewBids.chat")}</Text>
           </TouchableOpacity>
+  
           <TouchableOpacity
             style={[
               styles.acceptBtn,
-              item.status === "Accepted" ? { backgroundColor: "gray" } : null,
+              isThisAccepted
+                ? { backgroundColor: "gray" }
+                : alreadyPicked
+                ? { backgroundColor: "#ccc" }
+                : {},
             ]}
             onPress={() => {
-              console.log("✅ Accept pressed for bid:", item._id);
-              if (item.status !== "Accepted") handleAccept(item);
+              if (!acceptedBidId) {
+                handleAccept(item);
+              }
             }}
-            disabled={item.status === "Accepted"}
+            disabled={!!acceptedBidId}
           >
             <Text style={styles.acceptText}>
-              {item.status === "Accepted" ? "Accepted" : t("clientViewBids.accept")}
+              {isThisAccepted
+                ? "Accepted"
+                : alreadyPicked
+                ? "Already picked a tasker"
+                : t("clientViewBids.accept")}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
     );
   };
+  
   
 
   return (
