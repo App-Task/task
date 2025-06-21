@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,38 +13,66 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 
-
 const { width } = Dimensions.get("window");
 
 export default function ViewBidsScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { bids } = route.params;
+  const { taskId } = route.params;
+
+  const [bids, setBids] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBids = async () => {
+      try {
+        const res = await axios.get(`https://task-kq94.onrender.com/api/bids/task/${taskId}`);
+        console.log("✅ Bids fetched:", res.data);
+        setBids(res.data);
+      } catch (err) {
+        console.error("❌ Failed to load bids:", err.message);
+        if (err.response) {
+          console.log("❌ Backend response:", err.response.data);
+          console.log("❌ Status code:", err.response.status);
+          console.log("❌ Full error object:", err.toJSON());
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchBids();
+  }, []);
+  
+
   const handleAccept = async (bid) => {
     try {
       const res = await axios.put(`https://task-kq94.onrender.com/api/bids/${bid._id}/accept`);
       console.log("✅ Bid accepted:", res.data);
-  
+
       Alert.alert(
         t("clientViewBids.acceptedTitle"),
-        t("clientViewBids.acceptedMessage", { name: bid.taskerId.name })
+        t("clientViewBids.acceptedMessage", {
+          name: bid.taskerId?.name || "Tasker",
+        })
       );
-  
-      navigation.goBack(); // or navigate to confirmation screen
+
+      navigation.goBack(); // or navigate elsewhere
     } catch (err) {
       console.error("❌ Accept bid error:", err.message);
       Alert.alert("Error", "Something went wrong while accepting the bid.");
     }
   };
 
-  const handleChat = (bidder) => {
-    navigation.navigate("Chat", { name: bidder.name });
+  const handleChat = (bid) => {
+    const name = bid.taskerId?.name || "Tasker";
+    navigation.navigate("Chat", { name });
   };
 
   const renderBid = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.price}>{item.price} SAR</Text>
+        <Text style={styles.name}>{item.taskerId?.name || "Tasker"}</Text>
+        <Text style={styles.price}>{item.amount} SAR</Text>
       </View>
       <Text style={styles.message}>{item.message}</Text>
 
@@ -62,7 +90,6 @@ export default function ViewBidsScreen({ route, navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Header with Back Button */}
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="#213729" />
@@ -71,19 +98,24 @@ export default function ViewBidsScreen({ route, navigation }) {
           <View style={styles.backBtn} />
         </View>
 
-        <FlatList
-          data={bids}
-          keyExtractor={(item) => item.id}
-          renderItem={renderBid}
-          ListEmptyComponent={
-            <Text style={styles.empty}>{t("clientViewBids.noBids")}</Text>
-          }
-          contentContainerStyle={styles.listContent}
-        />
+        {loading ? (
+          <Text style={styles.empty}>{t("clientViewBids.loading") || "Loading..."}</Text>
+        ) : (
+          <FlatList
+            data={bids}
+            keyExtractor={(item) => item._id}
+            renderItem={renderBid}
+            ListEmptyComponent={
+              <Text style={styles.empty}>{t("clientViewBids.noBids")}</Text>
+            }
+            contentContainerStyle={styles.listContent}
+          />
+        )}
       </View>
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   safeArea: {

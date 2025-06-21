@@ -123,7 +123,7 @@ Alert.alert(
             <Text style={styles.buttonText}>{t("clientTaskDetails.editTask")}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("ViewBids", { bids })}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("ViewBids", { taskId: task._id })}>
             <Text style={styles.buttonText}>{t("clientTaskDetails.viewBids")}</Text>
           </TouchableOpacity>
 
