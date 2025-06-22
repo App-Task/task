@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,21 +10,18 @@ import {
   StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
-import { getToken } from "../../services/authStorage"; // make sure this import exists
-import { useEffect } from "react"; // ✅ add this
-
-
-
+import { getToken } from "../../services/authStorage";
 
 export default function EditProfileScreen() {
   const { t } = useTranslation();
 
-  const [name, setName] = useState("Yosuf Al Awadi");
-  const [gender, setGender] = useState("Male");
-  const [location, setLocation] = useState("Jeddah");
-  const [experience, setExperience] = useState("3 years");
-  const [skills, setSkills] = useState("Plumbing, Electrical");
-  const [about, setAbout] = useState("Reliable tasker with attention to detail.");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState(""); // ✅ added dynamic email
+  const [gender, setGender] = useState("");
+  const [location, setLocation] = useState("");
+  const [experience, setExperience] = useState("");
+  const [skills, setSkills] = useState("");
+  const [about, setAbout] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -35,16 +32,16 @@ export default function EditProfileScreen() {
             Authorization: `Bearer ${token}`,
           },
         });
-  
+
         const data = await res.json();
         if (res.ok) {
           setName(data.name || "");
+          setEmail(data.email || "");
           setGender(data.gender || "");
           setLocation(data.location || "");
           setExperience(data.experience || "");
           setSkills(data.skills || "");
           setAbout(data.about || "");
-          // setEmail(data.email || "") if you ever make email editable
         } else {
           console.error("❌ Failed to fetch profile:", data.msg);
         }
@@ -52,16 +49,13 @@ export default function EditProfileScreen() {
         console.error("❌ Error loading profile:", err.message);
       }
     };
-  
+
     fetchProfile();
   }, []);
-  
 
   const handleSave = async () => {
     try {
       const token = await getToken();
-      if (!token) throw new Error("No token found");
-  
       const res = await fetch("https://task-kq94.onrender.com/api/auth/me", {
         method: "PUT",
         headers: {
@@ -77,9 +71,8 @@ export default function EditProfileScreen() {
           about,
         }),
       });
-  
+
       const data = await res.json();
-  
       if (res.ok) {
         Alert.alert(t("taskerEditProfile.savedTitle"), t("taskerEditProfile.savedMessage"));
       } else {
@@ -91,7 +84,7 @@ export default function EditProfileScreen() {
       Alert.alert("Error", "Something went wrong. Please try again.");
     }
   };
-  
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>
@@ -107,7 +100,7 @@ export default function EditProfileScreen() {
 
       <TextInput
         style={styles.input}
-        value="yosuf@example.com"
+        value={email}
         editable={false}
         placeholder={t("taskerEditProfile.email")}
         textAlign={I18nManager.isRTL ? "right" : "left"}
@@ -168,7 +161,6 @@ export default function EditProfileScreen() {
     </ScrollView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

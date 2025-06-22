@@ -8,6 +8,8 @@ import RegisterScreen from "../screens/common/RegisterScreen";
 
 import BottomTabNavigator from "./BottomTabNavigator"; // Client-side bottom tabs
 import TaskerBottomTabNavigator from "./TaskerBottomTabNavigator"; // Tasker-side bottom tabs
+import TaskerEditProfileScreen from "../screens/tasker/EditProfileScreen";
+
 
 import TaskDetailsScreen from "../screens/clients/TaskDetailsScreen";
 import EditTaskScreen from "../screens/clients/EditTaskScreen";
@@ -50,12 +52,15 @@ export default function MainNavigator() {
       <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
 
       {/* Tasker Home & Subscreens */}
-      <Stack.Screen name="TaskerHome" component={TaskerBottomTabNavigator} />
-      <Stack.Screen name="Documents" component={DocumentsScreen} />
-      <Stack.Screen name="BankAccount" component={BankAccountScreen} />
-      <Stack.Screen name="Reviews" component={MyReviewsScreen} />
-      <Stack.Screen name="TaskerTaskDetails" component={TaskerTaskDetailsScreen} />
-      <Stack.Screen name="Settings" component={SettingsScreen} />
+{/* Tasker Home & Subscreens */}
+<Stack.Screen name="TaskerHome" component={TaskerBottomTabNavigator} />
+<Stack.Screen name="Documents" component={DocumentsScreen} />
+<Stack.Screen name="BankAccount" component={BankAccountScreen} />
+<Stack.Screen name="Reviews" component={MyReviewsScreen} />
+<Stack.Screen name="TaskerTaskDetails" component={TaskerTaskDetailsScreen} />
+<Stack.Screen name="Settings" component={SettingsScreen} />
+<Stack.Screen name="EditTaskerProfile" component={TaskerEditProfileScreen} />
+
     </Stack.Navigator>
   );
 }

@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 const dummyReviews = [
   {
     id: "1",
-    reviewer: "Ahmed Ali",
+    reviewer: "Ahmed Alieee",
     rating: 5,
     comment: "Great work, very reliable and fast!",
   },

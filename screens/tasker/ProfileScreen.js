@@ -118,8 +118,8 @@ export default function TaskerProfileScreen({ navigation }) {
       <View style={styles.buttonGroup}>
         <TouchableOpacity
           style={styles.rowItem}
-          onPress={() => navigation.navigate("EditProfile")}
-        >
+          onPress={() => navigation.navigate("EditTaskerProfile")}
+          >
           <Text style={styles.rowText}>{t("taskerProfile.edit")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>

@@ -9,6 +9,8 @@ import TaskerMyTasksScreen from "../screens/tasker/MyTasksScreen";
 import TaskerMessagesScreen from "../screens/tasker/MessagesScreen";
 import TaskerNotificationsScreen from "../screens/tasker/NotificationsScreen";
 import TaskerProfileScreen from "../screens/tasker/ProfileScreen";
+import EditProfileScreen from "../screens/tasker/EditProfileScreen";
+
 
 const Tab = createBottomTabNavigator();
 
