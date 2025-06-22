@@ -10,13 +10,16 @@ import {
   StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { getToken } from "../../services/authStorage";
 
 export default function EditProfileScreen() {
   const { t } = useTranslation();
+  const navigation = useNavigation();
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState(""); // ✅ added dynamic email
+  const [email, setEmail] = useState("");
   const [gender, setGender] = useState("");
   const [location, setLocation] = useState("");
   const [experience, setExperience] = useState("");
@@ -74,7 +77,12 @@ export default function EditProfileScreen() {
 
       const data = await res.json();
       if (res.ok) {
-        Alert.alert(t("taskerEditProfile.savedTitle"), t("taskerEditProfile.savedMessage"));
+        Alert.alert(t("taskerEditProfile.savedTitle"), t("taskerEditProfile.savedMessage"), [
+          {
+            text: "OK",
+            onPress: () => navigation.goBack(), // ✅ navigate back after save
+          },
+        ]);
       } else {
         console.error("❌ Update failed:", data);
         Alert.alert("Error", data.msg || "Failed to update profile.");
@@ -87,73 +95,23 @@ export default function EditProfileScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>
+      {/* ✅ Top Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" size={24} color="#213729" />
+      </TouchableOpacity>
 
-      <TextInput
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
-        placeholder={t("taskerEditProfile.name")}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-        placeholderTextColor="#999"
-      />
+      <View style={styles.headerWrapper}>
+  <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>
+</View>
 
-      <TextInput
-        style={styles.input}
-        value={email}
-        editable={false}
-        placeholder={t("taskerEditProfile.email")}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-        placeholderTextColor="#999"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={gender}
-        onChangeText={setGender}
-        placeholder={t("taskerEditProfile.gender")}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-        placeholderTextColor="#999"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={location}
-        onChangeText={setLocation}
-        placeholder={t("taskerEditProfile.location")}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-        placeholderTextColor="#999"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={experience}
-        onChangeText={setExperience}
-        placeholder={t("taskerEditProfile.experience")}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-        placeholderTextColor="#999"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={skills}
-        onChangeText={setSkills}
-        placeholder={t("taskerEditProfile.skills")}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-        placeholderTextColor="#999"
-      />
-
-      <TextInput
-        style={[styles.input, styles.textarea]}
-        value={about}
-        onChangeText={setAbout}
-        placeholder={t("taskerEditProfile.about")}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-        textAlignVertical="top"
-        placeholderTextColor="#999"
-        multiline
-        maxLength={150}
-      />
+      {/* Inputs */}
+      <TextInput style={styles.input} value={name} onChangeText={setName} placeholder={t("taskerEditProfile.name") || "Name"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+      <TextInput style={styles.input} value={email} editable={false} placeholder={t("taskerEditProfile.email") || "Email"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+      <TextInput style={styles.input} value={gender} onChangeText={setGender} placeholder={t("taskerEditProfile.gender") || "Gender"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+      <TextInput style={styles.input} value={location} onChangeText={setLocation} placeholder={t("taskerEditProfile.location") || "Location"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+      <TextInput style={styles.input} value={experience} onChangeText={setExperience} placeholder={t("taskerEditProfile.experience") || "Experience"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+      <TextInput style={styles.input} value={skills} onChangeText={setSkills} placeholder={t("taskerEditProfile.skills") || "Skills"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+      <TextInput style={[styles.input, styles.textarea]} value={about} onChangeText={setAbout} placeholder={t("taskerEditProfile.about") || "About"} textAlign={I18nManager.isRTL ? "right" : "left"} textAlignVertical="top" placeholderTextColor="#999" multiline maxLength={150} />
 
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>{t("taskerEditProfile.save")}</Text>
@@ -161,6 +119,7 @@ export default function EditProfileScreen() {
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -200,4 +159,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#ffffff",
   },
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+    zIndex: 10,
+  },backButton: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    zIndex: 10,
+  },
+  
+  headerWrapper: {
+    paddingTop: 20, // adds spacing below back button
+    marginBottom: 20,
+  },
+  
+  header: {
+    fontFamily: "InterBold",
+    fontSize: 22,
+    color: "#213729",
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
+  
+  
 });
