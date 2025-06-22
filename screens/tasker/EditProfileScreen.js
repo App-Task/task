@@ -11,6 +11,9 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { getToken } from "../../services/authStorage"; // make sure this import exists
+import { useEffect } from "react"; // ✅ add this
+
+
 
 
 export default function EditProfileScreen() {
@@ -22,6 +25,38 @@ export default function EditProfileScreen() {
   const [experience, setExperience] = useState("3 years");
   const [skills, setSkills] = useState("Plumbing, Electrical");
   const [about, setAbout] = useState("Reliable tasker with attention to detail.");
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = await getToken();
+        const res = await fetch("https://task-kq94.onrender.com/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        const data = await res.json();
+        if (res.ok) {
+          setName(data.name || "");
+          setGender(data.gender || "");
+          setLocation(data.location || "");
+          setExperience(data.experience || "");
+          setSkills(data.skills || "");
+          setAbout(data.about || "");
+          // setEmail(data.email || "") if you ever make email editable
+        } else {
+          console.error("❌ Failed to fetch profile:", data.msg);
+        }
+      } catch (err) {
+        console.error("❌ Error loading profile:", err.message);
+      }
+    };
+  
+    fetchProfile();
+  }, []);
+  
+
   const handleSave = async () => {
     try {
       const token = await getToken();
