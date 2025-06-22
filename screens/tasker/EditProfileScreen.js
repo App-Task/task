@@ -10,6 +10,8 @@ import {
   StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import { getToken } from "../../services/authStorage"; // make sure this import exists
+
 
 export default function EditProfileScreen() {
   const { t } = useTranslation();
@@ -20,12 +22,41 @@ export default function EditProfileScreen() {
   const [experience, setExperience] = useState("3 years");
   const [skills, setSkills] = useState("Plumbing, Electrical");
   const [about, setAbout] = useState("Reliable tasker with attention to detail.");
-
-  const handleSave = () => {
-    Alert.alert(t("taskerEditProfile.savedTitle"), t("taskerEditProfile.savedMessage"));
-    // TODO: send updated data to backend
+  const handleSave = async () => {
+    try {
+      const token = await getToken();
+      if (!token) throw new Error("No token found");
+  
+      const res = await fetch("https://task-kq94.onrender.com/api/auth/me", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name,
+          gender,
+          location,
+          experience,
+          skills,
+          about,
+        }),
+      });
+  
+      const data = await res.json();
+  
+      if (res.ok) {
+        Alert.alert(t("taskerEditProfile.savedTitle"), t("taskerEditProfile.savedMessage"));
+      } else {
+        console.error("❌ Update failed:", data);
+        Alert.alert("Error", data.msg || "Failed to update profile.");
+      }
+    } catch (err) {
+      console.error("❌ Error saving profile:", err.message);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    }
   };
-
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>

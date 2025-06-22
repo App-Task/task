@@ -71,11 +71,28 @@ router.put("/me", async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
     if (!user) return res.status(404).json({ msg: "User not found" });
-
-    const { name, email, profileImage } = req.body;
+    const {
+      name,
+      email,
+      profileImage,
+      gender,
+      location,
+      experience,
+      skills,
+      about,
+    } = req.body;
+    
     if (name) user.name = name;
     if (email) user.email = email;
     if (profileImage) user.profileImage = profileImage;
+    
+    // ✅ Optional tasker-only fields (won't affect clients)
+    if (gender !== undefined) user.gender = gender;
+    if (location !== undefined) user.location = location;
+    if (experience !== undefined) user.experience = experience;
+    if (skills !== undefined) user.skills = skills;
+    if (about !== undefined) user.about = about;
+    
 
     await user.save();
     res.json({
@@ -84,8 +101,14 @@ router.put("/me", async (req, res) => {
         name: user.name,
         email: user.email,
         profileImage: user.profileImage || null,
+        gender: user.gender || "",
+        location: user.location || "",
+        experience: user.experience || "",
+        skills: user.skills || "",
+        about: user.about || "",
       },
     });
+    
   } catch (err) {
     console.error("❌ Error updating profile:", err.message);
     res.status(500).json({ msg: "Server error" });
