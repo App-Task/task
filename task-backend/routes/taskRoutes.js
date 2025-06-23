@@ -144,7 +144,7 @@ router.put("/:id/cancel", async (req, res) => {
 
     res.json({ msg: "Task cancelled", task });
   } catch (err) {
-    console.error("❌ Cancel task error:", err.message);
+    console.error("❌ Cancel task error:", err.message); //
     res.status(500).json({ error: "Failed to cancel task" });
   }
 });
