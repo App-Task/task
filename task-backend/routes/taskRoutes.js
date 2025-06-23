@@ -133,5 +133,21 @@ router.get("/tasker/:taskerId", async (req, res) => {
   }
 });
 
+// ✅ PUT /api/tasks/:id/cancel — cancel a task
+router.put("/:id/cancel", async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) return res.status(404).json({ error: "Task not found" });
+
+    task.status = "Cancelled";
+    await task.save();
+
+    res.json({ msg: "Task cancelled", task });
+  } catch (err) {
+    console.error("❌ Cancel task error:", err.message);
+    res.status(500).json({ error: "Failed to cancel task" });
+  }
+});
+
 
 module.exports = router;

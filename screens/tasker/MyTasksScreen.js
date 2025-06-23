@@ -74,8 +74,35 @@ export default function TaskerMyTasksScreen() {
         {tab === "active" && (
           <TouchableOpacity
             style={[styles.btn, styles.dangerBtn]}
-            onPress={() => Alert.alert("Cancel", "Cancel task?")}
-          >
+            onPress={() => {
+              Alert.alert(
+                t("taskerMyTasks.cancel"),
+                t("taskerMyTasks.confirmCancel"),
+                [
+                  {
+                    text: t("taskerMyTasks.no"),
+                    style: "cancel",
+                  },
+                  {
+                    text: t("taskerMyTasks.yes"),
+                    style: "destructive",
+                    onPress: async () => {
+                      try {
+                        const res = await axios.put(`https://task-kq94.onrender.com/api/tasks/${item._id}/cancel`);
+                        if (res.status === 200) {
+                          Alert.alert(t("taskerMyTasks.cancelledSuccess"));
+                          setTasks((prev) => prev.filter((t) => t._id !== item._id));
+                        }
+                      } catch (err) {
+                        console.error("❌ Cancel error:", err);
+                        Alert.alert(t("taskerMyTasks.cancelFailed"), err.response?.data?.msg || "Error occurred");
+                      }
+                    },
+                  },
+                ]
+              );
+            }}
+                      >
             <Text style={[styles.btnText, styles.dangerText]}>{t("taskerMyTasks.cancel")}</Text>
           </TouchableOpacity>
         )}
