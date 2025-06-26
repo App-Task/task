@@ -15,6 +15,7 @@ import axios from "axios";
 import { getToken } from "../../services/authStorage";
 
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLayoutEffect } from "react";
 
 
 const { width } = Dimensions.get("window");
@@ -26,6 +27,14 @@ export default function ChatScreen({ navigation, route }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [currentUserId, setCurrentUserId] = useState("");
+
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: `Chat with ${name}`,
+    });
+  }, [navigation, name]);
+  
 
 
   const fetchMessages = async () => {

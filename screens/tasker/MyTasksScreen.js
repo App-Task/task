@@ -13,6 +13,8 @@ import Animated, { FadeInUp } from "react-native-reanimated";
 import { StyleSheet } from "react-native";
 import axios from "axios";
 import { fetchCurrentUser } from "../../services/auth";
+import { useNavigation } from "@react-navigation/native";
+
 
 export default function TaskerMyTasksScreen() {
   const { t } = useTranslation();
@@ -20,6 +22,8 @@ export default function TaskerMyTasksScreen() {
   const [tab, setTab] = useState("active");
   const [tasks, setTasks] = useState([]);
   const [taskerId, setTaskerId] = useState("");
+  const navigation = useNavigation();
+
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -61,9 +65,19 @@ export default function TaskerMyTasksScreen() {
 
       <View style={styles.actions}>
         {tab === "active" && (
-          <TouchableOpacity style={styles.btn} onPress={() => Alert.alert("Chat", "Open chat with client")}>
-            <Text style={styles.btnText}>{t("taskerMyTasks.chat")}</Text>
-          </TouchableOpacity>
+          <TouchableOpacity
+  style={styles.btn}
+  onPress={() =>
+    navigation.navigate("Chat", {
+      name: item.user?.name || "Client",
+      otherUserId: item.user?._id || item.userId,
+    })
+  }
+>
+  <Text style={styles.btnText}>{t("taskerMyTasks.chat")}</Text>
+</TouchableOpacity>
+
+
         )}
         <TouchableOpacity
           style={[styles.btn, styles.secondaryBtn]}
