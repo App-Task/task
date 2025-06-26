@@ -25,6 +25,16 @@ export default function ViewBidsScreen({ route, navigation }) {
   const [acceptedBidId, setAcceptedBidId] = useState(null);
 
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Alert.alert(
+      "Important Disclaimer",
+      "By continuing, you acknowledge that all payments, agreements, and transactions are strictly between you (the client) and the tasker. Task bears no responsibility or liability for any financial matters, disputes, or outcomes resulting from this engagement.",
+      [{ text: "I Understand", style: "default" }]
+    );
+  }, []);
+  
+
   useFocusEffect(
     React.useCallback(() => {
       console.log("📦 Fetching bids for taskId:", taskId);
