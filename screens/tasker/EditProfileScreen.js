@@ -96,13 +96,14 @@ export default function EditProfileScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* ✅ Top Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" size={24} color="#213729" />
-      </TouchableOpacity>
-
-      <View style={styles.headerWrapper}>
+      <View style={styles.headerRow}>
+  <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+    <Ionicons name="arrow-back" size={24} color="#213729" />
+  </TouchableOpacity>
   <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>
 </View>
+
+
 
       {/* Inputs */}
       <TextInput style={styles.input} value={name} onChangeText={setName} placeholder={t("taskerEditProfile.name") || "Name"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
@@ -119,22 +120,39 @@ export default function EditProfileScreen() {
     </ScrollView>
   );
 }
-
-
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#ffffff",
     paddingTop: 60,
     paddingBottom: 40,
     paddingHorizontal: 24,
+    flex: 1,
   },
+
+  headerRow: {
+    position: "relative",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 30,
+    height: 40,
+  },
+
+  backButton: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+
   header: {
     fontFamily: "InterBold",
     fontSize: 22,
     color: "#213729",
-    marginBottom: 30,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    textAlign: "center",
   },
+
   input: {
     backgroundColor: "#f2f2f2",
     borderRadius: 12,
@@ -145,43 +163,23 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 20,
   },
+
   textarea: {
     height: 100,
   },
+
   button: {
     backgroundColor: "#213729",
     paddingVertical: 16,
     borderRadius: 30,
     alignItems: "center",
   },
+
   buttonText: {
     fontFamily: "InterBold",
     fontSize: 16,
     color: "#ffffff",
   },
-  backButton: {
-    position: "absolute",
-    top: 40,
-    left: 20,
-    zIndex: 10,
-  },backButton: {
-    position: "absolute",
-    top: 50,
-    left: 20,
-    zIndex: 10,
-  },
-  
-  headerWrapper: {
-    paddingTop: 20, // adds spacing below back button
-    marginBottom: 20,
-  },
-  
-  header: {
-    fontFamily: "InterBold",
-    fontSize: 22,
-    color: "#213729",
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  
-  
 });
+
+  
