@@ -116,69 +116,76 @@ export default function TaskerProfileScreen({ navigation }) {
       <Text style={styles.email}>{user.email || " "}</Text>
 
       <View style={styles.buttonGroup}>
-        <TouchableOpacity
-          style={styles.rowItem}
-          onPress={() => navigation.navigate("EditTaskerProfile")}
-          >
-          <Text style={styles.rowText}>{t("taskerProfile.edit")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.rowItem}
+    onPress={() => navigation.navigate("EditTaskerProfile")}
+  >
+    <Text style={styles.rowText}>{t("taskerProfile.edit")}</Text>
+    <Ionicons name="chevron-forward" size={20} color="#999" />
+  </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.rowItem}
-          onPress={() => navigation.navigate("ChangePassword")}
-        >
-          <Text style={styles.rowText}>{t("taskerProfile.changePassword")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.rowItem}
+    onPress={() => navigation.navigate("ChangePassword")}
+  >
+    <Text style={styles.rowText}>Change Password</Text>
+    <Ionicons name="chevron-forward" size={20} color="#999" />
+  </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.rowItem}
-          onPress={() => navigation.navigate("Documents")}
-        >
-          <Text style={styles.rowText}>{t("taskerProfile.documents")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.rowItem}
+    onPress={() => navigation.navigate("Documents")}
+  >
+    <Text style={styles.rowText}>{t("taskerProfile.documents")}</Text>
+    <Ionicons name="chevron-forward" size={20} color="#999" />
+  </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.rowItem}
-          onPress={() => navigation.navigate("BankAccount")}
-        >
-          <Text style={styles.rowText}>{t("taskerProfile.bank")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
+  {/* 🔒 Commented out Bank Account */}
+  {/*
+  <TouchableOpacity
+    style={styles.rowItem}
+    onPress={() => navigation.navigate("BankAccount")}
+  >
+    <Text style={styles.rowText}>{t("taskerProfile.bank")}</Text>
+    <Ionicons name="chevron-forward" size={20} color="#999" />
+  </TouchableOpacity>
+  */}
 
-        <TouchableOpacity
-          style={styles.rowItem}
-          onPress={() => navigation.navigate("MyPayments")}
-        >
-          <Text style={styles.rowText}>{t("taskerProfile.payments")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
+  {/* 💸 Commented out My Payments */}
+  {/*
+  <TouchableOpacity
+    style={styles.rowItem}
+    onPress={() => navigation.navigate("MyPayments")}
+  >
+    <Text style={styles.rowText}>{t("taskerProfile.payments")}</Text>
+    <Ionicons name="chevron-forward" size={20} color="#999" />
+  </TouchableOpacity>
+  */}
 
-        <TouchableOpacity
-          style={styles.rowItem}
-          onPress={() => navigation.navigate("Reviews")}
-        >
-          <Text style={styles.rowText}>{t("taskerProfile.reviews")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.rowItem}
+    onPress={() => navigation.navigate("Reviews")}
+  >
+    <Text style={styles.rowText}>{t("taskerProfile.reviews")}</Text>
+    <Ionicons name="chevron-forward" size={20} color="#999" />
+  </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.rowItem}
-          onPress={() => navigation.navigate("Settings")}
-        >
-          <Text style={styles.rowText}>{t("taskerProfile.settings")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.rowItem}
+    onPress={() => navigation.navigate("Settings")}
+  >
+    <Text style={styles.rowText}>{t("taskerProfile.settings")}</Text>
+    <Ionicons name="chevron-forward" size={20} color="#999" />
+  </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.rowItem, styles.logoutRow]} onPress={handleLogout}>
-          <Text style={[styles.rowText, styles.logoutText]}>
-            {t("taskerProfile.logout")}
-          </Text>
-          <Ionicons name="log-out-outline" size={20} color="#213729" />
-        </TouchableOpacity>
-      </View>
+  <TouchableOpacity style={[styles.rowItem, styles.logoutRow]} onPress={handleLogout}>
+    <Text style={[styles.rowText, styles.logoutText]}>
+      {t("taskerProfile.logout")}
+    </Text>
+    <Ionicons name="log-out-outline" size={20} color="#213729" />
+  </TouchableOpacity>
+</View>
+
     </ScrollView>
   );
 }
