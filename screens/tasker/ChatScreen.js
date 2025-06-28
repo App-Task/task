@@ -31,7 +31,26 @@ export default function ChatScreen({ navigation, route }) {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: `Chat with ${name}`,
+      title: name,
+      headerShown: true,
+      headerStyle: {
+        backgroundColor: "#ffffff",
+        borderBottomWidth: 1,
+        borderBottomColor: "#eee",
+        elevation: 0,
+        shadowOpacity: 0,
+      },
+      headerTitleStyle: {
+        fontFamily: "InterBold",
+        fontSize: 18,
+        color: "#213729",
+      },
+      headerTintColor: "#213729",
+      headerRight: () => (
+        <TouchableOpacity onPress={() => alert(t("clientChat.reported"))} style={{ marginRight: 16 }}>
+          <Ionicons name="alert-circle-outline" size={24} color="#213729" />
+        </TouchableOpacity>
+      ),
     });
   }, [navigation, name]);
   
@@ -147,19 +166,7 @@ export default function ChatScreen({ navigation, route }) {
       <View style={styles.container}>
   
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons
-            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-            size={24}
-            color="#213729"
-          />
-        </TouchableOpacity>
-        <Text style={styles.title}>{name}</Text>
-        <TouchableOpacity onPress={() => alert(t("clientChat.reported"))}>
-          <Ionicons name="alert-circle-outline" size={24} color="#213729" />
-        </TouchableOpacity>
-      </View>
+
 
       {/* Chat */}
       <FlatList

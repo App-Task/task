@@ -13,18 +13,18 @@ import {
   Pressable,
 } from "react-native";
 import { useTranslation } from "react-i18next";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import Animated, {
+  FadeInUp,
+  useSharedValue,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
 import { useFocusEffect } from "@react-navigation/native";
 
-
-const JOB_TYPES = [
-  "Cleaning",
-  "Moving",
-  "Delivery",
-  "Repairs",
-];
+const JOB_TYPES = ["Cleaning", "Moving", "Delivery", "Repairs"];
 
 export default function ExploreTasksScreen({ navigation }) {
   const { t } = useTranslation();
@@ -36,14 +36,40 @@ export default function ExploreTasksScreen({ navigation }) {
   const [showModal, setShowModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Scroll animation logic
+  const scrollY = useSharedValue(0);
+  const showAnimation = useSharedValue(false);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      const currentY = event.contentOffset.y;
+      if (currentY < scrollY.value) {
+        showAnimation.value = true;
+      } else {
+        showAnimation.value = false;
+      }
+      scrollY.value = currentY;
+    },
+  });
+
+  const animationStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(showAnimation.value ? 1 : 0, { duration: 300 }),
+      transform: [
+        {
+          translateY: withTiming(showAnimation.value ? 0 : -20, {
+            duration: 300,
+          }),
+        },
+      ],
+    };
+  });
 
   const fetchTasks = async () => {
     try {
       const token = await getToken();
       const res = await axios.get("https://task-kq94.onrender.com/api/tasks", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(res.data);
       setFilteredTasks(res.data);
@@ -53,18 +79,18 @@ export default function ExploreTasksScreen({ navigation }) {
       setLoading(false);
     }
   };
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await fetchTasks();
     setRefreshing(false);
   };
-  
+
   useFocusEffect(
     React.useCallback(() => {
       fetchTasks();
     }, [])
   );
-  
 
   useEffect(() => {
     filterTasks();
@@ -72,18 +98,15 @@ export default function ExploreTasksScreen({ navigation }) {
 
   const filterTasks = () => {
     let result = tasks;
-
     if (searchQuery.trim()) {
       const text = searchQuery.toLowerCase();
       result = result.filter((task) =>
         task.title?.toLowerCase().includes(text)
       );
     }
-
     if (jobType) {
       result = result.filter((task) => task.category === jobType);
     }
-
     setFilteredTasks(result);
   };
 
@@ -100,9 +123,7 @@ export default function ExploreTasksScreen({ navigation }) {
         <Text style={styles.sub}>
           {t("taskerExplore.price")}: {item.budget} SAR
         </Text>
-        <Text style={styles.sub}>
-          {t("taskerExplore.bids")}: 0
-        </Text>
+        <Text style={styles.sub}>{t("taskerExplore.bids")}: 0</Text>
         <TouchableOpacity
           style={styles.button}
           onPress={() =>
@@ -127,14 +148,22 @@ export default function ExploreTasksScreen({ navigation }) {
         placeholderTextColor="#999"
       />
 
-      <TouchableOpacity style={styles.filterButton} onPress={() => setShowModal(true)}>
+      <TouchableOpacity
+        style={styles.filterButton}
+        onPress={() => setShowModal(true)}
+      >
         <Text style={styles.filterText}>
           {jobType ? `Filter: ${jobType}` : "Filter by job type"}
         </Text>
       </TouchableOpacity>
 
+
+
       <Modal visible={showModal} transparent animationType="fade">
-        <Pressable style={styles.modalOverlay} onPress={() => setShowModal(false)}>
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowModal(false)}
+        >
           <View style={styles.modalSheet}>
             {JOB_TYPES.map((type) => (
               <TouchableOpacity
@@ -166,12 +195,16 @@ export default function ExploreTasksScreen({ navigation }) {
       ) : filteredTasks.length === 0 ? (
         <Text style={styles.empty}>{t("taskerExplore.noTasks")}</Text>
       ) : (
-        <FlatList
+        <Animated.FlatList
           data={filteredTasks}
           keyExtractor={(item) => item._id}
           renderItem={renderTask}
           contentContainerStyle={{ paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          onScroll={scrollHandler}
+          scrollEventThrottle={16}
         />
       )}
     </View>
@@ -221,6 +254,18 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 14,
     color: "#213729",
+  },
+  scrollAnimation: {
+    backgroundColor: "#dff0d8",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignSelf: "center",
+    marginBottom: 10,
+  },
+  scrollAnimationText: {
+    color: "#213729",
+    fontFamily: "Inter",
   },
   empty: {
     fontFamily: "Inter",
