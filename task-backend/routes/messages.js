@@ -189,9 +189,11 @@ router.post("/", async (req, res) => {
     const notification = new Notification({
       userId: receiver,
       type: "message",
+      title: "New Message",
       message: `New message: "${text}"`,
       relatedTaskId: taskId || undefined,
     });
+    
     await notification.save();
 
     res.status(201).json(message);

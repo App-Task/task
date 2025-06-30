@@ -99,12 +99,14 @@ router.post("/", async (req, res) => {
     const task = await Task.findById(taskId);
     if (task) {
       const notification = new Notification({
-        userId: task.userId, // client
+        userId: task.userId,
         type: "bid",
+        title: "New Bid on Your Task",
         message: `A new bid was placed on your task "${task.title}"`,
         relatedTaskId: taskId,
         relatedBidId: bid._id,
       });
+      
       await notification.save();
     }
 
