@@ -9,21 +9,8 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import Animated, { FadeInRight } from "react-native-reanimated";
-
-const mockNotifications = [
-  {
-    id: "1",
-    type: "hired",
-    message: "You’ve been hired for 'Fix My AC'",
-    time: "2 hrs ago",
-  },
-  {
-    id: "2",
-    type: "message",
-    message: "You have a new message from Ahmed",
-    time: "4 hrs ago",
-  },
-];
+import axios from "axios";
+import { getToken } from "../../services/authStorage"; // adjust if path differs
 
 export default function TaskerNotificationsScreen() {
   const { t } = useTranslation();
@@ -31,18 +18,38 @@ export default function TaskerNotificationsScreen() {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    setTimeout(() => {
-      setNotifications(mockNotifications);
-      setLoading(false);
-    }, 1000);
+    const fetchNotifications = async () => {
+      try {
+        const token = await getToken();
+        const res = await axios.get("https://task-kq94.onrender.com/api/notifications", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setNotifications(res.data);
+      } catch (err) {
+        console.error("❌ Failed to fetch tasker notifications:", err.response?.data || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotifications();
   }, []);
 
   const renderItem = ({ item }) => (
     <Animated.View entering={FadeInRight.duration(400)} style={styles.card}>
       <Text style={styles.message}>
-        {t(`taskerNotifications.types.${item.type}`)}: {item.message}
+        {item.title}: {item.message}
       </Text>
-      <Text style={styles.time}>{item.time}</Text>
+      <Text style={styles.time}>
+        {new Date(item.createdAt).toLocaleString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          day: "numeric",
+          month: "short",
+        })}
+      </Text>
     </Animated.View>
   );
 
@@ -57,7 +64,7 @@ export default function TaskerNotificationsScreen() {
       ) : (
         <FlatList
           data={notifications}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
@@ -66,7 +73,6 @@ export default function TaskerNotificationsScreen() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

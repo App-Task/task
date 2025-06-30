@@ -89,6 +89,18 @@ router.put("/:bidId/accept", async (req, res) => {
       { new: true }
     );
 
+    // ✅ Notify tasker that they have been hired
+    if (updatedTask && updatedTask.taskerId) {
+      const notifyTasker = new Notification({
+        userId: updatedTask.taskerId,
+        type: "bid",
+        title: "You’ve Been Hired",
+        message: `You've been hired for the task "${updatedTask.title}"`,
+        relatedTaskId: updatedTask._id,
+      });
+      await notifyTasker.save();
+    }
+
     res.json({ bid, task: updatedTask });
   } catch (err) {
     console.error("❌ Accept bid error:", err.message);
