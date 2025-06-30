@@ -1,49 +1,35 @@
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
 const Notification = require("../models/Notification");
 
-// Get all notifications for a user
-router.get("/", async (req, res) => {
-    const decoded = verifyToken(req);
-    if (!decoded) return res.status(401).json({ error: "Unauthorized" });
-  
-    try {
-      const notifications = await Notification.find({ userId: decoded.userId || decoded.id }).sort({ createdAt: -1 });
-      res.json(notifications);
-    } catch (err) {
-      console.error("❌ Error fetching notifications:", err.message);
-      res.status(500).json({ error: "Failed to fetch notifications" });
-    }
-  });
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
-// Create a new notification
-router.post("/", async (req, res) => {
+// Token verification helper
+const verifyToken = (req) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
+
+  const token = authHeader.split(" ")[1];
   try {
-    const { userId, type, title, message } = req.body;
-
-    const notification = new Notification({
-      userId,
-      type,
-      title,
-      message,
-    });
-
-    await notification.save();
-    res.status(201).json(notification);
-  } catch (err) {
-    console.error("❌ Error creating notification:", err.message);
-    res.status(500).json({ error: "Failed to create notification" });
+    return jwt.verify(token, JWT_SECRET);
+  } catch {
+    return null;
   }
-});
+};
 
-// Mark a notification as read
-router.put("/:id/read", async (req, res) => {
+// ✅ Secure GET /api/notifications (token-based)
+router.get("/", async (req, res) => {
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+
   try {
-    await Notification.findByIdAndUpdate(req.params.id, { isRead: true });
-    res.status(200).json({ msg: "Marked as read" });
+    const userId = decoded.userId || decoded.id;
+    const notifications = await Notification.find({ userId }).sort({ createdAt: -1 });
+    res.json(notifications);
   } catch (err) {
-    console.error("❌ Error marking notification as read:", err.message);
-    res.status(500).json({ error: "Failed to update notification" });
+    console.error("❌ Error fetching notifications:", err.message);
+    res.status(500).json({ error: "Failed to fetch notifications" });
   }
 });
 
