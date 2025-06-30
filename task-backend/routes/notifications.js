@@ -3,15 +3,18 @@ const router = express.Router();
 const Notification = require("../models/Notification");
 
 // Get all notifications for a user
-router.get("/:userId", async (req, res) => {
-  try {
-    const notifications = await Notification.find({ userId: req.params.userId }).sort({ createdAt: -1 });
-    res.json(notifications);
-  } catch (err) {
-    console.error("❌ Error fetching notifications:", err.message);
-    res.status(500).json({ error: "Failed to fetch notifications" });
-  }
-});
+router.get("/", async (req, res) => {
+    const decoded = verifyToken(req);
+    if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+  
+    try {
+      const notifications = await Notification.find({ userId: decoded.userId || decoded.id }).sort({ createdAt: -1 });
+      res.json(notifications);
+    } catch (err) {
+      console.error("❌ Error fetching notifications:", err.message);
+      res.status(500).json({ error: "Failed to fetch notifications" });
+    }
+  });
 
 // Create a new notification
 router.post("/", async (req, res) => {

@@ -15,20 +15,24 @@ export default function NotificationsScreen() {
   const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const fetchNotifications = async () => {
     try {
       const token = await AsyncStorage.getItem("task_auth_token");
+  
       const res = await axios.get("https://task-kq94.onrender.com/api/notifications", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+  
       setNotifications(res.data);
     } catch (err) {
-      console.error("❌ Failed to fetch notifications:", err.message);
+      console.error("❌ Failed to fetch notifications:", err.response?.data || err.message);
     } finally {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchNotifications();
