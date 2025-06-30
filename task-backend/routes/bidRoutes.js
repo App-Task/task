@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Bid = require("../models/Bid");
 const Task = require("../models/Task");
+const Notification = require("../models/Notification"); // ✅ ADD THIS at the top with your imports
 
 // ✅ POST /api/bids — tasker submits a bid
 router.post("/", async (req, res) => {
@@ -77,6 +78,40 @@ router.put("/:bidId/accept", async (req, res) => {
   } catch (err) {
     console.error("❌ Accept bid error:", err.message);
     res.status(500).json({ error: "Failed to accept bid" });
+  }
+});
+
+
+// ✅ POST /api/bids — tasker submits a bid
+router.post("/", async (req, res) => {
+  try {
+    const { taskId, taskerId, amount, message } = req.body;
+
+    if (!taskId || !taskerId || !amount) {
+      return res.status(400).json({ error: "Missing required fields." });
+    }
+
+    // Save the bid
+    const bid = new Bid({ taskId, taskerId, amount, message });
+    await bid.save();
+
+    // 🔔 Fetch the task to get client ID
+    const task = await Task.findById(taskId);
+    if (task) {
+      const notification = new Notification({
+        userId: task.userId, // client
+        type: "bid",
+        message: `A new bid was placed on your task "${task.title}"`,
+        relatedTaskId: taskId,
+        relatedBidId: bid._id,
+      });
+      await notification.save();
+    }
+
+    res.status(201).json(bid);
+  } catch (err) {
+    console.error("❌ Bid creation error:", err.message);
+    res.status(500).json({ error: "Failed to create bid" });
   }
 });
 

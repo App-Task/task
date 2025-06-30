@@ -3,6 +3,8 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const Message = require("../models/Message");
 const User = require("../models/User");
+const Notification = require("../models/Notification"); // ✅ ADD this at the top
+
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
@@ -157,6 +159,45 @@ router.get("/test/insert", async (req, res) => {
   } catch (err) {
     console.error("Insert test message failed:", err);
     res.status(500).json({ error: "Failed to insert test message" });
+  }
+});
+
+// ✅ POST /api/messages
+router.post("/", async (req, res) => {
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+
+  const senderId = decoded.userId || decoded.id;
+  const { receiver, text, taskId } = req.body;
+
+  if (!receiver || !text) {
+    return res.status(400).json({ error: "Receiver and text required" });
+  }
+
+  try {
+    const receiverExists = await User.findById(receiver);
+    if (!receiverExists) return res.status(404).json({ error: "Receiver not found" });
+
+    const message = await Message.create({
+      sender: senderId,
+      receiver,
+      text,
+      taskId,
+    });
+
+    // 🔔 Create notification for receiver
+    const notification = new Notification({
+      userId: receiver,
+      type: "message",
+      message: `New message: "${text}"`,
+      relatedTaskId: taskId || undefined,
+    });
+    await notification.save();
+
+    res.status(201).json(message);
+  } catch (err) {
+    console.error("Message send error:", err);
+    res.status(500).json({ error: "Failed to send message" });
   }
 });
 

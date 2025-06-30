@@ -11,10 +11,15 @@ app.use(express.json());
 
 const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const messageRoutes = require("./routes/messages");
+const bidRoutes = require("./routes/bidRoutes");
+const notificationRoutes = require("./routes/notifications"); // ✅ NEW
 
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
-
+app.use("/api/messages", messageRoutes);
+app.use("/api/bids", bidRoutes);
+app.use("/api/notifications", notificationRoutes); // ✅ NEW
 
 // Test route
 app.get("/test", (req, res) => {
@@ -31,11 +36,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () =>
   console.log(`🚀 Server running on port ${PORT}`)
 );
-
-const messageRoutes = require("./routes/messages");
-app.use("/api/messages", messageRoutes);
-
-const bidRoutes = require("./routes/bidRoutes");
-app.use("/api/bids", bidRoutes);
-
-

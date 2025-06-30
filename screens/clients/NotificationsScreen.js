@@ -1,42 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
   I18nManager,
+  ActivityIndicator,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function NotificationsScreen() {
   const { t } = useTranslation();
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [notifications] = useState([
-    {
-      id: "1",
-      title: t("clientNotifications.taskHired"),
-      description: t("clientNotifications.taskHiredDesc"),
-      time: "2h ago",
-    },
-    {
-      id: "2",
-      title: t("clientNotifications.newMessage"),
-      description: t("clientNotifications.newMessageDesc"),
-      time: "4h ago",
-    },
-    {
-      id: "3",
-      title: t("clientNotifications.paymentSent"),
-      description: t("clientNotifications.paymentSentDesc"),
-      time: "1d ago",
-    },
-  ]);
+  const fetchNotifications = async () => {
+    try {
+      const token = await AsyncStorage.getItem("task_auth_token");
+      const res = await axios.get("https://task-kq94.onrender.com/api/notifications", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setNotifications(res.data);
+    } catch (err) {
+      console.error("❌ Failed to fetch notifications:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.cardTitle}>{item.title}</Text>
-      <Text style={styles.cardDesc}>{item.description}</Text>
-      <Text style={styles.cardTime}>{item.time}</Text>
+      <Text style={styles.cardDesc}>{item.message}</Text>
+      <Text style={styles.cardTime}>
+        {new Date(item.createdAt).toLocaleString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          day: "numeric",
+          month: "short",
+        })}
+      </Text>
     </View>
   );
 
@@ -44,12 +53,14 @@ export default function NotificationsScreen() {
     <View style={styles.container}>
       <Text style={styles.screenTitle}>{t("clientNotifications.title")}</Text>
 
-      {notifications.length === 0 ? (
+      {loading ? (
+        <ActivityIndicator size="large" color="#315052" style={{ marginTop: 30 }} />
+      ) : notifications.length === 0 ? (
         <Text style={styles.empty}>{t("clientNotifications.none")}</Text>
       ) : (
         <FlatList
           data={notifications}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: 30 }}
           showsVerticalScrollIndicator={false}
@@ -58,7 +69,6 @@ export default function NotificationsScreen() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
