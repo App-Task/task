@@ -83,7 +83,7 @@ export default function TaskDetailsScreen({ route }) {
         <Text style={styles.text}>{task.location}</Text>
 
         <Text style={styles.label}>{t("taskerTaskDetails.price")}</Text>
-        <Text style={styles.text}>{task.price} SAR</Text>
+        <Text style={styles.text}>{task.budget} SAR</Text>
 
         <Text style={styles.label}>{t("taskerTaskDetails.enterBid")}</Text>
         <TextInput
