@@ -45,19 +45,22 @@ export default function MessagesScreen({ navigation }) {
     useCallback(() => {
       fetchConversations();
     }, [])
-  );
-
-  const renderItem = ({ item }) => {
+  );const renderItem = ({ item }) => {
     const unread = item.unreadCount || 0;
     let badgeText = "";
     if (unread === 1) badgeText = "+1";
     else if (unread === 2) badgeText = "+2";
     else if (unread > 2 && unread <= 5) badgeText = `+${unread}`;
     else if (unread > 5) badgeText = "5+";
-
+  
+    const isUnread = unread > 0;
+  
     return (
       <TouchableOpacity
-        style={styles.card}
+        style={[
+          styles.card,
+          isUnread && styles.unreadCard, // highlight if unread
+        ]}
         onPress={() =>
           navigation.navigate("Chat", {
             name: item.name,
@@ -72,10 +75,10 @@ export default function MessagesScreen({ navigation }) {
               {item.lastMessage}
             </Text>
           </View>
-
+  
           <View style={styles.rightSide}>
             <Text style={styles.time}>{item.time}</Text>
-            {unread > 0 && (
+            {isUnread && (
               <View style={styles.unreadBadge}>
                 <Text style={styles.unreadText}>{badgeText}</Text>
               </View>
@@ -85,6 +88,7 @@ export default function MessagesScreen({ navigation }) {
       </TouchableOpacity>
     );
   };
+  
 
   return (
     <View style={styles.container}>
@@ -184,6 +188,9 @@ const styles = StyleSheet.create({
       marginBottom: 10,
       marginTop: -10,
     },
-    
+    unreadCard: {
+      backgroundColor: "#e5ffd4", // light green to highlight unread
+    },
+  
   },
 });
