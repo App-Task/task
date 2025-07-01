@@ -139,7 +139,14 @@ Alert.alert(
                   method: "PATCH",
                 });
                 const updated = await getTaskById(task._id);
-                navigation.navigate("MyTasks", { showReview: true, completedTask: updated });
+                navigation.navigate("ClientHome", {
+                  screen: "Tasks",
+                  params: {
+                    showReview: true,
+                    completedTask: updated,
+                  },
+                });
+                
                 
               } catch (err) {
                 console.error("❌ Failed to complete task:", err.message);
