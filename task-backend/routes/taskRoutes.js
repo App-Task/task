@@ -149,5 +149,22 @@ router.put("/:id/cancel", async (req, res) => {
   }
 });
 
+// ✅ PATCH /api/tasks/:id/complete — mark task as completed
+router.patch("/:id/complete", async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) return res.status(404).json({ error: "Task not found" });
+
+    task.status = "Completed";
+    await task.save();
+
+    res.json({ msg: "Task marked as completed", task });
+  } catch (err) {
+    console.error("❌ Complete task error:", err.message);
+    res.status(500).json({ error: "Failed to mark task as completed" });
+  }
+});
+
+
 
 module.exports = router;
