@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,17 +6,21 @@ import {
   TouchableOpacity,
   I18nManager,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function TaskerMessagesScreen({ navigation }) {
   const { t } = useTranslation();
   const [conversations, setConversations] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchConversations = async () => {
     try {
+      setLoading(true);
       const token = await getToken();
       const res = await axios.get(
         "https://task-kq94.onrender.com/api/messages/conversations",
@@ -24,71 +28,100 @@ export default function TaskerMessagesScreen({ navigation }) {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setConversations(res.data);
+
+      // Sort latest first
+      const sorted = res.data.sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+      );
+      
+
+      setConversations(sorted);
     } catch (err) {
       console.error("Failed to load conversations:", err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchConversations();
-  }, []);
-
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() =>
-        navigation.navigate("Chat", {
-          name: item.name,
-          otherUserId: item.otherUserId,
-        })
-      }
-    >
-      <View style={styles.avatar}>
-        <Text style={styles.avatarInitials}>
-          {item.name
-            .split(" ")
-            .map((w) => w[0])
-            .join("")
-            .slice(0, 2)
-            .toUpperCase()}
-        </Text>
-      </View>
-
-      <View style={styles.textGroup}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.preview} numberOfLines={1}>
-          {item.lastMessage}
-        </Text>
-      </View>
-
-      <View style={styles.rightGroup}>
-        <Text style={styles.time}>{item.time}</Text>
-        {/* Uncomment when you add unread logic */}
-        {/* item.unread && <View style={styles.unreadDot} /> */}
-      </View>
-    </TouchableOpacity>
+  useFocusEffect(
+    useCallback(() => {
+      fetchConversations();
+    }, [])
   );
+
+  const renderItem = ({ item }) => {
+    const initials =
+      item.name
+        ?.split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase() || "U";
+
+    const unread = item.unreadCount || 0;
+    let badge = "";
+    if (unread === 1) badge = "+1";
+    else if (unread === 2) badge = "+2";
+    else if (unread > 2 && unread <= 5) badge = `+${unread}`;
+    else if (unread > 5) badge = "5+";
+
+    return (
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() =>
+          navigation.navigate("Chat", {
+            name: item.name,
+            otherUserId: item.otherUserId,
+          })
+        }
+      >
+        <View style={styles.avatar}>
+          <Text style={styles.avatarInitials}>{initials}</Text>
+        </View>
+
+        <View style={styles.textGroup}>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.preview} numberOfLines={1}>
+            {item.lastMessage}
+          </Text>
+        </View>
+
+        <View style={styles.rightGroup}>
+          <Text style={styles.time}>{item.time}</Text>
+          {unread > 0 && (
+            <View style={styles.unreadBadge}>
+              <Text style={styles.unreadText}>{badge}</Text>
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>{t("taskerMessages.title")}</Text>
 
-      {conversations.length === 0 ? (
+      {loading && conversations.length === 0 ? (
+        <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
+      ) : conversations.length === 0 ? (
         <Text style={{ textAlign: "center", marginTop: 40, color: "#888" }}>
           {t("taskerMessages.empty")}
         </Text>
       ) : (
-        <FlatList
-          data={conversations}
-          keyExtractor={(item) => item.otherUserId}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 40 }}
-        />
+<FlatList
+  data={conversations}
+  keyExtractor={(item) => item.otherUserId}
+  renderItem={renderItem}
+  contentContainerStyle={{ paddingBottom: 40 }}
+  showsVerticalScrollIndicator={false}
+/>
+
       )}
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -155,5 +188,20 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     backgroundColor: "#c1ff72",
+    unreadBadge: {
+      backgroundColor: "#213729",
+      borderRadius: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      minWidth: 30,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    unreadText: {
+      color: "#fff",
+      fontFamily: "InterBold",
+      fontSize: 12,
+    },
+    
   },
 });

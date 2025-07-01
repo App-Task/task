@@ -1,6 +1,4 @@
-
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,45 +6,55 @@ import {
   TouchableOpacity,
   I18nManager,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
-
-
-
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function MessagesScreen({ navigation }) {
   const { t } = useTranslation();
   const [conversations, setConversations] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchConversations = async () => {
     try {
+      setRefreshing(true);
       const token = await getToken();
-  
       const res = await axios.get(
         "https://task-kq94.onrender.com/api/messages/conversations",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
-      console.log("✅ Conversations from API:", res.data); // <--- ADD THIS
-  
-      setConversations(res.data);
+
+      // Sort by latest message time (most recent first)
+      const sorted = res.data.sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+      );
+      setConversations(sorted);
     } catch (err) {
       console.error("Failed to load conversations:", err.message);
+    } finally {
+      setRefreshing(false);
     }
   };
-  
 
-  useEffect(() => {
-    fetchConversations();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchConversations();
+    }, [])
+  );
 
   const renderItem = ({ item }) => {
-    console.log("🔍 Conversation item:", item); // ✅
-  
+    const unread = item.unreadCount || 0;
+    let badgeText = "";
+    if (unread === 1) badgeText = "+1";
+    else if (unread === 2) badgeText = "+2";
+    else if (unread > 2 && unread <= 5) badgeText = `+${unread}`;
+    else if (unread > 5) badgeText = "5+";
+
     return (
       <TouchableOpacity
         style={styles.card}
@@ -57,35 +65,50 @@ export default function MessagesScreen({ navigation }) {
           })
         }
       >
-        <Text style={styles.name}>{item.name || "Unnamed User"}</Text>
-        <Text style={styles.message} numberOfLines={1}>
-          {item.lastMessage}
-        </Text>
-        <Text style={styles.time}>{item.time}</Text>
+        <View style={styles.row}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.name}>{item.name || "Unnamed User"}</Text>
+            <Text style={styles.message} numberOfLines={1}>
+              {item.lastMessage}
+            </Text>
+          </View>
+
+          <View style={styles.rightSide}>
+            <Text style={styles.time}>{item.time}</Text>
+            {unread > 0 && (
+              <View style={styles.unreadBadge}>
+                <Text style={styles.unreadText}>{badgeText}</Text>
+              </View>
+            )}
+          </View>
+        </View>
       </TouchableOpacity>
     );
   };
-  
 
-  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t("clientMessages.title")}</Text>
 
-      {conversations.length === 0 ? (
+      {refreshing && conversations.length === 0 ? (
+        <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
+      ) : conversations.length === 0 ? (
         <Text style={styles.empty}>{t("clientMessages.placeholder")}</Text>
       ) : (
-        <FlatList
-          data={conversations}
-          keyExtractor={(item) => item.otherUserId}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 40 }}
-          showsVerticalScrollIndicator={false}
-        />
+<FlatList
+  data={conversations}
+  keyExtractor={(item) => item.otherUserId}
+  renderItem={renderItem}
+  contentContainerStyle={{ paddingBottom: 40 }}
+  showsVerticalScrollIndicator={false}
+/>
+
       )}
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -107,6 +130,10 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   name: {
     fontFamily: "InterBold",
     fontSize: 16,
@@ -118,20 +145,45 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 14,
     color: "#555",
-    marginBottom: 6,
+    marginBottom: 4,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   time: {
     fontFamily: "Inter",
     fontSize: 12,
     color: "#999",
-    textAlign: I18nManager.isRTL ? "left" : "right",
+    textAlign: "right",
+    marginBottom: 6,
+  },
+  rightSide: {
+    alignItems: "flex-end",
+    marginLeft: 10,
+  },
+  unreadBadge: {
+    backgroundColor: "#213729",
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    minWidth: 30,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  unreadText: {
+    color: "#fff",
+    fontFamily: "InterBold",
+    fontSize: 12,
   },
   empty: {
     fontFamily: "Inter",
     fontSize: 16,
-    color: "#999", //
+    color: "#999",
     textAlign: "center",
     marginTop: 40,
+    refreshIconContainer: {
+      alignItems: "center",
+      marginBottom: 10,
+      marginTop: -10,
+    },
+    
   },
 });
