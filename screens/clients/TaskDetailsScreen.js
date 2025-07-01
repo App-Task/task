@@ -138,9 +138,9 @@ Alert.alert(
                 await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, {
                   method: "PATCH",
                 });
-
-                Alert.alert("Task Completed", "This task has been marked as completed.");
-                navigation.goBack(); // go back to trigger review popup
+                const updated = await getTaskById(task._id);
+                navigation.navigate("MyTasks", { showReview: true, completedTask: updated });
+                
               } catch (err) {
                 console.error("❌ Failed to complete task:", err.message);
                 Alert.alert("Error", "Could not mark the task as completed.");

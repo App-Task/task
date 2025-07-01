@@ -18,7 +18,8 @@ import StarRating from "react-native-star-rating-widget";
 
 const { width } = Dimensions.get("window");
 
-export default function MyTasksScreen({ navigation }) {
+export default function MyTasksScreen({ navigation, route }) {
+
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("Pending");
   const [groupedTasks, setGroupedTasks] = useState({
@@ -40,24 +41,25 @@ export default function MyTasksScreen({ navigation }) {
           setLoading(true);
           const userId = await SecureStore.getItemAsync("userId");
           if (!userId) throw new Error("No user ID");
-
+  
           const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
           const allTasks = await res.json();
-
+  
           const grouped = { Pending: [], Started: [], Completed: [] };
           allTasks.forEach((task) => {
             if (grouped[task.status]) {
               grouped[task.status].push(task);
             }
           });
-
+  
           setGroupedTasks(grouped);
-
-          // Check for completed tasks with no review
+  
+          // Show review for any completed task without review (on first load)
           for (let task of grouped.Completed) {
             const check = await fetch(`https://task-kq94.onrender.com/api/reviews/task/${task._id}`);
             const review = await check.json();
-            if (!review) {
+              if (!review || review.length === 0) {
+
               setReviewTask(task);
               setShowReview(true);
               break;
@@ -70,10 +72,34 @@ export default function MyTasksScreen({ navigation }) {
           setLoading(false);
         }
       };
-
+  
+      const handleReviewIntent = async () => {
+        if (route?.params?.showReview && route?.params?.completedTask) {
+          const task = route.params.completedTask;
+  
+          try {
+            const check = await fetch(`https://task-kq94.onrender.com/api/reviews/task/${task._id}`);
+            const review = await check.json();
+  
+            if (!review) {
+              setReviewTask(task);
+              setShowReview(true);
+            }
+          } catch (err) {
+            console.warn("⚠️ Failed to check review for completed task");
+          }
+  
+          // Prevent modal from showing again
+          navigation.setParams({ showReview: false, completedTask: null });
+        }
+      };
+  
       fetchTasks();
-    }, [])
+      handleReviewIntent();
+    }, [route])
   );
+  
+  
 
   const submitReview = async () => {
     if (!rating || !reviewTask) return;
@@ -95,6 +121,9 @@ export default function MyTasksScreen({ navigation }) {
       setReviewTask(null);
       setRating(0);
       setComment("");
+      setActiveTab("Completed"); // 👈 make sure the tab is correct
+      navigation.setParams({}); // 👈 clear old params
+
     } catch (err) {
       Alert.alert("Error", "Failed to submit review.");
     }
