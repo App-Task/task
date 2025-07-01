@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { removeToken } from "../../services/authStorage";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+
 import { fetchCurrentUser, updateUserProfile } from "../../services/auth";
 import * as ImagePicker from "expo-image-picker";
 
@@ -23,6 +24,7 @@ export default function ProfileScreen({ navigation }) {
   const nav = useNavigation();
   const [user, setUser] = useState({ name: "", email: "", profileImage: null });
   const [profileImage, setProfileImage] = useState(null);
+  
 
   const loadUser = async () => {
     try {
@@ -155,14 +157,22 @@ export default function ProfileScreen({ navigation }) {
           <Text style={styles.rowText}>{t("clientProfile.aboutUs")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.rowItem}>
-          <Text style={styles.rowText}>{t("clientProfile.privacyPolicy")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.rowItem}>
-          <Text style={styles.rowText}>{t("clientProfile.terms")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
+        <TouchableOpacity
+  style={styles.rowItem}
+  onPress={() => navigation.navigate("PrivacyPolicy")}
+>
+  <Text style={styles.rowText}>{t("clientProfile.privacyPolicy")}</Text>
+  <Ionicons name="chevron-forward" size={20} color="#999" />
+</TouchableOpacity>
+
+        <TouchableOpacity
+  style={styles.rowItem}
+  onPress={() => navigation.navigate("TermsAndConditions")}
+>
+  <Text style={styles.rowText}>{t("clientProfile.terms")}</Text>
+  <Ionicons name="chevron-forward" size={20} color="#999" />
+</TouchableOpacity>
+
         <TouchableOpacity style={styles.rowItem}>
           <Text style={styles.rowText}>{t("clientProfile.faqs")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />

@@ -5,6 +5,9 @@ import SplashScreen from "../screens/common/SplashScreen";
 import WelcomeScreen from "../screens/common/WelcomeScreen";
 import LoginScreen from "../screens/common/LoginScreen";
 import RegisterScreen from "../screens/common/RegisterScreen";
+import TermsAndConditionsScreen from "../screens/common/TermsAndConditionsScreen";
+import PrivacyPolicyScreen from "../screens/common/PrivacyPolicyScreen";
+
 
 import BottomTabNavigator from "./BottomTabNavigator"; // Client-side bottom tabs
 import TaskerBottomTabNavigator from "./TaskerBottomTabNavigator"; // Tasker-side bottom tabs
@@ -39,6 +42,12 @@ export default function MainNavigator() {
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} />
+      <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+
+
+
+
 
       {/* Client Home & Subscreens */}
       <Stack.Screen name="ClientHome" component={BottomTabNavigator} />

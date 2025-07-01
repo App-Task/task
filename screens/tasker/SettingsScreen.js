@@ -6,19 +6,11 @@ import {
   ScrollView,
   Alert,
   I18nManager,
-  StyleSheet, 
+  StyleSheet,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 
-
 export default function SettingsScreen({ navigation }) {
-  const { t } = useTranslation();
-
-  const handlePress = (label) => {
-    Alert.alert(t("settings.title"), `${t("settings.open")} "${label}"`);
-  };
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header with Back Button */}
@@ -30,42 +22,49 @@ export default function SettingsScreen({ navigation }) {
             color="#213729"
           />
         </TouchableOpacity>
-        <Text style={styles.header}>{t("settings.title")}</Text>
+        <Text style={styles.header}>Settings</Text>
         <View style={{ width: 24 }} />
       </View>
 
       {/* Items */}
-      <TouchableOpacity style={styles.item} onPress={() => handlePress(t("settings.about"))}>
+      <TouchableOpacity style={styles.item}>
         <Ionicons name="information-circle-outline" size={20} color="#215432" />
-        <Text style={styles.text}>{t("settings.about")}</Text>
+        <Text style={styles.text}>About</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => handlePress(t("settings.privacy"))}>
-        <Ionicons name="shield-checkmark-outline" size={20} color="#215432" />
-        <Text style={styles.text}>{t("settings.privacy")}</Text>
-      </TouchableOpacity>
+      <TouchableOpacity
+  style={styles.item}
+  onPress={() => navigation.navigate("PrivacyPolicy")}
+>
+  <Ionicons name="shield-checkmark-outline" size={20} color="#215432" />
+  <Text style={styles.text}>Privacy Policy</Text>
+</TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => handlePress(t("settings.terms"))}>
+
+      <TouchableOpacity
+        style={styles.item}
+        onPress={() => navigation.navigate("TermsAndConditions")}
+      >
         <Ionicons name="document-text-outline" size={20} color="#215432" />
-        <Text style={styles.text}>{t("settings.terms")}</Text>
+        <Text style={styles.text}>Terms and Conditions</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => handlePress(t("settings.faq"))}>
+      <TouchableOpacity style={styles.item}>
         <Ionicons name="help-circle-outline" size={20} color="#215432" />
-        <Text style={styles.text}>{t("settings.faq")}</Text>
+        <Text style={styles.text}>FAQ</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => handlePress(t("settings.contact"))}>
+      <TouchableOpacity style={styles.item}>
         <Ionicons name="chatbubbles-outline" size={20} color="#215432" />
-        <Text style={styles.text}>{t("settings.contact")}</Text>
+        <Text style={styles.text}>Contact Us</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={[styles.item, styles.logout]}
-        onPress={() => Alert.alert(t("settings.logoutMsg"))}
+        onPress={() => Alert.alert("You have been logged out.")}
       >
         <Ionicons name="log-out-outline" size={20} color="#213729" />
-        <Text style={[styles.text, styles.logoutText]}>{t("settings.logout")}</Text>
+        <Text style={[styles.text, styles.logoutText]}>Logout</Text>
       </TouchableOpacity>
 
       <View style={{ height: 40 }} />
