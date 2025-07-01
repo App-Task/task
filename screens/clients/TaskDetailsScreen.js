@@ -130,6 +130,27 @@ Alert.alert(
           <TouchableOpacity style={styles.secondaryButton} onPress={handleDelete}>
             <Text style={styles.secondaryButtonText}>{t("clientTaskDetails.cancelTask")}</Text>
           </TouchableOpacity>
+          {task.status === "Started" && (
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: "#215432" }]}
+            onPress={async () => {
+              try {
+                await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, {
+                  method: "PATCH",
+                });
+
+                Alert.alert("Task Completed", "This task has been marked as completed.");
+                navigation.goBack(); // go back to trigger review popup
+              } catch (err) {
+                console.error("❌ Failed to complete task:", err.message);
+                Alert.alert("Error", "Could not mark the task as completed.");
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>Mark as Completed</Text>
+          </TouchableOpacity>
+)}
+
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -26,29 +26,45 @@ export default function ViewBidsScreen({ route, navigation }) {
 
   const [bids, setBids] = useState([]);
   const [acceptedBidId, setAcceptedBidId] = useState(null);
-
+  const [reviews, setReviews] = useState({});
   const [loading, setLoading] = useState(true);
-
-
-  
 
   useFocusEffect(
     React.useCallback(() => {
       console.log("📦 Fetching bids for taskId:", taskId);
+
       const fetchBids = async () => {
         try {
           const res = await axios.get(`https://task-kq94.onrender.com/api/bids/task/${taskId}`);
           console.log("✅ Bids fetched successfully:", res.data);
-  
+
           setBids(res.data);
-  
+
           const accepted = res.data.find((bid) => bid.status === "Accepted");
           if (accepted) {
             console.log("🔒 Already accepted bid:", accepted._id);
             setAcceptedBidId(accepted._id);
           } else {
-            setAcceptedBidId(null); // reset if none accepted
+            setAcceptedBidId(null);
           }
+
+          const taskerIds = res.data.map((bid) => bid.taskerId?._id).filter(Boolean);
+          const reviewMap = {};
+
+          await Promise.all(
+            taskerIds.map(async (id) => {
+              try {
+                const reviewRes = await axios.get(
+                  `https://task-kq94.onrender.com/api/reviews/tasker/${id}`
+                );
+                reviewMap[id] = reviewRes.data;
+              } catch (err) {
+                console.warn(`⚠️ Failed to fetch review for tasker ${id}`);
+              }
+            })
+          );
+
+          setReviews(reviewMap);
         } catch (err) {
           console.error("❌ Failed to load bids:", err.message);
           if (err.response) {
@@ -60,60 +76,67 @@ export default function ViewBidsScreen({ route, navigation }) {
           setLoading(false);
         }
       };
-  
+
       fetchBids();
-  
-      return () => {
-        // Cleanup if needed
-      };
+
+      return () => {};
     }, [taskId])
   );
-  
-  
-  
-  
+
   const handleAccept = async (bid) => {
     try {
       const res = await axios.put(`https://task-kq94.onrender.com/api/bids/${bid._id}/accept`);
       console.log("✅ Bid accepted:", res.data);
-  
-      setAcceptedBidId(bid._id); // mark this one as accepted
-  
+
+      setAcceptedBidId(bid._id);
+
       Alert.alert(
         t("clientViewBids.acceptedTitle"),
         t("clientViewBids.acceptedMessage", {
           name: bid.taskerId?.name || "Tasker",
         })
       );
-  
-      // Optional: navigate.goBack();
     } catch (err) {
       console.error("❌ Accept bid error:", err.message);
       Alert.alert("Error", "Something went wrong while accepting the bid.");
     }
   };
+
   const handleChat = (bid) => {
     const name = bid.taskerId?.name || "Tasker";
     const otherUserId = bid.taskerId?._id;
     console.log("💬 Navigating to Chat with:", { name, otherUserId });
     navigation.navigate("Chat", { name, otherUserId });
-  };const renderBid = ({ item }) => {
+  };
+
+  const renderBid = ({ item }) => {
     const isThisAccepted = item._id === acceptedBidId || item.status === "Accepted";
     const alreadyPicked = acceptedBidId && item._id !== acceptedBidId;
-  
+
+    const review = reviews[item.taskerId?._id];
+    const average = review?.average;
+    const comment = review?.latest?.comment;
+
     return (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.name}>{item.taskerId?.name || "Tasker"}</Text>
           <Text style={styles.price}>{item.amount} SAR</Text>
         </View>
+
+        {average && (
+          <Text style={styles.review}>
+            ⭐ {average.toFixed(1)} — "{comment || t("clientViewBids.noComment")}"
+          </Text>
+        )}
+
         <Text style={styles.message}>{item.message}</Text>
-  
+
         <View style={styles.buttons}>
           <TouchableOpacity style={styles.chatBtn} onPress={() => handleChat(item)}>
             <Text style={styles.chatText}>{t("clientViewBids.chat")}</Text>
           </TouchableOpacity>
-  
+
           <TouchableOpacity
             style={[
               styles.acceptBtn,
@@ -142,8 +165,6 @@ export default function ViewBidsScreen({ route, navigation }) {
       </View>
     );
   };
-  
-  
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -173,6 +194,7 @@ export default function ViewBidsScreen({ route, navigation }) {
     </SafeAreaView>
   );
 }
+
 
 
 const styles = StyleSheet.create({
@@ -266,5 +288,12 @@ const styles = StyleSheet.create({
     marginTop: 40,
     color: "#999",
     fontSize: 14,
+  },
+  review: {
+    fontFamily: "Inter",
+    fontSize: 13,
+    color: "#555",
+    marginBottom: 6,
+    fontStyle: "italic",
   },
 });

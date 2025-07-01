@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,13 +8,13 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  TextInput,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import * as SecureStore from "expo-secure-store";
-
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
-
+import Modal from "react-native-modal";
+import StarRating from "react-native-star-rating-widget";
 
 const { width } = Dimensions.get("window");
 
@@ -28,6 +28,11 @@ export default function MyTasksScreen({ navigation }) {
   });
   const [loading, setLoading] = useState(true);
 
+  const [showReview, setShowReview] = useState(false);
+  const [reviewTask, setReviewTask] = useState(null);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+
   useFocusEffect(
     useCallback(() => {
       const fetchTasks = async () => {
@@ -35,19 +40,29 @@ export default function MyTasksScreen({ navigation }) {
           setLoading(true);
           const userId = await SecureStore.getItemAsync("userId");
           if (!userId) throw new Error("No user ID");
-  
+
           const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
           const allTasks = await res.json();
-  
-          // Group tasks by status
+
           const grouped = { Pending: [], Started: [], Completed: [] };
           allTasks.forEach((task) => {
             if (grouped[task.status]) {
               grouped[task.status].push(task);
             }
           });
-  
+
           setGroupedTasks(grouped);
+
+          // Check for completed tasks with no review
+          for (let task of grouped.Completed) {
+            const check = await fetch(`https://task-kq94.onrender.com/api/reviews/task/${task._id}`);
+            const review = await check.json();
+            if (!review) {
+              setReviewTask(task);
+              setShowReview(true);
+              break;
+            }
+          }
         } catch (err) {
           console.error("❌ Failed to fetch tasks:", err.message);
           Alert.alert("Error", t("clientMyTasks.fetchError"));
@@ -55,11 +70,35 @@ export default function MyTasksScreen({ navigation }) {
           setLoading(false);
         }
       };
-  
+
       fetchTasks();
     }, [])
   );
-  
+
+  const submitReview = async () => {
+    if (!rating || !reviewTask) return;
+    try {
+      await fetch("https://task-kq94.onrender.com/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          taskId: reviewTask._id,
+          taskerId: reviewTask.taskerId,
+          clientId: reviewTask.userId,
+          rating,
+          comment,
+        }),
+      });
+
+      Alert.alert("Thank you!", "Your review was submitted.");
+      setShowReview(false);
+      setReviewTask(null);
+      setRating(0);
+      setComment("");
+    } catch (err) {
+      Alert.alert("Error", "Failed to submit review.");
+    }
+  };
 
   const renderTask = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate("TaskDetails", { task: item })}>
@@ -72,6 +111,48 @@ export default function MyTasksScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* Review Modal */}
+      <Modal isVisible={showReview}>
+        <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20 }}>
+          <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#213729", marginBottom: 12 }}>
+            {t("clientReview.title") || "Rate Your Tasker"}
+          </Text>
+
+          <StarRating rating={rating} onChange={setRating} starSize={28} color="#215432" />
+
+          <TextInput
+            placeholder={t("clientReview.commentPlaceholder") || "Leave a comment..."}
+            value={comment}
+            onChangeText={setComment}
+            style={{
+              borderWidth: 1,
+              borderColor: "#ccc",
+              borderRadius: 12,
+              padding: 12,
+              marginTop: 16,
+              fontFamily: "Inter",
+              fontSize: 14,
+            }}
+            multiline
+          />
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#213729",
+              paddingVertical: 12,
+              borderRadius: 30,
+              marginTop: 20,
+              alignItems: "center",
+            }}
+            onPress={submitReview}
+          >
+            <Text style={{ color: "#fff", fontFamily: "InterBold", fontSize: 16 }}>
+              {t("clientReview.submit") || "Submit Review"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
       {/* Tabs */}
       <View style={styles.tabs}>
         {["Pending", "Started", "Completed"].map((tabKey) => (

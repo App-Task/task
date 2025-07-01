@@ -13,13 +13,16 @@ const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const messageRoutes = require("./routes/messages");
 const bidRoutes = require("./routes/bidRoutes");
-const notificationRoutes = require("./routes/notifications"); // ✅ NEW
+const notificationRoutes = require("./routes/notifications"); 
+const reviewRoutes = require("./routes/reviewRoutes");
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/bids", bidRoutes);
-app.use("/api/notifications", notificationRoutes); // ✅ NEW
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // Test route
 app.get("/test", (req, res) => {
