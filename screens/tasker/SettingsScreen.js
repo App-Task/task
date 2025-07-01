@@ -59,13 +59,7 @@ export default function SettingsScreen({ navigation }) {
         <Text style={styles.text}>Contact Us</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.item, styles.logout]}
-        onPress={() => Alert.alert("You have been logged out.")}
-      >
-        <Ionicons name="log-out-outline" size={20} color="#213729" />
-        <Text style={[styles.text, styles.logoutText]}>Logout</Text>
-      </TouchableOpacity>
+
 
       <View style={{ height: 40 }} />
     </ScrollView>
