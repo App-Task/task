@@ -58,13 +58,15 @@ export default function MyTasksScreen({ navigation, route }) {
           for (let task of grouped.Completed) {
             const check = await fetch(`https://task-kq94.onrender.com/api/reviews/task/${task._id}`);
             const review = await check.json();
-              if (!review || review.length === 0) {
-
+          
+            // ✅ Only show popup if there is NO review at all (null or empty array)
+            if (!review || (Array.isArray(review) && review.length === 0)) {
               setReviewTask(task);
               setShowReview(true);
               break;
             }
           }
+          
         } catch (err) {
           console.error("❌ Failed to fetch tasks:", err.message);
           Alert.alert("Error", t("clientMyTasks.fetchError"));
