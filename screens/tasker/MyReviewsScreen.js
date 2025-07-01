@@ -10,21 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-
-const dummyReviews = [
-  {
-    id: "1",
-    reviewer: "Ahmed Alieee",
-    rating: 5,
-    comment: "Great work, very reliable and fast!",
-  },
-  {
-    id: "2",
-    reviewer: "Mona Saleh",
-    rating: 4,
-    comment: "Good service, would recommend.",
-  },
-];
+import * as SecureStore from "expo-secure-store";
 
 export default function MyReviewsScreen({ navigation }) {
   const { t } = useTranslation();
@@ -32,10 +18,22 @@ export default function MyReviewsScreen({ navigation }) {
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    setTimeout(() => {
-      setReviews(dummyReviews);
-      setLoading(false);
-    }, 1000);
+    const fetchReviews = async () => {
+      try {
+        const taskerId = await SecureStore.getItemAsync("userId");
+        if (!taskerId) throw new Error("No tasker ID");
+
+        const res = await fetch(`https://task-kq94.onrender.com/api/reviews/tasker/${taskerId}`);
+        const data = await res.json();
+        setReviews(data || []);
+      } catch (err) {
+        console.error("❌ Failed to fetch reviews:", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
   }, []);
 
   const averageRating = (
@@ -55,10 +53,10 @@ export default function MyReviewsScreen({ navigation }) {
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.reviewHeader}>
-        <Text style={styles.reviewer}>{item.reviewer}</Text>
+        <Text style={styles.reviewer}>{item.reviewerName || "Client"}</Text>
         <View style={styles.stars}>{renderStars(item.rating)}</View>
       </View>
-      <Text style={styles.comment}>{item.comment}</Text>
+      {!!item.comment && <Text style={styles.comment}>{item.comment}</Text>}
     </View>
   );
 
@@ -90,7 +88,7 @@ export default function MyReviewsScreen({ navigation }) {
       ) : (
         <FlatList
           data={reviews}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: 60 }}
           showsVerticalScrollIndicator={false}
@@ -99,7 +97,6 @@ export default function MyReviewsScreen({ navigation }) {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
