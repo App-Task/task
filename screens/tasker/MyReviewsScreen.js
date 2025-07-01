@@ -21,8 +21,15 @@ export default function MyReviewsScreen({ navigation }) {
     const fetchReviews = async () => {
       try {
         const taskerId = await SecureStore.getItemAsync("userId");
-        const res = await fetch(`https://task-kq94.onrender.com/api/reviews/all/tasker/${taskerId}`);
-        const data = await res.json();
+        const response = await fetch(`https://task-kq94.onrender.com/api/reviews/all/tasker/${taskerId}`);
+        
+        // ✅ Check for success
+        if (!response.ok) {
+          const text = await response.text(); // catch HTML error
+          throw new Error(`Failed to fetch: ${response.status} ${text}`);
+        }
+    
+        const data = await response.json();
         setReviews(data);
       } catch (err) {
         console.error("❌ Failed to load reviews", err.message);
@@ -30,6 +37,7 @@ export default function MyReviewsScreen({ navigation }) {
         setLoading(false);
       }
     };
+    
   
     fetchReviews();
   }, []);
