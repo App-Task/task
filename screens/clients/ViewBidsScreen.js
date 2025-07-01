@@ -14,6 +14,8 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
+import { ActivityIndicator } from "react-native";
+
 
 
 
@@ -179,9 +181,14 @@ export default function ViewBidsScreen({ route, navigation }) {
         </View>
 
         {loading ? (
-          <Text style={styles.empty}>{t("clientViewBids.loading") || "Loading..."}</Text>
-        ) : (
-          <FlatList
+  <ActivityIndicator
+    size="large"
+    color="#213729"
+    style={{ marginTop: 50 }}
+  />
+) : (
+  <FlatList
+
             data={bids}
             keyExtractor={(item) => item._id}
             renderItem={renderBid}
