@@ -64,10 +64,20 @@ export default function ExploreTasksScreen({ navigation }) {
       ],
     };
   });
+  const [userId, setUserId] = useState(null);
 
   const fetchTasks = async () => {
     try {
       const token = await getToken();
+  
+      // Get current user data
+      const userRes = await axios.get("https://task-kq94.onrender.com/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const currentUserId = userRes.data._id;
+      setUserId(currentUserId);
+  
+      // Get all tasks
       const res = await axios.get("https://task-kq94.onrender.com/api/tasks", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -79,6 +89,7 @@ export default function ExploreTasksScreen({ navigation }) {
       setLoading(false);
     }
   };
+  
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -97,19 +108,24 @@ export default function ExploreTasksScreen({ navigation }) {
   }, [searchQuery, jobType, tasks]);
 
   const filterTasks = () => {
-    let result = tasks.filter((task) => task.status === "Pending");
+    let result = tasks.filter(
+      (task) => task.status === "Pending" && task.userId !== userId
+    );
+  
     if (searchQuery.trim()) {
       const text = searchQuery.toLowerCase();
       result = result.filter((task) =>
         task.title?.toLowerCase().includes(text)
       );
     }
+  
     if (jobType) {
       result = result.filter((task) => task.category === jobType);
     }
+  
     setFilteredTasks(result);
   };
-
+  
   const renderTask = ({ item }) => (
     <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
       {item.images?.length > 0 && (
