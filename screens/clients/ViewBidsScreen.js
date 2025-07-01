@@ -126,9 +126,10 @@ export default function ViewBidsScreen({ route, navigation }) {
 
         {average && (
           <Text style={styles.review}>
-            ⭐ {average.toFixed(1)} — "{comment || t("clientViewBids.noComment")}"
+            ⭐ {average.toFixed(1)}
           </Text>
         )}
+
 
         <Text style={styles.message}>{item.message}</Text>
 
