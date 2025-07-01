@@ -18,6 +18,8 @@ import * as SecureStore from "expo-secure-store";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
+// ... existing imports
+import { ActivityIndicator } from "react-native"; // NEW
 
 export default function ChatScreen({ route, navigation }) {
   const { t } = useTranslation();
@@ -26,6 +28,7 @@ export default function ChatScreen({ route, navigation }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [currentUserId, setCurrentUserId] = useState("");
+  const [sending, setSending] = useState(false); // NEW
 
   const fetchMessages = async () => {
     try {
@@ -46,6 +49,7 @@ export default function ChatScreen({ route, navigation }) {
 
   const sendMessage = async () => {
     if (!message.trim()) return;
+    setSending(true); // NEW
 
     try {
       const token = await getToken();
@@ -72,38 +76,33 @@ export default function ChatScreen({ route, navigation }) {
           ...res.data,
           sender: currentUserId,
           timestamp,
-          status: "delivered",
+          status: "✓",
         },
         ...prev,
       ]);
-
       setMessage("");
-
     } catch (err) {
       console.error("Error sending message:", err.message);
+    } finally {
+      setSending(false); // NEW
     }
   };
 
-  useEffect(() => { //
+  useEffect(() => {
     const initialize = async () => {
       const id = await SecureStore.getItemAsync("userId");
       setCurrentUserId(id);
-  
-      // ✅ wait until currentUserId is set, then fetch messages
-      setTimeout(() => {
-        fetchMessages();
-      }, 200);
-            setInterval(fetchMessages, 5000);
+      setTimeout(fetchMessages, 200);
+      setInterval(fetchMessages, 5000);
     };
-  
     initialize();
   }, []);
-  
+
   const renderItem = ({ item }) => {
     const sender = typeof item.sender === "object" ? item.sender : {};
     const senderId = sender._id || item.sender;
     const isMine = senderId?.toString() === currentUserId?.toString();
-  
+
     return (
       <View
         style={[
@@ -121,7 +120,7 @@ export default function ChatScreen({ route, navigation }) {
             style={styles.avatar}
           />
         )}
-  
+
         <View
           style={[
             styles.messageBubble,
@@ -137,54 +136,69 @@ export default function ChatScreen({ route, navigation }) {
       </View>
     );
   };
-  
-  
+
   return (
-<SafeAreaView style={styles.safeArea}>
-  <KeyboardAvoidingView
-    style={styles.container}
-    behavior={Platform.OS === "ios" ? "padding" : undefined}
-    keyboardVerticalOffset={90}
-  >
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={90}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="#213729" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>
+            {t("clientChat.chatWith", { name })}
+          </Text>
+        </View>
 
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#213729" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {t("clientChat.chatWith", { name })}
-        </Text>
-      </View>
-
-      <FlatList
-        data={messages}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id || item.id}
-        contentContainerStyle={styles.chatBox}
-        inverted
-      />
-
-
-      <View style={styles.inputRow}>
-        <TextInput
-          value={message}
-          onChangeText={(text) => setMessage(text)}
-
-          style={styles.input}
-          placeholder={t("clientChat.placeholder")}
+        {/* Messages */}
+        <FlatList
+          data={messages}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id || item.id}
+          contentContainerStyle={styles.chatBox}
+          inverted
         />
-        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-          <Ionicons name="send" size={20} color="#ffffff" />
-        </TouchableOpacity>
-      </View>
-      </KeyboardAvoidingView>
-</SafeAreaView>
 
+        {/* Input */}
+        <View style={styles.inputRow}>
+          <TextInput
+            value={message}
+            onChangeText={setMessage}
+            style={styles.input}
+            placeholder={t("clientChat.placeholder")}
+          />
+          <TouchableOpacity
+            style={[
+              styles.sendButton,
+              sending && { backgroundColor: "#888" },
+            ]}
+            onPress={sendMessage}
+            disabled={sending}
+          >
+            {sending ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Ionicons name="send" size={20} color="#ffffff" />
+            )}
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff" },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -206,31 +220,35 @@ const styles = StyleSheet.create({
   messageRow: {
     flexDirection: "row",
     alignItems: "flex-end",
-    marginBottom: 12,
+    marginBottom: 14,
     maxWidth: "100%",
   },
-  
   rowLeft: {
     justifyContent: "flex-start",
     alignSelf: "flex-start",
   },
-  
   rowRight: {
     flexDirection: "row-reverse",
     justifyContent: "flex-end",
     alignSelf: "flex-end",
   },
-  
   avatar: {
     width: 30,
     height: 30,
     borderRadius: 15,
     marginRight: 8,
+    backgroundColor: "#ddd",
   },
   messageBubble: {
     maxWidth: "75%",
-    padding: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   me: {
     backgroundColor: "#c1ff72",
@@ -242,20 +260,22 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 14,
     color: "#213729",
+    lineHeight: 20,
   },
   timestamp: {
     fontFamily: "Inter",
     fontSize: 11,
-    color: "#666",
-    marginTop: 4,
+    color: "#999",
+    marginTop: 6,
     textAlign: "right",
   },
   inputRow: {
     flexDirection: "row",
-    padding: 10,
+    padding: 12,
     borderTopWidth: 1,
     borderColor: "#eee",
     alignItems: "center",
+    backgroundColor: "#fff",
   },
   input: {
     flex: 1,
@@ -272,10 +292,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#213729",
     padding: 10,
     borderRadius: 30,
+    minWidth: 42,
+    minHeight: 42,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-  },
-  
 });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -7,27 +7,27 @@ import {
   StyleSheet,
   FlatList,
   I18nManager,
-  Dimensions,
+  Image,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import * as SecureStore from "expo-secure-store";
 import { getToken } from "../../services/authStorage";
-
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLayoutEffect } from "react";
-
+import { Dimensions } from "react-native";
 
 const { width } = Dimensions.get("window");
 
-export default function ChatScreen({ navigation, route }) {
+export default function TaskerChatScreen({ navigation, route }) {
   const { t } = useTranslation();
   const { name, otherUserId } = route.params;
 
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
+  const [message, setMessage] = useState("");
   const [currentUserId, setCurrentUserId] = useState("");
-
+  const [sending, setSending] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -47,14 +47,15 @@ export default function ChatScreen({ navigation, route }) {
       },
       headerTintColor: "#213729",
       headerRight: () => (
-        <TouchableOpacity onPress={() => alert(t("clientChat.reported"))} style={{ marginRight: 16 }}>
+        <TouchableOpacity
+          onPress={() => alert(t("clientChat.reported"))}
+          style={{ marginRight: 16 }}
+        >
           <Ionicons name="alert-circle-outline" size={24} color="#213729" />
         </TouchableOpacity>
       ),
     });
   }, [navigation, name]);
-  
-
 
   const fetchMessages = async () => {
     try {
@@ -74,15 +75,15 @@ export default function ChatScreen({ navigation, route }) {
   };
 
   const sendMessage = async () => {
-    if (!input.trim()) return;
-
+    if (!message.trim()) return;
+    setSending(true);
     try {
       const token = await getToken();
       const res = await axios.post(
         `https://task-kq94.onrender.com/api/messages`,
         {
           receiver: otherUserId,
-          text: input.trim(),
+          text: message.trim(),
         },
         {
           headers: {
@@ -93,31 +94,36 @@ export default function ChatScreen({ navigation, route }) {
 
       const newMessage = {
         ...res.data,
-        sender: "me",
-        time: new Date().toLocaleTimeString([], {
+        sender: currentUserId,
+        timestamp: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         }),
+        status: "✓",
       };
 
       setMessages((prev) => [newMessage, ...prev]);
-      setInput("");
+      setMessage("");
     } catch (err) {
       console.error("❌ Error sending message:", err.message);
+    } finally {
+      setSending(false);
     }
-  };const renderItem = ({ item }) => {
+  };
+
+  const renderItem = ({ item }) => {
     const sender = typeof item.sender === "object" ? item.sender : {};
     const senderId = sender._id || item.sender;
-    const isMe = senderId?.toString() === currentUserId?.toString();
-  
+    const isMine = senderId?.toString() === currentUserId?.toString();
+
     return (
       <View
         style={[
-          styles.bubbleRow,
-          isMe ? styles.rowRight : styles.rowLeft,
+          styles.messageRow,
+          isMine ? styles.rowRight : styles.rowLeft,
         ]}
       >
-        {!isMe && (
+        {!isMine && (
           <Image
             source={
               sender.profileImage
@@ -129,157 +135,94 @@ export default function ChatScreen({ navigation, route }) {
         )}
         <View
           style={[
-            styles.bubble,
-            isMe ? styles.myMessage : styles.theirMessage,
+            styles.messageBubble,
+            isMine ? styles.me : styles.other,
+            isMine ? { borderTopRightRadius: 0 } : { borderTopLeftRadius: 0 },
           ]}
         >
           <Text style={styles.messageText}>{item.text}</Text>
-          <Text style={styles.time}>
-            {item.time ||
+          <Text style={styles.timestamp}>
+            {item.timestamp ||
               new Date(item.createdAt).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
-              })}
+              })}{" "}
+            {isMine && (item.status || "✓")}
           </Text>
         </View>
       </View>
     );
   };
-  
 
   useEffect(() => {
     const initialize = async () => {
       const id = await SecureStore.getItemAsync("userId");
       setCurrentUserId(id);
-      setTimeout(fetchMessages, 100);
+      setTimeout(fetchMessages, 200);
       setInterval(fetchMessages, 5000);
     };
-  
     initialize();
-  
-    return () => clearInterval(); // cleanup
   }, []);
-  
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-  
-      {/* Header */}
-
-
-      {/* Chat */}
-      <FlatList
-        data={messages}
-        keyExtractor={(item) => item._id || item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.messageContainer}
-        inverted
-      />
-
-      {/* Input */}
-      <View style={styles.inputRow}>
-        <TextInput
-          style={styles.input}
-          placeholder={t("clientChat.placeholder")}
-          placeholderTextColor="#aaa"
-          value={input}
-          onChangeText={setInput}
-          textAlign={I18nManager.isRTL ? "right" : "left"}
+        {/* Messages */}
+        <FlatList
+          data={messages}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id || item.id}
+          contentContainerStyle={styles.chatBox}
+          inverted
         />
-        <TouchableOpacity onPress={sendMessage} style={styles.sendBtn}>
-          <Ionicons name="send" size={20} color="#fff" />
-        </TouchableOpacity>
-      </View>
-      </View>
-  </SafeAreaView>
 
+        {/* Input */}
+        <View style={styles.inputRow}>
+          <TextInput
+            value={message}
+            onChangeText={setMessage}
+            style={styles.input}
+            placeholder={t("clientChat.placeholder")}
+            placeholderTextColor="#aaa"
+            textAlign={I18nManager.isRTL ? "right" : "left"}
+          />
+          <TouchableOpacity
+            style={[
+              styles.sendButton,
+              sending && { backgroundColor: "#888" },
+            ]}
+            onPress={sendMessage}
+            disabled={sending}
+          >
+            {sending ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Ionicons name="send" size={20} color="#ffffff" />
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff" },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: "#ffffff",
-    borderBottomWidth: 1,
-    borderColor: "#eee",
-  },
-  title: {
-    fontFamily: "InterBold",
-    fontSize: 18,
-    color: "#213729",
-  },
-  messageContainer: {
-    padding: 20,
-    flexGrow: 1,
-    justifyContent: "flex-end",
-  },
-  bubble: {
-    maxWidth: width * 0.7,
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    marginBottom: 12,
-  },
-  myMessage: {
-    backgroundColor: "#213729",
-    alignSelf: "flex-end",
-  },
-  theirMessage: {
-    backgroundColor: "#f1f1f1",
-    alignSelf: "flex-start",
-  },
-  messageText: {
-    color: "#fff",
-    fontFamily: "Inter",
-    fontSize: 15,
-  },
-  time: {
-    color: "#ccc",
-    fontSize: 11,
-    marginTop: 4,
-    fontFamily: "Inter",
-    textAlign: I18nManager.isRTL ? "left" : "right",
-  },
-  inputRow: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderColor: "#eee",
-    backgroundColor: "#fff",
-  },
-  input: {
-    flex: 1,
-    height: 44,
-    borderRadius: 30,
-    backgroundColor: "#f2f2f2",
-    paddingHorizontal: 16,
-    fontSize: 15,
-    fontFamily: "Inter",
-    color: "#333",
-  },
-  sendBtn: {
-    backgroundColor: "#213729",
-    marginLeft: 10,
-    padding: 10,
-    borderRadius: 30,
-  },
   safeArea: {
     flex: 1,
     backgroundColor: "#ffffff",
   },
-  bubbleRow: {
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  chatBox: {
+    padding: 20,
+    flexGrow: 1,
+  },
+  messageRow: {
     flexDirection: "row",
     alignItems: "flex-end",
-    marginBottom: 12,
+    marginBottom: 14,
     maxWidth: "100%",
   },
   rowLeft: {
@@ -295,7 +238,65 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    marginHorizontal: 6,
+    marginRight: 8,
+    backgroundColor: "#ddd",
   },
-  
+  messageBubble: {
+    maxWidth: "75%",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  me: {
+    backgroundColor: "#c1ff72",
+  },
+  other: {
+    backgroundColor: "#e8e8e8",
+  },
+  messageText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#213729",
+    lineHeight: 20,
+  },
+  timestamp: {
+    fontFamily: "Inter",
+    fontSize: 11,
+    color: "#999",
+    marginTop: 6,
+    textAlign: "right",
+  },
+  inputRow: {
+    flexDirection: "row",
+    padding: 12,
+    borderTopWidth: 1,
+    borderColor: "#eee",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  input: {
+    flex: 1,
+    fontFamily: "Inter",
+    backgroundColor: "#f9f9f9",
+    borderRadius: 30,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: "#333",
+  },
+  sendButton: {
+    marginLeft: 10,
+    backgroundColor: "#213729",
+    padding: 10,
+    borderRadius: 30,
+    minWidth: 42,
+    minHeight: 42,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
