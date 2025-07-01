@@ -97,7 +97,7 @@ export default function ExploreTasksScreen({ navigation }) {
   }, [searchQuery, jobType, tasks]);
 
   const filterTasks = () => {
-    let result = tasks.filter((task) => task.status === "Started");
+    let result = tasks.filter((task) => task.status === "Pending");
     if (searchQuery.trim()) {
       const text = searchQuery.toLowerCase();
       result = result.filter((task) =>
