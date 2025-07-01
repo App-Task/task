@@ -21,24 +21,27 @@ export default function MyReviewsScreen({ navigation }) {
     const fetchReviews = async () => {
       try {
         const taskerId = await SecureStore.getItemAsync("userId");
-        if (!taskerId) throw new Error("No tasker ID");
-
-        const res = await fetch(`https://task-kq94.onrender.com/api/reviews/tasker/${taskerId}`);
+        const res = await fetch(`https://task-kq94.onrender.com/api/reviews/all/tasker/${taskerId}`);
         const data = await res.json();
-        setReviews(data || []);
+        setReviews(data);
       } catch (err) {
-        console.error("❌ Failed to fetch reviews:", err.message);
+        console.error("❌ Failed to load reviews", err.message);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchReviews();
   }, []);
+  
 
-  const averageRating = (
-    reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length || 0
-  ).toFixed(1);
+  const validReviews = Array.isArray(reviews) ? reviews : [];
+  const averageRating = validReviews.length
+  ? (validReviews.reduce((sum, r) => sum + r.rating, 0) / validReviews.length).toFixed(1)
+  : "0.0";
+
+
+
 
   const renderStars = (count) =>
     Array.from({ length: 5 }, (_, i) => (
@@ -50,15 +53,16 @@ export default function MyReviewsScreen({ navigation }) {
       />
     ));
 
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <View style={styles.reviewHeader}>
-        <Text style={styles.reviewer}>{item.reviewerName || "Client"}</Text>
-        <View style={styles.stars}>{renderStars(item.rating)}</View>
+    const renderItem = ({ item }) => (
+      <View style={styles.card}>
+        <View style={styles.reviewHeader}>
+          <Text style={styles.reviewer}>{item.clientId?.name || "Client"}</Text>
+          <View style={styles.stars}>{renderStars(item.rating)}</View>
+        </View>
+        {item.comment ? <Text style={styles.comment}>{item.comment}</Text> : null}
       </View>
-      {!!item.comment && <Text style={styles.comment}>{item.comment}</Text>}
-    </View>
-  );
+    );
+    
 
   return (
     <View style={styles.container}>
@@ -87,12 +91,13 @@ export default function MyReviewsScreen({ navigation }) {
         <Text style={styles.empty}>{t("taskerReviews.empty")}</Text>
       ) : (
         <FlatList
-          data={reviews}
+          data={validReviews}
           keyExtractor={(item) => item._id}
           renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: 60 }}
           showsVerticalScrollIndicator={false}
         />
+
       )}
     </View>
   );
