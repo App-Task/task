@@ -62,13 +62,15 @@ router.get("/task/:taskId", async (req, res) => {
 // 🔹 GET /api/reviews/all/tasker/:taskerId — full list for profile
 router.get("/all/tasker/:taskerId", async (req, res) => {
   try {
-    const reviews = await Review.find({ taskerId: req.params.taskerId }).sort({ createdAt: -1 });
+    const { taskerId } = req.params;
+    const reviews = await Review.find({ taskerId }).populate("clientId", "name");
     res.json(reviews);
   } catch (err) {
-    console.error("❌ Fetch all tasker reviews error:", err.message);
-    res.status(500).json({ error: "Failed to fetch tasker reviews" });
+    console.error("❌ Failed to fetch reviews for tasker", err.message);
+    res.status(500).json({ error: "Failed to fetch reviews" });
   }
 });
+
 
 
 module.exports = router;
