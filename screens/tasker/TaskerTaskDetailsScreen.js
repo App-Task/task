@@ -30,6 +30,8 @@ export default function TaskDetailsScreen({ route }) {
     const checkVerification = async () => {
       try {
         const user = await fetchCurrentUser();
+        console.log("👤 CURRENT USER:", user);
+
         setIsVerified(user.isVerified);
       } catch (err) {
         console.error("❌ Failed to check verification:", err.message);
@@ -52,6 +54,8 @@ export default function TaskDetailsScreen({ route }) {
   
     try {
       const user = await fetchCurrentUser();
+      console.log("👤 CURRENT USER:", user);
+
       if (!user.isVerified) {
         Alert.alert("Access Denied", "You must be verified to place a bid.");
         return;

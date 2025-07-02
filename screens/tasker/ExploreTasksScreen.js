@@ -72,6 +72,7 @@ export default function ExploreTasksScreen({ navigation }) {
   const fetchTasks = async () => {
     try {
       const user = await fetchCurrentUser();
+      console.log("👤 CURRENT USER:", user);
       if (!user.isVerified) {
         setShowVerifyBanner(true);
         setTasks([]);
