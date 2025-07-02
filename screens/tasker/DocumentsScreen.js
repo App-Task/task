@@ -72,6 +72,26 @@ export default function DocumentsScreen({ navigation }) {
       Alert.alert("Upload Failed", "Could not upload document. Please try again.");
     }
   };
+
+
+  const fetchDocuments = async () => {
+    try {
+      const user = await fetchCurrentUser();
+      setDocuments(
+        (user.documents || []).map((doc, index) => ({
+          id: index.toString(),
+          name: doc.split("/").pop(), // get just the file name
+        }))
+      );
+    } catch (err) {
+      console.error("❌ Error fetching documents:", err.message);
+    }
+  };
+  
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+  
   
 
   const deleteDocument = (id) => {

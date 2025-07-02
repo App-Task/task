@@ -80,11 +80,17 @@
     let taskers = [];
 
     async function fetchTaskers() {
-      const res = await axios.get("/api/users?verificationStatus=pending");
-      taskers = res.data;
-      populateLocationFilter();
-      renderTaskers(taskers);
-    }
+  try {
+    const res = await axios.get("/api/auth/users?verificationStatus=pending");
+    taskers = res.data;
+    populateLocationFilter();
+    renderTaskers(taskers);
+  } catch (err) {
+    console.error("❌ Failed to fetch taskers:", err.message);
+    document.getElementById("taskers").innerHTML = "<p>Error loading users.</p>";
+  }
+}
+
 
     function populateLocationFilter() {
       const uniqueLocations = [...new Set(taskers.map(t => t.location).filter(Boolean))];
