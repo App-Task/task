@@ -17,6 +17,7 @@ const notificationRoutes = require("./routes/notifications");
 const reviewRoutes = require("./routes/reviewRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const path = require("path");
+const documentRoutes = require("./routes/documents");
 
 
 app.use(express.static("public")); // ✅ serve static folder
@@ -27,6 +28,8 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/bids", bidRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/documents", documentRoutes);
+
 
 // Test route
 app.get("/test", (req, res) => {
