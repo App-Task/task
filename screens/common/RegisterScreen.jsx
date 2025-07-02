@@ -75,6 +75,8 @@ export default function RegisterScreen({ navigation, route }) {
           placeholderTextColor="#999"
           value={name}
           onChangeText={setName}
+          maxLength={55} // 👈 Add this line
+
         />
 
         <TextInput
