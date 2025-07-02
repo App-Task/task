@@ -106,7 +106,16 @@ export default function EditProfileScreen() {
 
 
       {/* Inputs */}
-      <TextInput style={styles.input} value={name} onChangeText={setName} placeholder={t("taskerEditProfile.name") || "Name"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+      <TextInput
+  style={styles.input}
+  value={name}
+  onChangeText={setName}
+  placeholder={t("taskerEditProfile.name") || "Name"}
+  textAlign={I18nManager.isRTL ? "right" : "left"}
+  placeholderTextColor="#999"
+  maxLength={50} // ✅ add this line
+/>
+
       <TextInput style={styles.input} value={email} editable={false} placeholder={t("taskerEditProfile.email") || "Email"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
       <TextInput style={styles.input} value={gender} onChangeText={setGender} placeholder={t("taskerEditProfile.gender") || "Gender"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
       <TextInput style={styles.input} value={location} onChangeText={setLocation} placeholder={t("taskerEditProfile.location") || "Location"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
