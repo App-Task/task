@@ -65,4 +65,36 @@ router.post("/upload-file", upload.single("file"), async (req, res) => {
   }
 });
 
+
+// ✅ Delete document from user
+router.delete("/delete/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { fileName } = req.body;
+
+    if (!fileName) return res.status(400).json({ error: "Missing fileName" });
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid userId" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Remove matching file path (partial match is okay)
+    user.documents = (user.documents || []).filter(
+      (doc) => !doc.includes(fileName)
+    );
+
+    await user.save();
+
+    console.log(`🗑️ Document '${fileName}' removed from user ${user.email}`);
+    res.json({ msg: "Document deleted successfully" });
+  } catch (err) {
+    console.error("❌ Delete error:", err.stack || err.message);
+    res.status(500).json({ error: "Deletion failed" });
+  }
+});
+
+
 module.exports = router;

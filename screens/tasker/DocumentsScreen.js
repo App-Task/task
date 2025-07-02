@@ -94,9 +94,26 @@ export default function DocumentsScreen({ navigation }) {
   
   
 
-  const deleteDocument = (id) => {
-    setDocuments((prev) => prev.filter((doc) => doc.id !== id));
+  const deleteDocument = async (id, name) => {
+    try {
+      const user = await fetchCurrentUser();
+      const token = await getToken();
+  
+      await axios.delete(
+        `https://task-kq94.onrender.com/api/documents/delete/${user._id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          data: { fileName: name }, // required for DELETE body
+        }
+      );
+  
+      setDocuments((prev) => prev.filter((doc) => doc.id !== id));
+    } catch (err) {
+      console.error("❌ Error deleting document:", err.response?.data || err.message);
+      Alert.alert("Delete Failed", "Could not delete document.");
+    }
   };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
