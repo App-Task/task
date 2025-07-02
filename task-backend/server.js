@@ -24,6 +24,8 @@ const notificationRoutes = require("./routes/notifications");
 const reviewRoutes = require("./routes/reviewRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const documentRoutes = require("./routes/documents");
+const userRoutes = require("./routes/userRoutes");
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
@@ -33,6 +35,8 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api", userRoutes);
+
 
 // ✅ Serve Admin Panel
 app.get("/admin", (req, res) => {
