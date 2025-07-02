@@ -50,19 +50,29 @@ router.post("/upload", async (req, res) => {
 
 // ✅ Route 2: Upload actual file using multipart/form-data
 router.post("/upload-file", upload.single("file"), async (req, res) => {
+  console.log("📥 Incoming file upload...");
+
   try {
     const { userId } = req.body;
+    console.log("🔍 User ID:", userId);
 
     if (!req.file) {
+      console.log("❌ No file received");
       return res.status(400).json({ error: "No file uploaded." });
     }
 
+    console.log("📎 Uploaded file:", req.file);
+
     if (!mongoose.Types.ObjectId.isValid(userId)) {
+      console.log("❌ Invalid userId");
       return res.status(400).json({ error: "Invalid userId" });
     }
 
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) {
+      console.log("❌ User not found");
+      return res.status(404).json({ error: "User not found" });
+    }
 
     const filePath = `/uploads/${req.file.filename}`;
 
@@ -71,10 +81,12 @@ router.post("/upload-file", upload.single("file"), async (req, res) => {
     user.isVerified = false;
     await user.save();
 
+    console.log("✅ File uploaded and user updated");
+
     res.json({ msg: "File uploaded", path: filePath });
   } catch (err) {
-    console.error("❌ Upload file error:", err.message);
-    res.status(500).json({ error: "File upload failed" });
+    console.error("❌ Upload file error:", err);
+    res.status(500).json({ error: "File upload failed", details: err.message });
   }
 });
 
