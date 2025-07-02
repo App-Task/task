@@ -1,3 +1,4 @@
+// routes/documents.js
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
@@ -5,10 +6,10 @@ const multer = require("multer");
 const path = require("path");
 const User = require("../models/User");
 
-// ✅ Set up multer for file storage
+// ✅ Set up multer storage config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // make sure this folder exists
+    cb(null, "uploads/"); // ensure this folder exists
   },
   filename: (req, file, cb) => {
     const uniqueName = `${Date.now()}-${file.originalname}`;
@@ -17,7 +18,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ✅ POST /api/documents/upload — JSON array method (already in place)
+
+// ✅ Route 1: Upload using JSON file names (used in initial mock)
 router.post("/upload", async (req, res) => {
   try {
     const { userId, files } = req.body;
@@ -45,7 +47,8 @@ router.post("/upload", async (req, res) => {
   }
 });
 
-// ✅ NEW: POST /api/documents/upload-file — real file upload
+
+// ✅ Route 2: Upload actual file using multipart/form-data
 router.post("/upload-file", upload.single("file"), async (req, res) => {
   try {
     const { userId } = req.body;

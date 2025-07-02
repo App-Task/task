@@ -29,6 +29,8 @@ app.use("/api/bids", bidRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/uploads", express.static("uploads"));
+
 
 
 // Test route
