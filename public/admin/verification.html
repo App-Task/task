@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tasker Verification Admin</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f7f7f7;
+      padding: 40px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #215432;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .search-box, .filter-select {
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 200px;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .card h3 {
+      margin-top: 0;
+    }
+    .docs a {
+      display: inline-block;
+      margin-right: 10px;
+      text-decoration: none;
+      color: #1a73e8;
+    }
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-accept {
+      background-color: #4caf50;
+      color: white;
+      margin-right: 10px;
+    }
+    .btn-decline {
+      background-color: #f44336;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Pending Tasker Verifications</h1>
+
+  <div class="controls">
+    <input type="text" class="search-box" id="search" placeholder="Search by name or email..." />
+    <select class="filter-select" id="locationFilter">
+      <option value="">All Locations</option>
+    </select>
+  </div>
+
+  <div id="taskers"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    let taskers = [];
+
+    async function fetchTaskers() {
+      const res = await axios.get("/api/users?verificationStatus=pending");
+      taskers = res.data;
+      populateLocationFilter();
+      renderTaskers(taskers);
+    }
+
+    function populateLocationFilter() {
+      const uniqueLocations = [...new Set(taskers.map(t => t.location).filter(Boolean))];
+      const select = document.getElementById("locationFilter");
+      uniqueLocations.forEach(loc => {
+        const option = document.createElement("option");
+        option.value = loc;
+        option.textContent = loc;
+        select.appendChild(option);
+      });
+    }
+
+    function renderTaskers(data) {
+      const container = document.getElementById("taskers");
+      container.innerHTML = "";
+      if (data.length === 0) {
+        container.innerHTML = "<p>No pending verifications.</p>";
+        return;
+      }
+
+      data.forEach(tasker => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>${tasker.name}</h3>
+          <p><strong>Email:</strong> ${tasker.email}</p>
+          <p><strong>Location:</strong> ${tasker.location || "N/A"}</p>
+          <p><strong>Phone:</strong> ${tasker.phoneNumber || "N/A"}</p>
+          <div class="docs">
+            <strong>Documents:</strong><br/>
+            ${tasker.documents?.map(doc => `<a href="\${doc}" target="_blank">\${doc}</a>`).join("") || "None"}
+          </div>
+          <div style="margin-top: 12px;">
+            <button class="btn btn-accept" onclick="verifyTasker('\${tasker._id}', 'accepted')">Accept</button>
+            <button class="btn btn-decline" onclick="verifyTasker('\${tasker._id}', 'declined')">Decline</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function verifyTasker(id, status) {
+      axios.patch(`/api/admin/verify-tasker/${id}`, { status }).then(() => {
+        taskers = taskers.filter(t => t._id !== id);
+        renderTaskers(taskers);
+      }).catch(err => {
+        alert("Error updating status");
+        console.error(err);
+      });
+    }
+
+    document.getElementById("search").addEventListener("input", (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = taskers.filter(t =>
+        t.name.toLowerCase().includes(term) || t.email.toLowerCase().includes(term)
+      );
+      renderTaskers(filtered);
+    });
+
+    document.getElementById("locationFilter").addEventListener("change", (e) => {
+      const loc = e.target.value;
+      const filtered = loc
+        ? taskers.filter(t => t.location === loc)
+        : taskers;
+      renderTaskers(filtered);
+    });
+
+    fetchTaskers();
+  </script>
+
+</body>
+</html>

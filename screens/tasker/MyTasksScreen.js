@@ -23,6 +23,8 @@ export default function TaskerMyTasksScreen() {
   const [tasks, setTasks] = useState([]);
   const [taskerId, setTaskerId] = useState("");
   const navigation = useNavigation();
+  const [showVerifyBanner, setShowVerifyBanner] = useState(false);
+
 
 
   useEffect(() => {
@@ -32,19 +34,28 @@ export default function TaskerMyTasksScreen() {
         const user = await fetchCurrentUser();
         setTaskerId(user._id);
   
+        if (!user.isVerified) {
+          setShowVerifyBanner(true);
+          setTasks([]);
+          setLoading(false);
+          return;
+        }
+  
+        setShowVerifyBanner(false); // ✅ hide if verified
+  
         const url = `https://task-kq94.onrender.com/api/tasks/tasker/${user._id}?type=${tab}`;
-        console.log("🔍 Fetching tasks from:", url); // ✅ log URL
+        console.log("🔍 Fetching tasks from:", url);
   
         const res = await axios.get(url);
-        console.log("✅ Response data:", res.data); // ✅ log response
+        console.log("✅ Response data:", res.data);
         setTasks(res.data);
       } catch (err) {
         console.error("❌ Error fetching tasks:", err.message);
         if (err.response) {
-          console.log("❌ Backend response error:", err.response.data); // ✅ backend message
-          console.log("❌ Status code:", err.response.status); // ✅ 404, 500, etc.
+          console.log("❌ Backend response error:", err.response.data);
+          console.log("❌ Status code:", err.response.status);
         } else {
-          console.log("❌ General error object:", err); // ✅ fallback
+          console.log("❌ General error object:", err);
         }
         Alert.alert("Error", "Failed to load tasks.");
       } finally {
@@ -139,6 +150,13 @@ export default function TaskerMyTasksScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+
+      {showVerifyBanner && (
+  <View style={styles.verifyBanner}>
+    <Text style={styles.verifyText}>You must be verified to view your tasks.</Text>
+  </View>
+)}
+
 
       {/* Task list */}
       {loading ? (
@@ -252,4 +270,19 @@ const styles = StyleSheet.create({
   dangerText: {
     color: "#ff5a5a",
   },
+
+
+  verifyBanner: {
+    backgroundColor: "#fff4e6",
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  verifyText: {
+    color: "#FFA500",
+    fontFamily: "InterBold",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  
 });

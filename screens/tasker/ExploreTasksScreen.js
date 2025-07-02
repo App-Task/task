@@ -22,6 +22,7 @@ import Animated, {
 } from "react-native-reanimated";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
+import { fetchCurrentUser } from "../../services/auth"; // ✅ make sure path is correct
 import { useFocusEffect } from "@react-navigation/native";
 
 const JOB_TYPES = ["Cleaning", "Moving", "Delivery", "Repairs"];
@@ -35,6 +36,8 @@ export default function ExploreTasksScreen({ navigation }) {
   const [jobType, setJobType] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [showVerifyBanner, setShowVerifyBanner] = useState(false);
+
 
   // Scroll animation logic
   const scrollY = useSharedValue(0);
@@ -68,6 +71,17 @@ export default function ExploreTasksScreen({ navigation }) {
 
   const fetchTasks = async () => {
     try {
+      const user = await fetchCurrentUser();
+      if (!user.isVerified) {
+        setShowVerifyBanner(true);
+        setTasks([]);
+        setFilteredTasks([]);
+        setLoading(false);
+        return;
+      }
+  
+      setShowVerifyBanner(false); // ✅ Hide if verified
+  
       const token = await getToken();
   
       // Get current user data
@@ -89,6 +103,7 @@ export default function ExploreTasksScreen({ navigation }) {
       setLoading(false);
     }
   };
+  
   
 
   const handleRefresh = async () => {
@@ -155,6 +170,15 @@ export default function ExploreTasksScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>{t("taskerExplore.header")}</Text>
+
+      {showVerifyBanner && (
+  <View style={styles.verifyBanner}>
+    <Text style={styles.verifyText}>
+      You must be verified to explore and bid on tasks.
+    </Text>
+  </View>
+)}
+
 
       <Text style={styles.label}>Search by job title</Text>
       <TextInput
@@ -350,4 +374,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#213729",
   },
+
+  verifyBanner: {
+    backgroundColor: "#fff4e6",
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  verifyText: {
+    color: "#FFA500",
+    fontFamily: "InterBold",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  
 });

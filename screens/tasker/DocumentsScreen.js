@@ -10,21 +10,43 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import axios from "axios";
+import { fetchCurrentUser } from "../../services/auth"; // ✅ adjust path if needed
+import { getToken } from "../../services/authStorage"; // ✅ adjust if needed
 
 export default function DocumentsScreen({ navigation }) {
   const { t } = useTranslation();
 
-  const [documents, setDocuments] = useState([
-    { id: "1", name: "ID Card.pdf" },
-    { id: "2", name: "Work Permit.jpg" },
-  ]);
+  const [documents, setDocuments] = useState([]);
 
-  const uploadDocument = () => {
-    Alert.alert(t("taskerDocuments.uploadedTitle"), t("taskerDocuments.uploadedMessage"));
-    setDocuments((prev) => [
-      ...prev,
-      { id: Date.now().toString(), name: `New Document ${prev.length + 1}.pdf` },
-    ]);
+  const uploadDocument = async () => {
+    try {
+      const user = await fetchCurrentUser();
+      const token = await getToken();
+
+      // Simulate uploading a new document
+      const newDocName = `Document_${documents.length + 1}.pdf`;
+
+      const res = await axios.post(
+        "https://task-kq94.onrender.com/api/documents/upload",
+        {
+          userId: user._id,
+          files: [newDocName], // later you can change this to actual file upload logic
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setDocuments((prev) => [
+        ...prev,
+        { id: Date.now().toString(), name: newDocName },
+      ]);
+      Alert.alert(t("taskerDocuments.uploadedTitle"), t("taskerDocuments.uploadedMessage"));
+    } catch (err) {
+      console.error("❌ Upload error:", err.response?.data || err.message);
+      Alert.alert("Upload Failed", "Could not upload document. Please try again.");
+    }
   };
 
   const deleteDocument = (id) => {

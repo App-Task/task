@@ -15,8 +15,12 @@ const messageRoutes = require("./routes/messages");
 const bidRoutes = require("./routes/bidRoutes");
 const notificationRoutes = require("./routes/notifications"); 
 const reviewRoutes = require("./routes/reviewRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const path = require("path");
 
 
+app.use(express.static("public")); // ✅ serve static folder
+app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/messages", messageRoutes);
@@ -28,6 +32,12 @@ app.use("/api/reviews", reviewRoutes);
 app.get("/test", (req, res) => {
   res.send("✅ Backend working");
 });
+
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/admin/verification.html"));
+});
+
+
 
 // Connect to MongoDB
 mongoose

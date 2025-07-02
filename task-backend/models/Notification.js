@@ -9,9 +9,10 @@ const notificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["bid", "message"],
+      enum: ["bid", "message", "verification"], // ✅ added verification
       required: true,
     },
+    
     title: {
       type: String,
       required: true,

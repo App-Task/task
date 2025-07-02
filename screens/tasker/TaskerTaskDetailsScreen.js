@@ -26,8 +26,23 @@ export default function TaskDetailsScreen({ route }) {
   const { t } = useTranslation();
   const navigation = useNavigation();
 
+  useEffect(() => {
+    const checkVerification = async () => {
+      try {
+        const user = await fetchCurrentUser();
+        setIsVerified(user.isVerified);
+      } catch (err) {
+        console.error("❌ Failed to check verification:", err.message);
+      }
+    };
+    checkVerification();
+  }, []);
+  
+
   const [bidAmount, setBidAmount] = useState("");
   const [message, setMessage] = useState("");
+  const [isVerified, setIsVerified] = useState(true);
+
 
   const handleBid = async () => {
     if (!bidAmount || !message) {
@@ -37,6 +52,10 @@ export default function TaskDetailsScreen({ route }) {
   
     try {
       const user = await fetchCurrentUser();
+      if (!user.isVerified) {
+        Alert.alert("Access Denied", "You must be verified to place a bid.");
+        return;
+      }
   
       const res = await axios.post("https://task-kq94.onrender.com/api/bids", {
         taskId: task._id,
@@ -50,7 +69,7 @@ export default function TaskDetailsScreen({ route }) {
       Alert.alert(
         t("taskerTaskDetails.successTitle"),
         t("taskerTaskDetails.bidSent"),
-        [{ text: "OK", onPress: () => navigation.goBack() }] // ✅ Go back after alert dismiss
+        [{ text: "OK", onPress: () => navigation.goBack() }]
       );
   
       setBidAmount("");
@@ -108,9 +127,24 @@ export default function TaskDetailsScreen({ route }) {
           placeholderTextColor="#999"
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleBid}>
-          <Text style={styles.buttonText}>{t("taskerTaskDetails.submitBid")}</Text>
-        </TouchableOpacity>
+{!isVerified && (
+  <View style={styles.verifyBanner}>
+    <Text style={styles.verifyText}>
+      You must be verified to place a bid.
+    </Text>
+  </View>
+)}
+
+<TouchableOpacity
+  style={[styles.button, !isVerified && { backgroundColor: "#ccc" }]}
+  onPress={handleBid}
+  disabled={!isVerified}
+>
+  <Text style={styles.buttonText}>
+    {t("taskerTaskDetails.submitBid")}
+  </Text>
+</TouchableOpacity>
+
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -189,4 +223,18 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 16,
   },
+
+  verifyBanner: {
+    backgroundColor: "#fff4e6",
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  verifyText: {
+    color: "#FFA500",
+    fontFamily: "InterBold",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  
 });

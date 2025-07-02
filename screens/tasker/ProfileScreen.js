@@ -20,7 +20,14 @@ const { width } = Dimensions.get("window");
 
 export default function TaskerProfileScreen({ navigation }) {
   const { t } = useTranslation();
-  const [user, setUser] = useState({ name: "", email: "", profileImage: null });
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    profileImage: null,
+    isVerified: false,
+    verificationStatus: "pending",
+  });
+  
   const [profileImage, setProfileImage] = useState(null);
   const nav = useNavigation();
 
@@ -114,6 +121,23 @@ export default function TaskerProfileScreen({ navigation }) {
 
       <Text style={styles.name}>{user.name || "Loading..."}</Text>
       <Text style={styles.email}>{user.email || " "}</Text>
+      {user.verificationStatus === "accepted" ? (
+  <View style={styles.verifiedBadge}>
+    <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
+    <Text style={styles.verifiedText}>Verified Tasker</Text>
+  </View>
+) : user.verificationStatus === "declined" ? (
+  <View style={styles.declinedBadge}>
+    <Ionicons name="close-circle" size={18} color="#ff4444" />
+    <Text style={styles.declinedText}>Verification Declined</Text>
+  </View>
+) : (
+  <View style={styles.pendingBadge}>
+    <Ionicons name="time" size={18} color="#FFA500" />
+    <Text style={styles.pendingText}>Verification Pending</Text>
+  </View>
+)}
+
 
       <View style={styles.buttonGroup}>
   <TouchableOpacity
@@ -266,4 +290,53 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     color: "#213729",
   },
+
+  verifiedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#e0f8e9",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    marginBottom: 20,
+  },
+  verifiedText: {
+    marginLeft: 8,
+    fontFamily: "Inter",
+    color: "#4CAF50",
+    fontSize: 14,
+  },
+  
+  declinedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ffe6e6",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    marginBottom: 20,
+  },
+  declinedText: {
+    marginLeft: 8,
+    fontFamily: "Inter",
+    color: "#ff4444",
+    fontSize: 14,
+  },
+  
+  pendingBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff4e6",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    marginBottom: 20,
+  },
+  pendingText: {
+    marginLeft: 8,
+    fontFamily: "Inter",
+    color: "#FFA500",
+    fontSize: 14,
+  },
+  
 });

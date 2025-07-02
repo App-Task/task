@@ -13,6 +13,15 @@ const userSchema = new mongoose.Schema(
     experience: { type: String, default: "" },
     skills: { type: String, default: "" },
     about: { type: String, default: "" },
+
+    // ✅ Verification-related fields
+    isVerified: { type: Boolean, default: false }, // admin approval required
+    documents: [{ type: String }], // uploaded document URLs or filenames
+    verificationStatus: {
+      type: String,
+      enum: ["pending", "accepted", "declined"],
+      default: "pending",
+    },
   },
   { timestamps: true }
 );
