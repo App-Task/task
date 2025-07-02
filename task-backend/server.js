@@ -2,49 +2,49 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const path = require("path");
 
 dotenv.config();
 const app = express();
 
+// ✅ Middlewares
 app.use(cors());
 app.use(express.json());
 
+// ✅ Serve static assets (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname, "public"))); // serves public/*
+app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // serve uploaded files
+
+// ✅ Routes
 const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const messageRoutes = require("./routes/messages");
 const bidRoutes = require("./routes/bidRoutes");
-const notificationRoutes = require("./routes/notifications"); 
+const notificationRoutes = require("./routes/notifications");
 const reviewRoutes = require("./routes/reviewRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-const path = require("path");
 const documentRoutes = require("./routes/documents");
 
-
-app.use(express.static("public")); // ✅ serve static folder
-app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/bids", bidRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api/documents", documentRoutes);
-app.use("/uploads", express.static("uploads"));
 
-
-
-// Test route
-app.get("/test", (req, res) => {
-  res.send("✅ Backend working");
-});
-
+// ✅ Serve Admin Panel
 app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "public/admin/verification.html"));
 });
 
+// ✅ Test route
+app.get("/test", (req, res) => {
+  res.send("✅ Backend working");
+});
 
-
-// Connect to MongoDB
+// ✅ MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))

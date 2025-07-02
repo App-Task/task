@@ -23,25 +23,29 @@ export default function DocumentsScreen({ navigation }) {
     try {
       const user = await fetchCurrentUser();
       const token = await getToken();
-
+  
       const result = await DocumentPicker.getDocumentAsync({
         type: "*/*",
         copyToCacheDirectory: true,
       });
-
+  
       if (result.canceled || !result.assets?.length) return;
-
+  
       const file = result.assets[0];
-
+  
+      console.log("📂 Picked file:", file);
+  
       const formData = new FormData();
       formData.append("userId", user._id);
       formData.append("file", {
         uri: file.uri,
-        name: file.name,
         type: file.mimeType || "application/octet-stream",
+        name: file.name || `upload-${Date.now()}`,
       });
-
-      await axios.post(
+  
+      console.log("📦 FormData prepared");
+  
+      const response = await axios.post(
         "https://task-kq94.onrender.com/api/documents/upload-file",
         formData,
         {
@@ -51,12 +55,14 @@ export default function DocumentsScreen({ navigation }) {
           },
         }
       );
-
+  
+      console.log("✅ Upload response:", response.data);
+  
       setDocuments((prev) => [
         ...prev,
         { id: Date.now().toString(), name: file.name },
       ]);
-
+  
       Alert.alert(
         t("taskerDocuments.uploadedTitle"),
         t("taskerDocuments.uploadedMessage")
@@ -66,6 +72,7 @@ export default function DocumentsScreen({ navigation }) {
       Alert.alert("Upload Failed", "Could not upload document. Please try again.");
     }
   };
+  
 
   const deleteDocument = (id) => {
     setDocuments((prev) => prev.filter((doc) => doc.id !== id));
