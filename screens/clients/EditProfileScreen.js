@@ -63,6 +63,8 @@ export default function EditProfileScreen({ navigation }) {
         value={name}
         onChangeText={setName}
         textAlign={I18nManager.isRTL ? "right" : "left"}
+        maxLength={50} // 👈 Add this line
+
       />
 
       <TextInput
