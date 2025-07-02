@@ -81,7 +81,8 @@
 
     async function fetchTaskers() {
   try {
-    const res = await axios.get("/api/auth/users?verificationStatus=pending");
+    const res = await axios.get("/api/users?verificationStatus=pending");
+
     taskers = res.data;
     populateLocationFilter();
     renderTaskers(taskers);
@@ -115,19 +116,20 @@
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
-          <h3>${tasker.name}</h3>
-          <p><strong>Email:</strong> ${tasker.email}</p>
-          <p><strong>Location:</strong> ${tasker.location || "N/A"}</p>
-          <p><strong>Phone:</strong> ${tasker.phoneNumber || "N/A"}</p>
-          <div class="docs">
-            <strong>Documents:</strong><br/>
-            ${tasker.documents?.map(doc => `<a href="\${doc}" target="_blank">\${doc}</a>`).join("") || "None"}
-          </div>
-          <div style="margin-top: 12px;">
-            <button class="btn btn-accept" onclick="verifyTasker('\${tasker._id}', 'accepted')">Accept</button>
-            <button class="btn btn-decline" onclick="verifyTasker('\${tasker._id}', 'declined')">Decline</button>
-          </div>
-        `;
+        <h3>${tasker.name}</h3>
+        <p><strong>Email:</strong> ${tasker.email}</p>
+        <p><strong>Location:</strong> ${tasker.location || "N/A"}</p>
+        <p><strong>Phone:</strong> ${tasker.phoneNumber || "N/A"}</p>
+        <div class="docs">
+          <strong>Documents:</strong><br/>
+          ${tasker.documents?.map(doc => `<a href="${doc}" target="_blank">${doc}</a>`).join("") || "None"}
+        </div>
+        <div style="margin-top: 12px;">
+          <button class="btn btn-accept" onclick="verifyTasker('${tasker._id}', 'accepted')">Accept</button>
+          <button class="btn btn-decline" onclick="verifyTasker('${tasker._id}', 'declined')">Decline</button>
+        </div>
+      `;
+
         container.appendChild(card);
       });
     }
