@@ -19,6 +19,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 
+
+
 // ✅ Route 1: Upload using JSON file names (used in initial mock)
 router.post("/upload", async (req, res) => {
   try {
@@ -50,18 +52,17 @@ router.post("/upload", async (req, res) => {
 
 // ✅ Route 2: Upload actual file using multipart/form-data
 router.post("/upload-file", upload.single("file"), async (req, res) => {
-  console.log("📥 Incoming file upload...");
-
   try {
+    console.log("📥 Incoming file upload request");
+
     const { userId } = req.body;
-    console.log("🔍 User ID:", userId);
+    console.log("🧾 Received userId:", userId);
+    console.log("🗂 Received file object:", req.file);
 
     if (!req.file) {
-      console.log("❌ No file received");
+      console.log("❌ No file was uploaded.");
       return res.status(400).json({ error: "No file uploaded." });
     }
-
-    console.log("📎 Uploaded file:", req.file);
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       console.log("❌ Invalid userId");
@@ -70,23 +71,23 @@ router.post("/upload-file", upload.single("file"), async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) {
-      console.log("❌ User not found");
+      console.log("❌ User not found in DB");
       return res.status(404).json({ error: "User not found" });
     }
 
     const filePath = `/uploads/${req.file.filename}`;
+    console.log("✅ Saving file path:", filePath);
 
     user.documents = [...(user.documents || []), filePath];
     user.verificationStatus = "pending";
     user.isVerified = false;
     await user.save();
 
-    console.log("✅ File uploaded and user updated");
-
+    console.log("✅ Upload complete for user:", user.email);
     res.json({ msg: "File uploaded", path: filePath });
   } catch (err) {
-    console.error("❌ Upload file error:", err);
-    res.status(500).json({ error: "File upload failed", details: err.message });
+    console.error("❌ Upload file error:", err.message);
+    res.status(500).json({ error: "File upload failed" });
   }
 });
 
