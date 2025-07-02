@@ -13,6 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { fetchCurrentUser, updateUserProfile } from "../../services/auth";
 
+import * as SecureStore from "expo-secure-store";
+
 
 export default function EditProfileScreen({ navigation }) {
   const { t } = useTranslation();
@@ -36,11 +38,14 @@ export default function EditProfileScreen({ navigation }) {
   const handleUpdate = async () => {
     try {
       await updateUserProfile({ name, email });
+      await SecureStore.setItemAsync("userName", name); // ✅ Store the updated name
       Alert.alert("Success", "Profile updated");
+      navigation.goBack(); // ✅ Make sure this is here to return to the home screen
     } catch (err) {
       Alert.alert("Error", "Failed to update profile");
     }
   };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
