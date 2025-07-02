@@ -117,48 +117,55 @@ Alert.alert(
           <Text style={styles.price}>{budget} SAR</Text>
         </View>
 
-        {/* Actions */}
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("EditTask", { task })}>
-            <Text style={styles.buttonText}>{t("clientTaskDetails.editTask")}</Text>
-          </TouchableOpacity>
+{/* Actions */}
+<View style={styles.actions}>
+  <TouchableOpacity
+    style={styles.button}
+    onPress={() => navigation.navigate("EditTask", { task })}
+  >
+    <Text style={styles.buttonText}>{t("clientTaskDetails.editTask")}</Text>
+  </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("ViewBids", { taskId: task._id })}>
-            <Text style={styles.buttonText}>{t("clientTaskDetails.viewBids")}</Text>
-          </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.button}
+    onPress={() => navigation.navigate("ViewBids", { taskId: task._id })}
+  >
+    <Text style={styles.buttonText}>{t("clientTaskDetails.viewBids")}</Text>
+  </TouchableOpacity>
 
-          <TouchableOpacity style={styles.secondaryButton} onPress={handleDelete}>
-            <Text style={styles.secondaryButtonText}>{t("clientTaskDetails.cancelTask")}</Text>
-          </TouchableOpacity>
-          {task.status === "Started" && (
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: "#215432" }]}
-            onPress={async () => {
-              try {
-                await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, {
-                  method: "PATCH",
-                });
-                const updated = await getTaskById(task._id);
-                navigation.navigate("ClientHome", {
-                  screen: "Tasks",
-                  params: {
-                    showReview: true,
-                    completedTask: updated,
-                  },
-                });
-                
-                
-              } catch (err) {
-                console.error("❌ Failed to complete task:", err.message);
-                Alert.alert("Error", "Could not mark the task as completed.");
-              }
-            }}
-          >
-            <Text style={styles.buttonText}>Mark as Completed</Text>
-          </TouchableOpacity>
-)}
+  {task.status === "Started" && (
+    <TouchableOpacity
+      style={styles.button} // same styling as Edit/View
+      onPress={async () => {
+        try {
+          await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, {
+            method: "PATCH",
+          });
+          const updated = await getTaskById(task._id);
+          navigation.navigate("ClientHome", {
+            screen: "Tasks",
+            params: {
+              showReview: true,
+              completedTask: updated,
+            },
+          });
+        } catch (err) {
+          console.error("❌ Failed to complete task:", err.message);
+          Alert.alert("Error", "Could not mark the task as completed.");
+        }
+      }}
+    >
+      <Text style={styles.buttonText}>Mark as Completed</Text>
+    </TouchableOpacity>
+  )}
 
-        </View>
+  {/* Cancel Task always at the bottom with minimal spacing */}
+  <TouchableOpacity style={[styles.secondaryButton, ]} onPress={handleDelete}>
+    <Text style={styles.secondaryButtonText}>{t("clientTaskDetails.cancelTask")}</Text>
+  </TouchableOpacity>
+</View>
+
+
       </ScrollView>
     </SafeAreaView>
   );
