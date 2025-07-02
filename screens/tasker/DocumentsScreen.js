@@ -11,12 +11,12 @@ import {
 import { useTranslation } from "react-i18next";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import axios from "axios";
-import { fetchCurrentUser } from "../../services/auth"; // ✅ adjust path if needed
-import { getToken } from "../../services/authStorage"; // ✅ adjust if needed
+import { fetchCurrentUser } from "../../services/auth";
+import { getToken } from "../../services/authStorage";
+import * as DocumentPicker from "expo-document-picker";
 
 export default function DocumentsScreen({ navigation }) {
   const { t } = useTranslation();
-
   const [documents, setDocuments] = useState([]);
 
   const uploadDocument = async () => {
@@ -24,25 +24,43 @@ export default function DocumentsScreen({ navigation }) {
       const user = await fetchCurrentUser();
       const token = await getToken();
 
-      // Simulate uploading a new document
-      const newDocName = `Document_${documents.length + 1}.pdf`;
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+        copyToCacheDirectory: true,
+      });
 
-      const res = await axios.post(
-        "https://task-kq94.onrender.com/api/documents/upload",
+      if (result.canceled || !result.assets?.length) return;
+
+      const file = result.assets[0];
+
+      const formData = new FormData();
+      formData.append("userId", user._id);
+      formData.append("file", {
+        uri: file.uri,
+        name: file.name,
+        type: file.mimeType || "application/octet-stream",
+      });
+
+      await axios.post(
+        "https://task-kq94.onrender.com/api/documents/upload-file",
+        formData,
         {
-          userId: user._id,
-          files: [newDocName], // later you can change this to actual file upload logic
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
       setDocuments((prev) => [
         ...prev,
-        { id: Date.now().toString(), name: newDocName },
+        { id: Date.now().toString(), name: file.name },
       ]);
-      Alert.alert(t("taskerDocuments.uploadedTitle"), t("taskerDocuments.uploadedMessage"));
+
+      Alert.alert(
+        t("taskerDocuments.uploadedTitle"),
+        t("taskerDocuments.uploadedMessage")
+      );
     } catch (err) {
       console.error("❌ Upload error:", err.response?.data || err.message);
       Alert.alert("Upload Failed", "Could not upload document. Please try again.");
