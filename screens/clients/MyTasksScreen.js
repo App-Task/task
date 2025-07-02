@@ -145,14 +145,16 @@ export default function MyTasksScreen({ navigation, route }) {
       {/* Review Modal */}
       <Modal isVisible={showReview}>
         <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20 }}>
-          <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#213729", marginBottom: 12 }}>
-            {t("clientReview.title") || "Rate Your Tasker"}
-          </Text>
+        <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#213729", marginBottom: 12 }}>
+  {t("clientReview.title", "Rate Your Tasker")}
+</Text>
+
 
           <StarRating rating={rating} onChange={setRating} starSize={28} color="#215432" />
 
           <TextInput
-            placeholder={t("clientReview.commentPlaceholder") || "Leave a comment..."}
+  placeholder={t("clientReview.commentPlaceholder", "Leave a comment...")}
+
             value={comment}
             onChangeText={setComment}
             style={{
@@ -178,7 +180,7 @@ export default function MyTasksScreen({ navigation, route }) {
             onPress={submitReview}
           >
             <Text style={{ color: "#fff", fontFamily: "InterBold", fontSize: 16 }}>
-              {t("clientReview.submit") || "Submit Review"}
+            {t("clientReview.submit", "Submit Review")}
             </Text>
           </TouchableOpacity>
         </View>
