@@ -103,7 +103,7 @@ export default function DocumentsScreen({ navigation }) {
         `https://task-kq94.onrender.com/api/documents/delete/${user._id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-          data: { fileName: name }, // required for DELETE body
+          data: { fileName: name }, // ✅ send fileName here
         }
       );
   
@@ -113,6 +113,7 @@ export default function DocumentsScreen({ navigation }) {
       Alert.alert("Delete Failed", "Could not delete document.");
     }
   };
+  
   
 
   return (
@@ -146,9 +147,10 @@ export default function DocumentsScreen({ navigation }) {
               color="#215432"
             />
             <Text style={styles.docName}>{doc.name}</Text>
-            <TouchableOpacity onPress={() => deleteDocument(doc.id)}>
+            <TouchableOpacity onPress={() => deleteDocument(doc.id, doc.name)}>
               <Ionicons name="trash-outline" size={20} color="#999" />
             </TouchableOpacity>
+
           </View>
         ))
       ) : (
