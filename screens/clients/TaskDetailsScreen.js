@@ -116,26 +116,31 @@ Alert.alert(
           <Text style={styles.priceLabel}>{t("clientTaskDetails.offeredPrice")}</Text>
           <Text style={styles.price}>{budget} SAR</Text>
         </View>
-
 {/* Actions */}
 <View style={styles.actions}>
-  <TouchableOpacity
-    style={styles.button}
-    onPress={() => navigation.navigate("EditTask", { task })}
-  >
-    <Text style={styles.buttonText}>{t("clientTaskDetails.editTask")}</Text>
-  </TouchableOpacity>
+  {/* Show only if task is Pending */}
+  {task.status === "Pending" && (
+    <>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("EditTask", { task })}
+      >
+        <Text style={styles.buttonText}>{t("clientTaskDetails.editTask")}</Text>
+      </TouchableOpacity>
 
-  <TouchableOpacity
-    style={styles.button}
-    onPress={() => navigation.navigate("ViewBids", { taskId: task._id })}
-  >
-    <Text style={styles.buttonText}>{t("clientTaskDetails.viewBids")}</Text>
-  </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("ViewBids", { taskId: task._id })}
+      >
+        <Text style={styles.buttonText}>{t("clientTaskDetails.viewBids")}</Text>
+      </TouchableOpacity>
+    </>
+  )}
 
+  {/* Only show if task is in progress */}
   {task.status === "Started" && (
     <TouchableOpacity
-      style={styles.button} // same styling as Edit/View
+      style={styles.button}
       onPress={async () => {
         try {
           await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, {
@@ -159,11 +164,12 @@ Alert.alert(
     </TouchableOpacity>
   )}
 
-  {/* Cancel Task always at the bottom with minimal spacing */}
-  <TouchableOpacity style={[styles.secondaryButton, ]} onPress={handleDelete}>
+  {/* Always show Cancel Task */}
+  <TouchableOpacity style={[styles.secondaryButton]} onPress={handleDelete}>
     <Text style={styles.secondaryButtonText}>{t("clientTaskDetails.cancelTask")}</Text>
   </TouchableOpacity>
 </View>
+
 
 
       </ScrollView>
