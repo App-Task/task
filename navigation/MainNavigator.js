@@ -7,6 +7,8 @@ import LoginScreen from "../screens/common/LoginScreen";
 import RegisterScreen from "../screens/common/RegisterScreen";
 import TermsAndConditionsScreen from "../screens/common/TermsAndConditionsScreen";
 import PrivacyPolicyScreen from "../screens/common/PrivacyPolicyScreen";
+import ImageViewerScreen from "../screens/ImageViewerScreen"; // adjust path
+
 
 
 import BottomTabNavigator from "./BottomTabNavigator"; // Client-side bottom tabs
@@ -44,6 +46,7 @@ export default function MainNavigator() {
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} />
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+      
 
 
 
@@ -59,6 +62,11 @@ export default function MainNavigator() {
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
       <Stack.Screen name="MyPayments" component={MyPaymentsScreen} />
       <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
+      <Stack.Screen
+  name="ImageViewer"
+  component={ImageViewerScreen}
+  options={{ headerShown: false }}
+/>
 
       {/* Tasker Home & Subscreens */}
 {/* Tasker Home & Subscreens */}

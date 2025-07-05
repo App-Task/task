@@ -95,13 +95,20 @@ Alert.alert(
         </View>
 
         {/* Images */}
-        {images.length > 0 && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
-            {images.map((img, index) => (
-              <Image key={index} source={{ uri: img }} style={styles.image} />
-            ))}
-          </ScrollView>
-        )}
+{/* Images */}
+{images.length > 0 && (
+  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
+    {images.map((img, index) => (
+      <TouchableOpacity
+        key={index}
+        onPress={() => navigation.navigate("ImageViewer", { uri: img })}
+      >
+        <Image source={{ uri: img }} style={styles.image} />
+      </TouchableOpacity>
+    ))}
+  </ScrollView>
+)}
+
 
         {/* Description */}
         <Text style={styles.label}>{t("clientTaskDetails.description")}</Text>
