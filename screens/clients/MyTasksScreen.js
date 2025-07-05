@@ -156,23 +156,28 @@ export default function MyTasksScreen({ navigation, route }) {
 
 
           <StarRating rating={rating} onChange={setRating} starSize={28} color="#215432" />
-
           <TextInput
   placeholder={t("clientReview.commentPlaceholder", "Leave a comment...")}
+  value={comment}
+  onChangeText={(text) => {
+    if (text.length <= 300) setComment(text); // limit to 300 characters
+  }}
+  style={{
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 16,
+    fontFamily: "Inter",
+    fontSize: 14,
+  }}
+  multiline
+  maxLength={300}
+/>
 
-            value={comment}
-            onChangeText={setComment}
-            style={{
-              borderWidth: 1,
-              borderColor: "#ccc",
-              borderRadius: 12,
-              padding: 12,
-              marginTop: 16,
-              fontFamily: "Inter",
-              fontSize: 14,
-            }}
-            multiline
-          />
+<Text style={{ fontFamily: "Inter", fontSize: 12, color: "#999", marginTop: 4 }}>
+  {comment.length}/300 characters
+</Text>
 
           <TouchableOpacity
             style={{

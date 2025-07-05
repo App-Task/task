@@ -123,7 +123,7 @@ export default function ViewBidsScreen({ route, navigation }) {
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.name}>{item.taskerId?.name || "Tasker"}</Text>
-          <Text style={styles.price}>{item.amount} SAR</Text>
+          <Text style={styles.price}>{item.amount} BHD</Text>
         </View>
 
         {average && (

@@ -114,11 +114,11 @@ Alert.alert(
         {/* Price */}
         <View style={styles.priceBox}>
           <Text style={styles.priceLabel}>{t("clientTaskDetails.offeredPrice")}</Text>
-          <Text style={styles.price}>{budget} SAR</Text>
+          <Text style={styles.price}>{budget} BHD</Text>
         </View>
 {/* Actions */}
 <View style={styles.actions}>
-  {/* Show only if task is Pending */}
+  {/* Show if task is Pending */}
   {task.status === "Pending" && (
     <>
       <TouchableOpacity
@@ -137,7 +137,7 @@ Alert.alert(
     </>
   )}
 
-  {/* Only show if task is in progress */}
+  {/* Show if task is Started */}
   {task.status === "Started" && (
     <TouchableOpacity
       style={styles.button}
@@ -164,10 +164,12 @@ Alert.alert(
     </TouchableOpacity>
   )}
 
-  {/* Always show Cancel Task */}
-  <TouchableOpacity style={[styles.secondaryButton]} onPress={handleDelete}>
-    <Text style={styles.secondaryButtonText}>{t("clientTaskDetails.cancelTask")}</Text>
-  </TouchableOpacity>
+  {/* Cancel Task for Pending or Started */}
+  {(task.status === "Pending" || task.status === "Started") && (
+    <TouchableOpacity style={styles.secondaryButton} onPress={handleDelete}>
+      <Text style={styles.secondaryButtonText}>{t("clientTaskDetails.cancelTask")}</Text>
+    </TouchableOpacity>
+  )}
 </View>
 
 
