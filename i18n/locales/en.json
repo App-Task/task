@@ -28,7 +28,9 @@
     "confirmPassword": "Confirm Password",
     "registerBtn": "Register",
     "alreadyHave": "Already have an account?",
-    "loginLink": "Login"
+    "loginLink": "Login",
+    "phone": "Phone Number"
+
   },
   "TaskBottomNav": {
   "explore": "Explore",

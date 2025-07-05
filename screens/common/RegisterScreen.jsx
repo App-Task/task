@@ -30,12 +30,14 @@ export default function RegisterScreen({ navigation, route }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [countryCode, setCountryCode] = useState("+966");
+  const [phone, setPhone] = useState("");
   const [secure1, setSecure1] = useState(true);
   const [secure2, setSecure2] = useState(true);
 
 
 const handleRegister = async () => {
-  if (!name || !email || !password || !confirm) {
+  if (!name || !email || !countryCode || !phone || !password || !confirm)    {
     Alert.alert(t("register.missingFields"), t("register.fillAllFields"));
     return;
   }
@@ -47,7 +49,9 @@ const handleRegister = async () => {
 
   try {
     // Step 1: Register the user
-    await registerUser({ name, email, password });
+    await registerUser({ name, email, password, phone: `${countryCode}${phone}` });
+
+
 
     // Step 2: Log the user in immediately
     const loginResponse = await loginUser({ email, password });
@@ -108,6 +112,28 @@ const handleRegister = async () => {
           keyboardType="email-address"
           autoCapitalize="none"
         />
+
+<View style={styles.phoneContainer}>
+  <TextInput
+    style={styles.countryCodeInput}
+    value={countryCode}
+    onChangeText={setCountryCode}
+    keyboardType="phone-pad"
+    placeholder="+966"
+    placeholderTextColor="#999"
+    maxLength={5}
+  />
+  <TextInput
+    style={styles.phoneInput}
+    value={phone}
+    onChangeText={setPhone}
+    keyboardType="phone-pad"
+    placeholder={t("register.phone")}
+    placeholderTextColor="#999"
+  />
+</View>
+
+
 
         <View style={styles.passwordContainer}>
           <TextInput
@@ -240,4 +266,33 @@ const styles = StyleSheet.create({
     color: "#213729",
     fontFamily: "InterBold",
   },
+
+  phoneContainer: {
+    flexDirection: "row",
+    width: "100%",
+    backgroundColor: "#f2f2f2",
+    borderRadius: 12,
+    marginBottom: 18,
+    overflow: "hidden",
+  },
+  
+  countryCodeInput: {
+    width: 80,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#333",
+    backgroundColor: "#e0e0e0",
+  },
+  
+  phoneInput: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#333",
+  },
+  
 });

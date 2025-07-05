@@ -28,7 +28,9 @@
     "confirmPassword": "تأكيد كلمة المرور",
     "registerBtn": "إنشاء حساب",
     "alreadyHave": "هل لديك حساب؟",
-    "loginLink": "تسجيل الدخول"
+    "loginLink": "تسجيل الدخول",
+    "phone": "رقم الجوال"
+
   },
   "TaskBottomNav": {
   "explore": "استكشاف",
