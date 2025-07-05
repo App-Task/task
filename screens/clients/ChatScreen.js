@@ -47,6 +47,24 @@ export default function ChatScreen({ route, navigation }) {
     }
   };
 
+  const markAsRead = async () => {
+    try {
+      const token = await getToken();
+      await axios.patch(
+        `https://task-kq94.onrender.com/api/messages/mark-read/${otherUserId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (err) {
+      console.error("Error marking messages as read:", err.message);
+    }
+  };
+  
+
   const sendMessage = async () => {
     if (!message.trim()) return;
     setSending(true); // NEW
@@ -92,11 +110,19 @@ export default function ChatScreen({ route, navigation }) {
     const initialize = async () => {
       const id = await SecureStore.getItemAsync("userId");
       setCurrentUserId(id);
-      setTimeout(fetchMessages, 200);
-      setInterval(fetchMessages, 5000);
+  
+      setTimeout(async () => {
+        await markAsRead();
+        await fetchMessages();
+      }, 200);
+  
+      const interval = setInterval(fetchMessages, 5000);
+      return () => clearInterval(interval);
     };
+  
     initialize();
   }, []);
+  
 
   const renderItem = ({ item }) => {
     const sender = typeof item.sender === "object" ? item.sender : {};

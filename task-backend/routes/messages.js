@@ -76,6 +76,17 @@ router.get("/conversations", async (req, res) => {
       },
     ]);
 
+    // Attach unread count to each conversation
+for (const convo of latestMessages) {
+  const unreadCount = await Message.countDocuments({
+    sender: convo.otherUserId,
+    receiver: userId,
+    isRead: false,
+  });
+  convo.unreadCount = unreadCount;
+}
+
+
     res.json(latestMessages);
   } catch (err) {
     console.error("Conversation fetch error:", err);
@@ -164,5 +175,26 @@ router.get("/test/insert", async (req, res) => {
     res.status(500).json({ error: "Failed to insert test message" });
   }
 });
+
+// ✅ PATCH /api/messages/mark-read/:userId — mark messages from user as read
+router.patch("/mark-read/:userId", async (req, res) => {
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+
+  const myId = decoded.userId || decoded.id;
+  const fromUserId = req.params.userId;
+
+  try {
+    await Message.updateMany(
+      { sender: fromUserId, receiver: myId, isRead: false },
+      { $set: { isRead: true } }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Mark read error:", err);
+    res.status(500).json({ error: "Failed to mark messages as read" });
+  }
+});
+
 
 module.exports = router;

@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
+import { getToken } from "../services/authStorage";
+import { useFocusEffect } from "@react-navigation/native";
+
 
 import ClientHomeScreen from "../screens/clients/HomeScreen";
 import PostTaskScreen from "../screens/clients/PostTaskScreen";
@@ -12,8 +16,31 @@ import NotificationsScreen from "../screens/clients/NotificationsScreen";
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabNavigator() {
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchUnreadMessages = async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get("https://task-kq94.onrender.com/api/messages/conversations", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const totalUnread = res.data.reduce((sum, convo) => sum + (convo.unreadCount || 0), 0);
+      setUnreadCount(totalUnread);
+    } catch (err) {
+      console.error("❌ Failed to fetch unread messages", err.message);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUnreadMessages();
+    }, [])
+  );
+
   return (
     <Tab.Navigator
+
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: "#c1ff72",
@@ -60,26 +87,22 @@ export default function BottomTabNavigator() {
   name="Messages"
   component={MessagesScreen}
   options={{
-    tabBarBadge: 2, // replace with dynamic count later
+    tabBarBadge: unreadCount > 0 ? unreadCount : null,
     tabBarBadgeStyle: {
-      backgroundColor: "#c1ff72",
-      color: "#213729",
+      backgroundColor: "#213729",
+      color: "#fff",
+      fontSize: 11,
       fontFamily: "InterBold",
-      fontSize: 10,
     },
   }}
 />
 
+
 <Tab.Screen
   name="Notifications"
   component={NotificationsScreen}
-  options={{
-    tabBarBadge: 1, // replace with real notification count later
-    tabBarBadgeStyle: {
-      backgroundColor: "#ff3b30", // red dot style
-    },
-  }}
 />
+
 
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
