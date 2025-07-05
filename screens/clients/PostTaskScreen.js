@@ -123,6 +123,12 @@ export default function PostTaskScreen({ navigation }) {
       setImages([...images, result.assets[0].uri]);
     }
   };
+  const deleteImage = (indexToDelete) => {
+    const updatedImages = images.filter((_, index) => index !== indexToDelete);
+    setImages(updatedImages);
+  };
+  
+  
 
   const renderCategoryItem = ({ item }) => (
     <TouchableOpacity
@@ -209,10 +215,21 @@ export default function PostTaskScreen({ navigation }) {
           </TouchableOpacity>
 
           <ScrollView horizontal>
-            {images.map((img, index) => (
-              <Image key={index} source={{ uri: img }} style={styles.preview} />
-            ))}
-          </ScrollView>
+  {images.map((img, index) => (
+    <View key={index} style={styles.imageWrapper}>
+      <Image source={{ uri: img }} style={styles.preview} />
+      <TouchableOpacity
+        style={styles.deleteIcon}
+        onPress={() => deleteImage(index)}
+      >
+        <Text style={styles.deleteIconText}>×</Text>
+      </TouchableOpacity>
+    </View>
+  ))}
+</ScrollView>
+
+
+
         </View>
 
         <TouchableOpacity style={styles.button} onPress={handlePost}>
@@ -319,11 +336,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   preview: {
-    width: 80,
-    height: 80,
+    width: "100%",
+    height: "100%",
     borderRadius: 10,
-    marginRight: 10,
   },
+  
   imageSection: {
     marginBottom: 20, // ❌ remove this line completely
     gap: 16,          // ✅ add this for internal spacing
@@ -402,5 +419,37 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     color: "#999",
   },
+  imageWrapper: {
+    position: "relative",
+    width: 80,
+    height: 80,
+    marginRight: 10,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  
+  
+  deleteIcon: {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    backgroundColor: "#ff5555",
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+    elevation: 5,
+  },
+  
+  
+  deleteIconText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    lineHeight: 20,
+  },
+  
   
 });
