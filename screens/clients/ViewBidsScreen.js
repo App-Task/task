@@ -110,41 +110,43 @@ export default function ViewBidsScreen({ route, navigation }) {
     console.log("💬 Navigating to Chat with:", { name, otherUserId });
     navigation.navigate("Chat", { name, otherUserId });
   };
-
   const renderBid = ({ item }) => {
     const isThisAccepted = item._id === acceptedBidId || item.status === "Accepted";
     const alreadyPicked = acceptedBidId && item._id !== acceptedBidId;
-
+  
     const review = reviews[item.taskerId?._id];
     const average = review?.average;
     const comment = review?.latest?.comment;
-
+  
     return (
       <View style={styles.card}>
-        <View style={styles.header}>
-          <Text style={styles.name}>{item.taskerId?.name || "Tasker"}</Text>
+        {/* Header: Name + Price */}
+        <View style={styles.headerRow}>
+          <View>
+            <Text style={styles.name}>{item.taskerId?.name || "Tasker"}</Text>
+            {average && (
+              <Text style={styles.review}>⭐ {average.toFixed(1)}</Text>
+            )}
+          </View>
           <Text style={styles.price}>{item.amount} BHD</Text>
         </View>
-
-        {average && (
-          <Text style={styles.review}>
-            ⭐ {average.toFixed(1)}
-          </Text>
-        )}
-
-
-        <Text style={styles.message}>{item.message}</Text>
-
-        <View style={styles.buttons}>
+  
+        {/* Message */}
+        {item.message ? (
+          <Text style={styles.message}>{item.message}</Text>
+        ) : null}
+  
+        {/* Action Buttons */}
+        <View style={styles.buttonsRow}>
           <TouchableOpacity style={styles.chatBtn} onPress={() => handleChat(item)}>
             <Text style={styles.chatText}>{t("clientViewBids.chat")}</Text>
           </TouchableOpacity>
-
+  
           <TouchableOpacity
             style={[
               styles.acceptBtn,
               isThisAccepted
-                ? { backgroundColor: "gray" }
+                ? { backgroundColor: "#888" }
                 : alreadyPicked
                 ? { backgroundColor: "#ccc" }
                 : {},
@@ -160,7 +162,7 @@ export default function ViewBidsScreen({ route, navigation }) {
               {isThisAccepted
                 ? "Accepted"
                 : alreadyPicked
-                ? "Already picked a tasker"
+                ? "Tasker already selected"
                 : t("clientViewBids.accept")}
             </Text>
           </TouchableOpacity>
@@ -168,6 +170,7 @@ export default function ViewBidsScreen({ route, navigation }) {
       </View>
     );
   };
+  
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -218,9 +221,9 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
+    alignItems: "center",
+    marginBottom: 10,
   },
   backBtn: {
     width: 24,
@@ -303,5 +306,11 @@ const styles = StyleSheet.create({
     color: "#555",
     marginBottom: 6,
     fontStyle: "italic",
+  },
+  buttonsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 12,
   },
 });
