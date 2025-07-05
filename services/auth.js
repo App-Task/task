@@ -43,10 +43,11 @@ import { getToken } from "./authStorage";
 export const fetchCurrentUser = async () => {
   const token = await getToken();
   const response = await axios.get(`${API_URL}/me`, {
-    headers: { Authorization: token },
+    headers: { Authorization: `Bearer ${token}` },
   });
   return response.data; // returns { name, email }
 };
+
 
 export const updateUserProfile = async (data) => {
   const token = await getToken();

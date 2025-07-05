@@ -14,7 +14,11 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { registerUser } from "../../services/auth";
+import { registerUser, loginUser } from "../../services/auth";
+import * as SecureStore from "expo-secure-store";
+import { storeToken } from "../../services/authStorage";
+
+
 
 const { width } = Dimensions.get("window");
 
@@ -29,24 +33,41 @@ export default function RegisterScreen({ navigation, route }) {
   const [secure1, setSecure1] = useState(true);
   const [secure2, setSecure2] = useState(true);
 
-  const handleRegister = async () => {
-    if (!name || !email || !password || !confirm) {
-      Alert.alert(t("register.missingFields"), t("register.fillAllFields"));
-      return;
-    }
 
-    if (password !== confirm) {
-      Alert.alert(t("register.mismatchTitle"), t("register.passwordMismatch"));
-      return;
-    }
+const handleRegister = async () => {
+  if (!name || !email || !password || !confirm) {
+    Alert.alert(t("register.missingFields"), t("register.fillAllFields"));
+    return;
+  }
 
-    try {
-      await registerUser({ name, email, password });
-      navigation.replace("Login", { role });
-    } catch (err) {
-      Alert.alert(t("register.errorTitle"), err.message || "Something went wrong");
-    }
-  };
+  if (password !== confirm) {
+    Alert.alert(t("register.mismatchTitle"), t("register.passwordMismatch"));
+    return;
+  }
+
+  try {
+    // Step 1: Register the user
+    await registerUser({ name, email, password });
+
+    // Step 2: Log the user in immediately
+    const loginResponse = await loginUser({ email, password });
+
+    const { token, user } = loginResponse;
+
+    // Step 3: Store user info
+    await storeToken(token);
+    await SecureStore.setItemAsync("userId", user.id);
+    await SecureStore.setItemAsync("userName", user.name);
+
+    // Step 4: Navigate to the correct home screen
+    navigation.reset({
+      index: 0,
+      routes: [{ name: role === "tasker" ? "TaskerHome" : "ClientHome" }],
+    });
+  } catch (err) {
+    Alert.alert(t("register.errorTitle"), err.message || "Something went wrong");
+  }
+};
 
   return (
     <KeyboardAvoidingView
