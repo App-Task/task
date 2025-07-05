@@ -52,10 +52,7 @@ export default function LoginScreen({ navigation, route }) {
           console.warn("⚠️ Invalid userId format. Skipping SecureStore save.");
         }
 
-        Alert.alert(
-          t("login.successTitle"),
-          `${t("login.loggedInAs")} ${response.user.name}`
-        );
+
 
         navigation.replace(role === "tasker" ? "TaskerHome" : "ClientHome");
       } else {
