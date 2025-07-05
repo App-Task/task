@@ -40,6 +40,7 @@ export default function EditProfileScreen({ navigation }) {
   }, []);
   
   
+  
 
   const handleUpdate = async () => {
     try {
