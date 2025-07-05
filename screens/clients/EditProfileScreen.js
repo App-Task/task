@@ -31,20 +31,25 @@ export default function EditProfileScreen({ navigation }) {
         const user = await fetchCurrentUser();
         setName(user.name || "");
         setEmail(user.email || "");
+  
+        // 👇 Just store full phone if it starts with +, no slicing
         if (user.phone?.startsWith("+")) {
-          const digitsOnly = user.phone.replace(/[^0-9]/g, "");
-          const cc = "+" + digitsOnly.slice(0, digitsOnly.length - 9); // assumes local part is last 9 digits
-          const local = digitsOnly.slice(-9);
-          setCountryCode(cc);
-          setPhone(local);
+          const prefixMatch = user.phone.match(/^(\+\d{1,4})/);
+          const code = prefixMatch ? prefixMatch[1] : "+";
+          const number = user.phone.replace(code, "");
+          setCountryCode(code);
+          setPhone(number);
+        } else {
+          setPhone(user.phone || "");
         }
-        
+  
       } catch (err) {
         Alert.alert("Error", "Failed to load user info");
       }
     };
     loadUser();
   }, []);
+  
 
   const handleUpdate = async () => {
     try {
