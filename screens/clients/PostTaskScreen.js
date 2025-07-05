@@ -147,58 +147,59 @@ export default function PostTaskScreen({ navigation }) {
         <Text style={styles.heading}>{t("clientPostTask.title")}</Text>
 
         <View style={styles.formSection}>
-          <TextInput
-            style={styles.input}
-            placeholder={t("clientPostTask.taskTitlePlaceholder")}
-            maxLength={15}
-            placeholderTextColor="#999"
-            value={title}
-            onChangeText={setTitle}
-            textAlign={I18nManager.isRTL ? "right" : "left"}
-          />
+  <TextInput
+    style={styles.input}
+    placeholder={t("clientPostTask.taskTitlePlaceholder")}
+    maxLength={15}
+    placeholderTextColor="#999"
+    value={title}
+    onChangeText={setTitle}
+    textAlign={I18nManager.isRTL ? "right" : "left"}
+  />
 
-          <TextInput
-            style={[styles.input, styles.textarea]}
-            placeholder={t("clientPostTask.taskDescPlaceholder")}
-            placeholderTextColor="#999"
-            value={description}
-            onChangeText={setDescription}
-            maxLength={150}
-            multiline
-            textAlignVertical="top"
-            textAlign={I18nManager.isRTL ? "right" : "left"}
-          />
+  <TextInput
+    style={[styles.input, styles.textarea]}
+    placeholder={t("clientPostTask.taskDescPlaceholder")}
+    placeholderTextColor="#999"
+    value={description}
+    onChangeText={setDescription}
+    maxLength={150}
+    multiline
+    textAlignVertical="top"
+    textAlign={I18nManager.isRTL ? "right" : "left"}
+  />
 
-          <TouchableOpacity
-            style={styles.categoryPicker}
-            onPress={() => setCategoryModalVisible(true)}
-          >
-            <Text style={styles.uploadText}>
-              {selectedCategory
-                ? t(`clientPostTask.categories.${selectedCategory.toLowerCase()}`)
-                : t("clientPostTask.selectCategory")}
-            </Text>
-          </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.categoryPicker}
+    onPress={() => setCategoryModalVisible(true)}
+  >
+    <Text style={styles.uploadText}>
+      {selectedCategory
+        ? t(`clientPostTask.categories.${selectedCategory.toLowerCase()}`)
+        : t("clientPostTask.selectCategory")}
+    </Text>
+  </TouchableOpacity>
 
-          <TextInput
-            style={styles.input}
-            placeholder={t("clientPostTask.enterAddress")}
-            placeholderTextColor="#999"
-            value={location}
-            onChangeText={setLocation}
-            textAlign={I18nManager.isRTL ? "right" : "left"}
-          />
+  <TextInput
+    style={styles.input}
+    placeholder={t("clientPostTask.enterAddress")}
+    placeholderTextColor="#999"
+    value={location}
+    onChangeText={setLocation}
+    textAlign={I18nManager.isRTL ? "right" : "left"}
+  />
 
-          <TextInput
-            style={styles.input}
-            placeholder={t("clientPostTask.budget")}
-            placeholderTextColor="#999"
-            value={budget}
-            onChangeText={setBudget}
-            keyboardType="numeric"
-            textAlign={I18nManager.isRTL ? "right" : "left"}
-          />
-        </View>
+  <TextInput
+    style={styles.input}
+    placeholder={t("clientPostTask.budget") + " (BHD)"}
+    placeholderTextColor="#999"
+    value={budget}
+    onChangeText={setBudget}
+    keyboardType="numeric"
+    textAlign={I18nManager.isRTL ? "right" : "left"}
+  />
+</View>
+
 
         <View style={styles.imageSection}>
           <TouchableOpacity style={styles.uploadBox} onPress={pickImages}>
@@ -276,8 +277,13 @@ const styles = StyleSheet.create({
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   formSection: {
-    gap: 20,
+    display: "flex",
+    flexDirection: "column",
+    gap: 16, // consistent spacing between all inputs
+    marginBottom: 24,
   },
+  
+  
   input: {
     backgroundColor: "#f2f2f2",
     borderRadius: 12,
@@ -286,8 +292,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
-    marginBottom: 20,
   },
+  
+  
   textarea: {
     height: 120,
   },
@@ -296,8 +303,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 18,
     borderRadius: 12,
-    marginBottom: 20,
   },
+  
   uploadBox: {
     backgroundColor: "#e8e8e8",
     borderRadius: 12,
@@ -318,8 +325,10 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   imageSection: {
-    marginBottom: 20,
+    marginBottom: 20, // ❌ remove this line completely
+    gap: 16,          // ✅ add this for internal spacing
   },
+  
   button: {
     backgroundColor: "#213729",
     paddingVertical: 16,
