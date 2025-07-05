@@ -70,35 +70,39 @@ export default function ClientHomeScreen({ navigation }) {
   const handleRefresh = () => {
     loadData(true);
   };
-
   const renderTask = ({ item }) => (
-    <Animated.View
-      entering={FadeInRight.duration(500)}
-      style={styles.taskItem}
+    <TouchableOpacity
+      onPress={() => navigation.navigate("TaskDetails", { task: item })}
     >
-      <Text style={styles.taskTitle}>{item.title}</Text>
-      <View
-        style={[
-          styles.badge,
-          {
-            backgroundColor:
-              item.status === "Pending" ? "#c1ff72" : "#215432",
-          },
-        ]}
+      <Animated.View
+        entering={FadeInRight.duration(500)}
+        style={styles.taskItem}
       >
-        <Text
+        <Text style={styles.taskTitle}>{item.title}</Text>
+        <View
           style={[
-            styles.badgeText,
+            styles.badge,
             {
-              color: item.status === "Pending" ? "#213729" : "#ffffff",
+              backgroundColor:
+                item.status === "Pending" ? "#c1ff72" : "#215432",
             },
           ]}
         >
-          {t(`clientHome.status.${item.status.toLowerCase()}`)}
-        </Text>
-      </View>
-    </Animated.View>
+          <Text
+            style={[
+              styles.badgeText,
+              {
+                color: item.status === "Pending" ? "#213729" : "#ffffff",
+              },
+            ]}
+          >
+            {t(`clientHome.status.${item.status.toLowerCase()}`)}
+          </Text>
+        </View>
+      </Animated.View>
+    </TouchableOpacity>
   );
+  
 
   return (
     <View style={styles.container}>
