@@ -77,6 +77,7 @@ router.put("/me", async (req, res) => {
     const {
       name,
       email,
+      phone,
       profileImage,
       gender,
       location,
@@ -85,8 +86,17 @@ router.put("/me", async (req, res) => {
       about,
     } = req.body;
     
+    
     if (name) user.name = name;
     if (email) user.email = email;
+    if (phone) {
+      const phoneExists = await User.findOne({ phone });
+      if (phoneExists && phoneExists._id.toString() !== user._id.toString()) {
+        return res.status(400).json({ msg: "Phone number already in use" });
+      }
+      user.phone = phone;
+    }
+    
     if (profileImage) user.profileImage = profileImage;
     
     // ✅ Optional tasker-only fields (won't affect clients)
@@ -103,6 +113,7 @@ router.put("/me", async (req, res) => {
       user: {
         name: user.name,
         email: user.email,
+        phone: user.phone,
         profileImage: user.profileImage || null,
         gender: user.gender || "",
         location: user.location || "",
@@ -111,6 +122,7 @@ router.put("/me", async (req, res) => {
         about: user.about || "",
       },
     });
+    
     
   } catch (err) {
     console.error("❌ Error updating profile:", err.message);

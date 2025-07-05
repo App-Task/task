@@ -20,6 +20,9 @@ export default function EditProfileScreen({ navigation }) {
   const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [countryCode, setCountryCode] = useState("+966");
+  const [phone, setPhone] = useState("");
+
 
   // Load current user data
   useEffect(() => {
@@ -28,6 +31,14 @@ export default function EditProfileScreen({ navigation }) {
         const user = await fetchCurrentUser();
         setName(user.name || "");
         setEmail(user.email || "");
+        if (user.phone?.startsWith("+")) {
+          const digitsOnly = user.phone.replace(/[^0-9]/g, "");
+          const cc = "+" + digitsOnly.slice(0, digitsOnly.length - 9); // assumes local part is last 9 digits
+          const local = digitsOnly.slice(-9);
+          setCountryCode(cc);
+          setPhone(local);
+        }
+        
       } catch (err) {
         Alert.alert("Error", "Failed to load user info");
       }
@@ -37,7 +48,7 @@ export default function EditProfileScreen({ navigation }) {
 
   const handleUpdate = async () => {
     try {
-      await updateUserProfile({ name, email });
+      await updateUserProfile({ name, email, phone: `${countryCode}${phone}` });
       await SecureStore.setItemAsync("userName", name); // ✅ Store the updated name
       Alert.alert("Success", "Profile updated");
       navigation.goBack(); // ✅ Make sure this is here to return to the home screen
@@ -83,6 +94,29 @@ export default function EditProfileScreen({ navigation }) {
           keyboardType="email-address"
           textAlign={I18nManager.isRTL ? "right" : "left"}
         />
+
+<View style={styles.phoneContainer}>
+  <TextInput
+    style={styles.countryCodeInput}
+    value={countryCode}
+    onChangeText={setCountryCode}
+    keyboardType="phone-pad"
+    placeholder="+966"
+    placeholderTextColor="#999"
+    maxLength={5}
+    textAlign={I18nManager.isRTL ? "right" : "left"}
+  />
+  <TextInput
+    style={styles.phoneInput}
+    value={phone}
+    onChangeText={setPhone}
+    keyboardType="phone-pad"
+    placeholder={t("register.phone")}
+    placeholderTextColor="#999"
+    textAlign={I18nManager.isRTL ? "right" : "left"}
+  />
+</View>
+
   
         <TouchableOpacity style={styles.button} onPress={handleUpdate}>
           <Text style={styles.buttonText}>{t("clientEditProfile.save")}</Text>
@@ -142,5 +176,31 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffffff", // 🔥 fixes full screen background
   },
+  phoneContainer: {
+    flexDirection: "row",
+    width: "100%",
+    backgroundColor: "#f2f2f2",
+    borderRadius: 12,
+    marginBottom: 16,
+    overflow: "hidden",
+  },
+  countryCodeInput: {
+    width: 80,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#333",
+    backgroundColor: "#e0e0e0",
+  },
+  phoneInput: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#333",
+  },
+  
   
 });
