@@ -7,7 +7,6 @@ import LoginScreen from "../screens/common/LoginScreen";
 import RegisterScreen from "../screens/common/RegisterScreen";
 import TermsAndConditionsScreen from "../screens/common/TermsAndConditionsScreen";
 import PrivacyPolicyScreen from "../screens/common/PrivacyPolicyScreen";
-import ImageViewerScreen from "../screens/ImageViewerScreen"; // adjust path
 
 
 
@@ -24,6 +23,8 @@ import EditProfileScreen from "../screens/clients/EditProfileScreen";
 import ChangePasswordScreen from "../screens/clients/ChangePasswordScreen";
 import MyPaymentsScreen from "../screens/clients/MyPaymentsScreen";
 import PaymentMethodsScreen from "../screens/clients/PaymentMethodsScreen";
+import ImageViewerScreen from "../screens/clients/ImageViewerScreen"; // adjust path
+
 
 import DocumentsScreen from "../screens/tasker/DocumentsScreen";
 import BankAccountScreen from "../screens/tasker/BankAccountScreen";
