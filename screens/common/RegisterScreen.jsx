@@ -42,7 +42,6 @@ export default function RegisterScreen({ navigation, route }) {
 
     try {
       await registerUser({ name, email, password });
-      Alert.alert(t("register.successTitle"), t("register.successMessage"));
       navigation.replace("Login", { role });
     } catch (err) {
       Alert.alert(t("register.errorTitle"), err.message || "Something went wrong");
