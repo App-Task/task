@@ -13,6 +13,9 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { removeToken } from "../../services/authStorage";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { Linking } from "react-native";
+import * as SecureStore from "expo-secure-store";
+
 
 import { fetchCurrentUser, updateUserProfile } from "../../services/auth";
 import * as ImagePicker from "expo-image-picker";
@@ -145,14 +148,7 @@ export default function ProfileScreen({ navigation }) {
           <Text style={styles.rowText}>{t("clientProfile.changePassword")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("MyPayments")}>
-          <Text style={styles.rowText}>{t("clientProfile.myPayments")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("PaymentMethods")}>
-          <Text style={styles.rowText}>{t("clientProfile.paymentMethods")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
+
         <TouchableOpacity style={styles.rowItem}>
           <Text style={styles.rowText}>{t("clientProfile.aboutUs")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
@@ -173,14 +169,28 @@ export default function ProfileScreen({ navigation }) {
   <Ionicons name="chevron-forward" size={20} color="#999" />
 </TouchableOpacity>
 
-        <TouchableOpacity style={styles.rowItem}>
-          <Text style={styles.rowText}>{t("clientProfile.faqs")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.rowItem}>
-          <Text style={styles.rowText}>{t("clientProfile.contactAdmin")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
+
+<TouchableOpacity
+  style={styles.rowItem}
+  onPress={async () => {
+    const name = user.name || "N/A";
+    const email = user.email || "N/A";
+    const phone = (await SecureStore.getItemAsync("userPhone")) || "N/A"; // if you store phone
+
+    const body = `Name: ${name}%0D%0AEmail: ${email}%0D%0APhone: ${phone}%0D%0A%0D%0AMessage: `;
+
+    const mailto = `mailto:task.team.bh@gmail.com?subject=App%20Support%20Request&body=${body}`;
+
+    Linking.openURL(mailto).catch((err) => {
+      Alert.alert("Error", "Could not open email app.");
+      console.error("❌ Email open failed:", err.message);
+    });
+  }}
+>
+  <Text style={styles.rowText}>{t("clientProfile.contactAdmin")}</Text>
+  <Ionicons name="chevron-forward" size={20} color="#999" />
+</TouchableOpacity>
+
         <TouchableOpacity style={[styles.rowItem, styles.logoutRow]} onPress={handleLogout}>
           <Text style={[styles.rowText, styles.logoutText]}>{t("clientProfile.logout")}</Text>
           <Ionicons name="log-out-outline" size={20} color="#213729" />

@@ -46,55 +46,60 @@ export default function EditProfileScreen({ navigation }) {
     }
   };
   
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons
-            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-            size={24}
-            color="#213729"
-          />
+    <View style={styles.wrapper}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+            <Ionicons
+              name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+              size={24}
+              color="#213729"
+            />
+          </TouchableOpacity>
+          <Text style={styles.title}>{t("clientEditProfile.title")}</Text>
+          <View style={{ width: 24 }} />
+        </View>
+  
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          placeholderTextColor="#999"
+          value={name}
+          onChangeText={setName}
+          textAlign={I18nManager.isRTL ? "right" : "left"}
+          maxLength={50}
+        />
+  
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#999"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          textAlign={I18nManager.isRTL ? "right" : "left"}
+        />
+  
+        <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+          <Text style={styles.buttonText}>{t("clientEditProfile.save")}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>{t("clientEditProfile.title")}</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        placeholderTextColor="#999"
-        value={name}
-        onChangeText={setName}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-        maxLength={50} // 👈 Add this line
-
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#999"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        textAlign={I18nManager.isRTL ? "right" : "left"}
-      />
-
-      <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-        <Text style={styles.buttonText}>{t("clientEditProfile.save")}</Text>
-      </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
-}
-
+}  
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     paddingBottom: 60,
     paddingHorizontal: 24,
     backgroundColor: "#ffffff",
   },
+  
+  
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -133,4 +138,9 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 16,
   },
+  wrapper: {
+    flex: 1,
+    backgroundColor: "#ffffff", // 🔥 fixes full screen background
+  },
+  
 });
