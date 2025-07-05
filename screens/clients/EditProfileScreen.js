@@ -20,8 +20,8 @@ export default function EditProfileScreen({ navigation }) {
   const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [countryCode, setCountryCode] = useState("+966");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("+966"); // default to KSA format
+
 
 
   // Load current user data
@@ -31,18 +31,7 @@ export default function EditProfileScreen({ navigation }) {
         const user = await fetchCurrentUser();
         setName(user.name || "");
         setEmail(user.email || "");
-  
-        // 👇 Just store full phone if it starts with +, no slicing
-        if (user.phone?.startsWith("+")) {
-          const prefixMatch = user.phone.match(/^(\+\d{1,4})/);
-          const code = prefixMatch ? prefixMatch[1] : "+";
-          const number = user.phone.replace(code, "");
-          setCountryCode(code);
-          setPhone(number);
-        } else {
-          setPhone(user.phone || "");
-        }
-  
+        setPhone(user.phone || "+966"); // ✅ load full phone directly
       } catch (err) {
         Alert.alert("Error", "Failed to load user info");
       }
@@ -50,10 +39,11 @@ export default function EditProfileScreen({ navigation }) {
     loadUser();
   }, []);
   
+  
 
   const handleUpdate = async () => {
     try {
-      await updateUserProfile({ name, email, phone: `${countryCode}${phone}` });
+      await updateUserProfile({ name, email, phone }); // ✅ send full phone string
       await SecureStore.setItemAsync("userName", name); // ✅ Store the updated name
       Alert.alert("Success", "Profile updated");
       navigation.goBack(); // ✅ Make sure this is here to return to the home screen
@@ -100,27 +90,16 @@ export default function EditProfileScreen({ navigation }) {
           textAlign={I18nManager.isRTL ? "right" : "left"}
         />
 
-<View style={styles.phoneContainer}>
-  <TextInput
-    style={styles.countryCodeInput}
-    value={countryCode}
-    onChangeText={setCountryCode}
-    keyboardType="phone-pad"
-    placeholder="+966"
-    placeholderTextColor="#999"
-    maxLength={5}
-    textAlign={I18nManager.isRTL ? "right" : "left"}
-  />
-  <TextInput
-    style={styles.phoneInput}
-    value={phone}
-    onChangeText={setPhone}
-    keyboardType="phone-pad"
-    placeholder={t("register.phone")}
-    placeholderTextColor="#999"
-    textAlign={I18nManager.isRTL ? "right" : "left"}
-  />
-</View>
+<TextInput
+  style={styles.input}
+  value={phone}
+  onChangeText={setPhone}
+  keyboardType="phone-pad"
+  placeholder={t("register.phone")}
+  placeholderTextColor="#999"
+  textAlign={I18nManager.isRTL ? "right" : "left"}
+/>
+
 
   
         <TouchableOpacity style={styles.button} onPress={handleUpdate}>
