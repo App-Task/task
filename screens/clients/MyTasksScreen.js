@@ -130,15 +130,20 @@ export default function MyTasksScreen({ navigation, route }) {
       Alert.alert("Error", "Failed to submit review.");
     }
   };
-
   const renderTask = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate("TaskDetails", { task: item })}>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardPrice}>{item.budget} SAR</Text>
+        <Text style={styles.cardPrice}>{item.budget} BHD</Text>
+  
+        <View style={styles.detailHint}>
+          <Text style={styles.detailHintText}>View Task Details</Text>
+          <Text style={styles.detailArrow}>›</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
+  
 
   return (
     <View style={styles.container}>
@@ -279,4 +284,24 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     marginTop: 60,
   },
+  detailHint: {
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  
+  detailHintText: {
+    fontSize: 13,
+    fontFamily: "Inter",
+    color: "#555",
+  },
+  
+  detailArrow: {
+    fontSize: 16,
+    color: "#555",
+    marginLeft: 4,
+    fontFamily: "InterBold",
+  },
+  
 });
