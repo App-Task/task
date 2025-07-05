@@ -431,25 +431,29 @@ const styles = StyleSheet.create({
   
   deleteIcon: {
     position: "absolute",
-    top: -6,
-    right: -6,
-    backgroundColor: "#ff5555",
-    borderRadius: 12,
-    width: 24,
-    height: 24,
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 10,
-    elevation: 5,
+    top: 2,
+    right: 2,
+    backgroundColor: "#ffffffdd", // subtle white background
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   
   
   deleteIconText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    lineHeight: 20,
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#444",
   },
+  
+  
   
   
 });
