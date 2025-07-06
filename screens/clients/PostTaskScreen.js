@@ -18,11 +18,17 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import * as SecureStore from "expo-secure-store";
 import { useTranslation } from "react-i18next";
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+
+
+
 
 const { width, height } = Dimensions.get("window");
 const rawCategories = ["Cleaning", "Moving", "Delivery", "Repairs", "Other"];
 
-export default function PostTaskScreen({ navigation }) {
+export default function PostTaskScreen() {
+  const navigation = useNavigation();
   const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -149,6 +155,14 @@ export default function PostTaskScreen({ navigation }) {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1 }}
     >
+          {/* 🔔 Notifications button */}
+    <TouchableOpacity
+      style={styles.notificationsIcon}
+      onPress={() => navigation.navigate("Notifications")}
+    >
+      <Ionicons name="notifications-outline" size={24} color="#213729" />
+    </TouchableOpacity>
+
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.heading}>{t("clientPostTask.title")}</Text>
 
@@ -462,6 +476,13 @@ const styles = StyleSheet.create({
     gap: 16, // increased for better visual breathing space
     marginBottom: 40,
   },
+  notificationsIcon: {
+    position: "absolute",
+    top: 65,
+    right: 24,
+    zIndex: 10,
+  },
+  
   
   
   
