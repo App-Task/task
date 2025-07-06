@@ -10,11 +10,19 @@ import {
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+
+
+
 
 export default function NotificationsScreen() {
   const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
+
   const fetchNotifications = async () => {
     try {
       const token = await AsyncStorage.getItem("task_auth_token");
@@ -55,7 +63,17 @@ export default function NotificationsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.screenTitle}>{t("clientNotifications.title")}</Text>
+<View style={styles.header}>
+  <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+    <Ionicons
+      name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+      size={24}
+      color="#213729"
+    />
+  </TouchableOpacity>
+  <Text style={styles.title}>{t("clientNotifications.title")}</Text>
+  <View style={{ width: 24 }}></View>
+  </View>
 
       {loading ? (
         <ActivityIndicator size="large" color="#315052" style={{ marginTop: 30 }} />
@@ -121,4 +139,21 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 40,
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 30,
+  },
+  backBtn: {
+    padding: 4,
+  },
+  title: {
+    fontFamily: "InterBold",
+    fontSize: 24,
+    color: "#213729",
+    textAlign: "center",
+    flex: 1,
+  },
+
 });

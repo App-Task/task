@@ -24,7 +24,6 @@ const { width } = Dimensions.get("window");
 
 export default function ProfileScreen({ navigation }) {
   const { t } = useTranslation();
-  const nav = useNavigation();
   const [user, setUser] = useState({ name: "", email: "", profileImage: null });
   const [profileImage, setProfileImage] = useState(null);
   
@@ -51,10 +50,11 @@ export default function ProfileScreen({ navigation }) {
     try {
       await removeToken();
       Alert.alert(t("clientProfile.logoutAlertTitle"), t("clientProfile.logoutAlertMessage"));
-      nav.reset({
+      navigation.reset({
         index: 0,
         routes: [{ name: "Welcome" }],
       });
+      
     } catch (err) {
       console.error("❌ Logout failed:", err.message);
     }
@@ -110,6 +110,13 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+
+<View style={styles.headerWrapper}>
+      <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+        <Ionicons name="notifications-outline" size={24} color="#213729" />
+      </TouchableOpacity>
+    </View>
+
       <TouchableOpacity onPress={handleChangeProfilePicture} style={styles.avatarWrapper}>
         <View style={styles.avatarPlaceholder}>
           {profileImage ? (
@@ -276,4 +283,11 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     color: "#213729",
   },
+  headerWrapper: {
+    width: "100%",
+    alignItems: "flex-end",
+    paddingHorizontal: 16,
+    marginBottom: 10,
+  },
+
 });
