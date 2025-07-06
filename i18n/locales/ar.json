@@ -315,15 +315,18 @@
 "taskerTaskDetails": {
   "location": "الموقع",
   "price": "السعر المعروض",
+  "description": "وصف المهمة",
+  "category": "الفئة",
   "enterBid": "أدخل عرضك",
-  "bidAmount": "عرضك (ر.س)",
-  "bidMessage": "أضف رسالة...",
+  "bidAmount": "عرضك (بالريال)",
+  "bidMessage": "رسالة إلى العميل",
   "submitBid": "إرسال العرض",
-  "errorTitle": "معلومات ناقصة",
-  "fillFields": "يرجى إدخال العرض والرسالة.",
-  "successTitle": "تم الإرسال",
-  "bidSent": "تم إرسال عرضك بنجاح."
+  "fillFields": "يرجى ملء جميع الحقول المطلوبة",
+  "successTitle": "تم بنجاح",
+  "bidSent": "تم إرسال عرضك بنجاح.",
+  "errorTitle": "خطأ"
 }
+
   
   
   

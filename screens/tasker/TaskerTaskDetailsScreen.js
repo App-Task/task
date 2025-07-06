@@ -27,21 +27,26 @@ export default function TaskDetailsScreen({ route }) {
   const navigation = useNavigation();
 
   useEffect(() => {
+    let isMounted = true;
     const init = async () => {
       try {
         const user = await fetchCurrentUser();
-        setIsVerified(user.isVerified);
+        if (isMounted) setIsVerified(user.isVerified);
   
         const res = await axios.get(`https://task-kq94.onrender.com/api/bids/tasker/${user._id}`);
         const bids = res.data;
         const foundBid = bids.find((b) => b.taskId?._id === task._id || b.taskId === task._id);
-
-        if (foundBid) setExistingBid(foundBid);
+  
+        if (foundBid && isMounted) setExistingBid(foundBid);
       } catch (err) {
         console.error("❌ Failed to check user or bid:", err.message);
       }
     };
+  
     init();
+    return () => {
+      isMounted = false;
+    };
   }, []);
   
   
@@ -82,8 +87,9 @@ const handleBid = async () => {
     Alert.alert(
       t("taskerTaskDetails.successTitle"),
       t("taskerTaskDetails.bidSent"),
-      [{ text: "OK", onPress: () => navigation.goBack() }]
+      [{ text: "OK", onPress: () => navigation.navigate("ExploreTasks", { refresh: true }) }]
     );
+    
 
     setBidAmount("");
     setMessage("");
@@ -117,6 +123,12 @@ const handleBid = async () => {
 
         <Text style={styles.label}>{t("taskerTaskDetails.price")}</Text>
         <Text style={styles.text}>{task.budget} SAR</Text>
+        <Text style={styles.label}>{t("taskerTaskDetails.description")}</Text>
+        <Text style={styles.text}>{task.description || "-"}</Text>
+        <Text style={styles.label}>{t("taskerTaskDetails.category")}</Text>
+        <Text style={styles.text}>{task.category || "-"}</Text>
+
+
 
         {existingBid ? (
   <View style={styles.existingBidBox}>

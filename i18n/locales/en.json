@@ -309,15 +309,18 @@
 "taskerTaskDetails": {
   "location": "Location",
   "price": "Offered Price",
-  "enterBid": "Enter Your Bid",
-  "bidAmount": "Your Offer (SAR)",
-  "bidMessage": "Add a message...",
+  "description": "Task Description",
+  "category": "Category",
+  "enterBid": "Place Your Bid",
+  "bidAmount": "Your Bid (SAR)",
+  "bidMessage": "Message to Client",
   "submitBid": "Submit Bid",
-  "errorTitle": "Missing Info",
-  "fillFields": "Please enter both bid and message.",
-  "successTitle": "Bid Sent",
-  "bidSent": "Your bid has been submitted."
+  "fillFields": "Please fill in all required fields",
+  "successTitle": "Success",
+  "bidSent": "Your bid has been submitted.",
+  "errorTitle": "Error"
 }
+
 
 
 

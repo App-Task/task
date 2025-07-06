@@ -27,7 +27,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 const JOB_TYPES = ["Cleaning", "Moving", "Delivery", "Repairs"];
 
-export default function ExploreTasksScreen({ navigation }) {
+export default function ExploreTasksScreen({ navigation, route }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);
@@ -132,6 +132,15 @@ setFilteredTasks(availableTasks);
       fetchTasks();
     }, [])
   );
+
+  useEffect(() => {
+    if (route.params?.refresh) {
+      fetchTasks();
+      // clear refresh flag after use
+      navigation.setParams({ refresh: false });
+    }
+  }, [route.params?.refresh]);
+  
 
   useEffect(() => {
     filterTasks();
