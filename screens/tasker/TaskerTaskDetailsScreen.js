@@ -95,8 +95,18 @@ const handleBid = async () => {
     Alert.alert(
       t("taskerTaskDetails.successTitle"),
       t("taskerTaskDetails.bidSent"),
-      [{ text: "OK", onPress: () => navigation.navigate("TaskerHome", { refresh: true }) }]
+      [
+        {
+          text: "OK",
+          onPress: () =>
+            navigation.navigate("TaskerHome", {
+              screen: "ExploreTasks",
+              params: { refresh: true },
+            }),
+        },
+      ]
     );
+    
     
 
     setBidAmount("");
@@ -127,10 +137,11 @@ const handleUpdateBid = async () => {
     });
 
     Alert.alert(
-      "Success",
-      "Your bid has been updated.",
-      [{ text: "OK", onPress: () => navigation.navigate("ExploreTasks", { refresh: true }) }]
+      t("taskerTaskDetails.successTitle"),
+      t("taskerTaskDetails.bidSent"),
+      [{ text: "OK", onPress: () => navigation.goBack() }]
     );
+    
 
     setExistingBid(res.data); // update local state
   } catch (err) {
