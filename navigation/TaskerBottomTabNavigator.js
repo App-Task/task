@@ -1,4 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { getToken } from "../services/authStorage";
+import { useFocusEffect } from "@react-navigation/native";
+
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
@@ -15,7 +19,28 @@ import EditProfileScreen from "../screens/tasker/EditProfileScreen";
 const Tab = createBottomTabNavigator();
 
 export default function TaskBottomNav() {
+  const [unreadCount, setUnreadCount] = useState(0);
   const { t } = useTranslation();
+
+  const fetchUnreadMessages = async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get("https://task-kq94.onrender.com/api/messages/conversations", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const totalUnread = res.data.reduce((sum, convo) => sum + (convo.unreadCount || 0), 0);
+      setUnreadCount(totalUnread);
+    } catch (err) {
+      console.error("❌ Tasker unread fetch error:", err.message);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUnreadMessages();
+    }, [])
+  );
 
   return (
     <Tab.Navigator
@@ -62,11 +87,22 @@ export default function TaskBottomNav() {
         component={TaskerMyTasksScreen}
         options={{ tabBarLabel: t("TaskBottomNav.myTasks") }}
       />
-      <Tab.Screen
-        name="Messages"
-        component={TaskerMessagesScreen}
-        options={{ tabBarLabel: t("TaskBottomNav.messages") }}
-      />
+     <Tab.Screen
+  name="Messages"
+  component={TaskerMessagesScreen}
+  options={{
+    tabBarLabel: t("TaskBottomNav.messages"),
+    tabBarBadge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null,
+    tabBarBadgeStyle: {
+      backgroundColor: "#213729",
+      color: "#fff",
+      fontSize: 11,
+      fontFamily: "InterBold",
+    },
+  }}
+/>
+
+
       <Tab.Screen
         name="Notifications"
         component={TaskerNotificationsScreen}

@@ -87,7 +87,7 @@ export default function BottomTabNavigator() {
   name="Messages"
   component={MessagesScreen}
   options={{
-    tabBarBadge: unreadCount > 0 ? unreadCount : null,
+    tabBarBadge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null,
     tabBarBadgeStyle: {
       backgroundColor: "#213729",
       color: "#fff",
@@ -96,6 +96,7 @@ export default function BottomTabNavigator() {
     },
   }}
 />
+
 
 
 <Tab.Screen
