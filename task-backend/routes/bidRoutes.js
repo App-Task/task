@@ -131,18 +131,14 @@ router.put("/:bidId/accept", async (req, res) => {
 
 // ✅ GET /api/bids/my-bids — for showing tasker's sent bids
 router.get("/my-bids", verifyTokenMiddleware, async (req, res) => {
-  const taskerId = req.user.userId || req.user.id;
-
-
   try {
-    const taskerId = decoded.userId || decoded.id;
-    const bids = await Bid.find({ taskerId, status: "Pending" })
-      .populate("taskId");
+    const taskerId = req.user.userId || req.user.id;
 
-    // only return tasks that are still available
+    const bids = await Bid.find({ taskerId, status: "Pending" }).populate("taskId");
+
     const filtered = bids
       .filter((b) => b.taskId && b.taskId.status === "Pending")
-      .map((b) => b.taskId); // extract task object
+      .map((b) => b.taskId);
 
     res.json(filtered);
   } catch (err) {
@@ -150,6 +146,7 @@ router.get("/my-bids", verifyTokenMiddleware, async (req, res) => {
     res.status(500).json({ error: "Failed to load bid sent" });
   }
 });
+
 
 // ✅ GET /api/bids/tasker/:taskerId — get all bids made by a tasker
 router.get("/tasker/:taskerId", async (req, res) => {
