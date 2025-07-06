@@ -22,18 +22,13 @@ export default function TaskerMessagesScreen({ navigation }) {
     try {
       setLoading(true);
       const token = await getToken();
-      const res = await axios.get(
-        "https://task-kq94.onrender.com/api/messages/conversations",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await axios.get("https://task-kq94.onrender.com/api/messages/conversations", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      // Sort latest first
       const sorted = res.data.sort(
         (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
       );
-      
 
       setConversations(sorted);
     } catch (err) {
@@ -50,24 +45,18 @@ export default function TaskerMessagesScreen({ navigation }) {
   );
 
   const renderItem = ({ item }) => {
-    const initials =
-      item.name
-        ?.split(" ")
-        .map((w) => w[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase() || "U";
-
     const unread = item.unreadCount || 0;
-    let badge = "";
-    if (unread === 1) badge = "+1";
-    else if (unread === 2) badge = "+2";
-    else if (unread > 2 && unread <= 5) badge = `+${unread}`;
-    else if (unread > 5) badge = "5+";
+    let badgeText = "";
+    if (unread === 1) badgeText = "+1";
+    else if (unread === 2) badgeText = "+2";
+    else if (unread > 2 && unread <= 5) badgeText = `+${unread}`;
+    else if (unread > 5) badgeText = "5+";
+
+    const isUnread = unread > 0;
 
     return (
       <TouchableOpacity
-        style={styles.card}
+        style={[styles.card, isUnread && styles.unreadCard]}
         onPress={() =>
           navigation.navigate("Chat", {
             name: item.name,
@@ -75,24 +64,22 @@ export default function TaskerMessagesScreen({ navigation }) {
           })
         }
       >
-        <View style={styles.avatar}>
-          <Text style={styles.avatarInitials}>{initials}</Text>
-        </View>
+        <View style={styles.row}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.name}>{item.name || "Unnamed User"}</Text>
+            <Text style={styles.message} numberOfLines={1}>
+              {item.lastMessage}
+            </Text>
+          </View>
 
-        <View style={styles.textGroup}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.preview} numberOfLines={1}>
-            {item.lastMessage}
-          </Text>
-        </View>
-
-        <View style={styles.rightGroup}>
-          <Text style={styles.time}>{item.time}</Text>
-          {unread > 0 && (
-            <View style={styles.unreadBadge}>
-              <Text style={styles.unreadText}>{badge}</Text>
-            </View>
-          )}
+          <View style={styles.rightSide}>
+            <Text style={styles.time}>{item.time}</Text>
+            {isUnread && (
+              <View style={styles.unreadBadge}>
+                <Text style={styles.unreadText}>{badgeText}</Text>
+              </View>
+            )}
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -100,108 +87,93 @@ export default function TaskerMessagesScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{t("taskerMessages.title")}</Text>
+      <Text style={styles.title}>{t("taskerMessages.title")}</Text>
 
       {loading && conversations.length === 0 ? (
         <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
       ) : conversations.length === 0 ? (
-        <Text style={{ textAlign: "center", marginTop: 40, color: "#888" }}>
-          {t("taskerMessages.empty")}
-        </Text>
+        <Text style={styles.empty}>{t("taskerMessages.empty")}</Text>
       ) : (
-<FlatList
-  data={conversations}
-  keyExtractor={(item) => item.otherUserId}
-  renderItem={renderItem}
-  contentContainerStyle={{ paddingBottom: 40 }}
-  showsVerticalScrollIndicator={false}
-/>
-
+        <FlatList
+          data={conversations}
+          keyExtractor={(item) => item.otherUserId}
+          renderItem={renderItem}
+          contentContainerStyle={{ paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
+        />
       )}
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
     paddingTop: 60,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
   },
-  header: {
+  title: {
     fontFamily: "InterBold",
-    fontSize: 22,
+    fontSize: 24,
     color: "#213729",
-    marginBottom: 20,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    marginBottom: 30,
+    textAlign: "center",
   },
   card: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    alignItems: "center",
-    padding: 14,
-    marginBottom: 14,
-    backgroundColor: "#f1f1f1",
+    backgroundColor: "#f2f2f2",
     borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
   },
-  avatar: {
-    width: 48,
-    height: 48,
-    backgroundColor: "#c1ff72",
-    borderRadius: 24,
-    justifyContent: "center",
+  row: {
+    flexDirection: "row",
     alignItems: "center",
-    marginRight: I18nManager.isRTL ? 0 : 14,
-    marginLeft: I18nManager.isRTL ? 14 : 0,
-  },
-  avatarInitials: {
-    fontFamily: "InterBold",
-    color: "#213729",
-    fontSize: 16,
-  },
-  textGroup: {
-    flex: 1,
   },
   name: {
     fontFamily: "InterBold",
     fontSize: 16,
     color: "#213729",
     marginBottom: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
-  preview: {
+  message: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#666",
-  },
-  rightGroup: {
-    alignItems: I18nManager.isRTL ? "flex-start" : "flex-end",
+    color: "#555",
+    marginBottom: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   time: {
     fontFamily: "Inter",
     fontSize: 12,
     color: "#999",
+    textAlign: "right",
     marginBottom: 6,
   },
-  unreadDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#c1ff72",
-    unreadBadge: {
-      backgroundColor: "#213729",
-      borderRadius: 12,
-      paddingHorizontal: 8,
-      paddingVertical: 2,
-      minWidth: 30,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    unreadText: {
-      color: "#fff",
-      fontFamily: "InterBold",
-      fontSize: 12,
-    },
-    
+  rightSide: {
+    alignItems: "flex-end",
+    marginLeft: 10,
+  },
+  unreadBadge: {
+    backgroundColor: "#213729",
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    minWidth: 30,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  unreadText: {
+    color: "#fff",
+    fontFamily: "InterBold",
+    fontSize: 12,
+  },
+  empty: {
+    fontFamily: "Inter",
+    fontSize: 16,
+    color: "#999",
+    textAlign: "center",
+    marginTop: 40,
   },
 });
