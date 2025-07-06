@@ -169,27 +169,44 @@ export default function ProfileScreen({ navigation }) {
   <Ionicons name="chevron-forward" size={20} color="#999" />
 </TouchableOpacity>
 
-
 <TouchableOpacity
   style={styles.rowItem}
-  onPress={async () => {
-    const name = user.name || "N/A";
-    const email = user.email || "N/A";
-    const phone = (await SecureStore.getItemAsync("userPhone")) || "N/A"; // if you store phone
-
-    const body = `Name: ${name}%0D%0AEmail: ${email}%0D%0APhone: ${phone}%0D%0A%0D%0AMessage: `;
-
-    const mailto = `mailto:task.team.bh@gmail.com?subject=App%20Support%20Request&body=${body}`;
-
-    Linking.openURL(mailto).catch((err) => {
-      Alert.alert("Error", "Could not open email app.");
-      console.error("❌ Email open failed:", err.message);
-    });
+  onPress={() => {
+    Alert.alert(
+      "Before You Continue",
+      "Please make sure to include your name, email, phone number, and your message in the email.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "OK",
+          onPress: async () => {
+            const mailto = `mailto:task.team.bh@gmail.com?subject=${encodeURIComponent(
+              "App Support Request"
+            )}`;
+            try {
+              const supported = await Linking.canOpenURL(mailto);
+              if (supported) {
+                await Linking.openURL(mailto);
+              } else {
+                Alert.alert("Error", "Email app is not available.");
+              }
+            } catch (err) {
+              console.error("❌ Failed to open email:", err.message);
+              Alert.alert("Error", "Could not open your email app.");
+            }
+          },
+        },
+      ]
+    );
   }}
 >
   <Text style={styles.rowText}>{t("clientProfile.contactAdmin")}</Text>
   <Ionicons name="chevron-forward" size={20} color="#999" />
 </TouchableOpacity>
+
+
+
+
 
         <TouchableOpacity style={[styles.rowItem, styles.logoutRow]} onPress={handleLogout}>
           <Text style={[styles.rowText, styles.logoutText]}>{t("clientProfile.logout")}</Text>
