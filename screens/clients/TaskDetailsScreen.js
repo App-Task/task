@@ -25,25 +25,32 @@ export default function TaskDetailsScreen({ route, navigation }) {
   const [task, setTask] = useState(initialTask);
   const [loading, setLoading] = useState(true);
   const isFocused = useIsFocused(); // 👈 tracks when screen comes into focus
+  const [bids, setBids] = useState([]);
+
 
   useEffect(() => {
-    const fetchTask = async () => {
-      try {
-        const freshTask = await getTaskById(initialTask._id);
-        setTask(freshTask);
-      } catch (err) {
-        console.error("❌ Task fetch failed:", err.message);
-        Alert.alert("Error", "Failed to load task.");
-      } finally {
-        setLoading(false);
-      }
-    };
-  
     if (isFocused) {
       fetchTask();
     }
   }, [isFocused]);
   
+
+  const fetchTask = async () => {
+    try {
+      const freshTask = await getTaskById(initialTask._id);
+      setTask(freshTask);
+  
+      // 👇 Fetch latest bids
+      const res = await fetch(`https://task-kq94.onrender.com/api/bids/task/${initialTask._id}`);
+      const bidData = await res.json();
+      setBids(bidData);
+    } catch (err) {
+      console.error("❌ Task fetch failed:", err.message);
+      Alert.alert("Error", "Failed to load task.");
+    } finally {
+      setLoading(false);
+    }
+  };
   
 
   const handleDelete = async () => {
@@ -80,7 +87,7 @@ Alert.alert(
     );
   }
 
-  const { title, description, location, budget, images = [], bids = [] } = task;
+  const { title, description, location, budget, images = [] } = task;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -127,22 +134,29 @@ Alert.alert(
 <View style={styles.actions}>
   {/* Show if task is Pending */}
   {task.status === "Pending" && (
-    <>
+  <>
+    {bids.length > 0 ? (
+      <Text style={styles.notice}>
+        You can't edit this task because a tasker has already placed a bid.
+      </Text>
+    ) : (
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("EditTask", { task })}
       >
         <Text style={styles.buttonText}>{t("clientTaskDetails.editTask")}</Text>
       </TouchableOpacity>
+    )}
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("ViewBids", { taskId: task._id })}
-      >
-        <Text style={styles.buttonText}>{t("clientTaskDetails.viewBids")}</Text>
-      </TouchableOpacity>
-    </>
-  )}
+    <TouchableOpacity
+      style={styles.button}
+      onPress={() => navigation.navigate("ViewBids", { taskId: task._id })}
+    >
+      <Text style={styles.buttonText}>{t("clientTaskDetails.viewBids")}</Text>
+    </TouchableOpacity>
+  </>
+)}
+
 
   {/* Show if task is Started */}
   {task.status === "Started" && (
@@ -281,4 +295,12 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 16,
   },
+  notice: {
+    marginBottom: 16,
+    fontSize: 15,
+    color: "#999",
+    textAlign: "center",
+    fontFamily: "Inter",
+  },
+  
 });
