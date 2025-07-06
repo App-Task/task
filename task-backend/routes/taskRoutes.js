@@ -174,6 +174,24 @@ router.patch("/:id/complete", async (req, res) => {
   }
 });
 
+// ✅ GET /api/bids/tasker/:taskerId — get all bids made by a tasker
+router.get("/tasker/:taskerId", async (req, res) => {
+  try {
+    const { taskerId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(taskerId)) {
+      return res.status(400).json({ error: "Invalid tasker ID" });
+    }
+
+    const bids = await Bid.find({ taskerId }).select("taskId");
+    res.json(bids);
+  } catch (err) {
+    console.error("❌ Error fetching tasker bids:", err.message);
+    res.status(500).json({ error: "Failed to fetch tasker bids" });
+  }
+});
+
+
 
 
 module.exports = router;
