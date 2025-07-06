@@ -172,37 +172,17 @@ export default function ProfileScreen({ navigation }) {
 <TouchableOpacity
   style={styles.rowItem}
   onPress={() => {
-    Alert.alert(
-      "Before You Continue",
-      "Please make sure to include your name, email, phone number, and your message in the email.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "OK",
-          onPress: async () => {
-            const mailto = `mailto:task.team.bh@gmail.com?subject=${encodeURIComponent(
-              "App Support Request"
-            )}`;
-            try {
-              const supported = await Linking.canOpenURL(mailto);
-              if (supported) {
-                await Linking.openURL(mailto);
-              } else {
-                Alert.alert("Error", "Email app is not available.");
-              }
-            } catch (err) {
-              console.error("❌ Failed to open email:", err.message);
-              Alert.alert("Error", "Could not open your email app.");
-            }
-          },
-        },
-      ]
-    );
+    const mailto = "mailto:task.team.bh@gmail.com";
+    Linking.openURL(mailto).catch((err) => {
+      console.error("❌ Failed to open email:", err.message);
+      Alert.alert("Error", "Could not open your email app.");
+    });
   }}
 >
   <Text style={styles.rowText}>{t("clientProfile.contactAdmin")}</Text>
   <Ionicons name="chevron-forward" size={20} color="#999" />
 </TouchableOpacity>
+
 
 
 
