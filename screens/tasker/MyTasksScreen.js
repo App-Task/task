@@ -43,7 +43,7 @@ export default function TaskerMyTasksScreen() {
   
         setShowVerifyBanner(false); // ✅ hide if verified
   
-        const url = `https://task-kq94.onrender.com/api/tasks/tasker/${user._id}?type=${tab}`;
+        const url = `https://task-kq94.onrender.com/api/tasks/tasker/${user._id}?type=${tab === "previous" ? "past" : tab}`;
         console.log("🔍 Fetching tasks from:", url);
   
         const res = await axios.get(url);
@@ -68,6 +68,7 @@ export default function TaskerMyTasksScreen() {
   
 
   const renderTask = ({ item }) => (
+    <TouchableOpacity onPress={() => navigation.navigate("TaskDetails", { task: item })}>
     <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.sub}>
@@ -101,31 +102,31 @@ export default function TaskerMyTasksScreen() {
             style={[styles.btn, styles.dangerBtn]}
             onPress={() => {
               Alert.alert(
-                t("taskerMyTasks.cancel"),
-                t("taskerMyTasks.confirmCancel"),
+                "Are you sure you want to cancel?",
+                "",
                 [
                   {
-                    text: t("taskerMyTasks.no"),
+                    text: "No",
                     style: "cancel",
                   },
                   {
-                    text: t("taskerMyTasks.yes"),
-                    style: "destructive",
+                    text: "Yes",
                     onPress: async () => {
                       try {
                         const res = await axios.put(`https://task-kq94.onrender.com/api/tasks/${item._id}/cancel`);
                         if (res.status === 200) {
-                          Alert.alert(t("taskerMyTasks.cancelledSuccess"));
+                          Alert.alert("Cancelled successfully");
                           setTasks((prev) => prev.filter((t) => t._id !== item._id));
                         }
                       } catch (err) {
                         console.error("❌ Cancel error:", err);
-                        Alert.alert(t("taskerMyTasks.cancelFailed"), err.response?.data?.msg || "Error occurred");
+                        Alert.alert("Error", err.response?.data?.msg || "Something went wrong.");
                       }
                     },
                   },
                 ]
               );
+              
             }}
                       >
             <Text style={[styles.btnText, styles.dangerText]}>{t("taskerMyTasks.cancel")}</Text>
@@ -133,6 +134,7 @@ export default function TaskerMyTasksScreen() {
         )}
       </View>
     </Animated.View>
+    </TouchableOpacity>
   );
 
   return (
@@ -144,9 +146,9 @@ export default function TaskerMyTasksScreen() {
             {t("taskerMyTasks.active")}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setTab("past")} style={[styles.tab, tab === "past" && styles.activeTab]}>
+        <TouchableOpacity onPress={() => setTab("previous")} style={[styles.tab, tab === "past" && styles.activeTab]}>
           <Text style={[styles.tabText, tab === "past" && styles.activeTabText]}>
-            {t("taskerMyTasks.past")}
+          {t("taskerMyTasks.previous")}
           </Text>
         </TouchableOpacity>
       </View>
