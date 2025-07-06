@@ -74,6 +74,14 @@ export default function TaskerMyTasksScreen() {
       <Text style={styles.sub}>
         {t("taskerMyTasks.status")}: {t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
       </Text>
+      {tab === "previous" && item.status === "cancelled" && (
+  <View style={styles.cancelBox}>
+    <Text style={styles.cancelText}>
+      Task Cancelled by {item.cancelledBy === "tasker" ? "You" : "Client"}
+    </Text>
+  </View>
+)}
+
 
       <View style={styles.actions}>
         {tab === "active" && (
@@ -146,11 +154,16 @@ export default function TaskerMyTasksScreen() {
             {t("taskerMyTasks.active")}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setTab("previous")} style={[styles.tab, tab === "past" && styles.activeTab]}>
-          <Text style={[styles.tabText, tab === "past" && styles.activeTabText]}>
-          {t("taskerMyTasks.previous")}
-          </Text>
-        </TouchableOpacity>
+        <TouchableOpacity
+  onPress={() => setTab("previous")}
+  style={[styles.tab, tab === "previous" && styles.activeTab]}
+>
+  <Text style={[styles.tabText, tab === "previous" && styles.activeTabText]}>
+    Previous
+  </Text>
+</TouchableOpacity>
+
+
       </View>
 
       {showVerifyBanner && (
@@ -286,5 +299,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
   },
+  cancelBox: {
+    backgroundColor: "#fff0f0",
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  cancelText: {
+    color: "#d00000",
+    fontFamily: "InterBold",
+    fontSize: 14,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
+  
   
 });
