@@ -34,6 +34,12 @@ export default function NotificationsScreen() {
       });
   
       setNotifications(res.data);
+  
+      // ✅ Mark all as read
+      await axios.patch("https://task-kq94.onrender.com/api/notifications/mark-read", {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
     } catch (err) {
       console.error("❌ Failed to fetch notifications:", err.response?.data || err.message);
     } finally {
@@ -47,7 +53,7 @@ export default function NotificationsScreen() {
   }, []);
 
   const renderItem = ({ item }) => (
-    <View style={styles.card}>
+    <View style={[styles.card, !item.isRead && styles.unreadCard]}>
       <Text style={styles.cardTitle}>{item.title}</Text>
       <Text style={styles.cardDesc}>{item.message}</Text>
       <Text style={styles.cardTime}>
@@ -155,5 +161,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     flex: 1,
   },
+
+  unreadCard: {
+    backgroundColor: "#e6f7e8", // subtle green for unread
+  },
+  
 
 });

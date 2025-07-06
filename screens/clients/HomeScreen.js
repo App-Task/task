@@ -16,9 +16,11 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import useUnreadNotifications from "../../hooks/useUnreadNotifications";
 export default function ClientHomeScreen() {
   const navigation = useNavigation(); // ✅ correctly grabs parent stack navigation
   const { t } = useTranslation();
+  const unreadCount = useUnreadNotifications();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [tasks, setTasks] = useState([]);
@@ -108,12 +110,17 @@ export default function ClientHomeScreen() {
   return (
     <View style={{ flex: 1 }}>
       {/* 🔔 Notifications button */}
-      <TouchableOpacity
-        style={styles.notificationsIcon}
-        onPress={() => navigation.navigate("Notifications")}
-      >
-        <Ionicons name="notifications-outline" size={24} color="#213729" />
-      </TouchableOpacity>
+      <View style={styles.notificationsIcon}>
+  <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+    <Ionicons name="notifications-outline" size={24} color="#213729" />
+    {unreadCount > 0 && (
+      <View style={styles.badge}>
+        <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
+      </View>
+    )}
+  </TouchableOpacity>
+</View>
+
   
       <View style={styles.container}>
       <Text style={styles.hello}>
@@ -228,6 +235,25 @@ const styles = StyleSheet.create({
     right: 24,
     zIndex: 10,
   },
+
+  badge: {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    backgroundColor: "#c00",
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    minWidth: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+  
   
   
 });

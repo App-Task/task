@@ -33,4 +33,22 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ✅ PATCH /api/notifications/mark-read
+router.patch("/mark-read", async (req, res) => {
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    await Notification.updateMany(
+      { userId: decoded.userId || decoded.id, isRead: false },
+      { $set: { isRead: true } }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error("❌ Error marking notifications as read:", err.message);
+    res.status(500).json({ error: "Failed to update notifications" });
+  }
+});
+
+
 module.exports = router;

@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { removeToken } from "../../services/authStorage";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Linking } from "react-native";
+import useUnreadNotifications from "../../hooks/useUnreadNotifications";
 import * as SecureStore from "expo-secure-store";
 
 
@@ -24,6 +25,7 @@ const { width } = Dimensions.get("window");
 
 export default function ProfileScreen({ navigation }) {
   const { t } = useTranslation();
+  const unreadCount = useUnreadNotifications();
   const [user, setUser] = useState({ name: "", email: "", profileImage: null });
   const [profileImage, setProfileImage] = useState(null);
   
@@ -112,10 +114,16 @@ export default function ProfileScreen({ navigation }) {
     <ScrollView contentContainerStyle={styles.container}>
 
 <View style={styles.headerWrapper}>
-      <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-        <Ionicons name="notifications-outline" size={24} color="#213729" />
-      </TouchableOpacity>
-    </View>
+  <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+    <Ionicons name="notifications-outline" size={24} color="#213729" />
+    {unreadCount > 0 && (
+      <View style={styles.badge}>
+        <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
+      </View>
+    )}
+  </TouchableOpacity>
+</View>
+
 
       <TouchableOpacity onPress={handleChangeProfilePicture} style={styles.avatarWrapper}>
         <View style={styles.avatarPlaceholder}>
@@ -289,5 +297,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 10,
   },
+
+  badge: {
+    position: "absolute",
+    top: -4,
+    right: -4,
+    backgroundColor: "#c00",
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    minWidth: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+  
 
 });

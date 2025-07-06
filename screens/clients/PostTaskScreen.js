@@ -20,6 +20,8 @@ import * as SecureStore from "expo-secure-store";
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import useUnreadNotifications from "../../hooks/useUnreadNotifications";
+
 
 
 
@@ -30,6 +32,7 @@ const rawCategories = ["Cleaning", "Moving", "Delivery", "Repairs", "Other"];
 export default function PostTaskScreen() {
   const navigation = useNavigation();
   const { t } = useTranslation();
+  const unreadCount = useUnreadNotifications();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
@@ -156,12 +159,17 @@ export default function PostTaskScreen() {
       style={{ flex: 1 }}
     >
           {/* 🔔 Notifications button */}
-    <TouchableOpacity
-      style={styles.notificationsIcon}
-      onPress={() => navigation.navigate("Notifications")}
-    >
-      <Ionicons name="notifications-outline" size={24} color="#213729" />
-    </TouchableOpacity>
+          <View style={styles.notificationsIcon}>
+  <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+    <Ionicons name="notifications-outline" size={24} color="#213729" />
+    {unreadCount > 0 && (
+      <View style={styles.badge}>
+        <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
+      </View>
+    )}
+  </TouchableOpacity>
+</View>
+
 
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.heading}>{t("clientPostTask.title")}</Text>
@@ -482,6 +490,25 @@ const styles = StyleSheet.create({
     right: 24,
     zIndex: 10,
   },
+
+  badge: {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    backgroundColor: "#c00",
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    minWidth: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+  
   
   
   

@@ -24,7 +24,7 @@ import ChangePasswordScreen from "../screens/clients/ChangePasswordScreen";
 import MyPaymentsScreen from "../screens/clients/MyPaymentsScreen";
 import PaymentMethodsScreen from "../screens/clients/PaymentMethodsScreen";
 import ImageViewerScreen from "../screens/clients/ImageViewerScreen"; // adjust path
-import TaskerProfileScreen from "../screens/clients/TaskerProfileScreen";
+import TaskerProfileScreen from "../screens/tasker/TaskerProfileScreen";
 import NotificationsScreen from "../screens/clients/NotificationsScreen";
 
 
