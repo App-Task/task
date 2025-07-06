@@ -160,29 +160,42 @@ Alert.alert(
 
   {/* Show if task is Started */}
   {task.status === "Started" && (
-    <TouchableOpacity
-      style={styles.button}
-      onPress={async () => {
-        try {
-          await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, {
-            method: "PATCH",
-          });
-          const updated = await getTaskById(task._id);
-          navigation.navigate("ClientHome", {
-            screen: "Tasks",
-            params: {
-              showReview: true,
-              completedTask: updated,
-            },
-          });
-        } catch (err) {
-          console.error("❌ Failed to complete task:", err.message);
-          Alert.alert("Error", "Could not mark the task as completed.");
-        }
-      }}
-    >
-      <Text style={styles.buttonText}>Mark as Completed</Text>
-    </TouchableOpacity>
+  <TouchableOpacity
+  style={styles.button}
+  onPress={() => {
+    Alert.alert(
+      "Mark as Completed",
+      "Are you sure you want to mark this task as completed?",
+      [
+        { text: "No" },
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, {
+                method: "PATCH",
+              });
+              const updated = await getTaskById(task._id);
+              navigation.navigate("ClientHome", {
+                screen: "Tasks",
+                params: {
+                  showReview: true,
+                  completedTask: updated,
+                },
+              });
+            } catch (err) {
+              console.error("❌ Failed to complete task:", err.message);
+              Alert.alert("Error", "Could not mark the task as completed.");
+            }
+          },
+        },
+      ]
+    );
+  }}
+>
+  <Text style={styles.buttonText}>Mark as Completed</Text>
+</TouchableOpacity>
+
   )}
 
   {/* Cancel Task for Pending or Started */}
