@@ -15,8 +15,12 @@ router.post("/", async (req, res) => {
     }
 
     // Save the bid
-    const bid = new Bid({ taskId, taskerId, amount, message });
-    await bid.save();
+const bid = new Bid({ taskId, taskerId, amount, message });
+await bid.save();
+
+// ✅ Increment bidCount on Task
+await Task.findByIdAndUpdate(taskId, { $inc: { bidCount: 1 } });
+
 
     // 🔔 Fetch the task to get client ID and title
     const task = await Task.findById(taskId);
@@ -107,5 +111,28 @@ router.put("/:bidId/accept", async (req, res) => {
     res.status(500).json({ error: "Failed to accept bid" });
   }
 });
+
+// ✅ GET /api/bids/my-bids — for showing tasker's sent bids
+router.get("/my-bids", async (req, res) => {
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const taskerId = decoded.userId || decoded.id;
+    const bids = await Bid.find({ taskerId, status: "Pending" })
+      .populate("taskId");
+
+    // only return tasks that are still available
+    const filtered = bids
+      .filter((b) => b.taskId && b.taskId.status === "Pending")
+      .map((b) => b.taskId); // extract task object
+
+    res.json(filtered);
+  } catch (err) {
+    console.error("❌ Error fetching bid sent:", err);
+    res.status(500).json({ error: "Failed to load bid sent" });
+  }
+});
+
 
 module.exports = router;

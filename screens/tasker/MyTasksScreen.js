@@ -19,7 +19,7 @@ import { useNavigation } from "@react-navigation/native";
 export default function TaskerMyTasksScreen() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("active");
+  const [tab, setTab] = useState("active"); // ⬅️ add "bidSent" as a possible value
   const [tasks, setTasks] = useState([]);
   const [taskerId, setTaskerId] = useState("");
   const navigation = useNavigation();
@@ -43,7 +43,13 @@ export default function TaskerMyTasksScreen() {
   
         setShowVerifyBanner(false); // ✅ hide if verified
   
-        const url = `https://task-kq94.onrender.com/api/tasks/tasker/${user._id}?type=${tab === "previous" ? "past" : tab}`;
+        let url;
+if (tab === "bidSent") {
+  url = `https://task-kq94.onrender.com/api/bids/tasks/${user._id}`;
+} else {
+  url = `https://task-kq94.onrender.com/api/tasks/tasker/${user._id}?type=${tab === "previous" ? "past" : tab}`;
+}
+
         console.log("🔍 Fetching tasks from:", url);
   
         const res = await axios.get(url);
@@ -162,6 +168,16 @@ export default function TaskerMyTasksScreen() {
     Previous
   </Text>
 </TouchableOpacity>
+
+<TouchableOpacity
+  onPress={() => setTab("bidSent")}
+  style={[styles.tab, tab === "bidSent" && styles.activeTab]}
+>
+  <Text style={[styles.tabText, tab === "bidSent" && styles.activeTabText]}>
+    {t("taskerMyTasks.bidSent")}
+  </Text>
+</TouchableOpacity>
+
 
 
       </View>

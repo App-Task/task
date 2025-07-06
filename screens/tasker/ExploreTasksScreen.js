@@ -93,11 +93,25 @@ export default function ExploreTasksScreen({ navigation }) {
       setUserId(currentUserId);
   
       // Get all tasks
-      const res = await axios.get("https://task-kq94.onrender.com/api/tasks", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setTasks(res.data);
-      setFilteredTasks(res.data);
+const taskRes = await axios.get("https://task-kq94.onrender.com/api/tasks", {
+  headers: { Authorization: `Bearer ${token}` },
+});
+const allTasks = taskRes.data;
+
+// 🔁 Get all bids made by this tasker
+const bidRes = await axios.get(`https://task-kq94.onrender.com/api/bids/tasker/${user._id}`, {
+  headers: { Authorization: `Bearer ${token}` },
+});
+const bidTaskIds = bidRes.data.map((bid) => bid.taskId);
+
+// ✅ Exclude tasks already bid on
+const availableTasks = allTasks.filter(
+  (task) => !bidTaskIds.includes(task._id)
+);
+
+setTasks(availableTasks);
+setFilteredTasks(availableTasks);
+
     } catch (err) {
       console.error("❌ Error fetching tasks:", err.message);
     } finally {
@@ -155,7 +169,10 @@ export default function ExploreTasksScreen({ navigation }) {
         <Text style={styles.sub}>
           {t("taskerExplore.price")}: {item.budget} SAR
         </Text>
-        <Text style={styles.sub}>{t("taskerExplore.bids")}: 0</Text>
+        <Text style={styles.sub}>
+  {t("taskerExplore.bids")}: {item.bidCount || 0}
+</Text>
+
         <TouchableOpacity
           style={styles.button}
           onPress={() =>

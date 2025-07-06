@@ -268,7 +268,8 @@
     "statusTypes": {
       "started": "In Progress",
       "completed": "Completed"
-    }
+    },
+    "bidSent": "Bid Sent"
   },
   "taskerNotifications": {
     "title": "Notifications",

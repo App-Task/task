@@ -275,7 +275,9 @@
     "statusTypes": {
       "started": "قيد التنفيذ",
       "completed": "مكتملة"
-    }
+    },
+    "bidSent": "العروض المرسلة"
+
   },
   "taskerNotifications": {
     "title": "الإشعارات",
