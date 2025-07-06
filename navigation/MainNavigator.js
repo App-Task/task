@@ -24,6 +24,8 @@ import ChangePasswordScreen from "../screens/clients/ChangePasswordScreen";
 import MyPaymentsScreen from "../screens/clients/MyPaymentsScreen";
 import PaymentMethodsScreen from "../screens/clients/PaymentMethodsScreen";
 import ImageViewerScreen from "../screens/clients/ImageViewerScreen"; // adjust path
+import TaskerProfileScreen from "../screens/clients/TaskerProfileScreen";
+
 
 
 import DocumentsScreen from "../screens/tasker/DocumentsScreen";
@@ -68,6 +70,12 @@ export default function MainNavigator() {
   component={ImageViewerScreen}
   options={{ headerShown: false }}
 />
+<Stack.Screen
+  name="TaskerProfile"
+  component={TaskerProfileScreen}
+  options={{ title: "Tasker Profile" }} // You can localize this if needed
+/>
+
 
       {/* Tasker Home & Subscreens */}
 {/* Tasker Home & Subscreens */}

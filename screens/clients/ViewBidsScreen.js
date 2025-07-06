@@ -143,6 +143,13 @@ export default function ViewBidsScreen({ route, navigation }) {
           </TouchableOpacity>
   
           <TouchableOpacity
+  style={styles.chatBtn}
+  onPress={() => navigation.navigate("TaskerProfile", { taskerId: item.taskerId?._id })}
+>
+  <Text style={styles.chatText}>View Profile</Text>
+</TouchableOpacity>
+
+          <TouchableOpacity
             style={[
               styles.acceptBtn,
               isThisAccepted
@@ -166,6 +173,8 @@ export default function ViewBidsScreen({ route, navigation }) {
                 : t("clientViewBids.accept")}
             </Text>
           </TouchableOpacity>
+
+
         </View>
       </View>
     );
