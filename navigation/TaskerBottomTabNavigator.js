@@ -18,8 +18,15 @@ import EditProfileScreen from "../screens/tasker/EditProfileScreen";
 
 const Tab = createBottomTabNavigator();
 
+
+
 export default function TaskBottomNav() {
   const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0); // ✅ ADD THIS BACK
+  
+  
+
+
   const { t } = useTranslation();
 
   const fetchUnreadMessages = async () => {
@@ -36,11 +43,34 @@ export default function TaskBottomNav() {
     }
   };
 
+  const fetchUnreadNotifications = async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get("https://task-kq94.onrender.com/api/notifications", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const unread = res.data.filter((n) => !n.isRead).length;
+      setUnreadNotifications(unread);
+    } catch (err) {
+      console.error("❌ Failed to fetch notifications:", err.message);
+    }
+  };
+  
   useFocusEffect(
     React.useCallback(() => {
       fetchUnreadMessages();
+      fetchUnreadNotifications(); // ✅ recheck when switching tabs
     }, [])
   );
+  
+
+useEffect(() => {
+  fetchUnreadNotifications(); // ✅ runs once immediately on login
+}, []);
+
+
+  
+  
 
   return (
     <Tab.Navigator
@@ -87,7 +117,32 @@ export default function TaskBottomNav() {
         component={TaskerMyTasksScreen}
         options={{ tabBarLabel: t("TaskBottomNav.myTasks") }}
       />
+     
+
+
      <Tab.Screen
+  name="Notifications"
+  children={() => (
+    <TaskerNotificationsScreen
+      setUnreadNotifications={setUnreadNotifications} // ✅ pass setter
+    />
+  )}
+  options={{
+    tabBarLabel: t("TaskBottomNav.notifications"),
+    tabBarBadge: unreadNotifications > 0 ? (unreadNotifications > 9 ? "9+" : unreadNotifications) : null,
+    tabBarBadgeStyle: {
+      backgroundColor: "#213729",
+      color: "#fff",
+      fontSize: 11,
+      fontFamily: "InterBold",
+    },
+  }}
+/>
+
+
+
+
+<Tab.Screen
   name="Messages"
   component={TaskerMessagesScreen}
   options={{
@@ -103,11 +158,6 @@ export default function TaskBottomNav() {
 />
 
 
-      <Tab.Screen
-        name="Notifications"
-        component={TaskerNotificationsScreen}
-        options={{ tabBarLabel: t("TaskBottomNav.notifications") }}
-      />
       <Tab.Screen
         name="Profile"
         component={TaskerProfileScreen}

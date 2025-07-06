@@ -22,14 +22,20 @@ export default function TaskerMessagesScreen({ navigation }) {
     try {
       setLoading(true);
       const token = await getToken();
+  
+      if (!token) {
+        setConversations([]); // clear conversations on logout
+        return;
+      }
+  
       const res = await axios.get("https://task-kq94.onrender.com/api/messages/conversations", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       const sorted = res.data.sort(
         (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
       );
-
+  
       setConversations(sorted);
     } catch (err) {
       console.error("Failed to load conversations:", err.message);
@@ -37,6 +43,7 @@ export default function TaskerMessagesScreen({ navigation }) {
       setLoading(false);
     }
   };
+  
 
   useFocusEffect(
     useCallback(() => {

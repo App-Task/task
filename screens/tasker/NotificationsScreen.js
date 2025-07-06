@@ -11,37 +11,84 @@ import { useTranslation } from "react-i18next";
 import Animated, { FadeInRight } from "react-native-reanimated";
 import axios from "axios";
 import { getToken } from "../../services/authStorage"; // adjust if path differs
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+import { useNavigation } from "@react-navigation/native";
 
-export default function TaskerNotificationsScreen() {
+
+export default function TaskerNotificationsScreen({ navigation, setUnreadNotifications }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0); // NEW: local count
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const token = await getToken();
-        const res = await axios.get("https://task-kq94.onrender.com/api/notifications", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setNotifications(res.data);
-      } catch (err) {
-        console.error("❌ Failed to fetch tasker notifications:", err.response?.data || err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+  
+      const fetchAndHandleNotifications = async () => {
+        try {
+          const token = await getToken();
+if (!token) {
+  setNotifications([]);
+  setUnreadCount(0);
+  setLoading(false);
+  return;
+}
 
-    fetchNotifications();
-  }, []);
+          
+          const res = await axios.get("https://task-kq94.onrender.com/api/notifications", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+  
+          const allNotifs = res.data;
+          const unread = allNotifs.filter((n) => !n.isRead).length;
+  
+          if (isActive) {
+            setNotifications(allNotifs);
+            setUnreadCount(unread);
+            setLoading(false);
+          }
+    
+          // ✅ Mark all as read after short delay
+          setTimeout(async () => {
+            await axios.patch("https://task-kq94.onrender.com/api/notifications/mark-read", {}, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+          
+            setUnreadCount(0); // ✅ manually clear unread count after marking read
+            if (setUnreadNotifications) setUnreadNotifications(0);
+          }, 2000);
+          
+  
+        } catch (err) {
+          console.error("❌ Notification fetch/mark error:", err.message);
+          if (isActive) setLoading(false);
+        }
+      };
+  
+      fetchAndHandleNotifications();
+  
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
+  
+  
 
   const renderItem = ({ item }) => (
-    <Animated.View entering={FadeInRight.duration(400)} style={styles.card}>
+    <Animated.View
+      entering={FadeInRight.duration(400)}
+      style={[
+        styles.card,
+        !item.isRead && styles.unreadCard, // ✅ Add unread style if needed
+      ]}
+    >
       <Text style={styles.message}>
-        {item.title}: {item.message}
+        {item.type === "message" ? item.message : `${item.title}: ${item.message}`}
       </Text>
+  
       <Text style={styles.time}>
         {new Date(item.createdAt).toLocaleString("en-GB", {
           hour: "2-digit",
@@ -52,6 +99,7 @@ export default function TaskerNotificationsScreen() {
       </Text>
     </Animated.View>
   );
+  
 
   return (
     <View style={styles.container}>
@@ -115,4 +163,8 @@ const styles = StyleSheet.create({
     color: "#999",
     textAlign: I18nManager.isRTL ? "left" : "right",
   },
+  unreadCard: {
+    backgroundColor: "#e6f2e6", // light green tint for unread
+  },
+  
 });
