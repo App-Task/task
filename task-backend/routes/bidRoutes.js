@@ -4,6 +4,21 @@ const mongoose = require("mongoose");
 const Bid = require("../models/Bid");
 const Task = require("../models/Task");
 const Notification = require("../models/Notification"); // ✅ for creating notifications
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret"; // replace with your actual secret if needed
+
+const verifyToken = (req) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
+
+  const token = authHeader.split(" ")[1];
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch {
+    return null;
+  }
+};
+
 
 // ✅ POST /api/bids — tasker submits a bid and notifies client
 router.post("/", async (req, res) => {
