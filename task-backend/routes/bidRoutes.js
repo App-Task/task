@@ -6,6 +6,8 @@ const Task = require("../models/Task");
 const Notification = require("../models/Notification"); // ✅ for creating notifications
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret"; // replace with your actual secret if needed
+const { verifyTokenMiddleware } = require("../middleware/authMiddleware");
+
 
 const verifyToken = (req) => {
   const authHeader = req.headers.authorization;
@@ -128,9 +130,9 @@ router.put("/:bidId/accept", async (req, res) => {
 });
 
 // ✅ GET /api/bids/my-bids — for showing tasker's sent bids
-router.get("/my-bids", async (req, res) => {
-  const decoded = verifyToken(req);
-  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+router.get("/my-bids", verifyTokenMiddleware, async (req, res) => {
+  const taskerId = req.user.userId || req.user.id;
+
 
   try {
     const taskerId = decoded.userId || decoded.id;
