@@ -25,6 +25,9 @@ import MyPaymentsScreen from "../screens/clients/MyPaymentsScreen";
 import PaymentMethodsScreen from "../screens/clients/PaymentMethodsScreen";
 import ImageViewerScreen from "../screens/clients/ImageViewerScreen"; // adjust path
 import TaskerProfileScreen from "../screens/clients/TaskerProfileScreen";
+import NotificationsScreen from "../screens/clients/NotificationsScreen";
+
+
 
 
 
@@ -75,6 +78,7 @@ export default function MainNavigator() {
   component={TaskerProfileScreen}
   options={{ title: "Tasker Profile" }} // You can localize this if needed
 />
+<Stack.Screen name="Notifications" component={NotificationsScreen} />
 
 
       {/* Tasker Home & Subscreens */}

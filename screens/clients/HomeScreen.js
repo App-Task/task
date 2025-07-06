@@ -14,9 +14,10 @@ import Animated, { FadeInRight } from "react-native-reanimated";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-
-
-export default function ClientHomeScreen({ navigation }) {
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+export default function ClientHomeScreen() {
+  const navigation = useNavigation(); // ✅ correctly grabs parent stack navigation
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -105,7 +106,16 @@ export default function ClientHomeScreen({ navigation }) {
   
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
+      {/* 🔔 Notifications button */}
+      <TouchableOpacity
+        style={styles.notificationsIcon}
+        onPress={() => navigation.navigate("Notifications")}
+      >
+        <Ionicons name="notifications-outline" size={24} color="#213729" />
+      </TouchableOpacity>
+  
+      <View style={styles.container}>
       <Text style={styles.hello}>
         {t("clientHome.greeting", { name: userName || t("clientHome.defaultName") })}
       </Text>
@@ -137,8 +147,10 @@ export default function ClientHomeScreen({ navigation }) {
         />
       )}
     </View>
+  </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -210,4 +222,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 40,
   },
+  notificationsIcon: {
+    position: "absolute",
+    top: 65, // ⬅️ Increased from 30 to 65
+    right: 24,
+    zIndex: 10,
+  },
+  
+  
 });

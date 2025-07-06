@@ -99,10 +99,7 @@ export default function BottomTabNavigator() {
 
 
 
-<Tab.Screen
-  name="Notifications"
-  component={NotificationsScreen}
-/>
+
 
 
       <Tab.Screen name="Profile" component={ProfileScreen} />
