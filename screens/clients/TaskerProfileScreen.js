@@ -6,65 +6,131 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  TouchableOpacity,
+  SafeAreaView,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 
-export default function TaskerProfileScreen({ route }) {
+export default function TaskerProfileScreen({ route, navigation }) {
   const { taskerId } = route.params;
   const [tasker, setTasker] = useState(null);
+  const [review, setReview] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTasker = async () => {
+    const fetchTaskerAndReview = async () => {
       try {
-        const res = await axios.get(`https://task-kq94.onrender.com/api/users/${taskerId}`);
-        setTasker(res.data);
+        const [userRes, reviewRes] = await Promise.all([
+          axios.get(`https://task-kq94.onrender.com/api/users/${taskerId}`),
+          axios.get(`https://task-kq94.onrender.com/api/reviews/tasker/${taskerId}`),
+        ]);
+        setTasker(userRes.data);
+        setReview(reviewRes.data);
       } catch (err) {
-        console.error("❌ Error loading tasker:", err.message);
+        console.error("❌ Error loading tasker or review:", err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTasker();
+    fetchTaskerAndReview();
   }, [taskerId]);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />;
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
+      </SafeAreaView>
+    );
   }
 
   if (!tasker) {
-    return <Text style={styles.error}>Failed to load tasker profile.</Text>;
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <Text style={styles.error}>Failed to load tasker profile.</Text>
+      </SafeAreaView>
+    );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {tasker.profileImage ? (
-        <Image source={{ uri: tasker.profileImage }} style={styles.image} />
-      ) : null}
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* Header with back button and title */}
+        <View style={styles.headerRow}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="#213729" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Tasker Profile</Text>
+          <View style={styles.backBtn} />
+        </View>
 
-      <Text style={styles.name}>{tasker.name}</Text>
+        <ScrollView contentContainerStyle={styles.scroll}>
+          {tasker.profileImage ? (
+            <Image source={{ uri: tasker.profileImage }} style={styles.image} />
+          ) : null}
 
-      <Text style={styles.label}>Location</Text>
-      <Text style={styles.value}>{tasker.location || "Not provided"}</Text>
+          <Text style={styles.name}>{tasker.name}</Text>
 
-      <Text style={styles.label}>Experience</Text>
-      <Text style={styles.value}>{tasker.experience || "Not provided"}</Text>
+{/* ⭐ Average Rating */}
+{review?.average && (
+  <View style={styles.ratingBox}>
+    <Text style={styles.ratingStar}>⭐</Text>
+    <Text style={styles.ratingText}>{review.average.toFixed(1)} / 5</Text>
+  </View>
+)}
 
-      <Text style={styles.label}>Skills</Text>
-      <Text style={styles.value}>{tasker.skills || "Not provided"}</Text>
 
-      <Text style={styles.label}>About</Text>
-      <Text style={styles.value}>{tasker.about || "Not provided"}</Text>
-    </ScrollView>
+          <Text style={styles.label}>Location</Text>
+          <Text style={styles.value}>{tasker.location || "Not provided"}</Text>
+
+          <Text style={styles.label}>Experience</Text>
+          <Text style={styles.value}>{tasker.experience || "Not provided"}</Text>
+
+          <Text style={styles.label}>Skills</Text>
+          <Text style={styles.value}>{tasker.skills || "Not provided"}</Text>
+
+          <Text style={styles.label}>About</Text>
+          <Text style={styles.value}>{tasker.about || "Not provided"}</Text>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
+  safeArea: {
+    flex: 1,
     backgroundColor: "#ffffff",
-    minHeight: "100%",
+  },
+  container: {
+    flex: 1,
+    paddingTop: 0,
+    paddingHorizontal: 20,
+    backgroundColor: "#ffffff",
+  },
+  scroll: {
+    paddingBottom: 60,
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+    marginTop: 10,
+  },
+  backBtn: {
+    width: 24,
+    height: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    fontFamily: "InterBold",
+    fontSize: 20,
+    color: "#213729",
+    textAlign: "center",
+    flex: 1,
   },
   image: {
     width: 120,
@@ -77,8 +143,15 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: "InterBold",
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 8,
     color: "#213729",
+  },
+  review: {
+    fontSize: 14,
+    fontFamily: "Inter",
+    textAlign: "center",
+    color: "#666",
+    marginBottom: 20,
   },
   label: {
     fontSize: 16,
@@ -98,4 +171,23 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 16,
   },
+  ratingBox: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  
+  ratingStar: {
+    fontSize: 20,
+    color: "#FFD700", // gold
+    marginRight: 6,
+  },
+  
+  ratingText: {
+    fontSize: 18,
+    fontFamily: "InterBold",
+    color: "#213729",
+  },
+  
 });
