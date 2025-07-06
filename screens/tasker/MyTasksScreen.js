@@ -45,14 +45,18 @@ export default function TaskerMyTasksScreen() {
   
         let url;
 if (tab === "bidSent") {
-  url = `https://task-kq94.onrender.com/api/bids/tasks/${user._id}`;
+  url = `https://task-kq94.onrender.com/api/bids/my-bids`;
 } else {
   url = `https://task-kq94.onrender.com/api/tasks/tasker/${user._id}?type=${tab === "previous" ? "past" : tab}`;
 }
 
         console.log("🔍 Fetching tasks from:", url);
   
-        const res = await axios.get(url);
+        const token = await SecureStore.getItemAsync("task_auth_token");
+const res = await axios.get(url, {
+  headers: { Authorization: `Bearer ${token}` },
+});
+
         console.log("✅ Response data:", res.data);
         setTasks(res.data);
       } catch (err) {

@@ -41,7 +41,16 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const tasks = await Task.find().sort({ createdAt: -1 });
-    res.json(tasks);
+
+const tasksWithBidCount = await Promise.all(
+  tasks.map(async (task) => {
+    const bidCount = await require("../models/Bid").countDocuments({ taskId: task._id });
+    return { ...task.toObject(), bidCount };
+  })
+);
+
+res.json(tasksWithBidCount);
+
   } catch (err) {
     console.error("❌ Task fetch error:", err.message);
     res.status(500).json({ error: "Failed to fetch tasks" });
