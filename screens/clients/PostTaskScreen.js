@@ -163,12 +163,13 @@ export default function PostTaskScreen() {
   <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
     <Ionicons name="notifications-outline" size={24} color="#213729" />
     {unreadCount > 0 && (
-      <View style={styles.badge}>
+      <View style={styles.notificationDot}>
         <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
       </View>
     )}
   </TouchableOpacity>
 </View>
+
 
 
       <ScrollView contentContainerStyle={styles.container}>
@@ -491,23 +492,28 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
 
-  badge: {
+  notificationDot: {
     position: "absolute",
-    top: -6,
-    right: -6,
+    top: -4,
+    right: -4,
     backgroundColor: "#c00",
     borderRadius: 10,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    minWidth: 20,
+    minWidth: 16,
+    height: 16,
+    paddingHorizontal: 4,
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 20,
   },
+  
   badgeText: {
     color: "#fff",
     fontSize: 10,
     fontWeight: "bold",
+    textAlign: "center",
+    includeFontPadding: false,
   },
+  
   
   
   

@@ -15,16 +15,12 @@ import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import StarRating from "react-native-star-rating-widget";
-import useUnreadNotifications from "../../hooks/useUnreadNotifications";
-
 
 const { width } = Dimensions.get("window");
 
 export default function MyTasksScreen({ navigation, route }) {
 
   const { t } = useTranslation();
-  const unreadCount = useUnreadNotifications();
-
   const [activeTab, setActiveTab] = useState("Pending");
   const [groupedTasks, setGroupedTasks] = useState({
     Pending: [],
@@ -151,18 +147,6 @@ export default function MyTasksScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      {/* 🔔 Notification Icon */}
-<View style={styles.notificationWrapper}>
-  <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-    <Text style={styles.notificationIcon}>🔔</Text>
-    {unreadCount > 0 && (
-      <View style={styles.badge}>
-        <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
-      </View>
-    )}
-  </TouchableOpacity>
-</View>
-
       {/* Review Modal */}
       <Modal isVisible={showReview}>
         <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20 }}>
@@ -323,32 +307,6 @@ const styles = StyleSheet.create({
     color: "#555",
     marginLeft: 4,
     fontFamily: "InterBold",
-  },
-  notificationWrapper: {
-    position: "absolute",
-    top: 65,
-    right: 20,
-    zIndex: 10,
-  },
-  notificationIcon: {
-    fontSize: 24,
-  },
-  badge: {
-    position: "absolute",
-    top: -4,
-    right: -6,
-    backgroundColor: "#c00",
-    borderRadius: 10,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    minWidth: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  badgeText: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "bold",
   },
   
 });

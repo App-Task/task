@@ -81,26 +81,33 @@ export default function ClientHomeScreen() {
         entering={FadeInRight.duration(500)}
         style={styles.taskItem}
       >
-        <Text style={styles.taskTitle}>{item.title}</Text>
-        <View
-          style={[
-            styles.badge,
-            {
-              backgroundColor:
-                item.status === "Pending" ? "#c1ff72" : "#215432",
-            },
-          ]}
-        >
-          <Text
+        {/* LEFT SIDE: Task title */}
+        <View style={styles.taskTextWrapper}>
+          <Text style={styles.taskTitle}>{item.title}</Text>
+        </View>
+  
+        {/* RIGHT SIDE: Status badge */}
+        <View style={styles.taskBadgeWrapper}>
+          <View
             style={[
-              styles.badgeText,
+              styles.taskStatusBadge,
               {
-                color: item.status === "Pending" ? "#213729" : "#ffffff",
+                backgroundColor:
+                  item.status === "Pending" ? "#c1ff72" : "#215432",
               },
             ]}
           >
-            {t(`clientHome.status.${item.status.toLowerCase()}`)}
-          </Text>
+            <Text
+              style={[
+                styles.taskStatusText,
+                {
+                  color: item.status === "Pending" ? "#213729" : "#ffffff",
+                },
+              ]}
+            >
+              {t(`clientHome.status.${item.status.toLowerCase()}`)}
+            </Text>
+          </View>
         </View>
       </Animated.View>
     </TouchableOpacity>
@@ -114,7 +121,8 @@ export default function ClientHomeScreen() {
   <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
     <Ionicons name="notifications-outline" size={24} color="#213729" />
     {unreadCount > 0 && (
-      <View style={styles.badge}>
+      <View style={styles.notificationDot}>
+
         <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
       </View>
     )}
@@ -236,23 +244,47 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
 
-  badge: {
+  notificationDot: {
     position: "absolute",
-    top: -6,
-    right: -6,
+    top: -4,
+    right: -4,
     backgroundColor: "#c00",
     borderRadius: 10,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    minWidth: 20,
+    minWidth: 16,
+    height: 16,
+    paddingHorizontal: 4,
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 20,
   },
   badgeText: {
     color: "#fff",
     fontSize: 10,
     fontWeight: "bold",
   },
+
+  taskTextWrapper: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  
+  taskBadgeWrapper: {
+    justifyContent: "center",
+    alignItems: "flex-end",
+    width: 100,
+  },
+  
+  taskStatusBadge: {
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  
+  taskStatusText: {
+    fontSize: 12,
+    fontFamily: "InterBold",
+  },
+  
   
   
   
