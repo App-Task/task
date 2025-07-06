@@ -21,10 +21,13 @@ import { fetchCurrentUser } from "../../services/auth"; // or your actual path
 
 const { width } = Dimensions.get("window");
 
+
 export default function TaskDetailsScreen({ route }) {
   const { task } = route.params;
   const { t } = useTranslation();
   const navigation = useNavigation();
+  const [submitting, setSubmitting] = useState(false);
+
 
   useEffect(() => {
     let isMounted = true;
@@ -37,7 +40,12 @@ export default function TaskDetailsScreen({ route }) {
         const bids = res.data;
         const foundBid = bids.find((b) => b.taskId?._id === task._id || b.taskId === task._id);
   
-        if (foundBid && isMounted) setExistingBid(foundBid);
+        if (foundBid && isMounted) {
+          setExistingBid(foundBid);
+          setBidAmount(String(foundBid.amount));
+          setMessage(foundBid.message);
+        }
+        
       } catch (err) {
         console.error("❌ Failed to check user or bid:", err.message);
       }
@@ -99,7 +107,53 @@ const handleBid = async () => {
   }
 };
 
-  
+const handleUpdateBid = async () => {
+  if (task.status !== "Pending") {
+    Alert.alert("Cannot Edit", "This task is no longer accepting bids.");
+    return;
+  }
+
+  if (!bidAmount || !message) {
+    Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.fillFields"));
+    return;
+  }
+
+  try {
+    setSubmitting(true);
+
+    const res = await axios.patch(`https://task-kq94.onrender.com/api/bids/${existingBid._id}`, {
+      amount: Number(bidAmount),
+      message,
+    });
+
+    Alert.alert(
+      "Success",
+      "Your bid has been updated.",
+      [{ text: "OK", onPress: () => navigation.navigate("ExploreTasks", { refresh: true }) }]
+    );
+
+    setExistingBid(res.data); // update local state
+  } catch (err) {
+    console.error("❌ Update bid error:", err.message);
+    Alert.alert("Error", "Something went wrong while updating the bid.");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+
+const getStatusColor = (status) => {
+  switch (status) {
+    case "Accepted":
+      return "#2e7d32";
+    case "Rejected":
+      return "#c62828";
+    case "Pending":
+    default:
+      return "#666";
+  }
+};
+
   
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -130,14 +184,62 @@ const handleBid = async () => {
 
 
 
-        {existingBid ? (
+        {existingBid && !existingBid.isAccepted ? (
+  <>
+    <Text style={styles.label}>{t("taskerTaskDetails.editYourBid")}</Text>
+
+    <TextInput
+      style={styles.input}
+      placeholder={t("taskerTaskDetails.bidAmount")}
+      value={bidAmount}
+      onChangeText={setBidAmount}
+      keyboardType="numeric"
+      textAlign={I18nManager.isRTL ? "right" : "left"}
+      placeholderTextColor="#999"
+    />
+
+    <TextInput
+      style={[styles.input, styles.textarea]}
+      placeholder={t("taskerTaskDetails.bidMessage")}
+      value={message}
+      onChangeText={setMessage}
+      multiline
+      maxLength={150}
+      textAlignVertical="top"
+      textAlign={I18nManager.isRTL ? "right" : "left"}
+      placeholderTextColor="#999"
+    />
+
+    <TouchableOpacity
+      style={[styles.button, submitting && { backgroundColor: "#ccc" }]}
+      onPress={handleUpdateBid}
+      disabled={submitting}
+    >
+      <Text style={styles.buttonText}>
+        {submitting ? t("taskerTaskDetails.submitting") : t("taskerTaskDetails.updateBid")}
+      </Text>
+    </TouchableOpacity>
+  </>
+) : existingBid ? (
   <View style={styles.existingBidBox}>
     <Text style={styles.label}>Your Bid:</Text>
     <Text style={styles.text}>{existingBid.amount} SAR</Text>
+
     <Text style={styles.label}>Your Message:</Text>
     <Text style={styles.text}>{existingBid.message}</Text>
+
+    {existingBid.status && (
+      <>
+        <Text style={styles.label}>{t("taskerTaskDetails.status")}</Text>
+        <Text style={[styles.text, { color: getStatusColor(existingBid.status) }]}>
+          {existingBid.status}
+        </Text>
+      </>
+    )}
   </View>
 ) : (
+
+
   <>
     <Text style={styles.label}>{t("taskerTaskDetails.enterBid")}</Text>
     <TextInput

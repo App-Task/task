@@ -318,7 +318,11 @@
   "fillFields": "Please fill in all required fields",
   "successTitle": "Success",
   "bidSent": "Your bid has been submitted.",
-  "errorTitle": "Error"
+  "errorTitle": "Error",
+  "editYourBid": "Edit Your Bid",
+"updateBid": "Update Bid",
+"submitting": "Submitting...",
+"status": "Bid Status"
 }
 
 

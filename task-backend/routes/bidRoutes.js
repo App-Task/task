@@ -168,6 +168,30 @@ router.get("/tasker/:taskerId", async (req, res) => {
   }
 });
 
+// In your backend bidRoutes.js
+router.patch("/:bidId", async (req, res) => {
+  try {
+    const { bidId } = req.params;
+    const { amount, message } = req.body;
+
+    const bid = await Bid.findById(bidId);
+    if (!bid) return res.status(404).json({ error: "Bid not found" });
+
+    // Block if client already accepted
+    if (bid.isAccepted) return res.status(403).json({ error: "Bid already accepted" });
+
+    bid.amount = amount;
+    bid.message = message;
+    await bid.save();
+
+    res.json(bid);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Update failed" });
+  }
+});
+
+
 
 
 module.exports = router;

@@ -324,7 +324,12 @@
   "fillFields": "يرجى ملء جميع الحقول المطلوبة",
   "successTitle": "تم بنجاح",
   "bidSent": "تم إرسال عرضك بنجاح.",
-  "errorTitle": "خطأ"
+  "errorTitle": "خطأ",
+  "editYourBid": "تعديل عرضك",
+"updateBid": "تحديث العرض",
+"submitting": "جارٍ الإرسال...",
+"status": "حالة العرض"
+
 }
 
   
