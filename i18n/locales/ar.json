@@ -263,22 +263,22 @@
     "average": "متوسط التقييم",
     "empty": "لم تستلم أي تقييمات بعد."
   },
-  "taskerMyTasks": {
-    "active": "نشطة",
-    "past": "السابقة",
-    "noTasks": "لا توجد مهام حالياً.",
-    "client": "العميل",
-    "status": "الحالة",
-    "chat": "محادثة",
-    "report": "الإبلاغ",
-    "cancel": "إلغاء المهمة",
-    "statusTypes": {
-      "started": "قيد التنفيذ",
-      "completed": "مكتملة"
-    },
-    "bidSent": "العروض المرسلة"
-
+ "taskerMyTasks": {
+  "status": "الحالة",
+  "statusTypes": {
+    "pending": "قيد الانتظار",
+    "started": "بدأت",
+    "completed": "مكتملة",
+    "cancelled": "ألغيت"
   },
+  "active": "نشطة",
+  "previous": "السابقة",
+  "bidSent": "العطاءات المرسلة",
+  "noTasks": "لا توجد مهام",
+  "chat": "دردشة",
+  "report": "إبلاغ",
+  "cancel": "إلغاء"
+},
   "taskerNotifications": {
     "title": "الإشعارات",
     "empty": "لا توجد إشعارات حالياً.",

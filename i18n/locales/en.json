@@ -257,20 +257,22 @@
     "empty": "You have not received any reviews yet."
   },
   "taskerMyTasks": {
-    "active": "Active",
-    "past": "Past",
-    "noTasks": "No tasks available.",
-    "client": "Client",
-    "status": "Status",
-    "chat": "Chat",
-    "report": "Report",
-    "cancel": "Cancel Task",
-    "statusTypes": {
-      "started": "In Progress",
-      "completed": "Completed"
-    },
-    "bidSent": "Bid Sent"
+  "status": "Status",
+  "statusTypes": {
+    "pending": "Pending",
+    "started": "Started",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
   },
+  "active": "Active",
+  "previous": "Previous",
+  "bidSent": "Bid Sent",
+  "noTasks": "No tasks found",
+  "chat": "Chat",
+  "report": "Report",
+  "cancel": "Cancel"
+},
+
   "taskerNotifications": {
     "title": "Notifications",
     "empty": "No notifications at the moment.",

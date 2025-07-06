@@ -157,13 +157,17 @@ router.get("/tasker/:taskerId", async (req, res) => {
       return res.status(400).json({ error: "Invalid tasker ID" });
     }
 
-    const bids = await Bid.find({ taskerId }).select("taskId");
+    const bids = await Bid.find({ taskerId })
+      .populate("taskId") // ✅ populate for matching task._id
+      .select("taskId amount message"); // ✅ include required fields only
+
     res.json(bids);
   } catch (err) {
     console.error("❌ Error fetching tasker bids:", err.message);
     res.status(500).json({ error: "Failed to fetch tasker bids" });
   }
 });
+
 
 
 module.exports = router;

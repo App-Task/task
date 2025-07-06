@@ -27,62 +27,72 @@ export default function TaskDetailsScreen({ route }) {
   const navigation = useNavigation();
 
   useEffect(() => {
-    const checkVerification = async () => {
+    const init = async () => {
       try {
         const user = await fetchCurrentUser();
-        console.log("👤 CURRENT USER:", user);
-
         setIsVerified(user.isVerified);
+  
+        const res = await axios.get(`https://task-kq94.onrender.com/api/bids/tasker/${user._id}`);
+        const bids = res.data;
+        const foundBid = bids.find((b) => b.taskId?._id === task._id || b.taskId === task._id);
+
+        if (foundBid) setExistingBid(foundBid);
       } catch (err) {
-        console.error("❌ Failed to check verification:", err.message);
+        console.error("❌ Failed to check user or bid:", err.message);
       }
     };
-    checkVerification();
+    init();
   }, []);
+  
   
 
   const [bidAmount, setBidAmount] = useState("");
-  const [message, setMessage] = useState("");
-  const [isVerified, setIsVerified] = useState(true);
+const [message, setMessage] = useState("");
+const [isVerified, setIsVerified] = useState(true);
+const [existingBid, setExistingBid] = useState(null); // ✅ NEW
 
 
-  const handleBid = async () => {
-    if (!bidAmount || !message) {
-      Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.fillFields"));
+
+const handleBid = async () => {
+  if (existingBid) {
+    Alert.alert("Already Bid", "You’ve already submitted a bid for this task.");
+    return;
+  }
+
+  if (!bidAmount || !message) {
+    Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.fillFields"));
+    return;
+  }
+
+  try {
+    const user = await fetchCurrentUser();
+
+    if (!user.isVerified) {
+      Alert.alert("Access Denied", "You must be verified to place a bid.");
       return;
     }
-  
-    try {
-      const user = await fetchCurrentUser();
-      console.log("👤 CURRENT USER:", user);
 
-      if (!user.isVerified) {
-        Alert.alert("Access Denied", "You must be verified to place a bid.");
-        return;
-      }
-  
-      const res = await axios.post("https://task-kq94.onrender.com/api/bids", {
-        taskId: task._id,
-        taskerId: user._id,
-        amount: Number(bidAmount),
-        message,
-      });
-  
-      console.log("✅ Bid response:", res.data);
-  
-      Alert.alert(
-        t("taskerTaskDetails.successTitle"),
-        t("taskerTaskDetails.bidSent"),
-        [{ text: "OK", onPress: () => navigation.goBack() }]
-      );
-  
-      setBidAmount("");
-      setMessage("");
-    } catch (err) {
-      console.error("❌ Bid error:", err.message);
-      Alert.alert("Error", "Something went wrong while submitting the bid.");
-    }
-  };
+    const res = await axios.post("https://task-kq94.onrender.com/api/bids", {
+      taskId: task._id,
+      taskerId: user._id,
+      amount: Number(bidAmount),
+      message,
+    });
+
+    Alert.alert(
+      t("taskerTaskDetails.successTitle"),
+      t("taskerTaskDetails.bidSent"),
+      [{ text: "OK", onPress: () => navigation.goBack() }]
+    );
+
+    setBidAmount("");
+    setMessage("");
+  } catch (err) {
+    console.error("❌ Bid error:", err.message);
+    Alert.alert("Error", "Something went wrong while submitting the bid.");
+  }
+};
+
   
   
   return (
@@ -108,46 +118,55 @@ export default function TaskDetailsScreen({ route }) {
         <Text style={styles.label}>{t("taskerTaskDetails.price")}</Text>
         <Text style={styles.text}>{task.budget} SAR</Text>
 
-        <Text style={styles.label}>{t("taskerTaskDetails.enterBid")}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t("taskerTaskDetails.bidAmount")}
-          value={bidAmount}
-          onChangeText={setBidAmount}
-          keyboardType="numeric"
-          textAlign={I18nManager.isRTL ? "right" : "left"}
-          placeholderTextColor="#999"
-        />
-
-        <TextInput
-          style={[styles.input, styles.textarea]}
-          placeholder={t("taskerTaskDetails.bidMessage")}
-          value={message}
-          onChangeText={setMessage}
-          multiline
-          maxLength={150}
-          textAlignVertical="top"
-          textAlign={I18nManager.isRTL ? "right" : "left"}
-          placeholderTextColor="#999"
-        />
-
-{!isVerified && (
-  <View style={styles.verifyBanner}>
-    <Text style={styles.verifyText}>
-      You must be verified to place a bid.
-    </Text>
+        {existingBid ? (
+  <View style={styles.existingBidBox}>
+    <Text style={styles.label}>Your Bid:</Text>
+    <Text style={styles.text}>{existingBid.amount} SAR</Text>
+    <Text style={styles.label}>Your Message:</Text>
+    <Text style={styles.text}>{existingBid.message}</Text>
   </View>
+) : (
+  <>
+    <Text style={styles.label}>{t("taskerTaskDetails.enterBid")}</Text>
+    <TextInput
+      style={styles.input}
+      placeholder={t("taskerTaskDetails.bidAmount")}
+      value={bidAmount}
+      onChangeText={setBidAmount}
+      keyboardType="numeric"
+      textAlign={I18nManager.isRTL ? "right" : "left"}
+      placeholderTextColor="#999"
+    />
+    <TextInput
+      style={[styles.input, styles.textarea]}
+      placeholder={t("taskerTaskDetails.bidMessage")}
+      value={message}
+      onChangeText={setMessage}
+      multiline
+      maxLength={150}
+      textAlignVertical="top"
+      textAlign={I18nManager.isRTL ? "right" : "left"}
+      placeholderTextColor="#999"
+    />
+
+    {!isVerified && (
+      <View style={styles.verifyBanner}>
+        <Text style={styles.verifyText}>You must be verified to place a bid.</Text>
+      </View>
+    )}
+
+    <TouchableOpacity
+      style={[styles.button, !isVerified && { backgroundColor: "#ccc" }]}
+      onPress={handleBid}
+      disabled={!isVerified}
+    >
+      <Text style={styles.buttonText}>
+        {t("taskerTaskDetails.submitBid")}
+      </Text>
+    </TouchableOpacity>
+  </>
 )}
 
-<TouchableOpacity
-  style={[styles.button, !isVerified && { backgroundColor: "#ccc" }]}
-  onPress={handleBid}
-  disabled={!isVerified}
->
-  <Text style={styles.buttonText}>
-    {t("taskerTaskDetails.submitBid")}
-  </Text>
-</TouchableOpacity>
 
 
         <View style={{ height: 40 }} />
@@ -240,5 +259,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
   },
+
+  existingBidBox: {
+    backgroundColor: "#f2f2f2",
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 16,
+  },
+  
   
 });

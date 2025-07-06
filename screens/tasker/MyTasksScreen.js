@@ -15,6 +15,8 @@ import axios from "axios";
 import { fetchCurrentUser } from "../../services/auth";
 import { useNavigation } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
+import { getToken } from "../../services/authStorage"; // make sure this import exists
+
 
 
 
@@ -55,7 +57,9 @@ if (tab === "bidSent") {
 
         console.log("🔍 Fetching tasks from:", url);
   
-        const token = await SecureStore.getItemAsync("task_auth_token");
+        const token = await getToken(); // ✅ use AsyncStorage-based function
+        console.log("🔐 Token from SecureStore:", token);
+
 const res = await axios.get(url, {
   headers: { Authorization: `Bearer ${token}` },
 });
@@ -81,7 +85,7 @@ const res = await axios.get(url, {
   
 
   const renderTask = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate("TaskDetails", { task: item })}>
+    <TouchableOpacity onPress={() => navigation.navigate("TaskerTaskDetails", { task: item })}>
     <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.sub}>
