@@ -95,7 +95,7 @@ const handleBid = async () => {
     Alert.alert(
       t("taskerTaskDetails.successTitle"),
       t("taskerTaskDetails.bidSent"),
-      [{ text: "OK", onPress: () => navigation.navigate("ExploreTasks", { refresh: true }) }]
+      [{ text: "OK", onPress: () => navigation.navigate("TaskerHome", { refresh: true }) }]
     );
     
 
