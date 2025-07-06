@@ -118,13 +118,17 @@ router.post("/", async (req, res) => {
     });
 
     // 🔔 Create notification for receiver
-    const notification = new Notification({
-      userId: receiver,
-      type: "message",
-      title: "New Message",
-      message: `New message: "${text}"`,
-      relatedTaskId: taskId || undefined,
-    });
+    // 🔔 Fetch sender info to personalize notification
+const senderUser = await User.findById(senderId);
+
+const notification = new Notification({
+  userId: receiver,
+  type: "message",
+  title: "New Message",
+  message: `New message from ${senderUser?.name || "someone"}`,
+  relatedTaskId: taskId || undefined,
+});
+
 
     await notification.save();
 
