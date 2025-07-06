@@ -152,7 +152,7 @@ export default function PostTaskScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.heading}>{t("clientPostTask.title")}</Text>
 
-        <View style={styles.formSection}>
+        <View style={styles.formContainer}>
   <TextInput
     style={styles.input}
     placeholder={t("clientPostTask.taskTitlePlaceholder")}
@@ -204,37 +204,36 @@ export default function PostTaskScreen({ navigation }) {
     keyboardType="numeric"
     textAlign={I18nManager.isRTL ? "right" : "left"}
   />
+
+  <TouchableOpacity style={styles.uploadBox} onPress={pickImages}>
+    <Text style={styles.uploadText}>
+      + {t("clientPostTask.uploadImage")} ({images.length}/3)
+    </Text>
+  </TouchableOpacity>
+  {images.length > 0 && (
+  <View style={{ marginTop: -16 }}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      {images.map((img, index) => (
+        <View key={index} style={styles.imageWrapper}>
+          <Image source={{ uri: img }} style={styles.preview} />
+          <TouchableOpacity
+            style={styles.deleteIcon}
+            onPress={() => deleteImage(index)}
+          >
+            <Text style={styles.deleteIconText}>×</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+    </ScrollView>
+  </View>
+)}
+
+
+  <TouchableOpacity style={styles.button} onPress={handlePost}>
+    <Text style={styles.buttonText}>{t("clientPostTask.postBtn")}</Text>
+  </TouchableOpacity>
 </View>
 
-
-        <View style={styles.imageSection}>
-          <TouchableOpacity style={styles.uploadBox} onPress={pickImages}>
-            <Text style={styles.uploadText}>
-              + {t("clientPostTask.uploadImage")} ({images.length}/3)
-            </Text>
-          </TouchableOpacity>
-
-          <ScrollView horizontal>
-  {images.map((img, index) => (
-    <View key={index} style={styles.imageWrapper}>
-      <Image source={{ uri: img }} style={styles.preview} />
-      <TouchableOpacity
-        style={styles.deleteIcon}
-        onPress={() => deleteImage(index)}
-      >
-        <Text style={styles.deleteIconText}>×</Text>
-      </TouchableOpacity>
-    </View>
-  ))}
-</ScrollView>
-
-
-
-        </View>
-
-        <TouchableOpacity style={styles.button} onPress={handlePost}>
-          <Text style={styles.buttonText}>{t("clientPostTask.postBtn")}</Text>
-        </TouchableOpacity>
 
         <Modal
   visible={categoryModalVisible}
@@ -316,11 +315,13 @@ const styles = StyleSheet.create({
     height: 120,
   },
   categoryPicker: {
-    backgroundColor: "#e8e8e8",
+    backgroundColor: "#f2f2f2", // match the input background
+    borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 18,
-    borderRadius: 12,
   },
+  
+  
   
   uploadBox: {
     backgroundColor: "#e8e8e8",
@@ -332,9 +333,11 @@ const styles = StyleSheet.create({
   },
   uploadText: {
     fontFamily: "Inter",
-    color: "#666",
-    fontSize: 14,
+    fontSize: 16,         // match input font size
+    color: "#333",        // match input text color
   },
+  
+
   preview: {
     width: "100%",
     height: "100%",
@@ -342,9 +345,10 @@ const styles = StyleSheet.create({
   },
   
   imageSection: {
-    marginBottom: 20, // ❌ remove this line completely
-    gap: 16,          // ✅ add this for internal spacing
+    gap:16,
+    marginBottom: 24, // match formSection spacing
   },
+  
   
   button: {
     backgroundColor: "#213729",
@@ -452,6 +456,13 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#444",
   },
+  formContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 16, // increased for better visual breathing space
+    marginBottom: 40,
+  },
+  
   
   
   
