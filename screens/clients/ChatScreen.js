@@ -151,9 +151,7 @@ export default function ChatScreen({ route, navigation }) {
         </View>
       </View>
     );
-  };
-
-  return (
+  };return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -163,45 +161,46 @@ export default function ChatScreen({ route, navigation }) {
           {t("clientChat.chatWith", { name })}
         </Text>
       </View>
-  
       <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0} // lower the offset
+  style={styles.flex}
+  behavior={Platform.OS === "ios" ? "padding" : "height"}
+  keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+>
+  <View style={styles.flex}>
+    <FlatList
+      data={messages}
+      renderItem={renderItem}
+      keyExtractor={(item) => item._id || item.id}
+      contentContainerStyle={styles.chatBox}
+      inverted
+      keyboardShouldPersistTaps="handled"
+    />
+
+    <View style={styles.inputRow}>
+      <TextInput
+        value={message}
+        onChangeText={setMessage}
+        style={styles.input}
+        placeholder={t("clientChat.placeholder")}
+      />
+      <TouchableOpacity
+        style={[
+          styles.sendButton,
+          sending && { backgroundColor: "#888" },
+        ]}
+        onPress={sendMessage}
+        disabled={sending}
       >
-        <View style={styles.flex}>
-          <FlatList
-            data={messages}
-            renderItem={renderItem}
-            keyExtractor={(item) => item._id || item.id}
-            contentContainerStyle={styles.chatBox}
-            inverted
-          />
-  
-          <View style={styles.inputRow}>
-            <TextInput
-              value={message}
-              onChangeText={setMessage}
-              style={styles.input}
-              placeholder={t("clientChat.placeholder")}
-            />
-            <TouchableOpacity
-              style={[
-                styles.sendButton,
-                sending && { backgroundColor: "#888" },
-              ]}
-              onPress={sendMessage}
-              disabled={sending}
-            >
-              {sending ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <Ionicons name="send" size={20} color="#ffffff" />
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
+        {sending ? (
+          <ActivityIndicator color="#fff" size="small" />
+        ) : (
+          <Ionicons name="send" size={20} color="#ffffff" />
+        )}
+      </TouchableOpacity>
+    </View>
+  </View>
+</KeyboardAvoidingView>
+
     </SafeAreaView>
   );
   
@@ -233,9 +232,12 @@ const styles = StyleSheet.create({
     color: "#213729",
   },
   chatBox: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 0,
+    paddingBottom: 0, // was 20 — reduce this to zero
     flexGrow: 1,
   },
+  
   messageRow: {
     flexDirection: "row",
     alignItems: "flex-end",
