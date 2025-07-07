@@ -69,6 +69,8 @@ export default function TaskDetailsScreen({ route, navigation }) {
               });
   
               Alert.alert("Task Cancelled");
+              navigation.navigate("ClientHome", { screen: "Tasks" });
+
               navigation.goBack();
             } catch (err) {
               Alert.alert("Error", "Failed to cancel task.");

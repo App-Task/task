@@ -142,29 +142,26 @@ router.get("/tasker/:taskerId", async (req, res) => {
   }
 });
 
-// ✅ PUT /api/tasks/:id/cancel — cancel a task
+// ✅ PUT /api/tasks/:id/cancel
 router.put("/:id/cancel", async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
-    if (!task) return res.status(404).json({ error: "Task not found" });
+    if (!task) return res.status(404).json({ msg: "Task not found" });
 
     const { cancelledBy } = req.body;
-    if (!cancelledBy || !mongoose.Types.ObjectId.isValid(cancelledBy)) {
-      return res.status(400).json({ error: "Missing or invalid cancelledBy user ID" });
-    }
+    if (!cancelledBy) return res.status(400).json({ msg: "Missing cancelledBy field" });
 
     task.status = "Cancelled";
     task.cancelledBy = cancelledBy;
     await task.save();
 
-    await task.populate("cancelledBy", "name"); // 👈 so frontend can display name
-
-    res.json({ msg: "Task cancelled", task });
+    res.status(200).json({ msg: "Task cancelled", task });
   } catch (err) {
     console.error("❌ Cancel task error:", err.message);
-    res.status(500).json({ error: "Failed to cancel task" });
+    res.status(500).json({ msg: "Server error" });
   }
 });
+
 
 
 // ✅ PATCH /api/tasks/:id/complete — mark task as completed
