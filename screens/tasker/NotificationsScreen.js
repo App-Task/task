@@ -15,67 +15,61 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { useNavigation } from "@react-navigation/native";
 
-
 export default function TaskerNotificationsScreen({ navigation, setUnreadNotifications }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0); // NEW: local count
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
 
+  // ✅ Move this outside useFocusEffect
+  const fetchAndHandleNotifications = async () => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        setNotifications([]);
+        setUnreadCount(0);
+        setLoading(false);
+        return;
+      }
+
+      const res = await axios.get("https://task-kq94.onrender.com/api/notifications", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const allNotifs = res.data;
+      const unread = allNotifs.filter((n) => !n.isRead).length;
+
+      setNotifications(allNotifs);
+      setUnreadCount(unread);
+      setLoading(false);
+
+      await axios.patch("https://task-kq94.onrender.com/api/notifications/mark-read", {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setUnreadCount(0);
+      if (setUnreadNotifications) setUnreadNotifications(0);
+    } catch (err) {
+      console.error("❌ Notification fetch/mark error:", err.message);
+      setLoading(false);
+    }
+  };
+
+  // ✅ Refresh handler for swipe-to-refresh
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchAndHandleNotifications();
+    setRefreshing(false);
+  };
+
+  // ✅ Triggers on screen focus
   useFocusEffect(
     useCallback(() => {
-      let isActive = true;
-  
-      const fetchAndHandleNotifications = async () => {
-        try {
-          const token = await getToken();
-if (!token) {
-  setNotifications([]);
-  setUnreadCount(0);
-  setLoading(false);
-  return;
-}
-
-          
-          const res = await axios.get("https://task-kq94.onrender.com/api/notifications", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-  
-          const allNotifs = res.data;
-          const unread = allNotifs.filter((n) => !n.isRead).length;
-  
-          if (isActive) {
-            setNotifications(allNotifs);
-            setUnreadCount(unread);
-            setLoading(false);
-          }
-    
-          // ✅ Mark all as read after short delay
-          setTimeout(async () => {
-            await axios.patch("https://task-kq94.onrender.com/api/notifications/mark-read", {}, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-          
-            setUnreadCount(0); // ✅ manually clear unread count after marking read
-            if (setUnreadNotifications) setUnreadNotifications(0);
-          }, 2000);
-          
-  
-        } catch (err) {
-          console.error("❌ Notification fetch/mark error:", err.message);
-          if (isActive) setLoading(false);
-        }
-      };
-  
       fetchAndHandleNotifications();
-  
-      return () => {
-        isActive = false;
-      };
     }, [])
   );
-  
-  
+
 
   const renderItem = ({ item }) => (
     <Animated.View
@@ -111,12 +105,15 @@ if (!token) {
         <Text style={styles.empty}>{t("taskerNotifications.empty")}</Text>
       ) : (
         <FlatList
-          data={notifications}
-          keyExtractor={(item) => item._id}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 40 }}
-          showsVerticalScrollIndicator={false}
-        />
+  data={notifications}
+  keyExtractor={(item) => item._id}
+  renderItem={renderItem}
+  contentContainerStyle={{ paddingBottom: 40 }}
+  showsVerticalScrollIndicator={false}
+  refreshing={refreshing}          // ✅ enables spinner on pull
+  onRefresh={handleRefresh}        // ✅ trigger refresh handler
+/>
+
       )}
     </View>
   );

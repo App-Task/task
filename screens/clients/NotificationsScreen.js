@@ -22,6 +22,8 @@ export default function NotificationsScreen() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const [refreshing, setRefreshing] = useState(false);
+
 
   const fetchNotifications = async () => {
     try {
@@ -46,6 +48,13 @@ export default function NotificationsScreen() {
       setLoading(false);
     }
   };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchNotifications();
+    setRefreshing(false);
+  };
+  
   
 
   useEffect(() => {
@@ -86,13 +95,16 @@ export default function NotificationsScreen() {
       ) : notifications.length === 0 ? (
         <Text style={styles.empty}>{t("clientNotifications.none")}</Text>
       ) : (
-        <FlatList
-          data={notifications}
-          keyExtractor={(item) => item._id}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 30 }}
-          showsVerticalScrollIndicator={false}
-        />
+            <FlatList
+      data={notifications}
+      keyExtractor={(item) => item._id}
+      renderItem={renderItem}
+      contentContainerStyle={{ paddingBottom: 30 }}
+      showsVerticalScrollIndicator={false}
+      refreshing={refreshing}                // ✅ enable pull-to-refresh
+      onRefresh={handleRefresh}              // ✅ trigger refresh logic
+    />
+
       )}
     </View>
   );
