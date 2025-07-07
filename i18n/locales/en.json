@@ -328,7 +328,9 @@
   "editYourBid": "Edit Your Bid",
 "updateBid": "Update Bid",
 "submitting": "Submitting...",
-"status": "Bid Status"
+"status": "Bid Status",
+"loadingBid": "Fetching your bid...",
+"loadingBidMessage": "Please wait while we load your bid details."
 }
 
 

@@ -28,6 +28,8 @@ export default function TaskDetailsScreen({ route }) {
   const navigation = useNavigation();
   const [submitting, setSubmitting] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [loadingBid, setLoadingBid] = useState(true); // ✅ NEW
+
 
 
 
@@ -47,9 +49,10 @@ export default function TaskDetailsScreen({ route }) {
           setBidAmount(String(foundBid.amount));
           setMessage(foundBid.message);
         }
-        
       } catch (err) {
         console.error("❌ Failed to check user or bid:", err.message);
+      } finally {
+        if (isMounted) setLoadingBid(false); // ✅ Mark bid as loaded
       }
     };
   
@@ -58,6 +61,7 @@ export default function TaskDetailsScreen({ route }) {
       isMounted = false;
     };
   }, []);
+  
   
   
 
@@ -233,12 +237,18 @@ const getStatusColor = (status) => {
       </Text>
     </TouchableOpacity>
   </>
+) : loadingBid ? (
+  <View style={styles.existingBidBox}>
+    <Text style={styles.label}>{t("taskerTaskDetails.loadingBid")}</Text>
+    <Text style={styles.text}>...</Text>
+  </View>
 ) : existingBid ? (
   <View style={styles.existingBidBox}>
     <Text style={styles.label}>Your Bid:</Text>
     <Text style={styles.text}>{existingBid.amount} BHD</Text>
     <Text style={styles.label}>Your Message:</Text>
     <Text style={styles.text}>{existingBid.message}</Text>
+
     {existingBid.status && (
       <>
         <Text style={styles.label}>{t("taskerTaskDetails.status")}</Text>
