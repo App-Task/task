@@ -86,16 +86,17 @@
     "updatedMessage": "Your task has been successfully updated."
   },
   "clientHome": {
-    "greeting": "Hello, {{name}}!",
-    "defaultName": "Guest",
-    "subtitle": "Welcome back, here's your latest activity.",
+    "greeting": "Hi {{name}},",
+    "defaultName": "there",
+    "subtitle": "What do you need help with today?",
     "postTaskBtn": "Post a Task",
     "yourTasks": "Your Tasks",
-    "noTasks": "You haven’t posted any tasks yet.",
+    "noTasks": "You haven't posted any tasks yet.",
     "status": {
       "pending": "Pending",
-      "started": "In Progress",
-      "completed": "Completed"
+      "started": "Started",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
     }
   },
   "clientMessages": {

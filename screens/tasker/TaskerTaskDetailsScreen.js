@@ -27,6 +27,8 @@ export default function TaskDetailsScreen({ route }) {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const [submitting, setSubmitting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
 
 
   useEffect(() => {
@@ -176,8 +178,11 @@ const getStatusColor = (status) => {
         {task.images?.length > 0 && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
             {task.images.map((uri, i) => (
-              <Image key={i} source={{ uri }} style={styles.image} />
-            ))}
+  <TouchableOpacity key={i} onPress={() => setSelectedImage(uri)}>
+    <Image source={{ uri }} style={styles.image} />
+  </TouchableOpacity>
+))}
+
           </ScrollView>
         )}
 
@@ -287,6 +292,25 @@ const getStatusColor = (status) => {
   </>
 )}
 
+{selectedImage && (
+  <View style={styles.fullScreenOverlay}>
+    <TouchableOpacity
+      style={styles.closeButton}
+      onPress={() => setSelectedImage(null)}
+    >
+      <Ionicons name="close" size={32} color="#fff" />
+    </TouchableOpacity>
+
+    <Image
+      source={{ uri: selectedImage }}
+      style={styles.fullScreenImage}
+      resizeMode="contain"
+    />
+  </View>
+)}
+
+
+
 
 
         <View style={{ height: 40 }} />
@@ -386,6 +410,35 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 16,
   },
+
+  fullScreenOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 9999,
+  },
+  
+  fullScreenImage: {
+    width: "100%",
+    height: "100%",
+  },
+
+  closeButton: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 10000,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    borderRadius: 20,
+    padding: 6,
+  },
+  
+  
   
   
 });

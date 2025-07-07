@@ -89,16 +89,17 @@
     "updatedMessage": "تم تحديث المهمة بنجاح."
   },
   "clientHome": {
-    "greeting": "مرحبًا، {{name}}!",
-    "defaultName": "زائر",
-    "subtitle": "مرحبًا بعودتك، إليك آخر الأنشطة.",
-    "postTaskBtn": "نشر مهمة",
+    "greeting": "مرحبًا {{name}}،",
+    "defaultName": "عزيزي",
+    "subtitle": "بما تحتاج إلى مساعدة اليوم؟",
+    "postTaskBtn": "أنشئ مهمة",
     "yourTasks": "مهامك",
-    "noTasks": "لم تقم بنشر أي مهام بعد.",
+    "noTasks": "لم تقم بإنشاء أي مهام بعد.",
     "status": {
       "pending": "قيد الانتظار",
       "started": "قيد التنفيذ",
-      "completed": "مكتملة"
+      "completed": "مكتملة",
+      "cancelled": "ملغاة"
     }
   },
   "clientMessages": {
