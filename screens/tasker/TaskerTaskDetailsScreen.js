@@ -195,10 +195,9 @@ const getStatusColor = (status) => {
 
 
 
-        {existingBid && !existingBid.isAccepted ? (
+        {existingBid && !existingBid.isAccepted && task.status === "Pending" ? (
   <>
     <Text style={styles.label}>{t("taskerTaskDetails.editYourBid")}</Text>
-
     <TextInput
       style={styles.input}
       placeholder={t("taskerTaskDetails.bidAmount")}
@@ -208,7 +207,6 @@ const getStatusColor = (status) => {
       textAlign={I18nManager.isRTL ? "right" : "left"}
       placeholderTextColor="#999"
     />
-
     <TextInput
       style={[styles.input, styles.textarea]}
       placeholder={t("taskerTaskDetails.bidMessage")}
@@ -220,7 +218,6 @@ const getStatusColor = (status) => {
       textAlign={I18nManager.isRTL ? "right" : "left"}
       placeholderTextColor="#999"
     />
-
     <TouchableOpacity
       style={[styles.button, submitting && { backgroundColor: "#ccc" }]}
       onPress={handleUpdateBid}
@@ -235,10 +232,8 @@ const getStatusColor = (status) => {
   <View style={styles.existingBidBox}>
     <Text style={styles.label}>Your Bid:</Text>
     <Text style={styles.text}>{existingBid.amount} SAR</Text>
-
     <Text style={styles.label}>Your Message:</Text>
     <Text style={styles.text}>{existingBid.message}</Text>
-
     {existingBid.status && (
       <>
         <Text style={styles.label}>{t("taskerTaskDetails.status")}</Text>
@@ -248,9 +243,11 @@ const getStatusColor = (status) => {
       </>
     )}
   </View>
+) : task.status !== "Pending" ? (
+  <Text style={styles.text}>
+    {t("taskerTaskDetails.taskClosedMessage") || "This task is no longer accepting bids."}
+  </Text>
 ) : (
-
-
   <>
     <Text style={styles.label}>{t("taskerTaskDetails.enterBid")}</Text>
     <TextInput
@@ -273,13 +270,11 @@ const getStatusColor = (status) => {
       textAlign={I18nManager.isRTL ? "right" : "left"}
       placeholderTextColor="#999"
     />
-
     {!isVerified && (
       <View style={styles.verifyBanner}>
         <Text style={styles.verifyText}>You must be verified to place a bid.</Text>
       </View>
     )}
-
     <TouchableOpacity
       style={[styles.button, !isVerified && { backgroundColor: "#ccc" }]}
       onPress={handleBid}

@@ -147,9 +147,10 @@ export default function DocumentsScreen({ navigation }) {
               color="#215432"
             />
             <Text style={styles.docName}>{doc.name}</Text>
-            <TouchableOpacity onPress={() => deleteDocument(doc.id, doc.name)}>
-              <Ionicons name="trash-outline" size={20} color="#999" />
-            </TouchableOpacity>
+            {/* <TouchableOpacity onPress={() => deleteDocument(doc.id, doc.name)}>
+  <Ionicons name="trash-outline" size={20} color="#999" />
+</TouchableOpacity> */}
+
 
           </View>
         ))
