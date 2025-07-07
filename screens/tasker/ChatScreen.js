@@ -17,6 +17,8 @@ import * as SecureStore from "expo-secure-store";
 import { getToken } from "../../services/authStorage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dimensions } from "react-native";
+import { KeyboardAvoidingView, Platform } from "react-native";
+
 
 const { width } = Dimensions.get("window");
 
@@ -124,14 +126,12 @@ export default function TaskerChatScreen({ navigation, route }) {
         ]}
       >
         {!isMine && (
-          <Image
-            source={
-              sender.profileImage
-                ? { uri: sender.profileImage }
-                : require("../../assets/images/profile.png")
-            }
-            style={styles.avatar}
-          />
+         <View style={styles.avatar}>
+         <Text style={styles.avatarLetter}>
+           {sender?.name?.charAt(0)?.toUpperCase() || "?"}
+         </Text>
+       </View>
+       
         )}
         <View
           style={[
@@ -165,44 +165,18 @@ export default function TaskerChatScreen({ navigation, route }) {
   }, []);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        {/* Messages */}
-        <FlatList
-          data={messages}
-          renderItem={renderItem}
-          keyExtractor={(item) => item._id || item.id}
-          contentContainerStyle={styles.chatBox}
-          inverted
-        />
-
-        {/* Input */}
-        <View style={styles.inputRow}>
-          <TextInput
-            value={message}
-            onChangeText={setMessage}
-            style={styles.input}
-            placeholder={t("clientChat.placeholder")}
-            placeholderTextColor="#aaa"
-            textAlign={I18nManager.isRTL ? "right" : "left"}
-          />
-          <TouchableOpacity
-            style={[
-              styles.sendButton,
-              sending && { backgroundColor: "#888" },
-            ]}
-            onPress={sendMessage}
-            disabled={sending}
-          >
-            {sending ? (
-              <ActivityIndicator color="#fff" size="small" />
-            ) : (
-              <Ionicons name="send" size={20} color="#ffffff" />
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
-    </SafeAreaView>
+   
+<SafeAreaView style={styles.safeArea}>
+  <KeyboardAvoidingView
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    style={{ flex: 1 }}
+    keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0} // adjust if needed
+  >
+    <View style={styles.container}>
+      {/* Messages and Input here */}
+    </View>
+  </KeyboardAvoidingView>
+</SafeAreaView>
   );
 }
 
@@ -239,8 +213,11 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
     marginRight: 8,
-    backgroundColor: "#ddd",
+    backgroundColor: "#315052", // or any other plain color you like
+    justifyContent: "center",
+    alignItems: "center",
   },
+  
   messageBubble: {
     maxWidth: "75%",
     paddingHorizontal: 14,
@@ -299,4 +276,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  avatarLetter: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 14,
+    textAlign: "center",
+    lineHeight: 30,
+  },
+  
 });
