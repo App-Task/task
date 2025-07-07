@@ -60,9 +60,10 @@ export default function MyTasksScreen({ navigation, route }) {
           setGroupedTasks(grouped);
       
           if (route?.params?.refreshTasks) {
-            setActiveTab("Cancelled"); // 👈 switch tab
-            navigation.setParams({ refreshTasks: false }); // 👈 reset
+            setActiveTab(route.params.targetTab || "Pending"); // ✅ dynamic
+            navigation.setParams({ refreshTasks: false, targetTab: null }); // ✅ reset
           }
+          
       
           // Handle review popup
           for (let task of grouped.Completed) {

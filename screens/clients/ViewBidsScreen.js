@@ -96,8 +96,20 @@ export default function ViewBidsScreen({ route, navigation }) {
         t("clientViewBids.acceptedTitle"),
         t("clientViewBids.acceptedMessage", {
           name: bid.taskerId?.name || "Tasker",
-        })
+        }),
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              navigation.navigate("ClientHome", {
+                screen: "Tasks",
+                params: { refreshTasks: true, targetTab: "Started" } // ✅ pass new tab
+              });
+            }
+          }
+        ]
       );
+      
     } catch (err) {
       console.error("❌ Accept bid error:", err.message);
       Alert.alert("Error", "Something went wrong while accepting the bid.");
