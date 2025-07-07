@@ -79,7 +79,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
     );
   };
   
-
+// comment
   if (loading) {
     return (
       <SafeAreaView style={styles.safeArea}>
