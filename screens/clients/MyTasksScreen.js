@@ -26,6 +26,8 @@ export default function MyTasksScreen({ navigation, route }) {
     Pending: [],
     Started: [],
     Completed: [],
+    Cancelled: [], // 🆕 add this
+
   });
   const [loading, setLoading] = useState(true);
 
@@ -45,15 +47,24 @@ export default function MyTasksScreen({ navigation, route }) {
           const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
           const allTasks = await res.json();
   
-          const grouped = { Pending: [], Started: [], Completed: [] };
+          const grouped = { Pending: [], Started: [], Completed: [], Cancelled: [] };
+
           allTasks.forEach((task) => {
-            if (grouped[task.status]) {
+            if (task.status === "cancelled") {
+              grouped.Cancelled.push(task);
+            } else if (grouped[task.status]) {
               grouped[task.status].push(task);
             }
           });
+          
   
-          setGroupedTasks(grouped);
-  
+          setGroupedTasks((prev) => {
+            const updated = { ...prev };
+            updated[activeTab] = updated[activeTab].filter((t) => t._id !== cancelledId);
+            updated.Cancelled = [...updated.Cancelled, cancelledTask]; // 👈 move it to Cancelled tab
+            return updated;
+          });
+            
           // Show review for any completed task without review (on first load)
           for (let task of grouped.Completed) {
             const check = await fetch(`https://task-kq94.onrender.com/api/reviews/task/${task._id}`);
@@ -140,7 +151,15 @@ export default function MyTasksScreen({ navigation, route }) {
           <Text style={styles.detailHintText}>View Task Details</Text>
           <Text style={styles.detailArrow}>›</Text>
         </View>
-      </View>
+        
+      {/* ⬇️ ADD THIS BLOCK RIGHT HERE (inside renderTask) */}
+      {activeTab === "Cancelled" && item.cancelledBy && (
+        <Text style={{ fontFamily: "Inter", color: "#c00", marginTop: 8 }}>
+          Cancelled by {item.cancelledBy === "client" ? "You" : "Tasker"}
+        </Text>
+      )}
+    </View>
+      
     </TouchableOpacity>
   );
   
@@ -198,17 +217,19 @@ export default function MyTasksScreen({ navigation, route }) {
 
       {/* Tabs */}
       <View style={styles.tabs}>
-        {["Pending", "Started", "Completed"].map((tabKey) => (
-          <TouchableOpacity
-            key={tabKey}
-            style={[styles.tab, activeTab === tabKey && styles.activeTab]}
-            onPress={() => setActiveTab(tabKey)}
-          >
-            <Text style={[styles.tabText, activeTab === tabKey && styles.activeTabText]}>
-              {t(`clientMyTasks.${tabKey.toLowerCase()}`)}
-            </Text>
-          </TouchableOpacity>
-        ))}
+       {["Pending", "Started", "Completed", "Cancelled"].map((tabKey) => (
+  <TouchableOpacity
+    key={tabKey}
+    style={[styles.tab, activeTab === tabKey && styles.activeTab]}
+    onPress={() => setActiveTab(tabKey)}
+  >
+    <Text style={[styles.tabText, activeTab === tabKey && styles.activeTabText]}>
+      {t(`clientMyTasks.${tabKey.toLowerCase()}`, tabKey)}
+    </Text>
+  </TouchableOpacity>
+))}
+
+    
       </View>
 
       {/* Task List */}

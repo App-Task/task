@@ -31,7 +31,7 @@ export default function MyPaymentsScreen() {
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.task}>{item.task}</Text>
-      <Text style={styles.amount}>{item.amount} SAR</Text>
+      <Text style={styles.amount}>{item.amount} BHD</Text>
       <Text style={styles.date}>{item.date}</Text>
     </View>
   );

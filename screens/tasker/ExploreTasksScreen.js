@@ -176,7 +176,7 @@ setFilteredTasks(availableTasks);
           {t("taskerExplore.location")}: {item.location}
         </Text>
         <Text style={styles.sub}>
-          {t("taskerExplore.price")}: {item.budget} SAR
+          {t("taskerExplore.price")}: {item.budget} BHD
         </Text>
         <Text style={styles.sub}>
   {t("taskerExplore.bids")}: {item.bidCount || 0}
