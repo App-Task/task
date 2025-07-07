@@ -14,16 +14,20 @@ const TaskSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true, // client
+    ref: "User", // client
+    required: true,
   },
   taskerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // new field for tasker
+    ref: "User", // tasker
   },
   bidCount: {
     type: Number,
     default: 0,
+  },
+  cancelledBy: {
+    type: mongoose.Schema.Types.ObjectId, // 👈 will store the _id of the user who cancelled
+    ref: "User",
   },
   createdAt: {
     type: Date,

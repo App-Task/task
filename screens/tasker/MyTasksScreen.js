@@ -91,14 +91,23 @@ const res = await axios.get(url, {
       <Text style={styles.sub}>
   {t("taskerMyTasks.status")}:{" "}
   {item.status === "cancelled"
-    ? `Cancelled by ${item.cancelledBy === "tasker" ? "You" : "Client"}`
+    ? `Cancelled by ${
+        item.cancelledBy?._id === taskerId
+          ? "You"
+          : item.cancelledBy?.name || "Client"
+      }`
     : t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
 </Text>
+
+      
+
 
 {tab === "previous" && item.status === "cancelled" && (
   <View style={styles.cancelBox}>
     <Text style={styles.cancelText}>
-      Task Cancelled by {item.cancelledBy === "tasker" ? "You" : "Client"}
+    Task Cancelled by {item.cancelledBy?._id === taskerId
+  ? "You"
+  : item.cancelledBy?.name || "Client"}
     </Text>
   </View>
 )}
