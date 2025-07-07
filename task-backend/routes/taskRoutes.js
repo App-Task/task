@@ -148,8 +148,10 @@ router.put("/:id/cancel", async (req, res) => {
     const task = await Task.findById(req.params.id);
     if (!task) return res.status(404).json({ error: "Task not found" });
 
+    const { cancelledBy } = req.body;
     task.status = "Cancelled";
-    await task.save();
+    if (cancelledBy) task.cancelledBy = cancelledBy;
+        await task.save();
 
     res.json({ msg: "Task cancelled", task });
   } catch (err) {

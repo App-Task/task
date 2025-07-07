@@ -52,32 +52,33 @@ export default function TaskDetailsScreen({ route, navigation }) {
     }
   };
   
-
   const handleDelete = async () => {
-Alert.alert(
-  "Cancel Task",
-  "Are you sure you want to cancel this task?",
-  [
-    { text: "No" },
-    {
-      text: "Yes",
-      onPress: async () => {
-        try {
-          await deleteTaskById(task._id);
-          Alert.alert("Task Cancelled");
-
-          // 👇 Auto-refresh MyTasksScreen
-          navigation.goBack();
-
-        } catch (err) {
-          Alert.alert("Error", "Failed to cancel task.");
-        }
-      },
-    },
-  ]
-);
-
+    Alert.alert(
+      "Cancel Task",
+      "Are you sure you want to cancel this task?",
+      [
+        { text: "No" },
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/cancel`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ cancelledBy: "client" }),
+              });
+  
+              Alert.alert("Task Cancelled");
+              navigation.goBack();
+            } catch (err) {
+              Alert.alert("Error", "Failed to cancel task.");
+            }
+          },
+        },
+      ]
+    );
   };
+  
 
   if (loading) {
     return (

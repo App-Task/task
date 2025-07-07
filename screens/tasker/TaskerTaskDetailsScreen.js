@@ -192,7 +192,7 @@ const getStatusColor = (status) => {
         <Text style={styles.text}>{task.location}</Text>
 
         <Text style={styles.label}>{t("taskerTaskDetails.price")}</Text>
-        <Text style={styles.text}>{task.budget} SAR</Text>
+        <Text style={styles.text}>{task.budget} BHD</Text>
         <Text style={styles.label}>{t("taskerTaskDetails.description")}</Text>
         <Text style={styles.text}>{task.description || "-"}</Text>
         <Text style={styles.label}>{t("taskerTaskDetails.category")}</Text>
@@ -236,7 +236,7 @@ const getStatusColor = (status) => {
 ) : existingBid ? (
   <View style={styles.existingBidBox}>
     <Text style={styles.label}>Your Bid:</Text>
-    <Text style={styles.text}>{existingBid.amount} SAR</Text>
+    <Text style={styles.text}>{existingBid.amount} BHD</Text>
     <Text style={styles.label}>Your Message:</Text>
     <Text style={styles.text}>{existingBid.message}</Text>
     {existingBid.status && (

@@ -43,41 +43,33 @@ export default function MyTasksScreen({ navigation, route }) {
           setLoading(true);
           const userId = await SecureStore.getItemAsync("userId");
           if (!userId) throw new Error("No user ID");
-  
+      
           const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
           const allTasks = await res.json();
-  
+      
           const grouped = { Pending: [], Started: [], Completed: [], Cancelled: [] };
-
+      
           allTasks.forEach((task) => {
-            if (task.status === "cancelled") {
+            if (task.status === "cancelled" || task.status === "Cancelled") {
               grouped.Cancelled.push(task);
             } else if (grouped[task.status]) {
               grouped[task.status].push(task);
             }
           });
-          
-  
-          setGroupedTasks((prev) => {
-            const updated = { ...prev };
-            updated[activeTab] = updated[activeTab].filter((t) => t._id !== cancelledId);
-            updated.Cancelled = [...updated.Cancelled, cancelledTask]; // 👈 move it to Cancelled tab
-            return updated;
-          });
-            
-          // Show review for any completed task without review (on first load)
+      
+          setGroupedTasks(grouped); // ✅ fix: just update with grouped result
+      
+          // Show review popup if needed
           for (let task of grouped.Completed) {
             const check = await fetch(`https://task-kq94.onrender.com/api/reviews/task/${task._id}`);
             const review = await check.json();
-          
-            // ✅ Only show popup if there is NO review at all (null or empty array)
             if (!review || (Array.isArray(review) && review.length === 0)) {
               setReviewTask(task);
               setShowReview(true);
               break;
             }
           }
-          
+      
         } catch (err) {
           console.error("❌ Failed to fetch tasks:", err.message);
           Alert.alert("Error", t("clientMyTasks.fetchError"));
@@ -85,6 +77,7 @@ export default function MyTasksScreen({ navigation, route }) {
           setLoading(false);
         }
       };
+      
   
       const handleReviewIntent = async () => {
         if (route?.params?.showReview && route?.params?.completedTask) {
