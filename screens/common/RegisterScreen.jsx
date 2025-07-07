@@ -34,21 +34,26 @@ export default function RegisterScreen({ navigation, route }) {
   const [phone, setPhone] = useState("");
   const [secure1, setSecure1] = useState(true);
   const [secure2, setSecure2] = useState(true);
+  const [isRegistering, setIsRegistering] = useState(false);
 
 
-const handleRegister = async () => {
-  if (!name || !email || !countryCode || !phone || !password || !confirm)    {
-    Alert.alert(t("register.missingFields"), t("register.fillAllFields"));
-    return;
-  }
 
-  if (password !== confirm) {
-    Alert.alert(t("register.mismatchTitle"), t("register.passwordMismatch"));
-    return;
-  }
-
-  try {
-    // Step 1: Register the user
+  const handleRegister = async () => {
+    if (!name || !email || !countryCode || !phone || !password || !confirm) {
+      Alert.alert(t("register.missingFields"), t("register.fillAllFields"));
+      return;
+    }
+  
+    if (password !== confirm) {
+      Alert.alert(t("register.mismatchTitle"), t("register.passwordMismatch"));
+      return;
+    }
+  
+    setIsRegistering(true); // ✅ show popup
+  
+    try {
+      // Step 1: Register the user
+  
     await registerUser({ name, email, password, phone: `${countryCode}${phone}` });
 
 
@@ -70,6 +75,8 @@ const handleRegister = async () => {
     });
   } catch (err) {
     Alert.alert(t("register.errorTitle"), err.message || "Something went wrong");
+  } finally {
+    setIsRegistering(false); // ✅ hide popup
   }
 };
 
@@ -179,6 +186,15 @@ const handleRegister = async () => {
           </Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {isRegistering && (
+  <View style={styles.loadingOverlay}>
+    <View style={styles.loadingBox}>
+      <Text style={styles.loadingText}>{t("register.registering", "Registering...")}</Text>
+    </View>
+  </View>
+)}
+
     </KeyboardAvoidingView>
   );
 }
@@ -293,6 +309,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
+  },
+  
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
+  loadingBox: {
+    backgroundColor: "#fff",
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    borderRadius: 16,
+    elevation: 4,
+  },
+  loadingText: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#213729",
   },
   
 });

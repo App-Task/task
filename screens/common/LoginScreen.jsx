@@ -26,13 +26,17 @@ export default function LoginScreen({ navigation, route }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [secure, setSecure] = useState(true);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
 
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert(t("login.missingTitle"), t("login.missingFields"));
       return;
     }
-
+  
+    setIsLoggingIn(true); // ✅ show popup
+  
     try {
       const response = await loginUser({ email, password });
 
@@ -61,7 +65,10 @@ export default function LoginScreen({ navigation, route }) {
     } catch (err) {
       console.log("❌ Login Error:", err.message);
       Alert.alert(t("login.failedTitle"), err.message);
+    } finally {
+      setIsLoggingIn(false); // ✅ hide popup
     }
+    
   };
 
   return (
@@ -117,6 +124,16 @@ export default function LoginScreen({ navigation, route }) {
           </Text>
         </TouchableOpacity>
       </ScrollView>
+
+
+      {isLoggingIn && (
+  <View style={styles.loadingOverlay}>
+    <View style={styles.loadingBox}>
+      <Text style={styles.loadingText}>{t("login.loggingIn", "Logging in...")}</Text>
+    </View>
+  </View>
+)}
+
     </KeyboardAvoidingView>
   );
 }
@@ -206,4 +223,29 @@ const styles = StyleSheet.create({
     color: "#213729",
     fontFamily: "InterBold",
   },
+
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
+  loadingBox: {
+    backgroundColor: "#fff",
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    borderRadius: 16,
+    elevation: 4,
+  },
+  loadingText: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#213729",
+  },
+  
 });
