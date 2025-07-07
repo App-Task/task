@@ -176,14 +176,19 @@
   "removePhoto": "Remove Photo",
   "cancel": "Cancel"
   },
-  "clientTaskDetails": {
-    "description": "Description",
-    "address": "Address",
-    "offeredPrice": "Offered Price",
-    "editTask": "Edit Task",
-    "viewBids": "View Bids",
-    "cancelTask": "Cancel Task"
-  },
+ "clientTaskDetails": {
+  "description": "Description",
+  "address": "Address",
+  "offeredPrice": "Offered Price",
+  "editTask": "Edit Task",
+  "viewBids": "View Bids",
+  "cancelTask": "Cancel Task",
+  "category": "Category",
+  "status": "Status",
+  "createdAt": "Created At",
+  "bidCount": "Number of Bids",
+  "notProvided": "Not provided"
+},
   "clientViewBids": {
     "title": "Bids Received",
     "chat": "Chat",
@@ -313,7 +318,7 @@
   "description": "Task Description",
   "category": "Category",
   "enterBid": "Place Your Bid",
-  "bidAmount": "Your Bid (SAR)",
+  "bidAmount": "Your Bid (BHD)",
   "bidMessage": "Message to Client",
   "submitBid": "Submit Bid",
   "fillFields": "Please fill in all required fields",

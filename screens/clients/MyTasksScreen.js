@@ -57,9 +57,14 @@ export default function MyTasksScreen({ navigation, route }) {
             }
           });
       
-          setGroupedTasks(grouped); // ✅ fix: just update with grouped result
+          setGroupedTasks(grouped);
       
-          // Show review popup if needed
+          if (route?.params?.refreshTasks) {
+            setActiveTab("Cancelled"); // 👈 switch tab
+            navigation.setParams({ refreshTasks: false }); // 👈 reset
+          }
+      
+          // Handle review popup
           for (let task of grouped.Completed) {
             const check = await fetch(`https://task-kq94.onrender.com/api/reviews/task/${task._id}`);
             const review = await check.json();
@@ -77,6 +82,7 @@ export default function MyTasksScreen({ navigation, route }) {
           setLoading(false);
         }
       };
+      
       
   
       const handleReviewIntent = async () => {

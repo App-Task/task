@@ -69,9 +69,11 @@ export default function TaskDetailsScreen({ route, navigation }) {
               });
   
               Alert.alert("Task Cancelled");
-              navigation.navigate("ClientHome", { screen: "Tasks" });
+navigation.navigate("ClientHome", {
+  screen: "Tasks",
+  params: { refreshTasks: true }
+});
 
-              navigation.goBack();
             } catch (err) {
               Alert.alert("Error", "Failed to cancel task.");
             }
@@ -128,11 +130,36 @@ export default function TaskDetailsScreen({ route, navigation }) {
         <Text style={styles.label}>{t("clientTaskDetails.address")}</Text>
         <Text style={styles.text}>{location}</Text>
 
+        {/* Category */}
+        <Text style={styles.label}>{t("clientTaskDetails.category")}</Text>
+        <Text style={styles.text}>{task.category || t("clientTaskDetails.notProvided")}</Text>
+
+        {/* Status */}
+        <Text style={styles.label}>{t("clientTaskDetails.status")}</Text>
+        <Text style={styles.text}>{task.status}</Text>
+
+        {/* Bid Count */}
+        <Text style={styles.label}>{t("clientTaskDetails.bidCount")}</Text>
+        <Text style={styles.text}>{task.bidCount}</Text>
+
+        {/* Created At */}
+        <Text style={styles.label}>{t("clientTaskDetails.createdAt")}</Text>
+        <Text style={styles.text}>
+          {new Date(task.createdAt).toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </Text>
+
+
         {/* Price */}
         <View style={styles.priceBox}>
           <Text style={styles.priceLabel}>{t("clientTaskDetails.offeredPrice")}</Text>
           <Text style={styles.price}>{budget} BHD</Text>
         </View>
+
+        
 {/* Actions */}
 <View style={styles.actions}>
   {/* Show if task is Pending */}

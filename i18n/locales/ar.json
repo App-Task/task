@@ -181,13 +181,18 @@
 },
 
   "clientTaskDetails": {
-    "description": "الوصف",
-    "address": "العنوان",
-    "offeredPrice": "السعر المعروض",
-    "editTask": "تعديل المهمة",
-    "viewBids": "عرض العروض",
-    "cancelTask": "إلغاء المهمة"
-  },
+  "description": "الوصف",
+  "address": "العنوان",
+  "offeredPrice": "السعر المعروض",
+  "editTask": "تعديل المهمة",
+  "viewBids": "عرض العروض",
+  "cancelTask": "إلغاء المهمة",
+  "category": "الفئة",
+  "status": "الحالة",
+  "createdAt": "تاريخ الإنشاء",
+  "bidCount": "عدد العروض",
+  "notProvided": "لم يتم التقديم"
+},
   "clientViewBids": {
     "title": "العروض المستلمة",
     "chat": "محادثة",
