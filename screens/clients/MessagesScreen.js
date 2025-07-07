@@ -16,11 +16,14 @@ import { useFocusEffect } from "@react-navigation/native";
 export default function MessagesScreen({ navigation }) {
   const { t } = useTranslation();
   const [conversations, setConversations] = useState([]);
+  const [loading, setLoading] = useState(true);      // ✅ NEW
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchConversations = async () => {
+  const fetchConversations = async (fromRefresh = false) => {
     try {
-      setRefreshing(true);
+      if (fromRefresh) setRefreshing(true);
+      else setLoading(true);
+  
       const token = await getToken();
       const res = await axios.get(
         "https://task-kq94.onrender.com/api/messages/conversations",
@@ -28,8 +31,7 @@ export default function MessagesScreen({ navigation }) {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-      // Sort by latest message time (most recent first)
+  
       const sorted = res.data.sort(
         (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
       );
@@ -37,15 +39,18 @@ export default function MessagesScreen({ navigation }) {
     } catch (err) {
       console.error("Failed to load conversations:", err.message);
     } finally {
-      setRefreshing(false);
+      if (fromRefresh) setRefreshing(false);
+      else setLoading(false);
     }
   };
+  
 
   useFocusEffect(
     useCallback(() => {
-      fetchConversations();
+      fetchConversations(false); // 👈 first-time load
     }, [])
-  );const renderItem = ({ item }) => {
+  );
+  const renderItem = ({ item }) => {
     const unread = item.unreadCount || 0;
     let badgeText = "";
     if (unread === 1) badgeText = "+1";
@@ -94,7 +99,7 @@ export default function MessagesScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>{t("clientMessages.title")}</Text>
 
-      {refreshing && conversations.length === 0 ? (
+      {loading && conversations.length === 0 ? (
         <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
       ) : conversations.length === 0 ? (
         <Text style={styles.empty}>{t("clientMessages.placeholder")}</Text>
@@ -105,7 +110,10 @@ export default function MessagesScreen({ navigation }) {
   renderItem={renderItem}
   contentContainerStyle={{ paddingBottom: 40 }}
   showsVerticalScrollIndicator={false}
+  refreshing={refreshing}          // ✅ enable pull-down indicator
+  onRefresh={() => fetchConversations(true)} // 👈 explicitly mark as refresh
 />
+
 
       )}
     </View>
@@ -183,14 +191,14 @@ const styles = StyleSheet.create({
     color: "#999",
     textAlign: "center",
     marginTop: 40,
-    refreshIconContainer: {
-      alignItems: "center",
-      marginBottom: 10,
-      marginTop: -10,
-    },
-    unreadCard: {
-      backgroundColor: "#e5ffd4", // light green to highlight unread
-    },
-  
   },
+  refreshIconContainer: {
+    alignItems: "center",
+    marginBottom: 10,
+    marginTop: -10,
+  },
+  unreadCard: {
+    backgroundColor: "#e5ffd4", // light green to highlight unread
+  },
+  
 });

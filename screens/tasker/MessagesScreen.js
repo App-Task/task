@@ -17,6 +17,8 @@ export default function TaskerMessagesScreen({ navigation }) {
   const { t } = useTranslation();
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
 
   const fetchConversations = async () => {
     try {
@@ -43,6 +45,13 @@ export default function TaskerMessagesScreen({ navigation }) {
       setLoading(false);
     }
   };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchConversations();
+    setRefreshing(false);
+  };
+  
   
 
   useFocusEffect(
@@ -102,12 +111,15 @@ export default function TaskerMessagesScreen({ navigation }) {
         <Text style={styles.empty}>{t("taskerMessages.empty")}</Text>
       ) : (
         <FlatList
-          data={conversations}
-          keyExtractor={(item) => item.otherUserId}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 40 }}
-          showsVerticalScrollIndicator={false}
-        />
+  data={conversations}
+  keyExtractor={(item) => item.otherUserId}
+  renderItem={renderItem}
+  contentContainerStyle={{ paddingBottom: 40 }}
+  showsVerticalScrollIndicator={false}
+  refreshing={refreshing}          // ✅ enables pull-to-refresh spinner
+  onRefresh={handleRefresh}        // ✅ trigger logic on swipe
+/>
+
       )}
     </View>
   );
