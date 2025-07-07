@@ -125,14 +125,14 @@ export default function TaskerChatScreen({ navigation, route }) {
           isMine ? styles.rowRight : styles.rowLeft,
         ]}
       >
-        {!isMine && (
-         <View style={styles.avatar}>
-         <Text style={styles.avatarLetter}>
-           {sender?.name?.charAt(0)?.toUpperCase() || "?"}
-         </Text>
-       </View>
-       
-        )}
+{!isMine && (
+  <View style={styles.avatar}>
+    <Text style={styles.avatarLetter}>
+      {(sender?.name || name || "?").charAt(0).toUpperCase()}
+    </Text>
+  </View>
+)}
+
         <View
           style={[
             styles.messageBubble,
@@ -172,9 +172,38 @@ export default function TaskerChatScreen({ navigation, route }) {
     style={{ flex: 1 }}
     keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0} // adjust if needed
   >
-    <View style={styles.container}>
-      {/* Messages and Input here */}
-    </View>
+<View style={styles.container}>
+  <FlatList
+    data={messages}
+    renderItem={renderItem}
+    keyExtractor={(item) => item._id || item.id}
+    contentContainerStyle={styles.chatBox}
+    inverted
+  />
+
+  <View style={styles.inputRow}>
+    <TextInput
+      value={message}
+      onChangeText={setMessage}
+      style={styles.input}
+      placeholder={t("clientChat.placeholder")}
+      placeholderTextColor="#aaa"
+      textAlign={I18nManager.isRTL ? "right" : "left"}
+    />
+    <TouchableOpacity
+      style={[styles.sendButton, sending && { backgroundColor: "#888" }]}
+      onPress={sendMessage}
+      disabled={sending}
+    >
+      {sending ? (
+        <ActivityIndicator color="#fff" size="small" />
+      ) : (
+        <Ionicons name="send" size={20} color="#ffffff" />
+      )}
+    </TouchableOpacity>
+  </View>
+</View>
+
   </KeyboardAvoidingView>
 </SafeAreaView>
   );
