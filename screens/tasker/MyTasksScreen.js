@@ -86,18 +86,24 @@ const res = await axios.get(url, {
 
   const renderTask = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate("TaskerTaskDetails", { task: item })}>
-    <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.sub}>
-  {t("taskerMyTasks.status")}:{" "}
-  {item.status === "cancelled"
-    ? `Cancelled by ${
-        item.cancelledBy?._id === taskerId
-          ? "You"
-          : item.cancelledBy?.name || "Client"
-      }`
-    : t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
-</Text>
+      <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
+        <Text style={styles.title}>{item.title}</Text>
+  
+        {item.status === "cancelled" ? (
+          <Text style={styles.sub}>
+            {t("taskerMyTasks.status")}:{" "}
+            Cancelled by{" "}
+            {item.cancelledBy?._id === taskerId
+              ? "You"
+              : item.cancelledBy?.name || "Client"}
+          </Text>
+        ) : (
+          <Text style={styles.sub}>
+            {t("taskerMyTasks.status")}:{" "}
+            {t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
+          </Text>
+        )}
+  
 
       
 
@@ -146,7 +152,7 @@ const res = await axios.get(url, {
                 [
                   {
                     text: "No",
-                    style: "cancel",
+                    style: "cancel", 
                   },
                   {
                     text: "Yes",
@@ -154,7 +160,7 @@ const res = await axios.get(url, {
                       try {
                         const res = await axios.put(
                           `https://task-kq94.onrender.com/api/tasks/${item._id}/cancel`,
-                          { cancelledBy: "tasker" },
+                          { cancelledBy: taskerId },
                           { headers: { "Content-Type": "application/json" } }
                         );
                     
