@@ -29,7 +29,7 @@ export default function WelcomeScreen({ navigation }) {
 
   useEffect(() => {
     const preload = async () => {
-      await Asset.loadAsync(require("../../assets/images/1.png"));
+      await Asset.loadAsync(require("../../assets/images/21.png"));
       await requestPermissions();
       setReady(true);
     };
@@ -85,7 +85,7 @@ export default function WelcomeScreen({ navigation }) {
     <>
       <View style={styles.container}>
         <Image
-          source={require("../../assets/images/1.png")}
+          source={require("../../assets/images/21.png")}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -142,9 +142,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   logo: {
-    width: width * 0.4,
-    height: width * 0.4,
-    marginBottom: 30,
+    width: width * 0.6,
+    height: width * 0.6,
+    marginBottom: 0,
   },
   title: {
     fontFamily: "InterBold",
