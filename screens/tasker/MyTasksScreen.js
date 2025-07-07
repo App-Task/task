@@ -143,7 +143,12 @@ const res = await axios.get(url, {
                     text: "Yes",
                     onPress: async () => {
                       try {
-                        const res = await axios.put(`https://task-kq94.onrender.com/api/tasks/${item._id}/cancel`);
+                        const res = await axios.put(
+                          `https://task-kq94.onrender.com/api/tasks/${item._id}/cancel`,
+                          { cancelledBy: "tasker" },
+                          { headers: { "Content-Type": "application/json" } }
+                        );
+                    
                         if (res.status === 200) {
                           Alert.alert("Cancelled successfully");
                           setTasks((prev) => prev.filter((t) => t._id !== item._id));
@@ -152,7 +157,8 @@ const res = await axios.get(url, {
                         console.error("❌ Cancel error:", err);
                         Alert.alert("Error", err.response?.data?.msg || "Something went wrong.");
                       }
-                    },
+                    }
+                    
                   },
                 ]
               );
