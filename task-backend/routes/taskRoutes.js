@@ -143,6 +143,8 @@ router.get("/tasker/:taskerId", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch tasker tasks" });
   }
 });
+
+
 // ✅ PUT /api/tasks/:id/cancel
 router.put("/:id/cancel", async (req, res) => {
   try {
@@ -156,22 +158,32 @@ router.put("/:id/cancel", async (req, res) => {
     task.cancelledBy = cancelledBy;
     await task.save();
 
-    // ✅ Notify tasker with correct message
-    if (task.taskerId) {
-      const clientCancelled = String(cancelledBy) === String(task.userId);
-      const message = clientCancelled
-        ? `The task “${task.title}” was cancelled by the client.`
-        : `The task “${task.title}” was cancelled by the you.`;
+    const isClient = String(cancelledBy) === String(task.userId);
+    const isTasker = String(cancelledBy) === String(task.taskerId);
 
-      const notif = new Notification({
+    // ✅ Notify tasker (if assigned)
+    if (task.taskerId) {
+      await Notification.create({
         userId: task.taskerId,
         type: "task",
         title: "Task Cancelled",
-        message,
+        message: isClient
+          ? `The task “${task.title}” was cancelled by the client.`
+          : `The task “${task.title}” was cancelled by you.`,
         relatedTaskId: task._id,
       });
-      await notif.save();
     }
+
+    // ✅ Notify client
+    await Notification.create({
+      userId: task.userId,
+      type: "task",
+      title: "Task Cancelled",
+      message: isTasker
+        ? `The task “${task.title}” was cancelled by the tasker.`
+        : `The task “${task.title}” was cancelled by you.`,
+      relatedTaskId: task._id,
+    });
 
     res.status(200).json({ msg: "Task cancelled", task });
 
@@ -180,6 +192,7 @@ router.put("/:id/cancel", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
+
 
 
 
