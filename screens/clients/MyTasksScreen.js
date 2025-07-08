@@ -36,6 +36,8 @@ export default function MyTasksScreen({ navigation, route }) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [userId, setUserId] = useState(null);
+  const [submittingReview, setSubmittingReview] = useState(false);
+
 
 
   useFocusEffect(
@@ -128,6 +130,8 @@ if (normalizedStatus === "cancelled") {
   const submitReview = async () => {
     if (!rating || !reviewTask) return;
     try {
+      setSubmittingReview(true); // ✅ Show loading overlay
+  
       await fetch("https://task-kq94.onrender.com/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -139,19 +143,22 @@ if (normalizedStatus === "cancelled") {
           comment,
         }),
       });
-
+  
+      setSubmittingReview(false); // ✅ Hide overlay
+  
       Alert.alert("Thank you!", "Your review was submitted.");
       setShowReview(false);
       setReviewTask(null);
       setRating(0);
       setComment("");
-      setActiveTab("Completed"); // 👈 make sure the tab is correct
-      navigation.setParams({}); // 👈 clear old params
-
+      setActiveTab("Completed");
+      navigation.setParams({});
     } catch (err) {
+      setSubmittingReview(false); // ✅ Hide on error
       Alert.alert("Error", "Failed to submit review.");
     }
   };
+  
   const renderTask = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate("TaskDetails", { task: item })}>
       <View style={styles.card}>
@@ -180,52 +187,64 @@ if (normalizedStatus === "cancelled") {
     <View style={styles.container}>
       {/* Review Modal */}
       <Modal isVisible={showReview}>
-        <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20 }}>
+  <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20 }}>
+    {submittingReview ? (
+      <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40 }}>
+        <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 12 }} />
+        <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+          {t("clientReview.submitting", "Submitting review...")}
+        </Text>
+      </View>
+    ) : (
+      <>
         <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#213729", marginBottom: 12 }}>
-  {t("clientReview.title", "Rate Your Tasker")}
-</Text>
+          {t("clientReview.title", "Rate Your Tasker")}
+        </Text>
 
+        <StarRating rating={rating} onChange={setRating} starSize={28} color="#215432" />
 
-          <StarRating rating={rating} onChange={setRating} starSize={28} color="#215432" />
-          <TextInput
-  placeholder={t("clientReview.commentPlaceholder", "Leave a comment...")}
-  value={comment}
-  onChangeText={(text) => {
-    if (text.length <= 300) setComment(text); // limit to 300 characters
-  }}
-  style={{
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 12,
-    padding: 12,
-    marginTop: 16,
-    fontFamily: "Inter",
-    fontSize: 14,
-  }}
-  multiline
-  maxLength={300}
-/>
+        <TextInput
+          placeholder={t("clientReview.commentPlaceholder", "Leave a comment...")}
+          value={comment}
+          onChangeText={(text) => {
+            if (text.length <= 300) setComment(text);
+          }}
+          style={{
+            borderWidth: 1,
+            borderColor: "#ccc",
+            borderRadius: 12,
+            padding: 12,
+            marginTop: 16,
+            fontFamily: "Inter",
+            fontSize: 14,
+          }}
+          multiline
+          maxLength={300}
+        />
 
-<Text style={{ fontFamily: "Inter", fontSize: 12, color: "#999", marginTop: 4 }}>
-  {comment.length}/300 characters
-</Text>
+        <Text style={{ fontFamily: "Inter", fontSize: 12, color: "#999", marginTop: 4 }}>
+          {comment.length}/300 characters
+        </Text>
 
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#213729",
-              paddingVertical: 12,
-              borderRadius: 30,
-              marginTop: 20,
-              alignItems: "center",
-            }}
-            onPress={submitReview}
-          >
-            <Text style={{ color: "#fff", fontFamily: "InterBold", fontSize: 16 }}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#213729",
+            paddingVertical: 12,
+            borderRadius: 30,
+            marginTop: 20,
+            alignItems: "center",
+          }}
+          onPress={submitReview}
+        >
+          <Text style={{ color: "#fff", fontFamily: "InterBold", fontSize: 16 }}>
             {t("clientReview.submit", "Submit Review")}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+          </Text>
+        </TouchableOpacity>
+      </>
+    )}
+  </View>
+</Modal>
+
 
       {/* Tabs */}
       <View style={styles.tabs}>
@@ -262,6 +281,34 @@ if (normalizedStatus === "cancelled") {
           contentContainerStyle={{ paddingTop: 20, paddingBottom: 40 }}
         />
       )}
+
+
+{submittingReview && (
+  <View style={{
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  }}>
+    <View style={{
+      backgroundColor: "#fff",
+      padding: 24,
+      borderRadius: 20,
+      alignItems: "center",
+    }}>
+      <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
+      <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+        {t("clientReview.submitting", "Submitting review...")}
+      </Text>
+    </View>
+  </View>
+)}
+
     </View>
   );
 }

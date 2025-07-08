@@ -203,6 +203,20 @@
     "acceptingBid": "Accepting..."
 
   },
+"clientReview": {
+  "title": "Rate Your Tasker",
+  "commentPlaceholder": "Leave a comment...",
+  "submit": "Submit Review",
+  "submitting": "Submitting review..."
+},
+
+
+
+
+
+
+
+
 
 
 

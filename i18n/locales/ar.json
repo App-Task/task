@@ -207,6 +207,16 @@
     "acceptingBid": "جاري القبول..."
 
   },
+"clientReview": {
+  "title": "قيّم المزود",
+  "commentPlaceholder": "اكتب تعليقاً...",
+  "submit": "إرسال التقييم",
+  "submitting": "جارٍ إرسال التقييم..."
+},
+
+
+
+
 
 
 
