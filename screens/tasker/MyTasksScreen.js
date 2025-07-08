@@ -83,103 +83,162 @@ const res = await axios.get(url, {
     loadTasks();
   }, [tab]);
   
-
-  const renderTask = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate("TaskerTaskDetails", { task: item })}>
-      <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
-        <Text style={styles.title}>{item.title}</Text>
+  const renderTask = ({ item }) => {
+    console.log("🔍 Task:", item.title, "CancelledBy:", item.cancelledBy);
   
-        <Text style={styles.sub}>
-  {t("taskerMyTasks.status")}:{" "}
-  {item.status === "cancelled"
-    ? `Cancelled by ${item.cancelledBy?._id === taskerId ? "you" : "client"}`
-    : t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
-</Text>
-
+    const cancelledById =
+      typeof item.cancelledBy === "object"
+        ? item.cancelledBy?._id
+        : item.cancelledBy;
   
+    const cancelledByTasker =
+      cancelledById && cancelledById.toString() === taskerId.toString();
+  
+    return (
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("TaskerTaskDetails", { task: item })
+        }
+      >
+        <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
+          {/* Title */}
+          <Text style={styles.title}>{item.title}</Text>
+  
+          {/* Status Line */}
+          <Text
+            style={[
+              styles.sub,
+              item.status === "cancelled" && {
+                color: "#c00",
+                fontWeight: "bold",
+              },
+            ]}
+          >
+            {t("taskerMyTasks.status")}:{" "}
+            {item.status === "cancelled"
+              ? `Cancelled by ${cancelledByTasker ? "you" : "client"}`
+              : t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
+          </Text>
 
-      
-
-
-{tab === "previous" && item.status === "cancelled" && (
-  <View style={styles.cancelBox}>
+          {tab === "previous" &&
+  item.status?.toLowerCase() === "cancelled" &&
+  item.cancelledBy && (
     <Text style={styles.cancelText}>
-    Task Cancelled by {item.cancelledBy?._id === taskerId
-  ? "You"
-  : item.cancelledBy?.name || "Client"}
+       Cancelled by{" "}
+      {typeof item.cancelledBy === "object"
+        ? item.cancelledBy._id === taskerId
+          ? "You"
+          : "Client"
+        : item.cancelledBy === taskerId
+        ? "You"
+        : "Client"}
     </Text>
-  </View>
 )}
 
-
-
-      <View style={styles.actions}>
-        {tab === "active" && (
-          <TouchableOpacity
-  style={styles.btn}
-  onPress={() =>
-    navigation.navigate("Chat", {
-      name: item.user?.name || "Client",
-      otherUserId: item.user?._id || item.userId,
-    })
-  }
->
-  <Text style={styles.btnText}>{t("taskerMyTasks.chat")}</Text>
-</TouchableOpacity>
-
-
-        )}
-        <TouchableOpacity
-          style={[styles.btn, styles.secondaryBtn]}
-          onPress={() => Alert.alert("Report", "Report client")}
-        >
-          <Text style={[styles.btnText, styles.secondaryText]}>{t("taskerMyTasks.report")}</Text>
-        </TouchableOpacity>
-        {tab === "active" && (
-          <TouchableOpacity
-            style={[styles.btn, styles.dangerBtn]}
-            onPress={() => {
-              Alert.alert(
-                "Are you sure you want to cancel?",
-                "",
-                [
-                  {
-                    text: "No",
-                    style: "cancel", 
-                  },
-                  {
-                    text: "Yes",
-                    onPress: async () => {
-                      try {
-                        const res = await axios.put(
-                          `https://task-kq94.onrender.com/api/tasks/${item._id}/cancel`,
-                          { cancelledBy: taskerId },
-                          { headers: { "Content-Type": "application/json" } }
-                        );
-                    
-                        if (res.status === 200) {
-                          Alert.alert("Cancelled successfully");
-                          setTasks((prev) => prev.filter((t) => t._id !== item._id));
+  
+          {/* Cancelled Notice */}
+          {item.status === "cancelled" && (
+            <View
+              style={{
+                backgroundColor: "#ffe5e5",
+                padding: 10,
+                borderRadius: 8,
+                borderColor: "#c00",
+                borderWidth: 1,
+                marginTop: 6,
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "InterBold",
+                  fontSize: 14,
+                  color: "#c00",
+                  textAlign: I18nManager.isRTL ? "right" : "left",
+                }}
+              >
+                ❗ This task was cancelled by{" "}
+                {cancelledByTasker
+                  ? "you"
+                  : item.cancelledBy?.name || "the client"}
+              </Text>
+            </View>
+          )}
+  
+          {/* Action Buttons */}
+          <View style={styles.actions}>
+            {tab === "active" && (
+              <TouchableOpacity
+                style={styles.btn}
+                onPress={() =>
+                  navigation.navigate("Chat", {
+                    name: item.user?.name || "Client",
+                    otherUserId: item.user?._id || item.userId,
+                  })
+                }
+              >
+                <Text style={styles.btnText}>{t("taskerMyTasks.chat")}</Text>
+              </TouchableOpacity>
+            )}
+  
+            <TouchableOpacity
+              style={[styles.btn, styles.secondaryBtn]}
+              onPress={() => Alert.alert("Report", "Report client")}
+            >
+              <Text style={[styles.btnText, styles.secondaryText]}>
+                {t("taskerMyTasks.report")}
+              </Text>
+            </TouchableOpacity>
+  
+            {tab === "active" && (
+              <TouchableOpacity
+                style={[styles.btn, styles.dangerBtn]}
+                onPress={() => {
+                  Alert.alert("Are you sure you want to cancel?", "", [
+                    { text: "No", style: "cancel" },
+                    {
+                      text: "Yes",
+                      onPress: async () => {
+                        try {
+                          const res = await axios.put(
+                            `https://task-kq94.onrender.com/api/tasks/${item._id}/cancel`,
+                            { cancelledBy: taskerId },
+                            {
+                              headers: {
+                                "Content-Type": "application/json",
+                              },
+                            }
+                          );
+  
+                          if (res.status === 200) {
+                            Alert.alert("Cancelled successfully");
+                            setTasks((prev) =>
+                              prev.filter((t) => t._id !== item._id)
+                            );
+                          }
+                        } catch (err) {
+                          console.error("❌ Cancel error:", err);
+                          Alert.alert(
+                            "Error",
+                            err.response?.data?.msg || "Something went wrong."
+                          );
                         }
-                      } catch (err) {
-                        console.error("❌ Cancel error:", err);
-                        Alert.alert("Error", err.response?.data?.msg || "Something went wrong.");
-                      }
-                    }
-                    
-                  },
-                ]
-              );
-              
-            }}
-                      >
-            <Text style={[styles.btnText, styles.dangerText]}>{t("taskerMyTasks.cancel")}</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    </Animated.View>
-    </TouchableOpacity>
-  );
+                      },
+                    },
+                  ]);
+                }}
+              >
+                <Text style={[styles.btnText, styles.dangerText]}>
+                  {t("taskerMyTasks.cancel")}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </Animated.View>
+      </TouchableOpacity>
+    );
+  };
+  
+  
 
   return (
     <View style={styles.container}>
