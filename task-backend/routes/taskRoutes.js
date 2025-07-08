@@ -161,7 +161,7 @@ router.put("/:id/cancel", async (req, res) => {
       const clientCancelled = String(cancelledBy) === String(task.userId);
       const message = clientCancelled
         ? `The task “${task.title}” was cancelled by the client.`
-        : `The task “${task.title}” was cancelled by the tasker.`;
+        : `The task “${task.title}” was cancelled by the you.`;
 
       const notif = new Notification({
         userId: task.taskerId,
