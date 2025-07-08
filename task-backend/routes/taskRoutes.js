@@ -189,16 +189,24 @@ router.patch("/:id/complete", async (req, res) => {
 await task.save();
 
 // ✅ Notify tasker
+// ✅ Notify tasker
 if (task.taskerId) {
+  const cancelledById = req.body.cancelledBy;
+  const clientCancelled = String(cancelledById) === String(task.userId);
+  const message = clientCancelled
+    ? `The task “${task.title}” was cancelled by the client.`
+    : `The task “${task.title}” was cancelled by the tasker.`;
+
   const notif = new Notification({
     userId: task.taskerId,
     type: "task",
-    title: "Task Completed",
-    message: `The task “${task.title}” has been marked as completed.`,
+    title: "Task Cancelled",
+    message,
     relatedTaskId: task._id,
   });
   await notif.save();
 }
+
 
 res.json({ msg: "Task marked as completed", task });
 

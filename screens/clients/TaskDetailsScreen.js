@@ -15,6 +15,8 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { getTaskById, updateTaskById, deleteTaskById } from "../../services/taskService";
 import { useIsFocused } from "@react-navigation/native";
+import * as SecureStore from "expo-secure-store";
+
 
 
 const { width } = Dimensions.get("window");
@@ -26,6 +28,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const isFocused = useIsFocused(); // 👈 tracks when screen comes into focus
   const [bids, setBids] = useState([]);
+
 
 
   useEffect(() => {
@@ -53,35 +56,67 @@ export default function TaskDetailsScreen({ route, navigation }) {
   };
   
   const handleDelete = async () => {
+    console.log("🟡 [Cancel Flow] User pressed 'Cancel Task'");
+  
     Alert.alert(
       "Cancel Task",
       "Are you sure you want to cancel this task?",
       [
-        { text: "No" },
+        { text: "No", onPress: () => console.log("🟡 [Cancel Flow] Cancel aborted by user") },
         {
           text: "Yes",
-          onPress: async () => {
-            try {
-              await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/cancel`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ cancelledBy: "client" }),
-              });
+          onPress: () => {
+            console.log("🟡 [Cancel Flow] User confirmed cancellation");
   
-              Alert.alert("Task Cancelled");
-navigation.navigate("ClientHome", {
-  screen: "Tasks",
-  params: { refreshTasks: true }
-});
-
-            } catch (err) {
-              Alert.alert("Error", "Failed to cancel task.");
-            }
+            SecureStore.getItemAsync("userId").then(async (clientId) => {
+              console.log("🔍 Retrieved userId:", clientId);
+  
+              if (!clientId) {
+                Alert.alert("Error", "User ID not found.");
+                console.log("❌ No userId in SecureStore, cannot proceed");
+                return;
+              }
+  
+              try {
+                const cancelPayload = { cancelledBy: clientId };
+                console.log("📦 Sending cancel request with payload:", cancelPayload);
+  
+                const res = await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/cancel`, {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(cancelPayload),
+                });
+  
+                const resultText = await res.text();
+                console.log("📨 Server responded with:", res.status, resultText);
+  
+                if (!res.ok) {
+                  console.log("❌ Cancel request failed");
+                  throw new Error("Failed to cancel task");
+                }
+  
+                Alert.alert("Task Cancelled");
+                console.log("✅ Task cancelled successfully, navigating back to task list");
+  
+                navigation.navigate("ClientHome", {
+                  screen: "Tasks",
+                  params: {
+                    refreshTasks: true,
+                    targetTab: "Cancelled",
+                    unique: Date.now(),
+                  },
+                });
+              } catch (err) {
+                console.log("❌ Error during cancel request:", err.message);
+                Alert.alert("Error", "Failed to cancel task.");
+              }
+            });
           },
         },
       ]
     );
   };
+  
   
 // comment
   if (loading) {
@@ -209,10 +244,12 @@ navigation.navigate("ClientHome", {
               navigation.navigate("ClientHome", {
                 screen: "Tasks",
                 params: {
-                  showReview: true,
-                  completedTask: updated,
+                  refreshTasks: true,
+                  targetTab: "Cancelled",
+                  unique: Date.now(), // 👈 ensures useEffect reruns
                 },
               });
+              
             } catch (err) {
               console.error("❌ Failed to complete task:", err.message);
               Alert.alert("Error", "Could not mark the task as completed.");

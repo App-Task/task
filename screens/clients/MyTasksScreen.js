@@ -35,6 +35,8 @@ export default function MyTasksScreen({ navigation, route }) {
   const [reviewTask, setReviewTask] = useState(null);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
+  const [userId, setUserId] = useState(null);
+
 
   useFocusEffect(
     useCallback(() => {
@@ -43,6 +45,8 @@ export default function MyTasksScreen({ navigation, route }) {
           setLoading(true);
           const userId = await SecureStore.getItemAsync("userId");
           if (!userId) throw new Error("No user ID");
+          setUserId(userId);
+          
       
           const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
           const allTasks = await res.json();
@@ -50,11 +54,18 @@ export default function MyTasksScreen({ navigation, route }) {
           const grouped = { Pending: [], Started: [], Completed: [], Cancelled: [] };
       
           allTasks.forEach((task) => {
-            if (task.status === "cancelled" || task.status === "Cancelled") {
-              grouped.Cancelled.push(task);
-            } else if (grouped[task.status]) {
-              grouped[task.status].push(task);
-            }
+            const normalizedStatus = (task.status || "").toLowerCase();
+
+if (normalizedStatus === "cancelled") {
+  grouped.Cancelled.push(task);
+} else if (normalizedStatus === "pending") {
+  grouped.Pending.push(task);
+} else if (normalizedStatus === "started") {
+  grouped.Started.push(task);
+} else if (normalizedStatus === "completed") {
+  grouped.Completed.push(task);
+}
+
           });
       
           setGroupedTasks(grouped);
@@ -154,10 +165,11 @@ export default function MyTasksScreen({ navigation, route }) {
         
       {/* ⬇️ ADD THIS BLOCK RIGHT HERE (inside renderTask) */}
       {activeTab === "Cancelled" && item.cancelledBy && (
-        <Text style={{ fontFamily: "Inter", color: "#c00", marginTop: 8 }}>
-          Cancelled by {item.cancelledBy === "client" ? "You" : "Tasker"}
-        </Text>
-      )}
+  <Text style={{ fontFamily: "Inter", color: "#c00", marginTop: 8 }}>
+    Cancelled by {item.cancelledBy === userId ? "You" : "Tasker"}
+  </Text>
+)}
+
     </View>
       
     </TouchableOpacity>
