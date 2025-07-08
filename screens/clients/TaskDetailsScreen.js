@@ -28,6 +28,9 @@ export default function TaskDetailsScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const isFocused = useIsFocused(); // 👈 tracks when screen comes into focus
   const [bids, setBids] = useState([]);
+  const [completing, setCompleting] = useState(false);
+const [canceling, setCanceling] = useState(false);
+
 
 
 
@@ -42,6 +45,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
     try {
       const freshTask = await getTaskById(initialTask._id);
       setTask(freshTask);
+      
   
       // 👇 Fetch latest bids
       const res = await fetch(`https://task-kq94.onrender.com/api/bids/task/${initialTask._id}`);
@@ -62,7 +66,10 @@ export default function TaskDetailsScreen({ route, navigation }) {
       "Cancel Task",
       "Are you sure you want to cancel this task?",
       [
-        { text: "No", onPress: () => console.log("🟡 [Cancel Flow] Cancel aborted by user") },
+        {
+          text: "No",
+          onPress: () => console.log("🟡 [Cancel Flow] Cancel aborted by user"),
+        },
         {
           text: "Yes",
           onPress: () => {
@@ -78,14 +85,19 @@ export default function TaskDetailsScreen({ route, navigation }) {
               }
   
               try {
+                setCanceling(true); // ✅ Show popup overlay
+  
                 const cancelPayload = { cancelledBy: clientId };
                 console.log("📦 Sending cancel request with payload:", cancelPayload);
   
-                const res = await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/cancel`, {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(cancelPayload),
-                });
+                const res = await fetch(
+                  `https://task-kq94.onrender.com/api/tasks/${task._id}/cancel`,
+                  {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(cancelPayload),
+                  }
+                );
   
                 const resultText = await res.text();
                 console.log("📨 Server responded with:", res.status, resultText);
@@ -94,6 +106,8 @@ export default function TaskDetailsScreen({ route, navigation }) {
                   console.log("❌ Cancel request failed");
                   throw new Error("Failed to cancel task");
                 }
+  
+                setCanceling(false); // ✅ Hide popup
   
                 Alert.alert("Task Cancelled");
                 console.log("✅ Task cancelled successfully, navigating back to task list");
@@ -107,6 +121,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
                   },
                 });
               } catch (err) {
+                setCanceling(false); // ✅ Hide on error
                 console.log("❌ Error during cancel request:", err.message);
                 Alert.alert("Error", "Failed to cancel task.");
               }
@@ -116,7 +131,6 @@ export default function TaskDetailsScreen({ route, navigation }) {
       ]
     );
   };
-  
   
 // comment
   if (loading) {
@@ -237,24 +251,27 @@ export default function TaskDetailsScreen({ route, navigation }) {
           text: "Yes",
           onPress: async () => {
             try {
+              setCompleting(true);
               await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, {
                 method: "PATCH",
               });
               const updated = await getTaskById(task._id);
+              setCompleting(false);
               navigation.navigate("ClientHome", {
                 screen: "Tasks",
                 params: {
                   refreshTasks: true,
                   targetTab: "Cancelled",
-                  unique: Date.now(), // 👈 ensures useEffect reruns
+                  unique: Date.now(),
                 },
               });
-              
             } catch (err) {
+              setCompleting(false);
               console.error("❌ Failed to complete task:", err.message);
               Alert.alert("Error", "Could not mark the task as completed.");
             }
-          },
+          }
+          
         },
       ]
     );
@@ -272,6 +289,26 @@ export default function TaskDetailsScreen({ route, navigation }) {
     </TouchableOpacity>
   )}
 </View>
+
+{completing && (
+  <View style={styles.overlay}>
+    <View style={styles.overlayBox}>
+      <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
+      <Text style={styles.overlayText}>{t("clientTaskDetails.completingTask")}</Text>
+    </View>
+  </View>
+)}
+
+{canceling && (
+  <View style={styles.overlay}>
+    <View style={styles.overlayBox}>
+      <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
+      <Text style={styles.overlayText}>{t("clientTaskDetails.cancelingTask")}</Text>
+
+    </View>
+  </View>
+)}
+
 
 
 
@@ -382,5 +419,30 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Inter",
   },
+
+  overlay: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+  overlayBox: {
+    backgroundColor: "#fff",
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  overlayText: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#213729",
+  },
+  
   
 });

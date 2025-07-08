@@ -84,9 +84,12 @@ const handleBid = async () => {
   }
 
   try {
+    setSubmitting(true); // ✅ Show popup
+
     const user = await fetchCurrentUser();
 
     if (!user.isVerified) {
+      setSubmitting(false);
       Alert.alert("Access Denied", "You must be verified to place a bid.");
       return;
     }
@@ -97,6 +100,8 @@ const handleBid = async () => {
       amount: Number(bidAmount),
       message,
     });
+
+    setSubmitting(false); // ✅ Hide popup
 
     Alert.alert(
       t("taskerTaskDetails.successTitle"),
@@ -112,13 +117,12 @@ const handleBid = async () => {
         },
       ]
     );
-    
-    
 
     setBidAmount("");
     setMessage("");
   } catch (err) {
     console.error("❌ Bid error:", err.message);
+    setSubmitting(false);
     Alert.alert("Error", "Something went wrong while submitting the bid.");
   }
 };
@@ -325,6 +329,15 @@ const getStatusColor = (status) => {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {submitting && (
+  <View style={styles.submittingOverlay}>
+    <View style={styles.submittingBox}>
+      <Text style={styles.submittingText}>{t("taskerTaskDetails.submittingBid")}</Text>
+    </View>
+  </View>
+)}
+
     </SafeAreaView>
   );
 }
@@ -447,6 +460,32 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 6,
   },
+
+  submittingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 9999,
+  },
+  
+  submittingBox: {
+    backgroundColor: "#ffffff",
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    borderRadius: 20,
+  },
+  
+  submittingText: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#213729",
+  },
+  
   
   
   

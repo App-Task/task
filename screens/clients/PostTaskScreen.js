@@ -40,6 +40,8 @@ export default function PostTaskScreen() {
   const [images, setImages] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
+  const [posting, setPosting] = useState(false);
+
 
   const handlePost = async () => {
     if (!title || !description || !location || !budget || !selectedCategory) {
@@ -48,9 +50,12 @@ export default function PostTaskScreen() {
     }
   
     try {
+      setPosting(true); // ✅ show overlay
+  
       const userId = await SecureStore.getItemAsync("userId");
   
       if (!userId) {
+        setPosting(false);
         Alert.alert("Error", "User not logged in. Please sign in again.");
         return;
       }
@@ -82,9 +87,6 @@ export default function PostTaskScreen() {
   
       console.log("✅ Task posted:", result);
   
-      // ✅ Log current nav state
-      console.log("🧭 Navigation state:", navigation.getState());
-  
       Alert.alert(
         t("clientPostTask.successTitle"),
         t("clientPostTask.successMessage"),
@@ -93,17 +95,13 @@ export default function PostTaskScreen() {
             text: "OK",
             onPress: () => {
               setTimeout(() => {
-                navigation.navigate("Home"); // ✅ NOT getParent(), just direct
+                navigation.navigate("Home");
               }, 100);
             },
           },
         ]
       );
-      
-      
-      
   
-      // ✅ Clear form after submission
       setTitle("");
       setDescription("");
       setLocation("");
@@ -113,8 +111,11 @@ export default function PostTaskScreen() {
     } catch (err) {
       console.error("❌ Post error:", err.message);
       Alert.alert("Error", "Could not post task. Try again.");
+    } finally {
+      setPosting(false); // ✅ always hide popup
     }
   };
+  
   
   const pickImages = async () => {
     if (images.length >= 3) {
@@ -296,6 +297,16 @@ export default function PostTaskScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+
+      {posting && (
+  <View style={styles.postingOverlay}>
+    <View style={styles.postingBox}>
+      <Text style={styles.postingText}>{t("clientPostTask.postingNow")}</Text>
+    </View>
+  </View>
+)}
+
     </KeyboardAvoidingView>
   );
 }
@@ -512,6 +523,31 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     includeFontPadding: false,
+  },
+  
+
+  postingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+  postingBox: {
+    backgroundColor: "#fff",
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  postingText: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#213729",
   },
   
   

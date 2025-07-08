@@ -30,6 +30,8 @@ export default function ViewBidsScreen({ route, navigation }) {
   const [acceptedBidId, setAcceptedBidId] = useState(null);
   const [reviews, setReviews] = useState({});
   const [loading, setLoading] = useState(true);
+  const [accepting, setAccepting] = useState(false);
+
 
   useFocusEffect(
     React.useCallback(() => {
@@ -87,11 +89,13 @@ export default function ViewBidsScreen({ route, navigation }) {
 
   const handleAccept = async (bid) => {
     try {
+      setAccepting(true); // Show the overlay
       const res = await axios.put(`https://task-kq94.onrender.com/api/bids/${bid._id}/accept`);
       console.log("✅ Bid accepted:", res.data);
-
+  
       setAcceptedBidId(bid._id);
-
+      setAccepting(false); // Hide the overlay
+  
       Alert.alert(
         t("clientViewBids.acceptedTitle"),
         t("clientViewBids.acceptedMessage", {
@@ -103,18 +107,19 @@ export default function ViewBidsScreen({ route, navigation }) {
             onPress: () => {
               navigation.navigate("ClientHome", {
                 screen: "Tasks",
-                params: { refreshTasks: true, targetTab: "Started" } // ✅ pass new tab
+                params: { refreshTasks: true, targetTab: "Started" },
               });
-            }
-          }
+            },
+          },
         ]
       );
-      
     } catch (err) {
+      setAccepting(false); // Hide on error too
       console.error("❌ Accept bid error:", err.message);
       Alert.alert("Error", "Something went wrong while accepting the bid.");
     }
   };
+  
 
   const handleChat = (bid) => {
     const name = bid.taskerId?.name || "Tasker";
@@ -223,6 +228,17 @@ export default function ViewBidsScreen({ route, navigation }) {
           />
         )}
       </View>
+
+
+      {accepting && (
+  <View style={styles.acceptingOverlay}>
+    <View style={styles.acceptingBox}>
+      <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
+      <Text style={styles.acceptingText}>{t("clientViewBids.acceptingBid")}</Text>
+    </View>
+  </View>
+)}
+
     </SafeAreaView>
   );
 }
@@ -334,4 +350,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 12,
   },
+
+
+  acceptingOverlay: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+  acceptingBox: {
+    backgroundColor: "#ffffff",
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  acceptingText: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#213729",
+  },
+  
 });

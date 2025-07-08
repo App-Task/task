@@ -159,7 +159,9 @@
       "delivery": "توصيل",
       "repairs": "تصليحات",
       "other": "أخرى"
-    }
+    },
+    "postingNow": "جاري النشر..."
+
   },
   "clientProfile": {
   "editProfile": "تعديل الملف الشخصي",
@@ -191,7 +193,9 @@
   "status": "الحالة",
   "createdAt": "تاريخ الإنشاء",
   "bidCount": "عدد العروض",
-  "notProvided": "لم يتم التقديم"
+  "notProvided": "لم يتم التقديم",
+   "completingTask": "جارٍ إنهاء المهمة...",
+  "cancelingTask": "جارٍ إلغاء المهمة..."
 },
   "clientViewBids": {
     "title": "العروض المستلمة",
@@ -199,7 +203,9 @@
     "accept": "قبول",
     "noBids": "لم يتم استلام أي عروض بعد.",
     "acceptedTitle": "تم قبول العرض",
-    "acceptedMessage": "لقد قبلت عرض {{name}}."
+    "acceptedMessage": "لقد قبلت عرض {{name}}.",
+    "acceptingBid": "جاري القبول..."
+
   },
 
 
@@ -336,7 +342,9 @@
 "submitting": "جارٍ الإرسال...",
 "status": "حالة العرض",
  "loadingBid": "جاري تحميل عرض السعر الخاص بك...",
-  "loadingBidMessage": "يرجى الانتظار أثناء تحميل تفاصيل عرضك."
+  "loadingBidMessage": "يرجى الانتظار أثناء تحميل تفاصيل عرضك.",
+  "submittingBid": "جاري تقديم العرض..."
+
 
 }
 

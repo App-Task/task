@@ -156,7 +156,9 @@
       "delivery": "Delivery",
       "repairs": "Repairs",
       "other": "Other"
-    }
+    },
+    "postingNow": "Posting..."
+
   },
   "clientProfile": {
     "editProfile": "Edit Profile",
@@ -187,7 +189,9 @@
   "status": "Status",
   "createdAt": "Created At",
   "bidCount": "Number of Bids",
-  "notProvided": "Not provided"
+  "notProvided": "Not provided",
+  "completingTask": "Marking as completed...",
+  "cancelingTask": "Cancelling task..."
 },
   "clientViewBids": {
     "title": "Bids Received",
@@ -195,7 +199,9 @@
     "accept": "Accept",
     "noBids": "No bids received yet.",
     "acceptedTitle": "Bid Accepted",
-    "acceptedMessage": "You have accepted {{name}}'s bid."
+    "acceptedMessage": "You have accepted {{name}}'s bid.",
+    "acceptingBid": "Accepting..."
+
   },
 
 
@@ -330,7 +336,8 @@
 "submitting": "Submitting...",
 "status": "Bid Status",
 "loadingBid": "Fetching your bid...",
-"loadingBidMessage": "Please wait while we load your bid details."
+"loadingBidMessage": "Please wait while we load your bid details.",
+"submittingBid": "Submitting bid..."
 }
 
 
