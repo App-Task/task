@@ -17,6 +17,17 @@ import * as DocumentPicker from "expo-document-picker";
 
 export default function DocumentsScreen({ navigation }) {
   const { t } = useTranslation();
+  const getMimeType = (filename) => {
+    const ext = filename.split('.').pop().toLowerCase();
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg': return 'image/jpeg';
+      case 'png': return 'image/png';
+      case 'pdf': return 'application/pdf';
+      default: return 'application/octet-stream';
+    }
+  };
+  
   const [documents, setDocuments] = useState([]);
 
   const uploadDocument = async () => {
@@ -39,9 +50,11 @@ export default function DocumentsScreen({ navigation }) {
       formData.append("userId", user._id);
       formData.append("file", {
         uri: file.uri,
-        type: file.mimeType || "application/octet-stream",
+        type: file.mimeType || getMimeType(file.name),
         name: file.name || `upload-${Date.now()}`,
       });
+
+      
   
       console.log("📦 FormData prepared");
   
