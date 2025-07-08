@@ -124,7 +124,7 @@
         <div class="docs">
           <strong>Documents:</strong><br/>
           ${tasker.documents?.map(doc => {
-  const url = doc.startsWith("http") ? doc : `/uploads/${doc}`;
+          const url = doc.includes("/uploads/") || doc.startsWith("http") ? doc : `/uploads/${doc}`;
   return `<a href="${url}" target="_blank">${doc.split("/").pop()}</a>`;
 }).join("") || "None"}
 
