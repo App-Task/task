@@ -41,13 +41,15 @@ export default function NotificationsScreen() {
       await axios.patch("https://task-kq94.onrender.com/api/notifications/mark-read", {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+     
+      
     } catch (err) {
       console.error("❌ Failed to fetch notifications:", err.response?.data || err.message);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleRefresh = async () => {
     setRefreshing(true);
