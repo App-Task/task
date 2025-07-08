@@ -143,7 +143,6 @@ router.get("/tasker/:taskerId", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch tasker tasks" });
   }
 });
-
 // ✅ PUT /api/tasks/:id/cancel
 router.put("/:id/cancel", async (req, res) => {
   try {
@@ -154,22 +153,27 @@ router.put("/:id/cancel", async (req, res) => {
     if (!cancelledBy) return res.status(400).json({ msg: "Missing cancelledBy field" });
 
     task.status = "Cancelled";
-task.cancelledBy = cancelledBy;
-await task.save();
+    task.cancelledBy = cancelledBy;
+    await task.save();
 
-// ✅ Notify tasker
-if (task.taskerId) {
-  const notif = new Notification({
-    userId: task.taskerId,
-    type: "task",
-    title: "Task Cancelled",
-    message: `The task “${task.title}” was cancelled by the client.`,
-    relatedTaskId: task._id,
-  });
-  await notif.save();
-}
+    // ✅ Notify tasker with correct message
+    if (task.taskerId) {
+      const clientCancelled = String(cancelledBy) === String(task.userId);
+      const message = clientCancelled
+        ? `The task “${task.title}” was cancelled by the client.`
+        : `The task “${task.title}” was cancelled by the tasker.`;
 
-res.status(200).json({ msg: "Task cancelled", task });
+      const notif = new Notification({
+        userId: task.taskerId,
+        type: "task",
+        title: "Task Cancelled",
+        message,
+        relatedTaskId: task._id,
+      });
+      await notif.save();
+    }
+
+    res.status(200).json({ msg: "Task cancelled", task });
 
   } catch (err) {
     console.error("❌ Cancel task error:", err.message);
@@ -189,24 +193,16 @@ router.patch("/:id/complete", async (req, res) => {
 await task.save();
 
 // ✅ Notify tasker
-// ✅ Notify tasker
 if (task.taskerId) {
-  const cancelledById = req.body.cancelledBy;
-  const clientCancelled = String(cancelledById) === String(task.userId);
-  const message = clientCancelled
-    ? `The task “${task.title}” was cancelled by the client.`
-    : `The task “${task.title}” was cancelled by the tasker.`;
-
   const notif = new Notification({
     userId: task.taskerId,
     type: "task",
-    title: "Task Cancelled",
-    message,
+    title: "Task Completed",
+    message: `The task “${task.title}” has been marked as completed.`,
     relatedTaskId: task._id,
   });
   await notif.save();
 }
-
 
 res.json({ msg: "Task marked as completed", task });
 
