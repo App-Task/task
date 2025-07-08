@@ -89,20 +89,13 @@ const res = await axios.get(url, {
       <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
         <Text style={styles.title}>{item.title}</Text>
   
-        {item.status === "cancelled" ? (
-          <Text style={styles.sub}>
-            {t("taskerMyTasks.status")}:{" "}
-            Cancelled by{" "}
-            {item.cancelledBy?._id === taskerId
-              ? "You"
-              : item.cancelledBy?.name || "Client"}
-          </Text>
-        ) : (
-          <Text style={styles.sub}>
-            {t("taskerMyTasks.status")}:{" "}
-            {t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
-          </Text>
-        )}
+        <Text style={styles.sub}>
+  {t("taskerMyTasks.status")}:{" "}
+  {item.status === "cancelled"
+    ? `Cancelled by ${item.cancelledBy?._id === taskerId ? "you" : "client"}`
+    : t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
+</Text>
+
   
 
       
