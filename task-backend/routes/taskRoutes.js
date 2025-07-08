@@ -135,7 +135,10 @@ router.get("/tasker/:taskerId", async (req, res) => {
     const tasks = await Task.find({
       taskerId,
       ...statusFilter,
-    }).sort({ createdAt: -1 });
+    })
+    .populate("cancelledBy", "_id name") // ✅ this is the fix
+    .sort({ createdAt: -1 });
+    
 
     res.json(tasks);
   } catch (err) {
