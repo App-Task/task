@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Task = require("../models/Task");
+const Notification = require("../models/Notification"); // ✅ for tasker notifications
+
 
 // ✅ POST /api/tasks - create new task with userId
 router.post("/", async (req, res) => {
@@ -152,10 +154,23 @@ router.put("/:id/cancel", async (req, res) => {
     if (!cancelledBy) return res.status(400).json({ msg: "Missing cancelledBy field" });
 
     task.status = "Cancelled";
-    task.cancelledBy = cancelledBy;
-    await task.save();
+task.cancelledBy = cancelledBy;
+await task.save();
 
-    res.status(200).json({ msg: "Task cancelled", task });
+// ✅ Notify tasker
+if (task.taskerId) {
+  const notif = new Notification({
+    userId: task.taskerId,
+    type: "task",
+    title: "Task Cancelled",
+    message: `The task “${task.title}” was cancelled by the client.`,
+    relatedTaskId: task._id,
+  });
+  await notif.save();
+}
+
+res.status(200).json({ msg: "Task cancelled", task });
+
   } catch (err) {
     console.error("❌ Cancel task error:", err.message);
     res.status(500).json({ msg: "Server error" });
@@ -171,9 +186,22 @@ router.patch("/:id/complete", async (req, res) => {
     if (!task) return res.status(404).json({ error: "Task not found" });
 
     task.status = "Completed";
-    await task.save();
+await task.save();
 
-    res.json({ msg: "Task marked as completed", task });
+// ✅ Notify tasker
+if (task.taskerId) {
+  const notif = new Notification({
+    userId: task.taskerId,
+    type: "task",
+    title: "Task Completed",
+    message: `The task “${task.title}” has been marked as completed.`,
+    relatedTaskId: task._id,
+  });
+  await notif.save();
+}
+
+res.json({ msg: "Task marked as completed", task });
+
   } catch (err) {
     console.error("❌ Complete task error:", err.message);
     res.status(500).json({ error: "Failed to mark task as completed" });

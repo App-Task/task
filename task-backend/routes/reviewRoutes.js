@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const Review = require("../models/Review");
+const Task = require("../models/Task"); // ✅ needed to fetch task title
+const Notification = require("../models/Notification"); // ✅ to notify tasker
+
 
 // 🔹 POST /api/reviews — submit review
 router.post("/", async (req, res) => {
@@ -16,7 +19,22 @@ router.post("/", async (req, res) => {
     if (existing) return res.status(400).json({ error: "Already reviewed" });
 
     const review = await Review.create({ taskId, taskerId, clientId, rating, comment });
-    res.status(201).json(review);
+
+// ✅ Notify the tasker
+const task = await Task.findById(taskId);
+if (task && taskerId) {
+  const notif = new Notification({
+    userId: taskerId,
+    type: "review",
+    title: "New Review",
+    message: `You received a review from the client for “${task.title}”.`,
+    relatedTaskId: task._id,
+  });
+  await notif.save();
+}
+
+res.status(201).json(review);
+
   } catch (err) {
     console.error("❌ Review submit error:", err.message);
     res.status(500).json({ error: "Failed to submit review" });
