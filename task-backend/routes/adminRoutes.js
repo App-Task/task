@@ -75,12 +75,13 @@ router.get("/clients", async (req, res) => {
         return {
           _id: c._id,
           name: c.name || "N/A",
-          email: c.email || "N/A",
+          email: typeof c.email === "string" ? c.email : "unknown@example.com",
           image: (c.profileImage && typeof c.profileImage === "string")
             ? c.profileImage
             : "/images/placeholder.png",
           isBlocked: !!c.isBlocked,
-          totalTasks: taskMap[c._id.toString()] || 0,
+          totalTasks: c._id ? taskMap[c._id.toString()] || 0 : 0,
+
         };
       } catch (err) {
         console.error("❌ Error mapping client:", c, err.message);
