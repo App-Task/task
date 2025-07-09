@@ -158,7 +158,7 @@ router.get("/taskers", async (req, res) => {
         _id: t._id,
         name: t.name,
         email: t.email,
-        phone: t.phoneNumber || "N/A",
+        phone: t.phone || "N/A",
         location: t.location || "N/A",
         documents: t.documents || [],
         verificationStatus: t.verificationStatus || "pending",
