@@ -41,25 +41,22 @@ export default function LoginScreen({ navigation, route }) {
       const response = await loginUser({ email, password });
 
       if (response?.token && response?.user) {
-        console.log("✅ userId being saved:", response.user.id); // ✅ Use .id, not ._id
-
-        // ✅ Save only if valid ObjectId
+        console.log("✅ userId being saved:", response.user.id);
+      
         if (response.user.id && String(response.user.id).length === 24) {
           await storeToken(response.token);
-          
           console.log("🔥 JWT Token:", response.token);
-
-
-          await SecureStore.setItemAsync("userId", String(response.user.id)); // ✅ Corrected
+      
+          await SecureStore.setItemAsync("userId", String(response.user.id));
           await SecureStore.setItemAsync("userName", String(response.user.name));
+          await SecureStore.setItemAsync("userRole", role); // ✅ ADD THIS
         } else {
           console.warn("⚠️ Invalid userId format. Skipping SecureStore save.");
         }
-
-
-
+      
         navigation.replace(role === "tasker" ? "TaskerHome" : "ClientHome");
-      } else {
+      }
+       else {
         throw new Error(t("login.failedGeneric"));
       }
     } catch (err) {
