@@ -54,24 +54,37 @@ router.patch("/verify-tasker/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to update verification status." });
   }
 });
+
 router.get("/clients", async (req, res) => {
   try {
+    console.log("🚀 [ADMIN] Fetching clients...");
     const clients = await User.find({ role: "client" }).lean();
+    console.log(`📦 Total clients found: ${clients.length}`);
 
     const tasks = await Task.aggregate([
       { $group: { _id: "$userId", total: { $sum: 1 } } }
     ]);
+    console.log(`📦 Task aggregation result: ${tasks.length} entries`);
 
-    const taskMap = Object.fromEntries(tasks.map(t => [t._id.toString(), t.total]));
+    const taskMap = Object.fromEntries(
+      tasks
+        .filter(t => t._id && typeof t._id.toString === "function")
+        .map(t => [t._id.toString(), t.total])
+    );
+    console.log("🗺️ TaskMap constructed:", taskMap);
 
-    const data = clients.map(c => {
+    const data = clients.map((c, index) => {
       try {
+        console.log(`🧾 Mapping client #${index + 1}:`, c);
+
+        const idStr = c._id?.toString?.() || null;
+
         return {
           _id: c._id,
           name: c.name || "N/A",
           email: typeof c.email === "string" ? c.email : "unknown@example.com",
           isBlocked: !!c.isBlocked,
-          totalTasks: c._id ? taskMap[c._id.toString()] || 0 : 0,
+          totalTasks: idStr && taskMap[idStr] ? taskMap[idStr] : 0,
         };
       } catch (err) {
         console.error("❌ Error mapping client:", c, err.message);
@@ -79,9 +92,10 @@ router.get("/clients", async (req, res) => {
       }
     }).filter(Boolean);
 
+    console.log(`✅ Final clients to return: ${data.length}`);
     res.json(data);
   } catch (err) {
-    console.error("❌ Failed to fetch clients:", err.message);
+    console.error("❌ Failed to fetch clients route error:", err.message);
     res.status(500).json({ error: "Failed to fetch clients" });
   }
 });
