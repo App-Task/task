@@ -122,21 +122,44 @@ export default function PostTaskScreen() {
       Alert.alert(t("clientPostTask.limitTitle"), t("clientPostTask.limitMsg"));
       return;
     }
-
+  
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsMultipleSelection: false,
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.5,
     });
-
+  
     if (!result.canceled) {
-      setImages([...images, result.assets[0].uri]);
+      const localUri = result.assets[0].uri;
+  
+      const formData = new FormData();
+      formData.append("file", {
+        uri: localUri,
+        type: "image/jpeg",
+        name: "upload.jpg",
+      });
+      formData.append("upload_preset", "task_app_preset");
+  
+      try {
+        const response = await fetch("https://api.cloudinary.com/v1_1/dvxz4nfnx/image/upload", {
+          method: "POST",
+          body: formData,
+        });
+  
+        const data = await response.json();
+  
+        if (data.secure_url) {
+          setImages([...images, data.secure_url]); // store Cloudinary URL
+        } else {
+          throw new Error("Upload failed");
+        }
+      } catch (err) {
+        console.error("❌ Cloudinary upload failed:", err);
+        Alert.alert("Upload failed", "Could not upload image. Try again.");
+      }
     }
   };
-  const deleteImage = (indexToDelete) => {
-    const updatedImages = images.filter((_, index) => index !== indexToDelete);
-    setImages(updatedImages);
-  };
+  
   
   
 
