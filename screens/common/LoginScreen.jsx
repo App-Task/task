@@ -49,7 +49,17 @@ export default function LoginScreen({ navigation, route }) {
       
           await SecureStore.setItemAsync("userId", String(response.user.id));
           await SecureStore.setItemAsync("userName", String(response.user.name));
-          await SecureStore.setItemAsync("userRole", role); // ✅ ADD THIS
+          if (response.user.role !== role) {
+            Alert.alert(
+              t("login.failedTitle"),
+              `This account is registered as a ${response.user.role}, not a ${role}.`
+            );
+            setIsLoggingIn(false);
+            return;
+          }
+          
+          await SecureStore.setItemAsync("userRole", response.user.role);
+          
         } else {
           console.warn("⚠️ Invalid userId format. Skipping SecureStore save.");
         }
