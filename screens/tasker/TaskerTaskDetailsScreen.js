@@ -55,19 +55,6 @@ export default function TaskDetailsScreen({ route }) {
       } finally {
         if (isMounted) setLoadingBid(false); // ✅ Mark bid as loaded
       }
-
-      useEffect(() => {
-        const fetchFullTask = async () => {
-          try {
-            const res = await axios.get(`https://task-kq94.onrender.com/api/tasks/${initialTask._id}`);
-            setTask(res.data);
-          } catch (err) {
-            console.error("❌ Failed to fetch full task:", err.message);
-          }
-        };
-      
-        fetchFullTask();
-      }, []);
       
     };
   
@@ -75,6 +62,19 @@ export default function TaskDetailsScreen({ route }) {
     return () => {
       isMounted = false;
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchFullTask = async () => {
+      try {
+        const res = await axios.get(`https://task-kq94.onrender.com/api/tasks/${initialTask._id}`);
+        setTask(res.data);
+      } catch (err) {
+        console.error("❌ Failed to fetch full task:", err.message);
+      }
+    };
+  
+    fetchFullTask();
   }, []);
   
   

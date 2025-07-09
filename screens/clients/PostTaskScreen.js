@@ -43,6 +43,13 @@ export default function PostTaskScreen() {
   const [posting, setPosting] = useState(false);
 
 
+const deleteImage = (index) => {
+  const updatedImages = [...images];
+  updatedImages.splice(index, 1);
+  setImages(updatedImages);
+};
+
+
   const handlePost = async () => {
     if (!title || !description || !location || !budget || !selectedCategory) {
       Alert.alert(t("clientPostTask.missingTitle"), t("clientPostTask.fillAllFields"));
