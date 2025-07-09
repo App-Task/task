@@ -38,10 +38,7 @@ app.use("/api/documents", documentRoutes);
 app.use("/api", userRoutes);
 
 
-// ✅ Serve Admin Panel
-app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/admin/dashboard.html"));
-});
+
 
 // ✅ Test route
 app.get("/test", (req, res) => {
