@@ -54,15 +54,9 @@ router.patch("/verify-tasker/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to update verification status." });
   }
 });
-// GET /api/admin/clients
 router.get("/clients", async (req, res) => {
   try {
     const clients = await User.find({ role: "client" }).lean();
-
-    console.log("✅ Clients found:", clients.length);
-    if (clients.length > 0) {
-      console.log("🧪 Sample client:", clients[0]);
-    }
 
     const tasks = await Task.aggregate([
       { $group: { _id: "$userId", total: { $sum: 1 } } }
@@ -76,18 +70,14 @@ router.get("/clients", async (req, res) => {
           _id: c._id,
           name: c.name || "N/A",
           email: typeof c.email === "string" ? c.email : "unknown@example.com",
-          image: (c.profileImage && typeof c.profileImage === "string")
-            ? c.profileImage
-            : "/images/placeholder.png",
           isBlocked: !!c.isBlocked,
           totalTasks: c._id ? taskMap[c._id.toString()] || 0 : 0,
-
         };
       } catch (err) {
         console.error("❌ Error mapping client:", c, err.message);
         return null;
       }
-    }).filter(Boolean); // Remove any mapping errors
+    }).filter(Boolean);
 
     res.json(data);
   } catch (err) {
