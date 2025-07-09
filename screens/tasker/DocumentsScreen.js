@@ -14,6 +14,8 @@ import axios from "axios";
 import { fetchCurrentUser } from "../../services/auth";
 import { getToken } from "../../services/authStorage";
 import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
+
 
 export default function DocumentsScreen({ navigation }) {
   const { t } = useTranslation();
@@ -29,6 +31,7 @@ export default function DocumentsScreen({ navigation }) {
   };
   
   const [documents, setDocuments] = useState([]);
+  
 
   const uploadDocument = async () => {
     try {
@@ -48,11 +51,19 @@ export default function DocumentsScreen({ navigation }) {
   
       const formData = new FormData();
       formData.append("userId", user._id);
-      formData.append("file", {
-        uri: file.uri,
-        type: file.mimeType || getMimeType(file.name),
-        name: file.name || `upload-${Date.now()}`,
-      });
+      const fileUri = file.uri;
+const fileInfo = await FileSystem.getInfoAsync(fileUri);
+if (!fileInfo.exists) {
+  throw new Error("File not found");
+}
+
+const fileBlob = {
+  uri: fileUri,
+  name: file.name || `upload-${Date.now()}`,
+  type: file.mimeType || getMimeType(file.name),
+};
+
+formData.append("file", fileBlob);
 
       
   

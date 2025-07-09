@@ -106,38 +106,51 @@
     }
 
     function renderTaskers(data) {
-      const container = document.getElementById("taskers");
-      container.innerHTML = "";
-      if (data.length === 0) {
-        container.innerHTML = "<p>No pending verifications.</p>";
-        return;
-      }
+  const container = document.getElementById("taskers");
+  container.innerHTML = "";
+  console.log(`🎨 Rendering ${data.length} taskers...`);
 
-      data.forEach(tasker => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-        <h3>${tasker.name}</h3>
-        <p><strong>Email:</strong> ${tasker.email}</p>
-        <p><strong>Location:</strong> ${tasker.location || "N/A"}</p>
-        <p><strong>Phone:</strong> ${tasker.phoneNumber || "N/A"}</p>
-        <div class="docs">
-          <strong>Documents:</strong><br/>
-          ${tasker.documents?.map(doc => {
-          const url = doc.includes("/uploads/") || doc.startsWith("http") ? doc : `/uploads/${doc}`;
-  return `<a href="${url}" target="_blank">${doc.split("/").pop()}</a>`;
-}).join("") || "None"}
+  if (data.length === 0) {
+    container.innerHTML = "<p>No pending verifications.</p>";
+    return;
+  }
 
-        </div>
-        <div style="margin-top: 12px;">
-          <button class="btn btn-accept" onclick="verifyTasker('${tasker._id}', 'accepted')">Accept</button>
-          <button class="btn btn-decline" onclick="verifyTasker('${tasker._id}', 'declined')">Decline</button>
-        </div>
-      `;
+  data.forEach(tasker => {
+    console.log("👤 Tasker:", tasker.name);
+    const card = document.createElement("div");
+    card.className = "card";
+    const docsHtml = tasker.documents?.map(doc => {
+      const url = doc.includes("/uploads/") || doc.startsWith("http") ? doc : `/uploads/${doc}`;
+      const fileName = doc.split("/").pop();
+      return `<a href="${url}" target="_blank" class="doc-link" data-filename="${fileName}">${fileName}</a>`;
+    }).join("") || "None";
 
-        container.appendChild(card);
-      });
-    }
+    card.innerHTML = `
+      <h3>${tasker.name}</h3>
+      <p><strong>Email:</strong> ${tasker.email}</p>
+      <p><strong>Location:</strong> ${tasker.location || "N/A"}</p>
+      <p><strong>Phone:</strong> ${tasker.phoneNumber || "N/A"}</p>
+      <div class="docs">
+        <strong>Documents:</strong><br/>
+        ${docsHtml}
+      </div>
+      <div style="margin-top: 12px;">
+        <button class="btn btn-accept" onclick="verifyTasker('${tasker._id}', 'accepted')">Accept</button>
+        <button class="btn btn-decline" onclick="verifyTasker('${tasker._id}', 'declined')">Decline</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  // ✅ Add click listeners to document links for logging
+  document.querySelectorAll(".doc-link").forEach(link => {
+    link.addEventListener("click", (e) => {
+      const file = e.target.getAttribute("data-filename");
+      console.log(`📂 Opening document: ${file}`);
+    });
+  });
+}
+
 
     function verifyTasker(id, status) {
       axios.patch(`/api/admin/verify-tasker/${id}`, { status }).then(() => {
