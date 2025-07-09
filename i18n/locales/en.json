@@ -157,7 +157,9 @@
       "repairs": "Repairs",
       "other": "Other"
     },
-    "postingNow": "Posting..."
+    "postingNow": "Posting...",
+    "uploadingImage": "Uploading image..."
+
 
   },
   "clientProfile": {
@@ -245,7 +247,12 @@
     "uploadBtn": "Upload Document",
     "empty": "No documents uploaded yet.",
     "uploadedTitle": "Uploaded",
-    "uploadedMessage": "Your document has been uploaded successfully."
+    "uploadedMessage": "Your document has been uploaded successfully.",
+    "confirmTitle": "Are you sure?",
+  "confirmMessage": "You cannot delete uploaded files. Do you want to continue?",
+  "yes": "Yes",
+  "no": "No",
+  "uploading": "Uploading document..."
   },
   "taskerEditProfile": {
     "title": "Edit Profile",

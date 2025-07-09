@@ -160,7 +160,9 @@
       "repairs": "تصليحات",
       "other": "أخرى"
     },
-    "postingNow": "جاري النشر..."
+    "postingNow": "جاري النشر...",
+    "uploadingImage": "جارٍ تحميل الصورة..."
+
 
   },
   "clientProfile": {
@@ -248,7 +250,12 @@
     "uploadBtn": "رفع مستند",
     "empty": "لم يتم رفع أي مستند بعد.",
     "uploadedTitle": "تم الرفع",
-    "uploadedMessage": "تم رفع المستند بنجاح."
+    "uploadedMessage": "تم رفع المستند بنجاح.",
+    "confirmTitle": "هل أنت متأكد؟",
+    "confirmMessage": "لا يمكنك حذف الملفات التي تم تحميلها. هل تريد المتابعة؟",
+    "yes": "نعم",
+    "no": "لا",
+    "uploading": "جارٍ تحميل المستند..."
   },
   "taskerEditProfile": {
     "title": "تعديل الملف الشخصي",

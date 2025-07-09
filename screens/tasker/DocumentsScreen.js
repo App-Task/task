@@ -31,6 +31,8 @@ export default function DocumentsScreen({ navigation }) {
   };
   
   const [documents, setDocuments] = useState([]);
+  const [uploading, setUploading] = useState(false);
+
   
 
   const uploadDocument = async () => {
@@ -47,56 +49,70 @@ export default function DocumentsScreen({ navigation }) {
   
       const file = result.assets[0];
   
-      console.log("📂 Picked file:", file);
-  
-      const formData = new FormData();
-      formData.append("userId", user._id);
-      const fileUri = file.uri;
-const fileInfo = await FileSystem.getInfoAsync(fileUri);
-if (!fileInfo.exists) {
-  throw new Error("File not found");
-}
-
-const fileBlob = {
-  uri: fileUri,
-  name: file.name || `upload-${Date.now()}`,
-  type: file.mimeType || getMimeType(file.name),
-};
-
-formData.append("file", fileBlob);
-
-      
-  
-      console.log("📦 FormData prepared");
-  
-      const response = await axios.post(
-        "https://task-kq94.onrender.com/api/documents/upload-file",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-  
-      console.log("✅ Upload response:", response.data);
-  
-      setDocuments((prev) => [
-        ...prev,
-        { id: Date.now().toString(), name: file.name },
-      ]);
-  
+      // 👇 Confirmation alert
       Alert.alert(
-        t("taskerDocuments.uploadedTitle"),
-        t("taskerDocuments.uploadedMessage")
+        t("taskerDocuments.confirmTitle"),
+        t("taskerDocuments.confirmMessage"),
+        [
+          {
+            text: t("taskerDocuments.no"),
+            style: "cancel",
+          },
+          {
+            text: t("taskerDocuments.yes"),
+            onPress: async () => {
+              setUploading(true); // show loading popup
+  
+              try {
+                const formData = new FormData();
+                formData.append("userId", user._id);
+                const fileUri = file.uri;
+                const fileInfo = await FileSystem.getInfoAsync(fileUri);
+                if (!fileInfo.exists) throw new Error("File not found");
+  
+                const fileBlob = {
+                  uri: fileUri,
+                  name: file.name || `upload-${Date.now()}`,
+                  type: file.mimeType || getMimeType(file.name),
+                };
+  
+                formData.append("file", fileBlob);
+  
+                const response = await axios.post(
+                  "https://task-kq94.onrender.com/api/documents/upload-file",
+                  formData,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      "Content-Type": "multipart/form-data",
+                    },
+                  }
+                );
+  
+                setDocuments((prev) => [
+                  ...prev,
+                  { id: Date.now().toString(), name: file.name },
+                ]);
+  
+                Alert.alert(
+                  t("taskerDocuments.uploadedTitle"),
+                  t("taskerDocuments.uploadedMessage")
+                );
+              } catch (err) {
+                console.error("❌ Upload error:", err.response?.data || err.message);
+                Alert.alert("Upload Failed", "Could not upload document. Please try again.");
+              } finally {
+                setUploading(false); // hide loading popup
+              }
+            },
+          },
+        ]
       );
     } catch (err) {
-      console.error("❌ Upload error:", err.response?.data || err.message);
-      Alert.alert("Upload Failed", "Could not upload document. Please try again.");
+      console.error("❌ Picker error:", err.message);
     }
   };
-
+  
 
   const fetchDocuments = async () => {
     try {
@@ -188,6 +204,38 @@ formData.append("file", fileBlob);
       </TouchableOpacity>
 
       <View style={{ height: 60 }} />
+
+
+      {uploading && (
+  <View
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0,0,0,0.4)",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 999,
+    }}
+  >
+    <View
+      style={{
+        backgroundColor: "#fff",
+        paddingVertical: 20,
+        paddingHorizontal: 30,
+        borderRadius: 20,
+        alignItems: "center",
+      }}
+    >
+      <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+        {t("taskerDocuments.uploading")}
+      </Text>
+    </View>
+  </View>
+)}
+
     </ScrollView>
   );
 }

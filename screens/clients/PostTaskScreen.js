@@ -41,6 +41,8 @@ export default function PostTaskScreen() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [posting, setPosting] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
+
 
 
 const deleteImage = (index) => {
@@ -148,6 +150,7 @@ const deleteImage = (index) => {
       formData.append("upload_preset", "task_app_preset");
   
       try {
+        setImageUploading(true); // 👈 Start loading
         const response = await fetch("https://api.cloudinary.com/v1_1/dvxz4nfnx/image/upload", {
           method: "POST",
           body: formData,
@@ -156,16 +159,19 @@ const deleteImage = (index) => {
         const data = await response.json();
   
         if (data.secure_url) {
-          setImages([...images, data.secure_url]); // store Cloudinary URL
+          setImages([...images, data.secure_url]);
         } else {
           throw new Error("Upload failed");
         }
       } catch (err) {
         console.error("❌ Cloudinary upload failed:", err);
         Alert.alert("Upload failed", "Could not upload image. Try again.");
+      } finally {
+        setImageUploading(false); // 👈 Stop loading
       }
     }
   };
+  
   
   
   
@@ -333,6 +339,16 @@ const deleteImage = (index) => {
   <View style={styles.postingOverlay}>
     <View style={styles.postingBox}>
       <Text style={styles.postingText}>{t("clientPostTask.postingNow")}</Text>
+    </View>
+  </View>
+)}
+
+
+
+{imageUploading && (
+  <View style={styles.postingOverlay}>
+    <View style={styles.postingBox}>
+      <Text style={styles.postingText}>{t("clientPostTask.uploadingImage") || "Uploading image..."}</Text>
     </View>
   </View>
 )}
