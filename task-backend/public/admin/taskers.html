@@ -49,27 +49,28 @@
   }
 
   function renderTaskers(data) {
-    const tbody = document.querySelector("#taskersTable tbody");
-    tbody.innerHTML = "";
+  const container = document.getElementById("taskersContainer");
+  container.innerHTML = "";
 
-    data.forEach(t => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${t.name}</td>
-        <td>${t.email}</td>
-        <td>${t.phone}</td>
-        <td>${t.location}</td>
-        <td>${t.verificationStatus}</td>
-        <td>
-          <button class="${t.isBlocked ? 'unblock' : 'block'}" onclick="toggleBlock('${t._id}', ${!t.isBlocked})">
-            ${t.isBlocked ? 'Unblock' : 'Block'}
-          </button>
-          <button class="delete" onclick="deleteTasker('${t._id}')">Delete</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
+  data.forEach(t => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <h3>${t.name}</h3>
+      <p><strong>Email:</strong> ${t.email}</p>
+      <p><strong>Phone:</strong> ${t.phone}</p>
+      <p><strong>Location:</strong> ${t.location}</p>
+      <p><strong>Status:</strong> ${t.verificationStatus}</p>
+      <div class="actions">
+        <button class="${t.isBlocked ? 'unblock' : 'block'}" onclick="toggleBlock('${t._id}', ${!t.isBlocked})">
+          ${t.isBlocked ? 'Unblock' : 'Block'}
+        </button>
+        <button class="delete" onclick="deleteTasker('${t._id}')">Delete</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
 
   function renderPagination() {
     const totalPages = Math.ceil(totalTaskers / 10);
