@@ -54,31 +54,47 @@ router.patch("/verify-tasker/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to update verification status." });
   }
 });
-
 // GET /api/admin/clients
 router.get("/clients", async (req, res) => {
   try {
     const clients = await User.find({ role: "client" }).lean();
+
+    console.log("✅ Clients found:", clients.length);
+    if (clients.length > 0) {
+      console.log("🧪 Sample client:", clients[0]);
+    }
+
     const tasks = await Task.aggregate([
       { $group: { _id: "$userId", total: { $sum: 1 } } }
     ]);
 
     const taskMap = Object.fromEntries(tasks.map(t => [t._id.toString(), t.total]));
 
-    const data = clients.map(c => ({
-      _id: c._id,
-      name: c.name,
-      email: c.email,
-      image: c.profileImage || "/images/placeholder.png",
-      isBlocked: !!c.isBlocked,
-      totalTasks: taskMap[c._id.toString()] || 0
-    }));
+    const data = clients.map(c => {
+      try {
+        return {
+          _id: c._id,
+          name: c.name || "N/A",
+          email: c.email || "N/A",
+          image: (c.profileImage && typeof c.profileImage === "string")
+            ? c.profileImage
+            : "/images/placeholder.png",
+          isBlocked: !!c.isBlocked,
+          totalTasks: taskMap[c._id.toString()] || 0,
+        };
+      } catch (err) {
+        console.error("❌ Error mapping client:", c, err.message);
+        return null;
+      }
+    }).filter(Boolean); // Remove any mapping errors
 
     res.json(data);
   } catch (err) {
+    console.error("❌ Failed to fetch clients:", err.message);
     res.status(500).json({ error: "Failed to fetch clients" });
   }
 });
+
 
 // PATCH /api/admin/clients/:id/block
 router.patch("/clients/:id/block", async (req, res) => {
