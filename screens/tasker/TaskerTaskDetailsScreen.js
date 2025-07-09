@@ -23,8 +23,9 @@ const { width } = Dimensions.get("window");
 
 
 export default function TaskDetailsScreen({ route }) {
-  const { task } = route.params;
-  const { t } = useTranslation();
+  const { task: initialTask } = route.params;
+  const [task, setTask] = useState(initialTask);
+    const { t } = useTranslation();
   const navigation = useNavigation();
   const [submitting, setSubmitting] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -54,6 +55,20 @@ export default function TaskDetailsScreen({ route }) {
       } finally {
         if (isMounted) setLoadingBid(false); // ✅ Mark bid as loaded
       }
+
+      useEffect(() => {
+        const fetchFullTask = async () => {
+          try {
+            const res = await axios.get(`https://task-kq94.onrender.com/api/tasks/${initialTask._id}`);
+            setTask(res.data);
+          } catch (err) {
+            console.error("❌ Failed to fetch full task:", err.message);
+          }
+        };
+      
+        fetchFullTask();
+      }, []);
+      
     };
   
     init();
