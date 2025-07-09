@@ -69,7 +69,7 @@ router.get("/clients", async (req, res) => {
       _id: c._id,
       name: c.name,
       email: c.email,
-      image: c.profilePic || "/images/placeholder.png",
+      image: c.profileImage || "/images/placeholder.png",
       isBlocked: !!c.isBlocked,
       totalTasks: taskMap[c._id.toString()] || 0
     }));
