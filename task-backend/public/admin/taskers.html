@@ -34,74 +34,78 @@
   <div id="taskersContainer"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script>
-    let taskers = [];
+<script>
+  let allTaskers = [];
+  let currentPage = 1;
+  let totalTaskers = 0;
 
-    async function fetchTaskers() {
-      const res = await axios.get("/api/admin/taskers");
-      taskers = res.data;
-      renderTaskers(taskers);
-    }
+  async function fetchTaskers() {
+    const res = await axios.get(`/api/admin/taskers?page=${currentPage}&limit=10`);
+    allTaskers = res.data.taskers;
+    totalTaskers = res.data.total;
 
-    function renderTaskers(data) {
-      const container = document.getElementById("taskersContainer");
-      container.innerHTML = "";
+    renderTaskers(allTaskers);
+    renderPagination();
+  }
 
-      data.forEach(t => {
-        const docsHtml = t.documents.map(doc => 
-          `<a href='${doc}' class='doc-link' target='_blank'>📄 ${doc.split('/').pop()}</a>`).join("");
+  function renderTaskers(data) {
+    const tbody = document.querySelector("#taskersTable tbody");
+    tbody.innerHTML = "";
 
-        const reviewsHtml = t.reviews.map(r =>
-          `<li>${r.rating}⭐ – ${r.comment}</li>`).join("") || "No reviews";
-
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <h3>${t.name}</h3>
-          <p><strong>Email:</strong> ${t.email}</p>
-          <p><strong>Phone:</strong> ${t.phone}</p>
-          <p><strong>Location:</strong> ${t.location}</p>
-          <p><strong>Verified:</strong> ${t.verificationStatus}</p>
-          <div><strong>Docs:</strong><br/>${docsHtml}</div>
-          <div style="margin-top: 8px;">
-            <button class="verify" onclick="verify('${t._id}', 'accepted')">Accept</button>
-            <button class="decline" onclick="verify('${t._id}', 'declined')">Decline</button>
-            <button class="${t.isBlocked ? 'unblock' : 'block'}" onclick="toggleBlock('${t._id}', ${!t.isBlocked})">
-              ${t.isBlocked ? 'Unblock' : 'Block'}
-            </button>
-            <button class="delete" onclick="deleteTasker('${t._id}')">Delete</button>
-          </div>
-          <div style="margin-top:10px;"><strong>Reviews:</strong><ul>${reviewsHtml}</ul></div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    async function verify(id, status) {
-      await axios.patch(`/api/admin/verify-tasker/${id}`, { status });
-      fetchTaskers();
-    }
-
-    async function toggleBlock(id, block) {
-      const action = block ? 'block' : 'unblock';
-      await axios.patch(`/api/admin/taskers/${id}/${action}`);
-      fetchTaskers();
-    }
-
-    async function deleteTasker(id) {
-      if (confirm("Are you sure you want to delete this tasker?")) {
-        await axios.delete(`/api/admin/taskers/${id}`);
-        fetchTaskers();
-      }
-    }
-
-    document.getElementById("search").addEventListener("input", e => {
-      const term = e.target.value.toLowerCase();
-      const filtered = taskers.filter(t => t.name.toLowerCase().includes(term) || t.email.toLowerCase().includes(term));
-      renderTaskers(filtered);
+    data.forEach(t => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${t.name}</td>
+        <td>${t.email}</td>
+        <td>${t.phone}</td>
+        <td>${t.location}</td>
+        <td>${t.verificationStatus}</td>
+        <td>
+          <button class="${t.isBlocked ? 'unblock' : 'block'}" onclick="toggleBlock('${t._id}', ${!t.isBlocked})">
+            ${t.isBlocked ? 'Unblock' : 'Block'}
+          </button>
+          <button class="delete" onclick="deleteTasker('${t._id}')">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
     });
+  }
 
+  function renderPagination() {
+    const totalPages = Math.ceil(totalTaskers / 10);
+    const controlsDiv = document.querySelector(".controls");
+
+    const old = document.querySelector(".pagination-buttons");
+    if (old) old.remove();
+
+    let html = '<div class="pagination-buttons">';
+    for (let i = 1; i <= totalPages; i++) {
+      html += `<button onclick="goToPage(${i})" style="margin-left: 6px;">${i}</button>`;
+    }
+    html += '</div>';
+    controlsDiv.insertAdjacentHTML("beforeend", html);
+  }
+
+  function goToPage(page) {
+    currentPage = page;
     fetchTaskers();
-  </script>
+  }
+
+  async function toggleBlock(id, block) {
+    const action = block ? "block" : "unblock";
+    await axios.patch(`/api/admin/taskers/${id}/${action}`);
+    fetchTaskers();
+  }
+
+  async function deleteTasker(id) {
+    if (confirm("Are you sure you want to delete this tasker?")) {
+      await axios.delete(`/api/admin/taskers/${id}`);
+      fetchTaskers();
+    }
+  }
+
+  fetchTaskers();
+</script>
+
 </body>
 </html>

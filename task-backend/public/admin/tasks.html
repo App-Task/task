@@ -43,18 +43,23 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
-    let tasks = [];
-
+    let allTasks = [];
+    let currentPage = 1;
+    let totalTasks = 0;
+  
     async function fetchTasks() {
-      const res = await axios.get("/api/admin/tasks");
-      tasks = res.data;
-      render(tasks);
+      const res = await axios.get(`/api/admin/tasks?page=${currentPage}&limit=10`);
+      allTasks = res.data.tasks;
+      totalTasks = res.data.total;
+  
+      renderTasks(allTasks);
+      renderPagination();
     }
-
-    function render(data) {
+  
+    function renderTasks(data) {
       const tbody = document.querySelector("#taskTable tbody");
       tbody.innerHTML = "";
-
+  
       data.forEach(t => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -68,20 +73,44 @@
         tbody.appendChild(tr);
       });
     }
-
+  
+    function renderPagination() {
+      const totalPages = Math.ceil(totalTasks / 10);
+      const controlsDiv = document.querySelector(".controls");
+  
+      // Remove old pagination
+      const old = document.querySelector(".pagination-buttons");
+      if (old) old.remove();
+  
+      // Create new pagination
+      let html = '<div class="pagination-buttons">';
+      for (let i = 1; i <= totalPages; i++) {
+        html += `<button onclick="goToPage(${i})" style="margin-left: 6px;">${i}</button>`;
+      }
+      html += '</div>';
+      controlsDiv.insertAdjacentHTML("beforeend", html);
+    }
+  
+    function goToPage(page) {
+      currentPage = page;
+      fetchTasks();
+    }
+  
+    // Filters
     document.getElementById("search").addEventListener("input", (e) => {
       const term = e.target.value.toLowerCase();
-      const filtered = tasks.filter(t => t.title.toLowerCase().includes(term));
-      render(filtered);
+      const filtered = allTasks.filter(t => t.title.toLowerCase().includes(term));
+      renderTasks(filtered);
     });
-
+  
     document.getElementById("statusFilter").addEventListener("change", (e) => {
       const value = e.target.value;
-      const filtered = value ? tasks.filter(t => t.status === value) : tasks;
-      render(filtered);
+      const filtered = value ? allTasks.filter(t => t.status === value) : allTasks;
+      renderTasks(filtered);
     });
-
+  
     fetchTasks();
   </script>
+  
 </body>
 </html>

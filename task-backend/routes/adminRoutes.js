@@ -58,7 +58,15 @@ router.patch("/verify-tasker/:id", async (req, res) => {
 router.get("/clients", async (req, res) => {
   try {
     console.log("🚀 [ADMIN] Fetching clients...");
-    const clients = await User.find({ role: "client" }).lean();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const [clients, total] = await Promise.all([
+      User.find({ role: "client" }).skip(skip).limit(limit).lean(),
+      User.countDocuments({ role: "client" })
+    ]);
+
     console.log(`📦 Total clients found: ${clients.length}`);
 
     const tasks = await Task.aggregate([
@@ -76,7 +84,6 @@ router.get("/clients", async (req, res) => {
     const data = clients.map((c, index) => {
       try {
         console.log(`🧾 Mapping client #${index + 1}:`, c);
-
         const idStr = c._id?.toString?.() || null;
 
         return {
@@ -93,7 +100,7 @@ router.get("/clients", async (req, res) => {
     }).filter(Boolean);
 
     console.log(`✅ Final clients to return: ${data.length}`);
-    res.json(data);
+    res.json({ clients: data, total }); // ✅ ONLY response
   } catch (err) {
     console.error("❌ Failed to fetch clients route error:", err.message);
     res.status(500).json({ error: "Failed to fetch clients" });
@@ -134,7 +141,15 @@ router.delete("/clients/:id", async (req, res) => {
 // GET /api/admin/taskers
 router.get("/taskers", async (req, res) => {
   try {
-    const taskers = await User.find({ role: "tasker" }).lean();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const [taskers, total] = await Promise.all([
+      User.find({ role: "tasker" }).skip(skip).limit(limit).lean(),
+      User.countDocuments({ role: "tasker" })
+    ]);
+
     const allReviews = await Review.find().lean();
 
     const result = await Promise.all(taskers.map(async t => {
@@ -152,11 +167,13 @@ router.get("/taskers", async (req, res) => {
       };
     }));
 
-    res.json(result);
+    res.json({ taskers: result, total });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch taskers" });
   }
 });
+
+
 
 // PATCH /api/admin/taskers/:id/block
 router.patch("/taskers/:id/block", async (req, res) => {
@@ -192,7 +209,20 @@ router.delete("/taskers/:id", async (req, res) => {
 // GET /api/admin/tasks
 router.get("/tasks", async (req, res) => {
   try {
-    const tasks = await Task.find().sort({ createdAt: -1 }).populate("userId").populate("taskerId").lean();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const [tasks, total] = await Promise.all([
+      Task.find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("userId")
+        .populate("taskerId")
+        .lean(),
+      Task.countDocuments()
+    ]);
 
     const result = tasks.map(t => ({
       _id: t._id,
@@ -205,11 +235,12 @@ router.get("/tasks", async (req, res) => {
       completedAt: t.status === "Completed" ? new Date(t.updatedAt).toLocaleString() : null,
     }));
 
-    res.json(result);
+    res.json({ tasks: result, total });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch tasks" });
   }
 });
+
 // GET /api/admin/stats
 router.get("/stats", async (req, res) => {
   try {

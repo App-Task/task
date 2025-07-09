@@ -40,13 +40,21 @@
   </table>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
   <script>
     let allClients = [];
+    let currentPage = 1;
+let totalClients = 0;
+
 
     async function fetchClients() {
-      const res = await axios.get('/api/admin/clients');
-      allClients = res.data;
-      renderClients(allClients);
+        const res = await axios.get(`/api/admin/clients?page=${currentPage}&limit=10`);
+        allClients = res.data.clients;
+totalClients = res.data.total;
+
+renderClients(allClients);
+renderPagination();
+
     }
 
     function renderClients(data) {
@@ -90,6 +98,31 @@
     });
 
     fetchClients();
+
+
+    function renderPagination() {
+  const totalPages = Math.ceil(totalClients / 10);
+  const controlsDiv = document.querySelector(".controls");
+
+  // Remove previous pagination if any
+  const oldPagination = controlsDiv.querySelector(".pagination-buttons");
+  if (oldPagination) oldPagination.remove();
+
+  // Create new pagination
+  let html = '<div class="pagination-buttons">';
+  for (let i = 1; i <= totalPages; i++) {
+    html += `<button onclick="goToPage(${i})" style="margin-left: 6px;">${i}</button>`;
+  }
+  html += '</div>';
+  controlsDiv.insertAdjacentHTML("beforeend", html);
+}
+
+
+function goToPage(page) {
+  currentPage = page;
+  fetchClients();
+}
+
   </script>
 </body>
 </html>
