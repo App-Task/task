@@ -29,6 +29,14 @@ const TaskSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId, // 👈 will store the _id of the user who cancelled
     ref: "User",
   },
+  completedAt: {
+    type: Date,
+    default: null,
+  },
+  cancelledAt: {
+    type: Date,
+    default: null,
+  },  
   createdAt: {
     type: Date,
     default: Date.now,

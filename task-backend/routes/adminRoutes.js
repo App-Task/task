@@ -231,8 +231,9 @@ router.get("/tasks", async (req, res) => {
       createdAt: t.createdAt,
       clientName: t.userId?.name || "N/A",
       taskerName: t.taskerId?.name || null,
-      cancelledAt: t.status === "Cancelled" ? new Date(t.updatedAt).toLocaleString() : null,
-      completedAt: t.status === "Completed" ? new Date(t.updatedAt).toLocaleString() : null,
+      cancelledAt: t.cancelledAt ? new Date(t.cancelledAt).toISOString() : null,
+completedAt: t.completedAt ? new Date(t.completedAt).toISOString() : null,
+
     }));
 
     res.json({ tasks: result, total });

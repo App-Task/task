@@ -163,7 +163,10 @@ router.put("/:id/cancel", async (req, res) => {
     if (!cancelledBy) return res.status(400).json({ msg: "Missing cancelledBy field" });
 
     task.status = "Cancelled";
-    task.cancelledBy = cancelledBy;
+task.cancelledBy = cancelledBy;
+task.cancelledAt = new Date();
+task.completedAt = null; // clear if it was previously completed
+
     await task.save();
 
     const isClient = String(cancelledBy) === String(task.userId);
@@ -211,7 +214,10 @@ router.patch("/:id/complete", async (req, res) => {
     if (!task) return res.status(404).json({ error: "Task not found" });
 
     task.status = "Completed";
+task.completedAt = new Date();
+task.cancelledAt = null; // clear if previously cancelled
 await task.save();
+
 
 // ✅ Notify tasker
 if (task.taskerId) {

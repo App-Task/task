@@ -73,7 +73,14 @@
           <td>${t.taskerName || "—"}</td>
           <td>${t.status}</td>
           <td>${new Date(t.createdAt).toLocaleString()}</td>
-          <td>${t.completedAt || t.cancelledAt || "—"}</td>
+          <td>${
+  t.completedAt
+    ? new Date(t.completedAt).toLocaleString()
+    : t.cancelledAt
+    ? new Date(t.cancelledAt).toLocaleString()
+    : "—"
+}</td>
+
         `;
         tbody.appendChild(tr);
       });
