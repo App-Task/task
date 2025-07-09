@@ -3,13 +3,18 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const User = require("../models/User");
 
-// ✅ GET /api/users?verificationStatus=pending
 router.get("/users", async (req, res) => {
   try {
     const filter = {};
+
     if (req.query.verificationStatus) {
       filter.verificationStatus = req.query.verificationStatus;
     }
+
+    if (req.query.role) {
+      filter.role = req.query.role; // ✅ Only include taskers
+    }
+
     const users = await User.find(filter);
     res.json(users);
   } catch (err) {
@@ -17,6 +22,8 @@ router.get("/users", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch users" });
   }
 });
+
+
 
 
 // ✅ GET /api/users/:id — fetch specific user by ID

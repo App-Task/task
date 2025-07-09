@@ -8,6 +8,13 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     profileImage: { type: String },
 
+    // ✅ NEW FIELD: User role
+    role: {
+      type: String,
+      enum: ["client", "tasker"],
+      required: true, // enforce role is always set
+    },
+
     // ✅ Tasker-only optional fields
     gender: { type: String, default: "" },
     location: { type: String, default: "" },
@@ -16,8 +23,8 @@ const userSchema = new mongoose.Schema(
     about: { type: String, default: "" },
 
     // ✅ Verification-related fields
-    isVerified: { type: Boolean, default: false }, // admin approval required
-    documents: [{ type: String }], // uploaded document URLs or filenames
+    isVerified: { type: Boolean, default: false },
+    documents: [{ type: String }],
     verificationStatus: {
       type: String,
       enum: ["pending", "accepted", "declined"],

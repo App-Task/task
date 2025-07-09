@@ -54,7 +54,7 @@ export default function RegisterScreen({ navigation, route }) {
     try {
       // Step 1: Register the user
   
-    await registerUser({ name, email, password, phone: `${countryCode}${phone}` });
+      await registerUser({ name, email, password, phone: `${countryCode}${phone}`, role });
 
 
 
