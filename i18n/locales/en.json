@@ -18,7 +18,10 @@
     "forgotPassword": "Forgot Password?",
     "loginBtn": "Login",
     "noAccount": "Don't have an account?",
-    "registerLink": "Register"
+    "registerLink": "Register",
+    "failedTitle": "Login Failed",
+    "blockedAccount": "Your account has been blocked by the admin.",
+    "failedGeneric": "Something went wrong. Please try again."
   },
   "register": {
     "title": "Create an Account ",

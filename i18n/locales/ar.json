@@ -18,7 +18,10 @@
     "forgotPassword": "هل نسيت كلمة المرور؟",
     "loginBtn": "تسجيل الدخول",
     "noAccount": "ليس لديك حساب؟",
-    "registerLink": "سجّل الآن"
+    "registerLink": "سجّل الآن",
+    "failedTitle": "فشل تسجيل الدخول",
+  "blockedAccount": "تم حظر حسابك من قبل الإدارة.",
+  "failedGeneric": "حدث خطأ ما. حاول مرة أخرى."
   },
   "register": {
     "title": "إنشاء حساب ",

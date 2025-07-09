@@ -41,10 +41,15 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ msg: "Invalid credentials" });
 
+    // ✅ Blocked check
+    if (user.isBlocked) {
+      return res.status(403).json({ msg: "Your account has been blocked by the admin." });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "dev_secret_key", {
       expiresIn: "7d",
     });
 
@@ -56,3 +61,4 @@ exports.login = async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 };
+

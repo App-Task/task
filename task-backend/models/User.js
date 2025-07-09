@@ -7,6 +7,11 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     profileImage: { type: String },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+    
 
     // ✅ NEW FIELD: User role
     role: {
@@ -32,6 +37,8 @@ const userSchema = new mongoose.Schema(
     },
   },
   { timestamps: true }
+
+  
 );
 
 module.exports = mongoose.model("User", userSchema);

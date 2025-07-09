@@ -105,7 +105,12 @@ router.put("/:id", async (req, res) => {
 // ✅ DELETE /api/tasks/:id - delete task by ID
 router.delete("/:id", async (req, res) => {
   try {
-    const deletedTask = await Task.findByIdAndDelete(req.params.id);
+    const task = await Task.findById(req.params.id);
+if (!task) return res.status(404).json({ error: "Task not found" });
+
+await task.deleteOne(); // ✅ triggers the middleware
+res.json({ msg: "Task deleted successfully" });
+
     if (!deletedTask) return res.status(404).json({ error: "Task not found" });
     res.json({ msg: "Task deleted successfully" });
   } catch (err) {

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <style>
+    body { font-family: sans-serif; background: #f2f2f2; padding: 40px; }
+    h1 { text-align: center; color: #215432; margin-bottom: 30px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .card h2 { font-size: 32px; margin: 10px 0; color: #215432; }
+    .card p { font-size: 14px; color: #666; }
+    .nav { margin-top: 40px; text-align: center; }
+    .nav a {
+      margin: 0 10px;
+      padding: 10px 20px;
+      background: #215432;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Dashboard</h1>
+
+  <div class="cards" id="statsContainer">
+    <!-- JS will insert cards here -->
+  </div>
+
+  <div class="nav">
+    <a href="/admin/clients.html">Clients</a>
+    <a href="/admin/taskers.html">Taskers</a>
+    <a href="/admin/tasks.html">Tasks</a>
+    <a href="/admin/verification.html">Verifications</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    async function fetchStats() {
+      const res = await axios.get("/api/admin/stats");
+      const stats = res.data;
+
+      const container = document.getElementById("statsContainer");
+      container.innerHTML = `
+        <div class="card"><h2>${stats.clients}</h2><p>Total Clients</p></div>
+        <div class="card"><h2>${stats.taskers}</h2><p>Total Taskers</p></div>
+        <div class="card"><h2>${stats.verifiedTaskers}</h2><p>Verified Taskers</p></div>
+        <div class="card"><h2>${stats.tasks}</h2><p>Total Tasks</p></div>
+      `;
+    }
+
+    fetchStats();
+  </script>
+</body>
+</html>

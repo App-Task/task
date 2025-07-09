@@ -61,7 +61,18 @@ export default function LoginScreen({ navigation, route }) {
       }
     } catch (err) {
       console.log("❌ Login Error:", err.message);
-      Alert.alert(t("login.failedTitle"), err.message);
+      if (err.response?.status === 403) {
+        Alert.alert(
+          t("login.failedTitle"),
+          t("login.blockedAccount", "Your account has been blocked by the admin.")
+        );
+      } else {
+        Alert.alert(
+          t("login.failedTitle"),
+          err.response?.data?.msg || err.message || t("login.failedGeneric")
+        );
+      }
+      
     } finally {
       setIsLoggingIn(false); // ✅ hide popup
     }

@@ -35,4 +35,16 @@ const TaskSchema = new mongoose.Schema({
   },
 });
 
+TaskSchema.pre("deleteOne", { document: true, query: false }, async function (next) {
+  try {
+    const taskId = this._id;
+    await require("./Bid").deleteMany({ taskId }); // delete bids related to this task
+    next();
+  } catch (err) {
+    console.error("❌ Error deleting related bids for task:", err.message);
+    next(err);
+  }
+});
+
+
 module.exports = mongoose.model("Task", TaskSchema);

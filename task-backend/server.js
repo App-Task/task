@@ -40,7 +40,7 @@ app.use("/api", userRoutes);
 
 // ✅ Serve Admin Panel
 app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/admin/verification.html"));
+  res.sendFile(path.join(__dirname, "public/admin/dashboard.html"));
 });
 
 // ✅ Test route
