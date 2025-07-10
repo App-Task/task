@@ -25,7 +25,14 @@ if (phoneExists)
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
 
-    const user = await User.create({ name, email, phone, password: hashed, role });
+    const user = await User.create({ 
+      name: name.trim(), 
+      email: normalizedEmail, 
+      phone: normalizedPhone, 
+      password: hashed, 
+      role 
+    });
+    
 
 
 
