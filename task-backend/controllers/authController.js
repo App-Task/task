@@ -4,23 +4,19 @@ const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, phone, role = "client" } = req.body;
+    const { name, email, password, phone } = req.body;
+    const role = req.body.role?.toLowerCase() || "client";  // ✅ Safe fallback and normalization
+
     const normalizedEmail = email.trim().toLowerCase();
-const normalizedPhone = phone.trim();
+    const normalizedPhone = phone.trim();
 
+    const existing = await User.findOne({ email: normalizedEmail, role });
+    if (existing)
+      return res.status(400).json({ msg: "Email already in use for this role" });
 
-
-
-const existing = await User.findOne({ email: normalizedEmail, role });
-
-if (existing)
-  return res.status(400).json({ msg: "Email already in use for this role" });
-
-const phoneExists = await User.findOne({ phone: normalizedPhone, role });
-if (phoneExists)
-  return res.status(400).json({ msg: "Phone number already in use for this role" });
-
-
+    const phoneExists = await User.findOne({ phone: normalizedPhone, role });
+    if (phoneExists)
+      return res.status(400).json({ msg: "Phone number already in use for this role" });
 
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
@@ -32,19 +28,18 @@ if (phoneExists)
       password: hashed, 
       role 
     });
-    
-
-
 
     res.status(201).json({
       msg: "User registered",
       user: { id: user._id, name: user.name, email: user.email, phone: user.phone },
     });
-    
+
   } catch (err) {
+    console.error("❌ Registration Error:", err.message);
     res.status(500).json({ msg: "Server error" });
   }
 };
+
 
 exports.login = async (req, res) => {
   try {
