@@ -140,54 +140,46 @@ router.delete("/clients/:id", async (req, res) => {
   }
 });
 
-// GET /api/admin/taskers
+// ✅ FIXED: GET /api/admin/taskers
 router.get("/taskers", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const [taskers, total] = await Promise.all([
+    const [taskers, total, reviews] = await Promise.all([
       User.find({ role: "tasker" }).skip(skip).limit(limit).lean(),
-      User.countDocuments({ role: "tasker" })
+      User.countDocuments({ role: "tasker" }),
+      Review.find().lean(),
     ]);
 
-    const allReviews = await Review.find().lean();
+    const result = taskers.map(t => {
+      const userReviews = reviews.filter(r => r.taskerId.toString() === t._id.toString());
 
-    const result = await Promise.all(taskers.map(async t => {
-      const reviews = allReviews.filter(r => r.taskerId.toString() === t._id.toString());
       return {
         _id: t._id,
-        title: t.title,
-        description: t.description || "N/A",
+        name: t.name || "N/A",
+        email: t.email || "N/A",
+        phone: t.phone || "N/A",
         location: t.location || "N/A",
-        status: t.status,
-        createdAt: t.createdAt,
-        clientName: t.userId?.name || "N/A",
-        taskerName: t.taskerId?.name || null,
-        cancelledAt: t.cancelledAt ? new Date(t.cancelledAt).toISOString() : null,
-        completedAt: t.completedAt ? new Date(t.completedAt).toISOString() : null,
-        bids: taskBids.map(b => ({
-          tasker: b.taskerId?.name || "Unknown",
-          price: b.amount,
-          message: b.message,
-          isAccepted: b.status === "Accepted",
+        isBlocked: !!t.isBlocked,
+        image: t.image || null,
+        verificationStatus: t.verificationStatus || "pending",
+        documents: t.documents || [],
+        reviews: userReviews.map(r => ({
+          rating: r.rating,
+          comment: r.comment || "",
         })),
-        acceptedBid: accepted ? {
-          tasker: accepted.taskerId?.name || "Unknown",
-          price: accepted.amount,
-          message: accepted.message,
-        } : null,
-
       };
-      
-    }));
+    });
 
     res.json({ taskers: result, total });
   } catch (err) {
+    console.error("❌ Failed to fetch taskers:", err.message);
     res.status(500).json({ error: "Failed to fetch taskers" });
   }
 });
+
 
 
 
