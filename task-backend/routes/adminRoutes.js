@@ -90,9 +90,11 @@ router.get("/clients", async (req, res) => {
           _id: c._id,
           name: c.name || "N/A",
           email: typeof c.email === "string" ? c.email : "unknown@example.com",
+          phone: c.phone || "N/A", // ✅ ADD THIS
           isBlocked: !!c.isBlocked,
           totalTasks: idStr && taskMap[idStr] ? taskMap[idStr] : 0,
         };
+        
       } catch (err) {
         console.error("❌ Error mapping client:", c, err.message);
         return null;

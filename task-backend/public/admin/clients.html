@@ -37,6 +37,7 @@
         <th>Image</th>
         <th>Name</th>
         <th>Email</th>
+        <th>Phone</th>
         <th>Total Tasks</th>
         <th>Actions</th>
       </tr>
@@ -71,6 +72,7 @@ renderPagination();
           <td><img src="${c.image || 'https://via.placeholder.com/40'}" /></td>
           <td>${c.name}</td>
           <td>${c.email}</td>
+          <td>${c.phone}</td> 
           <td>${c.totalTasks}</td>
           <td class="actions">
             <button class="${c.isBlocked ? 'unblock' : 'block'}" onclick="toggleBlock('${c._id}', ${!c.isBlocked})">
