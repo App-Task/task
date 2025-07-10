@@ -7,14 +7,15 @@ const User = require("../models/User");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../utils/cloudinary");
 
-// ✅ Cloudinary Multer config only
 const cloudStorage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "tasks",
     allowed_formats: ["jpg", "jpeg", "png", "pdf"],
+    access_mode: "public", // ✅ force all uploads to be public
   },
 });
+
 const uploadCloud = multer({ storage: cloudStorage });
 
 // ✅ Upload route
