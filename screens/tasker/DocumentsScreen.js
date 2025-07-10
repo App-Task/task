@@ -93,7 +93,8 @@ export default function DocumentsScreen({ navigation }) {
 await axios.patch(
   `https://task-kq94.onrender.com/api/documents/update/${user._id}`,
   {
-    documentUrl: response.data.imageUrl, // what Cloudinary returns
+    documentUrl: response.data.path, // ✅ correct key returned by backend
+
   },
   {
     headers: { Authorization: `Bearer ${token}` },
@@ -103,7 +104,7 @@ await axios.patch(
 // ✅ Show in UI
 setDocuments((prev) => [
   ...prev,
-  { id: Date.now().toString(), name: response.data.imageUrl.split("/").pop() },
+  { id: Date.now().toString(), name: response.data.path.split("/").pop()  },
 ]);
 
   

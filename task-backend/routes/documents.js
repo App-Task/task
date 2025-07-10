@@ -70,6 +70,11 @@ router.delete("/delete/:userId", async (req, res) => {
 
 // ✅ Update user.documents[] with a Cloudinary URL
 router.patch("/update/:id", async (req, res) => {
+
+  console.log("📡 PATCH /api/documents/update hit");
+console.log("🧾 ID:", req.params.id);
+console.log("🧾 documentUrl:", req.body.documentUrl);
+
   try {
     const { documentUrl } = req.body;
     const userId = req.params.id;
