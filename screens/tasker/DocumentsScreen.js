@@ -89,22 +89,28 @@ export default function DocumentsScreen({ navigation }) {
                   }
                 );
                 
-// ✅ Save the Cloudinary URL in MongoDB via PATCH
-await axios.patch(
-  `https://task-kq94.onrender.com/api/documents/update/${user._id}`,
-  {
-    documentUrl: response.data.path, // ✅ correct
-  },
-  {
-    headers: { Authorization: `Bearer ${token}` },
-  }
-);
+                const uploadedPath = response?.data?.path;
 
-// ✅ Show in UI
-setDocuments((prev) => [
-  ...prev,
-  { id: Date.now().toString(), name: response.data.path.split("/").pop()  },
-]);
+                if (!uploadedPath) {
+                  console.error("❌ Upload succeeded but response is missing 'path':", response.data);
+                  throw new Error("Upload succeeded but no document URL was returned.");
+                }
+                
+                // ✅ Save to MongoDB via PATCH
+                await axios.patch(
+                  `https://task-kq94.onrender.com/api/documents/update/${user._id}`,
+                  { documentUrl: uploadedPath },
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+                
+                // ✅ Show in UI
+                setDocuments((prev) => [
+                  ...prev,
+                  { id: Date.now().toString(), name: uploadedPath.split("/").pop() },
+                ]);
+                
 
   
                 Alert.alert(
@@ -133,7 +139,7 @@ setDocuments((prev) => [
       setDocuments(
         (user.documents || []).map((doc, index) => ({
           id: index.toString(),
-          name: doc.split("/").pop(), // get just the file name
+          name: doc ? doc.split("/").pop() : "unknown",
         }))
       );
     } catch (err) {
