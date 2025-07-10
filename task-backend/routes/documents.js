@@ -54,7 +54,9 @@ router.post("/upload-file", uploadCloud.single("file"), async (req, res) => {
     const finalUrl = req.file?.secure_url || req.file?.url || req.file?.path;
 
 
-    user.documents = [...(user.documents || []), finalUrl];
+    if (!user.documents.includes(finalUrl)) {
+      user.documents.push(finalUrl);
+    }    
     user.verificationStatus = "pending";
     user.isVerified = false;
     await user.save();
@@ -116,7 +118,9 @@ console.log("🧾 documentUrl:", req.body.documentUrl);
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    user.documents.push(documentUrl);
+    if (!user.documents.includes(documentUrl)) {
+      user.documents.push(documentUrl);
+    }    
     user.verificationStatus = "pending";
     user.isVerified = false;
     await user.save();
