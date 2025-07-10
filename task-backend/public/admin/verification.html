@@ -125,10 +125,10 @@
     const card = document.createElement("div");
     card.className = "card";
     const docsHtml = tasker.documents?.map(doc => {
-      const url = doc.includes("/uploads/") || doc.startsWith("http") ? doc : `/uploads/${doc}`;
-      const fileName = doc.split("/").pop();
-      return `<a href="${url}" target="_blank" class="doc-link" data-filename="${fileName}">${fileName}</a>`;
-    }).join("") || "None";
+  const fileName = doc.split("/").pop();
+  return `<a href="${doc}" target="_blank" class="doc-link" data-filename="${fileName}">${fileName}</a>`;
+}).join("") || "None";
+
 
     card.innerHTML = `
       <h3>${tasker.name}</h3>

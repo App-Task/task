@@ -41,11 +41,17 @@ router.post("/upload-file", uploadCloud.single("file"), async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    const finalUrl = req.file?.path || req.file?.secure_url;
-    if (!finalUrl) {
-      console.error("❌ Missing file URL in req.file:", req.file);
-      return res.status(500).json({ error: "Missing file URL from Cloudinary" });
+    const ext = req.file?.format || "pdf";
+    const publicId = req.file?.public_id || req.file?.filename;
+
+    if (!publicId) {
+      console.error("❌ Missing public_id:", req.file);
+      return res.status(500).json({ error: "Missing public_id from Cloudinary" });
     }
+
+    // ✅ Construct accessible public URL manually
+    const isPDF = ext === "pdf";
+    const finalUrl = `https://res.cloudinary.com/dfli5co1y/${isPDF ? "raw" : "image"}/upload/${publicId}.${ext}`;
 
     user.documents = [...(user.documents || []), finalUrl];
     user.verificationStatus = "pending";
@@ -63,6 +69,7 @@ router.post("/upload-file", uploadCloud.single("file"), async (req, res) => {
     res.status(500).json({ error: "Upload failed" });
   }
 });
+
 
 
 // ✅ Delete route

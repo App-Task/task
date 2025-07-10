@@ -70,7 +70,7 @@
       <p><strong>Documents:</strong><br>
         ${
           t.documents.map((doc, i) => {
-            const url = doc.includes("/uploads/") || doc.startsWith("http") ? doc : `/uploads/${doc}`;
+            const url = doc;
             return `<a class="doc-link" href="${url}" target="_blank">Doc ${i+1}</a>`;
           }).join("")
         }
