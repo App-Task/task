@@ -228,7 +228,8 @@ router.get("/tasks", async (req, res) => {
 
 const result = tasks.map(t => {
   const taskBids = allBids.filter(b => b.taskId?.toString() === t._id.toString());
-  const accepted = taskBids.find(b => b.isAccepted);
+  const accepted = taskBids.find(b => b.status === "Accepted");
+
 
   return {
     _id: t._id,
@@ -245,8 +246,9 @@ const result = tasks.map(t => {
       tasker: b.taskerId?.name || "Unknown",
       price: b.amount,
       message: b.message,
-      isAccepted: b.isAccepted,
+      isAccepted: b.status === "Accepted",
     })),
+    
     acceptedBid: accepted ? {
       tasker: accepted.taskerId?.name || "Unknown",
       price: accepted.amount,
