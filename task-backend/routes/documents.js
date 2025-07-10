@@ -9,12 +9,16 @@ const cloudinary = require("../utils/cloudinary");
 
 const cloudStorage = new CloudinaryStorage({
   cloudinary,
-  params: {
-    folder: "tasks",
-    allowed_formats: ["jpg", "jpeg", "png", "pdf"],
-    access_mode: "public", // ✅ force all uploads to be public
+  params: async (req, file) => {
+    return {
+      folder: "tasks",
+      access_mode: "public",
+      resource_type: file.mimetype === "application/pdf" ? "raw" : "image", // ✅ This fixes PDF issue
+      allowed_formats: ["jpg", "jpeg", "png", "pdf"],
+    };
   },
 });
+
 
 const uploadCloud = multer({ storage: cloudStorage });
 
