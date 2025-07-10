@@ -17,7 +17,7 @@ const cloudStorage = new CloudinaryStorage({
       folder: "tasks",
       public_id: `${Date.now()}-${file.originalname.replace(/\.[^/.]+$/, "")}`,
       format: ext,
-      resource_type: isPDF ? "raw" : "image", // ✅ key fix
+      resource_type: "auto",
       access_mode: "public",
     };
   },
