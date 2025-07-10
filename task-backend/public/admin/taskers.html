@@ -67,15 +67,17 @@
       <p><strong>Location:</strong> ${t.location}</p>
       <p><strong>Status:</strong> ${t.verificationStatus}</p>
       ${t.image ? `<img src="${t.image}" alt="${t.name}" style="width:80px;height:80px;border-radius:8px;">` : ""}
-      
       <p><strong>Documents:</strong><br>
-        ${t.documents.map((doc, i) => `<a class="doc-link" href="${doc}" target="_blank">Doc ${i+1}</a>`).join("")}
+        ${
+          t.documents.map((doc, i) => {
+            const url = doc.includes("/uploads/") || doc.startsWith("http") ? doc : `/uploads/${doc}`;
+            return `<a class="doc-link" href="${url}" target="_blank">Doc ${i+1}</a>`;
+          }).join("")
+        }
       </p>
-      
       <p><strong>Reviews:</strong><br>
         ${t.reviews.length === 0 ? "No reviews" : t.reviews.map(r => `<div>⭐ ${r.rating} – ${r.comment}</div>`).join("")}
       </p>
-      
       <div class="actions">
         <button class="${t.isBlocked ? 'unblock' : 'block'}" onclick="toggleBlock('${t._id}', ${!t.isBlocked})">
           ${t.isBlocked ? 'Unblock' : 'Block'}
@@ -85,7 +87,16 @@
     `;
     container.appendChild(div);
   });
+
+  // ✅ Attach after rendering
+  document.querySelectorAll(".doc-link").forEach(link => {
+    link.addEventListener("click", (e) => {
+      const file = e.target.href.split("/").pop();
+      console.log(`📂 Opening document: ${file}`);
+    });
+  });
 }
+
 
   function renderPagination() {
     const totalPages = Math.ceil(totalTaskers / 10);
