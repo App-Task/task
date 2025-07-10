@@ -10,18 +10,19 @@ const cloudinary = require("../utils/cloudinary");
 const cloudStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
-    const ext = file.originalname.split('.').pop().toLowerCase();
-    const isPDF = file.mimetype === "application/pdf";
+    const ext = file.originalname.split(".").pop().toLowerCase();
+    const isPDF = ext === "pdf";
 
     return {
       folder: "tasks",
-      public_id: `${Date.now()}-${file.originalname.replace(/\.[^/.]+$/, "")}`, // removes extension to avoid double
-      resource_type: isPDF ? "raw" : "image",
-      format: ext, // force correct file format
+      public_id: `${Date.now()}-${file.originalname.replace(/\.[^/.]+$/, "")}`,
+      format: ext,
+      resource_type: isPDF ? "raw" : "image", // ✅ key fix
       access_mode: "public",
     };
   },
 });
+
 
 
 
