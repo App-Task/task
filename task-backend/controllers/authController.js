@@ -43,7 +43,7 @@ exports.login = async (req, res) => {
 
     if (!user) return res.status(400).json({ msg: "Invalid credentials" });
 
-    // ✅ Blocked check
+    // ✅ Blocked check\
     if (user.isBlocked) {
       return res.status(403).json({ msg: "Your account has been blocked by the admin." });
     }
