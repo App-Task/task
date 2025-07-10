@@ -158,15 +158,29 @@ router.get("/taskers", async (req, res) => {
       const reviews = allReviews.filter(r => r.taskerId.toString() === t._id.toString());
       return {
         _id: t._id,
-        name: t.name,
-        email: t.email,
-        phone: t.phone || "N/A",
+        title: t.title,
+        description: t.description || "N/A",
         location: t.location || "N/A",
-        documents: t.documents || [],
-        verificationStatus: t.verificationStatus || "pending",
-        isBlocked: !!t.isBlocked,
-        reviews: reviews.map(r => ({ rating: r.rating, comment: r.comment })),
+        status: t.status,
+        createdAt: t.createdAt,
+        clientName: t.userId?.name || "N/A",
+        taskerName: t.taskerId?.name || null,
+        cancelledAt: t.cancelledAt ? new Date(t.cancelledAt).toISOString() : null,
+        completedAt: t.completedAt ? new Date(t.completedAt).toISOString() : null,
+        bids: taskBids.map(b => ({
+          tasker: b.taskerId?.name || "Unknown",
+          price: b.amount,
+          message: b.message,
+          isAccepted: b.status === "Accepted",
+        })),
+        acceptedBid: accepted ? {
+          tasker: accepted.taskerId?.name || "Unknown",
+          price: accepted.amount,
+          message: accepted.message,
+        } : null,
+        images: t.images || [], // ✅ ADD THIS LINE
       };
+      
     }));
 
     res.json({ taskers: result, total });
