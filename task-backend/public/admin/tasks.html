@@ -36,11 +36,16 @@
     <thead>
       <tr>
         <th>Title</th>
+        <th>Description</th>
+        <th>Location</th>
         <th>Client</th>
         <th>Tasker</th>
         <th>Status</th>
         <th>Created</th>
         <th>Cancelled/Completed</th>
+        <th>Bids</th>
+        <th>Accepted Bid</th>
+
       </tr>
     </thead>
     <tbody></tbody>
@@ -68,20 +73,32 @@
       data.forEach(t => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${t.title}</td>
-          <td>${t.clientName}</td>
-          <td>${t.taskerName || "—"}</td>
-          <td>${t.status}</td>
-          <td>${new Date(t.createdAt).toLocaleString()}</td>
-          <td>${
-  t.completedAt
-    ? new Date(t.completedAt).toLocaleString()
-    : t.cancelledAt
-    ? new Date(t.cancelledAt).toLocaleString()
-    : "—"
-}</td>
+  <td>${t.title}</td>
+  <td>${t.description}</td>
+  <td>${t.location}</td>
+  <td>${t.clientName}</td>
+  <td>${t.taskerName || "—"}</td>
+  <td>${t.status}</td>
+  <td>${new Date(t.createdAt).toLocaleString()}</td>
+  <td>${
+    t.completedAt
+      ? new Date(t.completedAt).toLocaleString()
+      : t.cancelledAt
+      ? new Date(t.cancelledAt).toLocaleString()
+      : "—"
+  }</td>
+  <td>
+    ${t.bids.length > 0
+      ? t.bids.map(b => `💰 ${b.price} – ${b.tasker}`).join("<br>")
+      : "—"}
+  </td>
+  <td>
+    ${t.acceptedBid
+      ? `✅ ${t.acceptedBid.tasker}<br>💰 ${t.acceptedBid.price}<br>${t.acceptedBid.message}`
+      : "—"}
+  </td>
+`;
 
-        `;
         tbody.appendChild(tr);
       });
     }

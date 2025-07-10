@@ -224,17 +224,37 @@ router.get("/tasks", async (req, res) => {
       Task.countDocuments()
     ]);
 
-    const result = tasks.map(t => ({
-      _id: t._id,
-      title: t.title,
-      status: t.status,
-      createdAt: t.createdAt,
-      clientName: t.userId?.name || "N/A",
-      taskerName: t.taskerId?.name || null,
-      cancelledAt: t.cancelledAt ? new Date(t.cancelledAt).toISOString() : null,
-completedAt: t.completedAt ? new Date(t.completedAt).toISOString() : null,
+    const allBids = await Bid.find().populate("taskerId").lean();
 
-    }));
+const result = tasks.map(t => {
+  const taskBids = allBids.filter(b => b.taskId?.toString() === t._id.toString());
+  const accepted = taskBids.find(b => b.isAccepted);
+
+  return {
+    _id: t._id,
+    title: t.title,
+    description: t.description || "N/A",
+    location: t.location || "N/A",
+    status: t.status,
+    createdAt: t.createdAt,
+    clientName: t.userId?.name || "N/A",
+    taskerName: t.taskerId?.name || null,
+    cancelledAt: t.cancelledAt ? new Date(t.cancelledAt).toISOString() : null,
+    completedAt: t.completedAt ? new Date(t.completedAt).toISOString() : null,
+    bids: taskBids.map(b => ({
+      tasker: b.taskerId?.name || "Unknown",
+      price: b.price,
+      message: b.message,
+      isAccepted: b.isAccepted,
+    })),
+    acceptedBid: accepted ? {
+      tasker: accepted.taskerId?.name || "Unknown",
+      price: accepted.price,
+      message: accepted.message,
+    } : null,
+  };
+});
+
 
     res.json({ tasks: result, total });
   } catch (err) {
