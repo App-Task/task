@@ -76,19 +76,19 @@ export default function DocumentsScreen({ navigation }) {
                   type: file.mimeType || getMimeType(file.name),
                 };
   
-                formData.append("image", fileBlob); // use 'image' to match upload.js route
+                formData.append("file", fileBlob); // ✅ must match uploadCloud.single("file")
 
-const response = await axios.post(
-  "https://task-kq94.onrender.com/api/upload", // ✅ use Cloudinary uploader
-  formData,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data",
-    },
-  }
-);
-
+                const response = await axios.post(
+                  "https://task-kq94.onrender.com/api/documents/upload-file", // ✅ correct route
+                  formData,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      "Content-Type": "multipart/form-data",
+                    },
+                  }
+                );
+                
 // ✅ Save the Cloudinary URL in MongoDB via PATCH
 await axios.patch(
   `https://task-kq94.onrender.com/api/documents/update/${user._id}`,

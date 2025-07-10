@@ -68,4 +68,29 @@ router.delete("/delete/:userId", async (req, res) => {
   }
 });
 
+// ✅ Update user.documents[] with a Cloudinary URL
+router.patch("/update/:id", async (req, res) => {
+  try {
+    const { documentUrl } = req.body;
+    const userId = req.params.id;
+
+    if (!documentUrl) return res.status(400).json({ error: "Missing documentUrl" });
+    if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).json({ error: "Invalid user ID" });
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    user.documents.push(documentUrl);
+    user.verificationStatus = "pending";
+    user.isVerified = false;
+    await user.save();
+
+    res.json({ msg: "Document saved", documents: user.documents });
+  } catch (err) {
+    console.error("❌ Update route error:", err.stack || err.message);
+    res.status(500).json({ error: "Update failed" });
+  }
+});
+
+
 module.exports = router;
