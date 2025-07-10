@@ -104,6 +104,7 @@ export default function DocumentsScreen({ navigation }) {
                     headers: { Authorization: `Bearer ${token}` },
                   }
                 );
+
                 
                 // ✅ Show in UI
                 setDocuments((prev) => [
