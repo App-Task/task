@@ -10,14 +10,19 @@ const cloudinary = require("../utils/cloudinary");
 const cloudStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
+    const ext = file.originalname.split('.').pop().toLowerCase();
+    const isPDF = file.mimetype === "application/pdf";
+
     return {
       folder: "tasks",
+      public_id: `${Date.now()}-${file.originalname.replace(/\.[^/.]+$/, "")}`, // removes extension to avoid double
+      resource_type: isPDF ? "raw" : "image",
+      format: ext, // force correct file format
       access_mode: "public",
-      resource_type: file.mimetype === "application/pdf" ? "raw" : "image", // ✅ This fixes PDF issue
-      allowed_formats: ["jpg", "jpeg", "png", "pdf"],
     };
   },
 });
+
 
 
 const uploadCloud = multer({ storage: cloudStorage });
