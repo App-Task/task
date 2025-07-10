@@ -93,8 +93,7 @@ export default function DocumentsScreen({ navigation }) {
 await axios.patch(
   `https://task-kq94.onrender.com/api/documents/update/${user._id}`,
   {
-    documentUrl: response.data.path, // ✅ correct key returned by backend
-
+    documentUrl: response.data.path, // ✅ correct
   },
   {
     headers: { Authorization: `Bearer ${token}` },
