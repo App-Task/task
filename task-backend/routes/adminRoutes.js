@@ -178,7 +178,7 @@ router.get("/taskers", async (req, res) => {
           price: accepted.amount,
           message: accepted.message,
         } : null,
-        images: t.images || [], // ✅ ADD THIS LINE
+
       };
       
     }));
