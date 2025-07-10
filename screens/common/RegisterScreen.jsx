@@ -54,12 +54,20 @@ export default function RegisterScreen({ navigation, route }) {
     try {
       // Step 1: Register the user
   
-      await registerUser({ name, email, password, phone: `${countryCode}${phone}`, role });
+      await registerUser({ 
+        name: name.trim(), 
+        email: email.trim().toLowerCase(), 
+        password, 
+        phone: `${countryCode}${phone.trim()}`, 
+        role 
+      });
+      
 
 
 
     // Step 2: Log the user in immediately
-    const loginResponse = await loginUser({ email, password });
+    const loginResponse = await loginUser({ email: email.trim().toLowerCase(), password, role });
+
 
     const { token, user } = loginResponse;
 

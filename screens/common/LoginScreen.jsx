@@ -38,7 +38,8 @@ export default function LoginScreen({ navigation, route }) {
     setIsLoggingIn(true); // ✅ show popup
   
     try {
-      const response = await loginUser({ email, password });
+      const response = await loginUser({ email: email.trim().toLowerCase(), password, role });
+
 
       if (response?.token && response?.user) {
         console.log("✅ userId being saved:", response.user.id);

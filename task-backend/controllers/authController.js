@@ -5,14 +5,18 @@ const jwt = require("jsonwebtoken");
 exports.register = async (req, res) => {
   try {
     const { name, email, password, phone, role = "client" } = req.body;
+    const normalizedEmail = email.trim().toLowerCase();
+const normalizedPhone = phone.trim();
 
 
 
-    const existing = await User.findOne({ email, role });
+
+const existing = await User.findOne({ email: normalizedEmail, role });
+
 if (existing)
   return res.status(400).json({ msg: "Email already in use for this role" });
 
-const phoneExists = await User.findOne({ phone, role });
+const phoneExists = await User.findOne({ phone: normalizedPhone, role });
 if (phoneExists)
   return res.status(400).json({ msg: "Phone number already in use for this role" });
 
