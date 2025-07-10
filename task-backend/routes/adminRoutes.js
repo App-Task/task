@@ -243,15 +243,16 @@ const result = tasks.map(t => {
     completedAt: t.completedAt ? new Date(t.completedAt).toISOString() : null,
     bids: taskBids.map(b => ({
       tasker: b.taskerId?.name || "Unknown",
-      price: b.price,
+      price: b.amount,
       message: b.message,
       isAccepted: b.isAccepted,
     })),
     acceptedBid: accepted ? {
       tasker: accepted.taskerId?.name || "Unknown",
-      price: accepted.price,
+      price: accepted.amount,
       message: accepted.message,
     } : null,
+    
   };
 });
 
