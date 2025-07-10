@@ -249,17 +249,20 @@ router.get("/stats", async (req, res) => {
     const taskers = await User.countDocuments({ role: "tasker" });
     const verifiedTaskers = await User.countDocuments({ role: "tasker", verificationStatus: "accepted" });
     const tasks = await Task.countDocuments();
+    const totalUsers = await User.countDocuments(); // ✅ Add this line
 
     res.json({
       clients,
       taskers,
       verifiedTaskers,
-      tasks
+      tasks,
+      totalUsers // ✅ Return it to the frontend
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch stats" });
   }
 });
+
 
 
 module.exports = router;
