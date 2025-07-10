@@ -28,19 +28,25 @@ const cloudStorage = new CloudinaryStorage({
 
 const uploadCloud = multer({ storage: cloudStorage });
 
-// ✅ Upload route
 router.post("/upload-file", uploadCloud.single("file"), async (req, res) => {
   try {
     console.log("📥 Cloudinary Upload: /api/documents/upload-file");
 
     const { userId } = req.body;
-    if (!req.file || !req.file.path) return res.status(400).json({ error: "No file uploaded" });
+    console.log("📦 req.file =", req.file);
+
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
     if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).json({ error: "Invalid userId" });
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    const finalUrl = req.file.secure_url;
+    const finalUrl = req.file?.path || req.file?.secure_url;
+    if (!finalUrl) {
+      console.error("❌ Missing file URL in req.file:", req.file);
+      return res.status(500).json({ error: "Missing file URL from Cloudinary" });
+    }
+
     user.documents = [...(user.documents || []), finalUrl];
     user.verificationStatus = "pending";
     user.isVerified = false;
@@ -50,13 +56,14 @@ router.post("/upload-file", uploadCloud.single("file"), async (req, res) => {
     res.status(200).json({
       msg: "Uploaded to Cloudinary",
       path: finalUrl,
-      resourceType: req.file.resource_type, // Optional, but helpful
+      resourceType: req.file.resource_type,
     });
-      } catch (err) {
+  } catch (err) {
     console.error("❌ Upload error:", err.stack || err.message);
     res.status(500).json({ error: "Upload failed" });
   }
 });
+
 
 // ✅ Delete route
 router.delete("/delete/:userId", async (req, res) => {
