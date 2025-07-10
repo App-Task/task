@@ -76,23 +76,36 @@ export default function DocumentsScreen({ navigation }) {
                   type: file.mimeType || getMimeType(file.name),
                 };
   
-                formData.append("file", fileBlob);
-  
-                const response = await axios.post(
-                  "https://task-kq94.onrender.com/api/documents/upload-file",
-                  formData,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                      "Content-Type": "multipart/form-data",
-                    },
-                  }
-                );
-  
-                setDocuments((prev) => [
-                  ...prev,
-                  { id: Date.now().toString(), name: file.name },
-                ]);
+                formData.append("image", fileBlob); // use 'image' to match upload.js route
+
+const response = await axios.post(
+  "https://task-kq94.onrender.com/api/upload", // ✅ use Cloudinary uploader
+  formData,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  }
+);
+
+// ✅ Save the Cloudinary URL in MongoDB via PATCH
+await axios.patch(
+  `https://task-kq94.onrender.com/api/documents/update/${user._id}`,
+  {
+    documentUrl: response.data.imageUrl, // what Cloudinary returns
+  },
+  {
+    headers: { Authorization: `Bearer ${token}` },
+  }
+);
+
+// ✅ Show in UI
+setDocuments((prev) => [
+  ...prev,
+  { id: Date.now().toString(), name: response.data.imageUrl.split("/").pop() },
+]);
+
   
                 Alert.alert(
                   t("taskerDocuments.uploadedTitle"),
