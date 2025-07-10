@@ -14,7 +14,7 @@ const cloudStorage = new CloudinaryStorage({
     const isPDF = ext === "pdf";
 
     return {
-      folder: "tasks",
+      folder: "documents",
       public_id: `${Date.now()}-${file.originalname.replace(/\.[^/.]+$/, "")}`,
       format: ext,
       resource_type: "auto",
