@@ -51,7 +51,8 @@ router.post("/upload-file", uploadCloud.single("file"), async (req, res) => {
 
     // ✅ Construct accessible public URL manually
     const isPDF = ext === "pdf";
-    const finalUrl = `https://res.cloudinary.com/dfli5co1y/${isPDF ? "raw" : "image"}/upload/${publicId}.${ext}`;
+    const finalUrl = req.file?.secure_url || req.file?.url || req.file?.path;
+
 
     user.documents = [...(user.documents || []), finalUrl];
     user.verificationStatus = "pending";
