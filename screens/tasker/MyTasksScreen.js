@@ -28,6 +28,9 @@ export default function TaskerMyTasksScreen() {
   const [taskerId, setTaskerId] = useState("");
   const navigation = useNavigation();
   const [showVerifyBanner, setShowVerifyBanner] = useState(false);
+  const [reportedTaskIds, setReportedTaskIds] = useState([]);
+  const [reportingTaskId, setReportingTaskId] = useState(null);
+
 
 
 
@@ -180,47 +183,56 @@ const res = await axios.get(url, {
               </TouchableOpacity>
             )}
   
-            <TouchableOpacity
-              style={[styles.btn, styles.secondaryBtn]}
-              onPress={() => {
-                Alert.prompt(
-                  "Report Client",
-                  "Enter reason for reporting this client:",
-                  [
-                    {
-                      text: "Cancel",
-                      style: "cancel"
-                    },
-                    {
-                      text: "Submit",
-                      onPress: async (reason) => {
-                        try {
-                          const token = await getToken();
-                          const res = await axios.post("https://task-kq94.onrender.com/api/reports", {
-                            reporterId: taskerId,
-                            reportedUserId: item.user?._id || item.userId,
-                            reason,
-                            taskId: item._id
-                          }, {
-                            headers: { Authorization: `Bearer ${token}` }
-                          });
-                          Alert.alert("Reported", "Client has been reported successfully.");
-                        } catch (err) {
-                          console.error("❌ Report error:", err.message);
-                          Alert.alert("Error", "Failed to submit report.");
-                        }
-                      }
-                    }
-                  ],
-                  "plain-text"
-                );
-              }}
-              
-            >
-              <Text style={[styles.btnText, styles.secondaryText]}>
-                {t("taskerMyTasks.report")}
-              </Text>
-            </TouchableOpacity>
+  <TouchableOpacity
+  style={[
+    styles.btn,
+    styles.secondaryBtn,
+    reportedTaskIds.includes(item._id) && { opacity: 0.5 }
+  ]}
+  disabled={reportedTaskIds.includes(item._id) || reportingTaskId === item._id}
+  onPress={() => {
+    Alert.prompt(
+      "Report Client",
+      "Enter reason for reporting this client:",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Submit",
+          onPress: async (reason) => {
+            try {
+              setReportingTaskId(item._id);
+              Alert.alert("Loading...", "Submitting your report.");
+
+              const token = await getToken();
+              await axios.post("https://task-kq94.onrender.com/api/reports", {
+                reporterId: taskerId,
+                reportedUserId: item.user?._id || item.userId,
+                reason,
+                taskId: item._id,
+              }, {
+                headers: { Authorization: `Bearer ${token}` }
+              });
+
+              setReportedTaskIds((prev) => [...prev, item._id]);
+              Alert.alert("Reported", "Client has been reported successfully.");
+            } catch (err) {
+              console.error("❌ Report error:", err.message);
+              Alert.alert("Error", "Failed to submit report.");
+            } finally {
+              setReportingTaskId(null);
+            }
+          }
+        }
+      ],
+      "plain-text"
+    );
+  }}
+>
+  <Text style={[styles.btnText, styles.secondaryText]}>
+    {reportedTaskIds.includes(item._id) ? "Reported" : t("taskerMyTasks.report")}
+  </Text>
+</TouchableOpacity>
+
   
             {tab === "active" && (
               <TouchableOpacity
