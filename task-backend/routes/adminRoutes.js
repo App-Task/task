@@ -301,8 +301,8 @@ router.get("/stats", async (req, res) => {
 router.get("/reports", async (req, res) => {
   try {
     const reports = await Report.find()
-      .populate("reporterId", "name email")
-      .populate("reportedUserId", "name email")
+      .populate("reporterId", "name email phone")
+      .populate("reportedUserId", "name email phone")    
       .populate("taskId", "title")
       .sort({ createdAt: -1 });
 
@@ -310,8 +310,10 @@ router.get("/reports", async (req, res) => {
       _id: r._id,
       reporterName: r.reporterId?.name || "N/A",
       reporterEmail: r.reporterId?.email || "N/A",
+      reporterPhone: r.reporterId?.phone || "N/A",
       reportedName: r.reportedUserId?.name || "N/A",
       reportedEmail: r.reportedUserId?.email || "N/A",
+      reportedPhone: r.reportedUserId?.phone || "N/A",
       taskTitle: r.taskId?.title || "N/A",
       reason: r.reason,
       createdAt: new Date(r.createdAt).toLocaleString(),

@@ -39,11 +39,19 @@
       data.forEach(r => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${r.reporterName} <br><small>${r.reporterEmail}</small></td>
-          <td>${r.reportedName} <br><small>${r.reportedEmail}</small></td>
-          <td>${r.taskTitle}</td>
-          <td>${r.reason}</td>
-          <td>${r.createdAt}</td>
+        <td>
+            ${r.reporterName}<br>
+            <small>${r.reporterEmail}</small><br>
+            <small>📞 ${r.reporterPhone}</small>
+        </td>
+        <td>
+            ${r.reportedName}<br>
+            <small>${r.reportedEmail}</small><br>
+            <small>📞 ${r.reportedPhone}</small>
+        </td>
+        <td>${r.taskTitle}</td>
+        <td>${r.reason}</td>
+        <td>${r.createdAt}</td>
         `;
         tbody.appendChild(row);
       });
