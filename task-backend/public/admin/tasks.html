@@ -100,11 +100,13 @@
       : "—"}
   </td>
 
-    <td>
-    ${t.images && t.images.length > 0
-      ? t.images.map(img => `<img src="${img}" width="50" style="margin:2px; border-radius:4px;" />`).join("")
-      : "—"}
-  </td>
+   <td>
+  ${t.images && t.images.length > 0
+    ? t.images.map((img, i) => `<a href="${img}" target="_blank">🖼️ Image ${i + 1}</a>`).join("<br>")
+    : "—"}
+</td>
+
+
 
  
 `;
