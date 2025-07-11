@@ -335,28 +335,7 @@ if (normalizedStatus === "cancelled") {
   </TouchableOpacity>
 ))}
 
-{isReporting && (
-  <View style={{
-    position: "absolute",
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 999,
-  }}>
-    <View style={{
-      backgroundColor: "#fff",
-      padding: 24,
-      borderRadius: 16,
-      alignItems: "center",
-    }}>
-      <ActivityIndicator size="large" color="#213729" />
-      <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#213729" }}>
-        Submitting Report...
-      </Text>
-    </View>
-  </View>
-)}
+
 
 
     
@@ -403,6 +382,31 @@ if (normalizedStatus === "cancelled") {
       <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
       <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
         {t("clientReview.submitting", "Submitting review...")}
+      </Text>
+    </View>
+  </View>
+)}
+
+
+
+{isReporting && (
+  <View style={{
+    position: "absolute",
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  }}>
+    <View style={{
+      backgroundColor: "#fff",
+      padding: 24,
+      borderRadius: 16,
+      alignItems: "center",
+    }}>
+      <ActivityIndicator size="large" color="#213729" />
+      <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#213729" }}>
+        Submitting Report...
       </Text>
     </View>
   </View>
