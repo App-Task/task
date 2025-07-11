@@ -30,6 +30,8 @@ export default function TaskerMyTasksScreen() {
   const [showVerifyBanner, setShowVerifyBanner] = useState(false);
   const [reportedTaskIds, setReportedTaskIds] = useState([]);
   const [reportingTaskId, setReportingTaskId] = useState(null);
+  const [isReporting, setIsReporting] = useState(false);
+
 
 
 
@@ -201,8 +203,8 @@ const res = await axios.get(url, {
           onPress: async (reason) => {
             try {
               setReportingTaskId(item._id);
-              Alert.alert("Loading...", "Submitting your report.");
-
+              setIsReporting(true); // ✅ Start loading
+            
               const token = await getToken();
               await axios.post("https://task-kq94.onrender.com/api/reports", {
                 reporterId: taskerId,
@@ -212,7 +214,7 @@ const res = await axios.get(url, {
               }, {
                 headers: { Authorization: `Bearer ${token}` }
               });
-
+            
               setReportedTaskIds((prev) => [...prev, item._id]);
               Alert.alert("Reported", "Client has been reported successfully.");
             } catch (err) {
@@ -220,7 +222,9 @@ const res = await axios.get(url, {
               Alert.alert("Error", "Failed to submit report.");
             } finally {
               setReportingTaskId(null);
+              setIsReporting(false); // ✅ End loading
             }
+            
           }
         }
       ],
@@ -336,6 +340,31 @@ const res = await axios.get(url, {
           contentContainerStyle={{ paddingBottom: 60 }}
         />
       )}
+
+
+{isReporting && (
+  <View style={{
+    position: "absolute",
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  }}>
+    <View style={{
+      backgroundColor: "#fff",
+      padding: 24,
+      borderRadius: 16,
+      alignItems: "center",
+    }}>
+      <ActivityIndicator size="large" color="#213729" />
+      <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#213729" }}>
+        Submitting Report...
+      </Text>
+    </View>
+  </View>
+)}
+
     </View>
   );
 }

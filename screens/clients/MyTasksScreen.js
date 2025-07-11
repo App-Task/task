@@ -39,6 +39,8 @@ export default function MyTasksScreen({ navigation, route }) {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reportedTaskIds, setReportedTaskIds] = useState([]);
   const [reportingTaskId, setReportingTaskId] = useState(null);
+  const [isReporting, setIsReporting] = useState(false);
+
 
 
 
@@ -208,8 +210,8 @@ if (normalizedStatus === "cancelled") {
             onPress: async (reason) => {
               try {
                 setReportingTaskId(item._id);
-                Alert.alert("Loading...", "Submitting your report...");
-
+                setIsReporting(true); // ✅ Start spinner
+              
                 const token = await SecureStore.getItemAsync("token");
                 await fetch("https://task-kq94.onrender.com/api/reports", {
                   method: "POST",
@@ -224,15 +226,17 @@ if (normalizedStatus === "cancelled") {
                     taskId: item._id,
                   }),
                 });
-
+              
                 setReportedTaskIds((prev) => [...prev, item._id]);
                 Alert.alert("Reported", "Tasker has been reported successfully.");
               } catch (err) {
                 console.error("❌ Report error:", err.message);
                 Alert.alert("Error", "Failed to submit report.");
               } finally {
+                setIsReporting(false); // ✅ Hide spinner
                 setReportingTaskId(null);
               }
+              
             },
           },
         ],
@@ -330,6 +334,30 @@ if (normalizedStatus === "cancelled") {
     </Text>
   </TouchableOpacity>
 ))}
+
+{isReporting && (
+  <View style={{
+    position: "absolute",
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  }}>
+    <View style={{
+      backgroundColor: "#fff",
+      padding: 24,
+      borderRadius: 16,
+      alignItems: "center",
+    }}>
+      <ActivityIndicator size="large" color="#213729" />
+      <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#213729" }}>
+        Submitting Report...
+      </Text>
+    </View>
+  </View>
+)}
+
 
     
       </View>
