@@ -196,9 +196,11 @@ if (normalizedStatus === "cancelled") {
         marginTop: 10,
         alignSelf: "flex-start",
       },
-      reportedTaskIds.includes(item._id) && { opacity: 0.5 },
+      {}
+
     ]}
-    disabled={reportedTaskIds.includes(item._id) || reportingTaskId === item._id}
+    disabled={reportingTaskId === item._id}
+
     onPress={() => {
       Alert.prompt(
         "Report Tasker",
@@ -245,7 +247,7 @@ if (normalizedStatus === "cancelled") {
     }}
   >
     <Text style={{ color: "#213729", fontFamily: "InterBold", fontSize: 13 }}>
-      {reportedTaskIds.includes(item._id) ? "Reported" : "Report Tasker"}
+    "Report Tasker"
     </Text>
   </TouchableOpacity>
 )}

@@ -28,7 +28,6 @@ export default function TaskerMyTasksScreen() {
   const [taskerId, setTaskerId] = useState("");
   const navigation = useNavigation();
   const [showVerifyBanner, setShowVerifyBanner] = useState(false);
-  const [reportedTaskIds, setReportedTaskIds] = useState([]);
   const [reportingTaskId, setReportingTaskId] = useState(null);
   const [isReporting, setIsReporting] = useState(false);
 
@@ -189,9 +188,9 @@ const res = await axios.get(url, {
   style={[
     styles.btn,
     styles.secondaryBtn,
-    reportedTaskIds.includes(item._id) && { opacity: 0.5 }
   ]}
-  disabled={reportedTaskIds.includes(item._id) || reportingTaskId === item._id}
+  disabled={reportingTaskId === item._id}
+
   onPress={() => {
     Alert.prompt(
       "Report Client",
@@ -215,7 +214,6 @@ const res = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
               });
             
-              setReportedTaskIds((prev) => [...prev, item._id]);
               Alert.alert("Reported", "Client has been reported successfully.");
             } catch (err) {
               console.error("❌ Report error:", err.message);
@@ -233,7 +231,8 @@ const res = await axios.get(url, {
   }}
 >
   <Text style={[styles.btnText, styles.secondaryText]}>
-    {reportedTaskIds.includes(item._id) ? "Reported" : t("taskerMyTasks.report")}
+  {t("taskerMyTasks.report")}
+
   </Text>
 </TouchableOpacity>
 
