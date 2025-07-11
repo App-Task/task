@@ -142,35 +142,38 @@ const deleteImage = (index) => {
       const localUri = result.assets[0].uri;
   
       const formData = new FormData();
-      formData.append("file", {
+      formData.append("image", {
         uri: localUri,
         type: "image/jpeg",
         name: "upload.jpg",
       });
-      formData.append("upload_preset", "task_app_preset");
   
       try {
-        setImageUploading(true); // 👈 Start loading
-        const response = await fetch("https://api.cloudinary.com/v1_1/dvxz4nfnx/image/upload", {
+        setImageUploading(true);
+        const response = await fetch("https://task-kq94.onrender.com/api/upload", {
           method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
           body: formData,
         });
   
         const data = await response.json();
   
-        if (data.secure_url) {
-          setImages([...images, data.secure_url]);
+        if (data.imageUrl) {
+          setImages([...images, data.imageUrl]);
         } else {
           throw new Error("Upload failed");
         }
       } catch (err) {
-        console.error("❌ Cloudinary upload failed:", err);
+        console.error("❌ Upload failed:", err);
         Alert.alert("Upload failed", "Could not upload image. Try again.");
       } finally {
-        setImageUploading(false); // 👈 Stop loading
+        setImageUploading(false);
       }
     }
   };
+  
   
   
   
