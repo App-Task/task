@@ -7,6 +7,8 @@ const Task = require("../models/Task");
 const Message = require("../models/Message");
 const Bid = require("../models/Bid");
 const Review = require("../models/Review");
+const Report = require("../models/Report"); // ✅ make sure it's imported at the top
+
 
 
 // ✅ PATCH /api/admin/verify-tasker/:id
@@ -294,6 +296,34 @@ router.get("/stats", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch stats" });
   }
 });
+
+// GET /api/admin/reports
+router.get("/reports", async (req, res) => {
+  try {
+    const reports = await Report.find()
+      .populate("reporterId", "name email")
+      .populate("reportedUserId", "name email")
+      .populate("taskId", "title")
+      .sort({ createdAt: -1 });
+
+    const formatted = reports.map((r) => ({
+      _id: r._id,
+      reporterName: r.reporterId?.name || "N/A",
+      reporterEmail: r.reporterId?.email || "N/A",
+      reportedName: r.reportedUserId?.name || "N/A",
+      reportedEmail: r.reportedUserId?.email || "N/A",
+      taskTitle: r.taskId?.title || "N/A",
+      reason: r.reason,
+      createdAt: new Date(r.createdAt).toLocaleString(),
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error("❌ Failed to fetch reports:", err.message);
+    res.status(500).json({ error: "Failed to fetch reports" });
+  }
+});
+
 
 
 

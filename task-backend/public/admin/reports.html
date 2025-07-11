@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin – Reports</title>
+  <style>
+    body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+    h1 { color: #215432; text-align: center; margin-bottom: 20px; }
+    table { width: 100%; background: white; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+    th { background: #215432; color: white; }
+    tr:hover { background-color: #f9f9f9; }
+  </style>
+</head>
+<body>
+
+<h1>Reported Users</h1>
+
+<table id="reportsTable">
+  <thead>
+    <tr>
+      <th>Reporter</th>
+      <th>Reported</th>
+      <th>Task</th>
+      <th>Reason</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  async function loadReports() {
+    try {
+      const res = await fetch("/api/admin/reports");
+      const data = await res.json();
+
+      const tbody = document.querySelector("#reportsTable tbody");
+      data.forEach(r => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${r.reporterName} <br><small>${r.reporterEmail}</small></td>
+          <td>${r.reportedName} <br><small>${r.reportedEmail}</small></td>
+          <td>${r.taskTitle}</td>
+          <td>${r.reason}</td>
+          <td>${r.createdAt}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    } catch (err) {
+      console.error("Failed to load reports:", err);
+    }
+  }
+
+  loadReports();
+</script>
+
+</body>
+</html>
