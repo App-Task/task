@@ -247,7 +247,7 @@ if (normalizedStatus === "cancelled") {
     }}
   >
     <Text style={{ color: "#213729", fontFamily: "InterBold", fontSize: 13 }}>
-    "Report Tasker"
+    Report Tasker
     </Text>
   </TouchableOpacity>
 )}
