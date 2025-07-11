@@ -182,7 +182,40 @@ const res = await axios.get(url, {
   
             <TouchableOpacity
               style={[styles.btn, styles.secondaryBtn]}
-              onPress={() => Alert.alert("Report", "Report client")}
+              onPress={() => {
+                Alert.prompt(
+                  "Report Client",
+                  "Enter reason for reporting this client:",
+                  [
+                    {
+                      text: "Cancel",
+                      style: "cancel"
+                    },
+                    {
+                      text: "Submit",
+                      onPress: async (reason) => {
+                        try {
+                          const token = await getToken();
+                          const res = await axios.post("https://task-kq94.onrender.com/api/reports", {
+                            reporterId: taskerId,
+                            reportedUserId: item.user?._id || item.userId,
+                            reason,
+                            taskId: item._id
+                          }, {
+                            headers: { Authorization: `Bearer ${token}` }
+                          });
+                          Alert.alert("Reported", "Client has been reported successfully.");
+                        } catch (err) {
+                          console.error("❌ Report error:", err.message);
+                          Alert.alert("Error", "Failed to submit report.");
+                        }
+                      }
+                    }
+                  ],
+                  "plain-text"
+                );
+              }}
+              
             >
               <Text style={[styles.btnText, styles.secondaryText]}>
                 {t("taskerMyTasks.report")}

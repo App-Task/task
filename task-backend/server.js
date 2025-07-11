@@ -40,6 +40,8 @@ app.use("/api/admin", adminRoutes);
 console.log("📦 Registering /api/documents routes...");
 app.use("/api/documents", documentRoutes);
 app.use("/api", userRoutes);
+app.use("/api/reports", require("./routes/reportRoutes"));
+
 
 
 
