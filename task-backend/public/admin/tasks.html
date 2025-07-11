@@ -45,6 +45,7 @@
         <th>Cancelled/Completed</th>
         <th>Bids</th>
         <th>Accepted Bid</th>
+        <th>Images</th>
 
 
       </tr>
@@ -98,6 +99,13 @@
       ? `✅ ${t.acceptedBid.tasker}<br>💰 ${t.acceptedBid.price}<br>${t.acceptedBid.message}`
       : "—"}
   </td>
+
+    <td>
+    ${t.images && t.images.length > 0
+      ? t.images.map(img => `<img src="${img}" width="50" style="margin:2px; border-radius:4px;" />`).join("")
+      : "—"}
+  </td>
+
  
 `;
 

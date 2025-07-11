@@ -243,6 +243,7 @@ const result = tasks.map(t => {
     _id: t._id,
     title: t.title,
     description: t.description || "N/A",
+    images: t.images || [],
     location: t.location || "N/A",
     status: t.status,
     createdAt: t.createdAt,
