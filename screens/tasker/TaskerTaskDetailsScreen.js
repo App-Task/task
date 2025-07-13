@@ -124,11 +124,11 @@ const handleBid = async () => {
       [
         {
           text: "OK",
-          onPress: () =>
-            navigation.navigate("TaskerHome", {
-              screen: "ExploreTasks",
-              params: { refresh: true },
-            }),
+          onPress: () => {
+            navigation.setParams({ refresh: true });
+            navigation.goBack();
+          }
+          
         },
       ]
     );

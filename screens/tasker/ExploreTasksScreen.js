@@ -102,7 +102,9 @@ const allTasks = taskRes.data;
 const bidRes = await axios.get(`https://task-kq94.onrender.com/api/bids/tasker/${user._id}`, {
   headers: { Authorization: `Bearer ${token}` },
 });
-const bidTaskIds = bidRes.data.map((bid) => bid.taskId);
+const bidTaskIds = bidRes.data.map((bid) =>
+  typeof bid.taskId === "object" ? bid.taskId._id : bid.taskId
+);
 
 // ✅ Exclude tasks already bid on
 const availableTasks = allTasks.filter(
@@ -130,16 +132,11 @@ setFilteredTasks(availableTasks);
   useFocusEffect(
     React.useCallback(() => {
       fetchTasks();
+      return () => {}; // clean-up if needed
     }, [])
   );
+  
 
-  useEffect(() => {
-    if (route.params?.refresh) {
-      fetchTasks();
-      // clear refresh flag after use
-      navigation.setParams({ refresh: false });
-    }
-  }, [route.params?.refresh]);
   
 
   useEffect(() => {
