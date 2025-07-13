@@ -108,7 +108,7 @@ export default function TaskerMessagesScreen({ navigation }) {
       {loading && conversations.length === 0 ? (
         <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
       ) : conversations.length === 0 ? (
-        <Text style={styles.empty}>{t("taskerMessages.empty")}</Text>
+<Text style={styles.empty}>No messages yet</Text>
       ) : (
         <FlatList
   data={conversations}

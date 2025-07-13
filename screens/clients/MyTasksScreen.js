@@ -281,6 +281,7 @@ allTasks.forEach((task) => {
 
 
 
+
     </View>
       
     </TouchableOpacity>
