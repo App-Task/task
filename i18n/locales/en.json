@@ -1,5 +1,5 @@
 {
-  "welcome": "Welcome to Task!",
+  "welcome": "Reliable Help, Just a Task Away.",
 "chooseRole": "Choose your role:",
 "role": {
   "client": "Client",
@@ -21,7 +21,9 @@
     "registerLink": "Register",
     "failedTitle": "Login Failed",
     "blockedAccount": "Your account has been blocked by the admin.",
-    "failedGeneric": "Something went wrong. Please try again."
+    "failedGeneric": "Something went wrong. Please try again.",
+    "missingTitle": "Missing Information",
+    "missingFields": "Please enter both email and password."
   },
   "register": {
     "title": "Create an Account ",
@@ -32,7 +34,17 @@
     "registerBtn": "Register",
     "alreadyHave": "Already have an account?",
     "loginLink": "Login",
-    "phone": "Phone Number"
+    "phone": "Phone Number",
+    "missingFields": "Missing Information",
+  "fillAllFields": "Please fill out all fields.",
+  "mismatchTitle": "Password Mismatch",
+  "passwordMismatch": "Passwords do not match.",
+  "accept": "I accept the",
+  "privacy": "Privacy Policy",
+  "terms": "Terms and Conditions",
+  "and": "and",
+  "termsRequiredTitle": "Terms Required",
+  "termsRequiredMessage": "You must accept the Terms and Privacy Policy to continue."
 
   },
   "TaskBottomNav": {
@@ -104,7 +116,7 @@
   },
   "clientMessages": {
     "title": "Messages",
-    "placeholder": "No messages yet."
+    "placeholder": "No messages yet"
   },
   "clientPayments": {
     "title": "My Payments",
@@ -116,10 +128,12 @@
   },
 "clientMyTasks": {
   "pending": "Pending",
-  "started": "In Progress",
-  "completed": "Completed",
-  "noTasks": "No {{status}} tasks available.",
-  "fetchError": "Could not load your tasks. Please try again."
+    "started": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "previous": "Previous",
+    "noTasks": "No tasks in {{status}} status currently",
+    "fetchError": "An error occurred while fetching your tasks."
 }
 ,
   "clientNotifications": {
@@ -153,13 +167,16 @@
     "fillAllFields": "Please fill all fields to continue.",
     "successTitle": "Task Posted",
     "successMessage": "Your task has been successfully posted.",
-    "categories": {
-      "cleaning": "Cleaning",
-      "moving": "Moving",
-      "delivery": "Delivery",
-      "repairs": "Repairs",
-      "other": "Other"
-    },
+   "categories": {
+    "handyman": "Handyman",
+    "moving": "Moving",
+    "ikea assembly": "IKEA assembly",
+    "cleaning": "Cleaning",
+    "shopping & delivery": "Shopping & Delivery",
+    "yardwork services": "Yardwork Services",
+    "dog walking": "Dog Walking",
+    "other": "Other"
+  },
     "postingNow": "Posting...",
     "uploadingImage": "Uploading image..."
 

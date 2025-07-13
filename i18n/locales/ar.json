@@ -1,5 +1,5 @@
 {
-  "welcome": "مرحبًا بك في تاسك!",
+  "welcome": ".مساعدة موثوقة، على بُعد مهمة واحدة فقط",
 "chooseRole": "اختر دورك:",
 "role": {
   "client": "عميل",
@@ -21,7 +21,9 @@
     "registerLink": "سجّل الآن",
     "failedTitle": "فشل تسجيل الدخول",
   "blockedAccount": "تم حظر حسابك من قبل الإدارة.",
-  "failedGeneric": "حدث خطأ ما. حاول مرة أخرى."
+  "failedGeneric": "حدث خطأ ما. حاول مرة أخرى.",
+  "missingTitle": "معلومات ناقصة",
+  "missingFields": "يرجى إدخال البريد الإلكتروني وكلمة المرور."
   },
   "register": {
     "title": "إنشاء حساب ",
@@ -32,7 +34,15 @@
     "registerBtn": "إنشاء حساب",
     "alreadyHave": "هل لديك حساب؟",
     "loginLink": "تسجيل الدخول",
-    "phone": "رقم الجوال"
+    "phone": "رقم الجوال",
+    "missingFields": "معلومات ناقصة",
+  "fillAllFields": "يرجى ملء جميع الحقول.",
+ "accept": "أوافق على",
+  "privacy": "سياسة الخصوصية",
+  "terms": "الشروط والأحكام",
+  "and": "و",
+  "termsRequiredTitle": "الموافقة مطلوبة",
+  "termsRequiredMessage": "يجب الموافقة على الشروط وسياسة الخصوصية للمتابعة."
 
   },
   "TaskBottomNav": {
@@ -107,7 +117,7 @@
   },
   "clientMessages": {
     "title": "الرسائل",
-    "placeholder": "لا توجد رسائل بعد."
+    "placeholder": "لا توجد رسائل بعد"
   },
   "clientPayments": {
     "title": "مدفوعاتي",
@@ -120,9 +130,11 @@
 "clientMyTasks": {
   "pending": "قيد الانتظار",
   "started": "قيد التنفيذ",
-  "completed": "مكتملة",
-  "noTasks": "لا توجد مهام {{status}} حاليًا.",
-  "fetchError": "تعذر تحميل المهام. يرجى المحاولة مرة أخرى."
+  "completed": "مكتمل",
+  "cancelled": "ملغي",
+  "previous": "المهام السابقة",
+  "noTasks": "لا توجد مهام في حالة {{status}} حالياً",
+  "fetchError": "حدث خطأ أثناء تحميل المهام."
 }
 ,
   "clientNotifications": {
@@ -156,13 +168,16 @@
     "fillAllFields": "يرجى ملء جميع الحقول للمتابعة.",
     "successTitle": "تم النشر",
     "successMessage": "تم نشر المهمة بنجاح.",
-    "categories": {
-      "cleaning": "تنظيف",
-      "moving": "نقل",
-      "delivery": "توصيل",
-      "repairs": "تصليحات",
-      "other": "أخرى"
-    },
+   "categories": {
+    "handyman": "أعمال الصيانة",
+    "moving": "النقل",
+    "ikea assembly": "تركيب أثاث إيكيا",
+    "cleaning": "التنظيف",
+    "shopping & delivery": "التسوق والتوصيل",
+    "yardwork services": "أعمال الحديقة",
+    "dog walking": "تمشية الكلاب",
+    "other": "أخرى"
+  },
     "postingNow": "جاري النشر...",
     "uploadingImage": "جارٍ تحميل الصورة..."
 

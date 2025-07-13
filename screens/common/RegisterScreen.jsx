@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import CountryPicker, { CountryCode, Country } from "react-native-country-picker-modal";
 import {
   View,
   Text,
@@ -30,11 +31,13 @@ export default function RegisterScreen({ navigation, route }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [countryCode, setCountryCode] = useState("+966");
+  const [countryCode, setCountryCode] = useState("BH");
+  const [callingCode, setCallingCode] = useState("+973");
   const [phone, setPhone] = useState("");
   const [secure1, setSecure1] = useState(true);
   const [secure2, setSecure2] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
 
 
@@ -48,6 +51,15 @@ export default function RegisterScreen({ navigation, route }) {
       Alert.alert(t("register.mismatchTitle"), t("register.passwordMismatch"));
       return;
     }
+
+    if (!acceptedTerms) {
+      Alert.alert(
+        t("register.termsRequiredTitle", "Terms Required"),
+        t("register.termsRequiredMessage", "You must accept the Terms and Privacy Policy to continue.")
+      );
+      return;
+    }
+    
   
     setIsRegistering(true); // ✅ show popup
   
@@ -58,7 +70,7 @@ export default function RegisterScreen({ navigation, route }) {
         name: name.trim(), 
         email: email.trim().toLowerCase(), 
         password, 
-        phone: `${countryCode}${phone.trim()}`, 
+        phone: `${callingCode}${phone.trim()}`,
         role 
       });
       
@@ -101,7 +113,7 @@ export default function RegisterScreen({ navigation, route }) {
         </View>
 
         <Image
-          source={require("../../assets/images/1.png")}
+          source={require("../../assets/images/21.png")}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -129,15 +141,20 @@ export default function RegisterScreen({ navigation, route }) {
         />
 
 <View style={styles.phoneContainer}>
-  <TextInput
-    style={styles.countryCodeInput}
-    value={countryCode}
-    onChangeText={setCountryCode}
-    keyboardType="phone-pad"
-    placeholder="+966"
-    placeholderTextColor="#999"
-    maxLength={5}
-  />
+  <View style={styles.countryPickerWrapper}>
+    <CountryPicker
+      countryCode={countryCode}
+      withFilter
+      withFlag
+      withCountryNameButton
+      withCallingCode
+      withEmoji
+      onSelect={(selectedCountry) => {
+        setCountryCode(selectedCountry.cca2);
+        setCallingCode("+" + selectedCountry.callingCode[0]);
+      }}
+    />
+  </View>
   <TextInput
     style={styles.phoneInput}
     value={phone}
@@ -147,6 +164,7 @@ export default function RegisterScreen({ navigation, route }) {
     placeholderTextColor="#999"
   />
 </View>
+
 
 
 
@@ -183,6 +201,36 @@ export default function RegisterScreen({ navigation, route }) {
             <Ionicons name={secure2 ? "eye-off" : "eye"} size={20} color="#999" />
           </TouchableOpacity>
         </View>
+
+        <View style={styles.termsContainer}>
+  <TouchableOpacity
+    onPress={() => setAcceptedTerms(!acceptedTerms)}
+    style={styles.checkbox}
+  >
+    <Ionicons
+      name={acceptedTerms ? "checkbox" : "square-outline"}
+      size={20}
+      color="#213729"
+    />
+    <Text style={styles.termsText}>
+      {t("register.accept")}{" "}
+      <Text
+        style={styles.linkText}
+        onPress={() => navigation.navigate("PrivacyPolicy")}
+      >
+        {t("register.privacy")}
+      </Text>{" "}
+      {t("register.and")}{" "}
+      <Text
+        style={styles.linkText}
+        onPress={() => navigation.navigate("TermsAndConditions")}
+      >
+        {t("register.terms")}
+      </Text>
+    </Text>
+  </TouchableOpacity>
+</View>
+
 
         <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>{t("register.registerBtn")}</Text>
@@ -227,9 +275,9 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   logo: {
-    width: width * 0.3,
-    height: width * 0.3,
-    marginBottom: 30,
+    width: width * 0.6,
+    height: width * 0.6,
+    marginBottom: -30,
   },
   title: {
     fontSize: 26,
@@ -299,16 +347,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     overflow: "hidden",
   },
-  
-  countryCodeInput: {
-    width: 80,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    fontSize: 16,
-    fontFamily: "Inter",
-    color: "#333",
-    backgroundColor: "#e0e0e0",
-  },
+
   
   phoneInput: {
     flex: 1,
@@ -342,5 +381,40 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#213729",
   },
+
+  countryPickerWrapper: {
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    backgroundColor: "#e0e0e0",
+    borderRightWidth: 1,
+    borderRightColor: "#ccc",
+  },
+
+  termsContainer: {
+    width: "100%",
+    marginBottom: 16,
+  },
+  
+  checkbox: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
+  
+  termsText: {
+    marginLeft: 8,
+    fontFamily: "Inter",
+    fontSize: 13,
+    color: "#213729",
+    flexShrink: 1,
+  },
+  
+  linkText: {
+    fontFamily: "InterBold",
+    color: "#215432",
+    textDecorationLine: "underline",
+  },
+  
+  
   
 });

@@ -116,10 +116,13 @@ const [canceling, setCanceling] = useState(false);
                   screen: "Tasks",
                   params: {
                     refreshTasks: true,
-                    targetTab: "Cancelled",
+                    targetTab: "Previous",
+                    subTab: "Cancelled",
                     unique: Date.now(),
                   },
                 });
+                
+                
               } catch (err) {
                 setCanceling(false); // ✅ Hide on error
                 console.log("❌ Error during cancel request:", err.message);
@@ -261,10 +264,12 @@ const [canceling, setCanceling] = useState(false);
                 screen: "Tasks",
                 params: {
                   refreshTasks: true,
-                  targetTab: "Cancelled",
+                  targetTab: "Previous", // ✅ correct main tab
+                  subTab: "Completed",   // ✅ correct sub-tab
                   unique: Date.now(),
                 },
               });
+              
             } catch (err) {
               setCompleting(false);
               console.error("❌ Failed to complete task:", err.message);

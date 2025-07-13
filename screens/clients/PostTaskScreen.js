@@ -27,7 +27,17 @@ import useUnreadNotifications from "../../hooks/useUnreadNotifications";
 
 
 const { width, height } = Dimensions.get("window");
-const rawCategories = ["Cleaning", "Moving", "Delivery", "Repairs", "Other"];
+const rawCategories = [
+  "Handyman",
+  "Moving",
+  "IKEA assembly",
+  "Cleaning",
+  "Shopping & Delivery",
+  "Yardwork Services",
+  "Dog Walking",
+  "Other"
+];
+
 
 export default function PostTaskScreen() {
   const navigation = useNavigation();
@@ -42,6 +52,16 @@ export default function PostTaskScreen() {
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [posting, setPosting] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewUri, setPreviewUri] = useState(null);
+  const [categoryError, setCategoryError] = useState(false);
+  const [titleError, setTitleError] = useState(false);
+  const [descError, setDescError] = useState(false);
+  const [locationError, setLocationError] = useState(false);
+  const [budgetError, setBudgetError] = useState(false);
+
+
+
 
 
 
@@ -53,10 +73,60 @@ const deleteImage = (index) => {
 
 
   const handlePost = async () => {
-    if (!title || !description || !location || !budget || !selectedCategory) {
-      Alert.alert(t("clientPostTask.missingTitle"), t("clientPostTask.fillAllFields"));
-      return;
-    }
+    let hasError = false;
+
+if (!selectedCategory) {
+  setCategoryError(true);
+  hasError = true;
+} else {
+  setCategoryError(false);
+}
+
+let errorFlag = false;
+
+if (!title) {
+  setTitleError(true);
+  errorFlag = true;
+} else {
+  setTitleError(false);
+}
+
+if (!description) {
+  setDescError(true);
+  errorFlag = true;
+} else {
+  setDescError(false);
+}
+
+if (!location) {
+  setLocationError(true);
+  errorFlag = true;
+} else {
+  setLocationError(false);
+}
+
+if (!budget) {
+  setBudgetError(true);
+  errorFlag = true;
+} else {
+  setBudgetError(false);
+}
+
+if (!selectedCategory) {
+  setCategoryError(true);
+  errorFlag = true;
+} else {
+  setCategoryError(false);
+}
+
+if (errorFlag) {
+  Alert.alert(t("clientPostTask.missingTitle"), t("clientPostTask.fillAllFields"));
+  return;
+}
+
+
+    setCategoryError(false); // ✅ clear error once valid
+    
   
     try {
       setPosting(true); // ✅ show overlay
@@ -217,7 +287,7 @@ const deleteImage = (index) => {
 
         <View style={styles.formContainer}>
   <TextInput
-    style={styles.input}
+      style={[styles.input, titleError && { borderColor: "#c00", borderWidth: 2 }]}
     placeholder={t("clientPostTask.taskTitlePlaceholder")}
     maxLength={15}
     placeholderTextColor="#999"
@@ -227,7 +297,8 @@ const deleteImage = (index) => {
   />
 
   <TextInput
-    style={[styles.input, styles.textarea]}
+    style={[styles.input, styles.textarea, descError && { borderColor: "#c00", borderWidth: 2 }]}
+
     placeholder={t("clientPostTask.taskDescPlaceholder")}
     placeholderTextColor="#999"
     value={description}
@@ -238,10 +309,14 @@ const deleteImage = (index) => {
     textAlign={I18nManager.isRTL ? "right" : "left"}
   />
 
-  <TouchableOpacity
-    style={styles.categoryPicker}
-    onPress={() => setCategoryModalVisible(true)}
-  >
+<TouchableOpacity
+  style={[
+    styles.categoryPicker,
+    categoryError && { borderColor: "#c00", borderWidth: 2 }
+  ]}
+  onPress={() => setCategoryModalVisible(true)}
+>
+
     <Text style={styles.uploadText}>
       {selectedCategory
         ? t(`clientPostTask.categories.${selectedCategory.toLowerCase()}`)
@@ -250,7 +325,9 @@ const deleteImage = (index) => {
   </TouchableOpacity>
 
   <TextInput
-    style={styles.input}
+
+  style={[styles.input, locationError && { borderColor: "#c00", borderWidth: 2 }]}
+  
     placeholder={t("clientPostTask.enterAddress")}
     placeholderTextColor="#999"
     value={location}
@@ -259,7 +336,8 @@ const deleteImage = (index) => {
   />
 
   <TextInput
-    style={styles.input}
+      style={[styles.input, budgetError && { borderColor: "#c00", borderWidth: 2 }]}
+
     placeholder={t("clientPostTask.budget") + " (BHD)"}
     placeholderTextColor="#999"
     value={budget}
@@ -278,7 +356,13 @@ const deleteImage = (index) => {
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
       {images.map((img, index) => (
         <View key={index} style={styles.imageWrapper}>
-          <Image source={{ uri: img }} style={styles.preview} />
+          <TouchableOpacity onPress={() => {
+            setPreviewUri(img);
+            setPreviewVisible(true);
+          }}>
+            <Image source={{ uri: img }} style={styles.preview} />
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.deleteIcon}
             onPress={() => deleteImage(index)}
@@ -351,10 +435,25 @@ const deleteImage = (index) => {
 {imageUploading && (
   <View style={styles.postingOverlay}>
     <View style={styles.postingBox}>
-      <Text style={styles.postingText}>{t("clientPostTask.uploadingImage") || "Uploading image..."}</Text>
+      <Text style={styles.postingText}>
+        {t("clientPostTask.uploadingImage") || "Uploading image..."}
+      </Text>
     </View>
   </View>
 )}
+
+<Modal visible={previewVisible} transparent animationType="fade">
+  <View style={styles.previewModalContainer}>
+    <TouchableOpacity
+      style={styles.closeButton}
+      onPress={() => setPreviewVisible(false)}
+    >
+      <Text style={styles.closeButtonText}>×</Text>
+    </TouchableOpacity>
+    <Image source={{ uri: previewUri }} style={styles.fullPreviewImage} />
+  </View>
+</Modal>
+
 
     </KeyboardAvoidingView>
   );
@@ -598,6 +697,46 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#213729",
   },
+
+  previewModalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  
+  fullPreviewImage: {
+    width: width * 0.9,
+    height: height * 0.7,
+    borderRadius: 12,
+    resizeMode: "contain",
+  },
+  
+  closeButton: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 10,
+    backgroundColor: "rgba(255,255,255,0.9)",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 4,
+  },
+  
+  closeButtonText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+    marginTop: -2,
+  },
+  
   
   
   

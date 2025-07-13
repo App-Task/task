@@ -142,15 +142,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   logo: {
-    width: width * 0.6,
-    height: width * 0.6,
-    marginBottom: 0,
+    width: width * 0.8,
+    height: width * 0.8,
+    marginBottom: -70,
   },
+  
   title: {
     fontFamily: "InterBold",
-    fontSize: 30,
+    fontSize: 25,
+    textAlign: "center",
     color: "#215432",
-    marginBottom: 30,
+    marginBottom: 20,
   },
   langSwitch: {
     marginBottom: 30,

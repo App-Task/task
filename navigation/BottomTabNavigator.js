@@ -81,8 +81,8 @@ export default function BottomTabNavigator() {
       })}
     >
       <Tab.Screen name="Home" component={ClientHomeScreen} />
-      <Tab.Screen name="Post" component={PostTaskScreen} />
       <Tab.Screen name="Tasks" component={MyTasksScreen} />
+      <Tab.Screen name="Post" component={PostTaskScreen} />
       <Tab.Screen
   name="Messages"
   component={MessagesScreen}

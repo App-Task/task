@@ -15,6 +15,8 @@ import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import StarRating from "react-native-star-rating-widget";
+import { I18nManager } from "react-native";
+
 
 const { width } = Dimensions.get("window");
 
@@ -22,13 +24,15 @@ export default function MyTasksScreen({ navigation, route }) {
 
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("Pending");
+  const [previousSubTab, setPreviousSubTab] = useState("Completed");
+
   const [groupedTasks, setGroupedTasks] = useState({
     Pending: [],
     Started: [],
     Completed: [],
-    Cancelled: [], // 🆕 add this
-
+    Cancelled: [],
   });
+  
   const [loading, setLoading] = useState(true);
 
   const [showReview, setShowReview] = useState(false);
@@ -59,28 +63,37 @@ export default function MyTasksScreen({ navigation, route }) {
           const allTasks = await res.json();
       
           const grouped = { Pending: [], Started: [], Completed: [], Cancelled: [] };
-      
-          allTasks.forEach((task) => {
-            const normalizedStatus = (task.status || "").toLowerCase();
 
-if (normalizedStatus === "cancelled") {
-  grouped.Cancelled.push(task);
-} else if (normalizedStatus === "pending") {
-  grouped.Pending.push(task);
-} else if (normalizedStatus === "started") {
-  grouped.Started.push(task);
-} else if (normalizedStatus === "completed") {
-  grouped.Completed.push(task);
-}
+allTasks.forEach((task) => {
+  const normalizedStatus = (task.status || "").toLowerCase();
+  if (normalizedStatus === "pending") {
+    grouped.Pending.push(task);
+  } else if (normalizedStatus === "started") {
+    grouped.Started.push(task);
+  } else if (normalizedStatus === "completed") {
+    grouped.Completed.push(task);
+  } else if (normalizedStatus === "cancelled") {
+    grouped.Cancelled.push(task);
+  }
+});
 
-          });
       
           setGroupedTasks(grouped);
       
           if (route?.params?.refreshTasks) {
-            setActiveTab(route.params.targetTab || "Pending"); // ✅ dynamic
-            navigation.setParams({ refreshTasks: false, targetTab: null }); // ✅ reset
+            setActiveTab(route.params.targetTab || "Pending");
+          
+            if (route.params.targetTab === "Previous" && route.params.subTab) {
+              setPreviousSubTab(route.params.subTab); // ✅ set inner tab
+            }
+          
+            navigation.setParams({
+              refreshTasks: false,
+              targetTab: null,
+              subTab: null,
+            });
           }
+          
           
       
           // Handle review popup
@@ -156,7 +169,7 @@ if (normalizedStatus === "cancelled") {
       setReviewTask(null);
       setRating(0);
       setComment("");
-      setActiveTab("Completed");
+      setActiveTab("Previous");
       navigation.setParams({});
     } catch (err) {
       setSubmittingReview(false); // ✅ Hide on error
@@ -169,6 +182,20 @@ if (normalizedStatus === "cancelled") {
       <View style={styles.card}>
         <Text style={styles.cardTitle}>{item.title}</Text>
         <Text style={styles.cardPrice}>{item.budget} BHD</Text>
+        {activeTab === "Previous" && (
+        <Text style={{
+          fontFamily: "InterBold",
+          color: item.status?.toLowerCase() === "cancelled" ? "#c00" : "#215432",
+          marginTop: 4,
+        }}>
+          {t(
+  `clientMyTasks.${item.status?.toLowerCase() === "cancelled" ? "cancelled" : "completed"}`,
+  item.status
+)}
+
+        </Text>
+      )}
+
   
         <View style={styles.detailHint}>
           <Text style={styles.detailHintText}>View Task Details</Text>
@@ -325,7 +352,7 @@ if (normalizedStatus === "cancelled") {
 
       {/* Tabs */}
       <View style={styles.tabs}>
-       {["Pending", "Started", "Completed", "Cancelled"].map((tabKey) => (
+      {["Pending", "Started", "Previous"].map((tabKey) => (
   <TouchableOpacity
     key={tabKey}
     style={[styles.tab, activeTab === tabKey && styles.activeTab]}
@@ -345,22 +372,60 @@ if (normalizedStatus === "cancelled") {
 
       {/* Task List */}
       {loading ? (
-        <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
-      ) : (
-        <FlatList
-          data={groupedTasks[activeTab]}
-          keyExtractor={(item) => item._id}
-          renderItem={renderTask}
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>
-              {t("clientMyTasks.noTasks", {
-                status: t(`clientMyTasks.${activeTab.toLowerCase()}`),
-              })}
-            </Text>
-          }
-          contentContainerStyle={{ paddingTop: 20, paddingBottom: 40 }}
-        />
-      )}
+  <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
+) : (
+  <>
+    {activeTab === "Previous" ? (
+  <View>
+    {/* Sub Tabs */}
+    <View style={styles.subTabs}>
+      {["Completed", "Cancelled"].map((tab) => (
+        <TouchableOpacity
+          key={tab}
+          style={[styles.subTab, previousSubTab === tab && styles.activeSubTab]}
+          onPress={() => setPreviousSubTab(tab)}
+        >
+          <Text style={[styles.subTabText, previousSubTab === tab && styles.activeSubTabText]}>
+            {t(`clientMyTasks.${tab.toLowerCase()}`, tab)}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+
+    {/* Sub-tab Content */}
+    <FlatList
+      data={groupedTasks[previousSubTab]}
+      keyExtractor={(item) => item._id}
+      renderItem={renderTask}
+      ListEmptyComponent={
+        <Text style={styles.emptyText}>
+          {t("clientMyTasks.noTasks", {
+            status: t(`clientMyTasks.${previousSubTab.toLowerCase()}`),
+          })}
+        </Text>
+      }
+      contentContainerStyle={{ paddingTop: 20, paddingBottom: 40 }}
+    />
+  </View>
+) : (
+
+      <FlatList
+        data={groupedTasks[activeTab]}
+        keyExtractor={(item) => item._id}
+        renderItem={renderTask}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>
+            {t("clientMyTasks.noTasks", {
+              status: t(`clientMyTasks.${activeTab.toLowerCase()}`),
+            })}
+          </Text>
+        }
+        contentContainerStyle={{ paddingTop: 20, paddingBottom: 40 }}
+      />
+    )}
+  </>
+)}
+
 
 
 {submittingReview && (
@@ -462,6 +527,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#213729",
     marginBottom: 6,
+    textAlign: I18nManager.isRTL ? "right" : "left", // ✅
   },
   cardPrice: {
     fontFamily: "Inter",
@@ -474,11 +540,11 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     marginTop: 60,
   },
-  detailHint: {
-    marginTop: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
+  detailHintText: {
+    fontSize: 13,
+    fontFamily: "Inter",
+    color: "#555",
+    textAlign: I18nManager.isRTL ? "right" : "left", // ✅
   },
   
   detailHintText: {
@@ -493,5 +559,41 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     fontFamily: "InterBold",
   },
+  
+  sectionTitle: {
+    fontFamily: "InterBold",
+    fontSize: 18,
+    color: "#213729",
+    marginVertical: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left", // ✅
+  },
+
+  subTabs: {
+    flexDirection: "row",
+    backgroundColor: "#e9e9e9",
+    borderRadius: 20,
+    marginBottom: 10,
+    overflow: "hidden",
+  },
+  subTab: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: "center",
+    borderRadius: 20,
+  },
+  activeSubTab: {
+    backgroundColor: "#213729",
+  },
+  subTabText: {
+    fontFamily: "Inter",
+    color: "#213729",
+    fontSize: 14,
+  },
+  activeSubTabText: {
+    fontFamily: "InterBold",
+    color: "#fff",
+  },
+  
+  
   
 });
