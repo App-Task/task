@@ -169,6 +169,18 @@ const res = await axios.get(url, {
           )}
   
           {/* Action Buttons */}
+
+          {tab === "bidSent" && (
+  <TouchableOpacity
+    style={[styles.btn, { alignSelf: "flex-start", marginBottom: 10 }]}
+    onPress={() =>
+      navigation.navigate("TaskerTaskDetails", { task: item })
+    }
+  >
+<Text style={styles.btnText}>View Details</Text>
+</TouchableOpacity>
+)}
+
           <View style={styles.actions}>
             {tab === "active" && (
               <TouchableOpacity
@@ -183,14 +195,12 @@ const res = await axios.get(url, {
                 <Text style={styles.btnText}>{t("taskerMyTasks.chat")}</Text>
               </TouchableOpacity>
             )}
-  
-  <TouchableOpacity
+<TouchableOpacity
   style={[
-    styles.btn,
+    tab === "bidSent" ? styles.reportSubtleBtn : styles.btn,
     styles.secondaryBtn,
   ]}
   disabled={reportingTaskId === item._id}
-
   onPress={() => {
     Alert.prompt(
       "Report Client",
@@ -202,8 +212,7 @@ const res = await axios.get(url, {
           onPress: async (reason) => {
             try {
               setReportingTaskId(item._id);
-              setIsReporting(true); // ✅ Start loading
-            
+              setIsReporting(true);
               const token = await getToken();
               await axios.post("https://task-kq94.onrender.com/api/reports", {
                 reporterId: taskerId,
@@ -213,28 +222,27 @@ const res = await axios.get(url, {
               }, {
                 headers: { Authorization: `Bearer ${token}` }
               });
-            
               Alert.alert("Reported", "Client has been reported successfully.");
             } catch (err) {
               console.error("❌ Report error:", err.message);
               Alert.alert("Error", "Failed to submit report.");
             } finally {
               setReportingTaskId(null);
-              setIsReporting(false); // ✅ End loading
+              setIsReporting(false);
             }
-            
-          }
-        }
+          },
+        },
       ],
       "plain-text"
     );
   }}
 >
   <Text style={[styles.btnText, styles.secondaryText]}>
-  {t("taskerMyTasks.report")}
-
+    {t("taskerMyTasks.report")}
   </Text>
 </TouchableOpacity>
+
+
 
   
             {tab === "active" && (
@@ -490,6 +498,13 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 14,
     textAlign: I18nManager.isRTL ? "right" : "left",
+  },
+  reportSubtleBtn: {
+    alignSelf: "flex-end",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    marginTop: 4,
+    borderRadius: 20,
   },
   
   
