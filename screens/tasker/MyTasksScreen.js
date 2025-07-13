@@ -291,33 +291,35 @@ const res = await axios.get(url, {
   return (
     <View style={styles.container}>
       {/* Tabs */}
-      <View style={styles.tabs}>
-        <TouchableOpacity onPress={() => setTab("active")} style={[styles.tab, tab === "active" && styles.activeTab]}>
-          <Text style={[styles.tabText, tab === "active" && styles.activeTabText]}>
-            {t("taskerMyTasks.active")}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-  onPress={() => setTab("previous")}
-  style={[styles.tab, tab === "previous" && styles.activeTab]}
->
-  <Text style={[styles.tabText, tab === "previous" && styles.activeTabText]}>
-    Previous
-  </Text>
-</TouchableOpacity>
+     <View style={styles.tabs}>
+  <TouchableOpacity
+    onPress={() => setTab("bidSent")}
+    style={[styles.tab, tab === "bidSent" && styles.activeTab]}
+  >
+    <Text style={[styles.tabText, tab === "bidSent" && styles.activeTabText]}>
+      {t("taskerMyTasks.bidSent")}
+    </Text>
+  </TouchableOpacity>
 
-<TouchableOpacity
-  onPress={() => setTab("bidSent")}
-  style={[styles.tab, tab === "bidSent" && styles.activeTab]}
->
-  <Text style={[styles.tabText, tab === "bidSent" && styles.activeTabText]}>
-    {t("taskerMyTasks.bidSent")}
-  </Text>
-</TouchableOpacity>
+  <TouchableOpacity
+    onPress={() => setTab("active")}
+    style={[styles.tab, tab === "active" && styles.activeTab]}
+  >
+    <Text style={[styles.tabText, tab === "active" && styles.activeTabText]}>
+      {t("taskerMyTasks.active")}
+    </Text>
+  </TouchableOpacity>
 
+  <TouchableOpacity
+    onPress={() => setTab("previous")}
+    style={[styles.tab, tab === "previous" && styles.activeTab]}
+  >
+    <Text style={[styles.tabText, tab === "previous" && styles.activeTabText]}>
+      Previous
+    </Text>
+  </TouchableOpacity>
+</View>
 
-
-      </View>
 
       {showVerifyBanner && (
   <View style={styles.verifyBanner}>
