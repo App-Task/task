@@ -167,9 +167,16 @@ setFilteredTasks(availableTasks);
   
   const renderTask = ({ item }) => (
     <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
-      {item.images?.length > 0 && (
-        <Image source={{ uri: item.images[0] }} style={styles.image} />
-      )}
+<View style={styles.imageWrapper}>
+  {item.images?.length > 0 ? (
+    <Image source={{ uri: item.images[0] }} style={styles.image} />
+  ) : (
+    <View style={styles.placeholderImage}>
+      <Text style={styles.placeholderText}>No Image</Text>
+    </View>
+  )}
+</View>
+
       <View style={styles.info}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.sub}>
@@ -207,13 +214,14 @@ setFilteredTasks(availableTasks);
 )}
 
 
-      <Text style={styles.label}>Search by job title</Text>
-      <TextInput
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        style={styles.searchInput}
-        placeholderTextColor="#999"
-      />
+<TextInput
+  value={searchQuery}
+  onChangeText={setSearchQuery}
+  style={styles.searchInput}
+  placeholder={t("taskerExplore.searchPlaceholder", "Search by job title")}
+  placeholderTextColor="#999"
+/>
+
 
       <TouchableOpacity
         style={styles.filterButton}
@@ -414,5 +422,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
   },
+  imageWrapper: {
+    width: "100%",
+    height: 150,
+    backgroundColor: "#eee",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  placeholderImage: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#e0e0e0",
+  },
+  placeholderText: {
+    color: "#888",
+    fontFamily: "Inter",
+    fontSize: 14,
+  },
+  
   
 });
