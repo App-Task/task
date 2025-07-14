@@ -109,10 +109,10 @@
     <button class="delete-btn" onclick="deleteTasker()">Delete</button>
     <button class="block-btn" onclick="toggleBlock()">Block</button>
     <div style="margin: 20px 0;">
-      <p><strong>Verification Status -</strong></p>
-      <button class="approve-btn" onclick="verify('accepted')">Approve</button>
-      <button class="decline-btn" onclick="verify('declined')">Decline</button>
-    </div>
+        <p><strong>Verification Status -</strong></p>
+        <div id="verificationButtons"></div>
+      </div>
+      
     <div>
       <p><strong>Documents -</strong></p>
       <div id="documents"></div>
@@ -153,6 +153,20 @@
     async function fetchTasker() {
       const res = await axios.get(`/api/admin/taskers/${id}`);
       taskerData = res.data.tasker;
+      const verificationContainer = document.getElementById("verificationButtons");
+
+if (taskerData.verificationStatus === "accepted") {
+  verificationContainer.innerHTML = `
+    <button class="approve-btn" disabled>Approved</button>
+    <button class="decline-btn" onclick="verify('declined')">Decline</button>
+  `;
+} else {
+  verificationContainer.innerHTML = `
+    <button class="approve-btn" onclick="verify('accepted')">Approve</button>
+    <button class="decline-btn" onclick="verify('declined')">Decline</button>
+  `;
+}
+
       document.getElementById("name").textContent = taskerData.name;
       document.getElementById("email").textContent = "Email: " + taskerData.email;
       document.getElementById("phone").textContent = "Number: " + taskerData.phone;
