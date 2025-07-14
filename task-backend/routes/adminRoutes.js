@@ -367,7 +367,6 @@ router.get("/clients/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch client profile" });
   }
 });
-// GET /api/admin/taskers/:id
 router.get("/taskers/:id", async (req, res) => {
   const taskerId = req.params.id;
 
@@ -378,22 +377,20 @@ router.get("/taskers/:id", async (req, res) => {
     }
 
     const reviews = await Review.find({ taskerId }).sort({ createdAt: -1 }).lean();
-    const tasks = await Task.find({ "bids.taskerId": taskerId }).sort({ createdAt: -1 }).lean();
-    const bids = await Bid.find({ taskerId }).lean();
+    const bids = await Bid.find({ taskerId }).populate("taskId").lean();
 
-    const enrichedTasks = tasks.map(task => {
-      const bid = bids.find(b => b.taskId?.toString() === task._id.toString());
-      return {
-        title: task.title,
-        description: task.description,
-        location: task.location,
-        images: task.images || [],
-        category: task.category || "N/A",
-        createdAt: new Date(task.createdAt).toLocaleDateString(),
-        bidAmount: bid?.amount || "N/A",
-        bidStatus: bid?.status || "N/A"
-      };
-    });
+    const enrichedTasks = bids
+      .filter(b => b.taskId)
+      .map(b => ({
+        title: b.taskId.title,
+        description: b.taskId.description || "N/A",
+        location: b.taskId.location || "N/A",
+        images: b.taskId.images || [],
+        category: b.taskId.category || "N/A",
+        createdAt: new Date(b.taskId.createdAt).toLocaleDateString(),
+        bidAmount: b.amount || "N/A",
+        bidStatus: b.status || "N/A"
+      }));
 
     res.json({
       tasker: {
@@ -421,6 +418,7 @@ router.get("/taskers/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch tasker profile" });
   }
 });
+
 
 
 
