@@ -27,6 +27,17 @@ import { useFocusEffect } from "@react-navigation/native";
 
 const JOB_TYPES = ["Cleaning", "Moving", "Delivery", "Repairs"];
 
+const formatDateTime = (isoString) => {
+  const date = new Date(isoString);
+  return date.toLocaleString("en-US", {
+    weekday: "short",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  });
+};
+
+
 export default function ExploreTasksScreen({ navigation, route }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
@@ -185,6 +196,11 @@ setFilteredTasks(availableTasks);
         <Text style={styles.sub}>
   {t("taskerExplore.bids")}: {item.bidCount || 0}
 </Text>
+<Text style={styles.sub}>
+  Posted: {formatDateTime(item.createdAt)}
+</Text>
+
+
 
         <TouchableOpacity
           style={styles.button}
