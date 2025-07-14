@@ -118,7 +118,7 @@ if ("profileImage" in req.body) user.profileImage = profileImage;
     if (about !== undefined) user.about = about;
     
 
-    await user.save();
+    await user.save(); //
     res.json({
       msg: "Profile updated",
       user: {
