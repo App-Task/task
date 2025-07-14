@@ -15,7 +15,7 @@ import axios from "axios";
 export default function TaskerProfileScreen({ route, navigation }) {
   const { taskerId } = route.params;
   const [tasker, setTasker] = useState(null);
-  const [review, setReview] = useState(null);
+  const [reviewData, setReviewData] = useState({ average: null, reviews: [] });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,11 +23,14 @@ export default function TaskerProfileScreen({ route, navigation }) {
       try {
         const [userRes, reviewRes] = await Promise.all([
           axios.get(`https://task-kq94.onrender.com/api/users/${taskerId}`),
-          axios.get(`https://task-kq94.onrender.com/api/reviews/tasker/${taskerId}`),
+          axios.get(`https://task-kq94.onrender.com/api/reviews/all/tasker/${taskerId}`)
         ]);
         setTasker(userRes.data);
-        setReview(reviewRes.data);
-      } catch (err) {
+        setReviewData({
+          reviews: reviewRes.data || [],
+        });
+        
+              } catch (err) {
         console.error("❌ Error loading tasker or review:", err.message);
       } finally {
         setLoading(false);
@@ -72,13 +75,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
 
           <Text style={styles.name}>{tasker.name}</Text>
 
-{/* ⭐ Average Rating */}
-{review?.average && (
-  <View style={styles.ratingBox}>
-    <Text style={styles.ratingStar}>⭐</Text>
-    <Text style={styles.ratingText}>{review.average.toFixed(1)} / 5</Text>
-  </View>
-)}
+
 
 
           <Text style={styles.label}>Location</Text>
@@ -92,6 +89,20 @@ export default function TaskerProfileScreen({ route, navigation }) {
 
           <Text style={styles.label}>About</Text>
           <Text style={styles.value}>{tasker.about || "Not provided"}</Text>
+
+          <Text style={styles.label}>Reviews</Text>
+{reviewData.reviews.length === 0 ? (
+  <Text style={styles.value}>No reviews yet</Text>
+) : (
+  reviewData.reviews.map((rev, idx) => (
+    <View key={idx} style={styles.reviewBox}>
+      <Text style={styles.reviewRating}>⭐ {rev.rating} / 5</Text>
+      {rev.comment ? <Text style={styles.reviewComment}>{rev.comment}</Text> : null}
+    </View>
+  ))
+)}
+
+
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -189,5 +200,27 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     color: "#213729",
   },
+  reviewBox: {
+    marginTop: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    backgroundColor: "#f9f9f9",
+  },
+  
+  reviewRating: {
+    fontSize: 16,
+    fontFamily: "InterBold",
+    color: "#213729",
+  },
+  
+  reviewComment: {
+    fontSize: 15,
+    fontFamily: "Inter",
+    color: "#333",
+    marginTop: 4,
+  },
+  
   
 });
