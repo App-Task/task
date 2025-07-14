@@ -47,6 +47,13 @@ export default function TaskerProfileScreen({ navigation }) {
     }, [])
   );
 
+  useEffect(() => {
+    if (!user?.profileImage) {
+      setProfileImage(null);
+    }
+  }, [user]);
+  
+
   const handleLogout = async () => {
     try {
       await removeToken();
@@ -110,13 +117,20 @@ export default function TaskerProfileScreen({ navigation }) {
           onPress: async () => {
             try {
               await updateUserProfile({ profileImage: null });
-              setProfileImage(null);
+        
+              const refreshed = await fetchCurrentUser();
+              console.log("✅ Refreshed user after removing photo:", refreshed);
+        
+              setUser(refreshed);
+              setProfileImage(null); // ✅ force clear
+        
             } catch (err) {
               console.error("❌ Failed to remove image:", err.message);
               Alert.alert("Error", "Could not remove profile image.");
             }
           },
         },
+        
         { text: t("taskerProfile.cancel"), style: "cancel" },
       ],
       { cancelable: true }
@@ -137,7 +151,7 @@ export default function TaskerProfileScreen({ navigation }) {
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={handleChangeProfilePicture} style={styles.avatarWrapper}>
         <View style={styles.avatar}>
-        {profileImage && profileImage.trim() !== "" ? (
+        {profileImage ? (
             <Image
               source={{ uri: profileImage }}
               style={{ width: "100%", height: "100%", borderRadius: 100 }}

@@ -108,7 +108,7 @@ if (rawPhone) user.rawPhone = rawPhone;
 if (countryCode) user.countryCode = countryCode;
 
     
-    if (profileImage) user.profileImage = profileImage;
+if ("profileImage" in req.body) user.profileImage = profileImage;
     
     // ✅ Optional tasker-only fields (won't affect clients)
     if (gender !== undefined) user.gender = gender;
