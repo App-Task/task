@@ -208,76 +208,88 @@ allTasks.forEach((task) => {
     Cancelled by {item.cancelledBy === userId ? "You" : "Tasker"}
   </Text>
 )}
-
-
 {["Pending", "Started", "Cancelled"].includes(activeTab) && item.taskerId && (
-  <TouchableOpacity
-    style={[
-      {
+  <View style={{ marginTop: 10, flexDirection: "row", gap: 12 }}>
+    {/* View Profile Button */}
+    <TouchableOpacity
+      style={{
+        backgroundColor: "#213729",
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 30,
+      }}
+      onPress={() =>
+        navigation.navigate("TaskerProfile", {
+          taskerId: typeof item.taskerId === "string" ? item.taskerId : item.taskerId?._id,
+        })
+      }
+      
+    >
+      <Text style={{ color: "#fff", fontFamily: "InterBold", fontSize: 13 }}>
+        View Profile
+      </Text>
+    </TouchableOpacity>
+
+    {/* Report Tasker Button */}
+    <TouchableOpacity
+      style={{
         backgroundColor: "#fff",
         borderColor: "#213729",
         borderWidth: 1,
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 30,
-        marginTop: 10,
-        alignSelf: "flex-start",
-      },
-      {}
-
-    ]}
-    disabled={reportingTaskId === item._id}
-
-    onPress={() => {
-      Alert.prompt(
-        "Report Tasker",
-        "Enter reason for reporting this tasker:",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Submit",
-            onPress: async (reason) => {
-              try {
-                setReportingTaskId(item._id);
-                setIsReporting(true); // ✅ Start spinner
-              
-                const token = await SecureStore.getItemAsync("token");
-                await fetch("https://task-kq94.onrender.com/api/reports", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                  },
-                  body: JSON.stringify({
-                    reporterId: userId,
-                    reportedUserId: item.taskerId,
-                    reason,
-                    taskId: item._id,
-                  }),
-                });
-              
-                setReportedTaskIds((prev) => [...prev, item._id]);
-                Alert.alert("Reported", "Tasker has been reported successfully.");
-              } catch (err) {
-                console.error("❌ Report error:", err.message);
-                Alert.alert("Error", "Failed to submit report.");
-              } finally {
-                setIsReporting(false); // ✅ Hide spinner
-                setReportingTaskId(null);
-              }
-              
+      }}
+      disabled={reportingTaskId === item._id}
+      onPress={() => {
+        Alert.prompt(
+          "Report Tasker",
+          "Enter reason for reporting this tasker:",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Submit",
+              onPress: async (reason) => {
+                try {
+                  setReportingTaskId(item._id);
+                  setIsReporting(true);
+                  const token = await SecureStore.getItemAsync("token");
+                  await fetch("https://task-kq94.onrender.com/api/reports", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                      reporterId: userId,
+                      reportedUserId: item.taskerId,
+                      reason,
+                      taskId: item._id,
+                    }),
+                  });
+                  setReportedTaskIds((prev) => [...prev, item._id]);
+                  Alert.alert("Reported", "Tasker has been reported successfully.");
+                } catch (err) {
+                  console.error("❌ Report error:", err.message);
+                  Alert.alert("Error", "Failed to submit report.");
+                } finally {
+                  setIsReporting(false);
+                  setReportingTaskId(null);
+                }
+              },
             },
-          },
-        ],
-        "plain-text"
-      );
-    }}
-  >
-    <Text style={{ color: "#213729", fontFamily: "InterBold", fontSize: 13 }}>
-    Report Tasker
-    </Text>
-  </TouchableOpacity>
+          ],
+          "plain-text"
+        );
+      }}
+    >
+      <Text style={{ color: "#213729", fontFamily: "InterBold", fontSize: 13 }}>
+        Report Tasker
+      </Text>
+    </TouchableOpacity>
+  </View>
 )}
+
 
 
 
