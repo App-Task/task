@@ -367,6 +367,60 @@ router.get("/clients/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch client profile" });
   }
 });
+// GET /api/admin/taskers/:id
+router.get("/taskers/:id", async (req, res) => {
+  const taskerId = req.params.id;
+
+  try {
+    const tasker = await User.findById(taskerId).lean();
+    if (!tasker || tasker.role !== "tasker") {
+      return res.status(404).json({ error: "Tasker not found" });
+    }
+
+    const reviews = await Review.find({ taskerId }).sort({ createdAt: -1 }).lean();
+    const tasks = await Task.find({ "bids.taskerId": taskerId }).sort({ createdAt: -1 }).lean();
+    const bids = await Bid.find({ taskerId }).lean();
+
+    const enrichedTasks = tasks.map(task => {
+      const bid = bids.find(b => b.taskId?.toString() === task._id.toString());
+      return {
+        title: task.title,
+        description: task.description,
+        location: task.location,
+        images: task.images || [],
+        category: task.category || "N/A",
+        createdAt: new Date(task.createdAt).toLocaleDateString(),
+        bidAmount: bid?.amount || "N/A",
+        bidStatus: bid?.status || "N/A"
+      };
+    });
+
+    res.json({
+      tasker: {
+        _id: tasker._id,
+        name: tasker.name,
+        email: tasker.email,
+        phone: tasker.phone,
+        image: tasker.image || null,
+        location: tasker.location || "N/A",
+        experience: tasker.experience || "N/A",
+        about: tasker.about || "",
+        isBlocked: !!tasker.isBlocked,
+        verificationStatus: tasker.verificationStatus || "pending",
+        documents: tasker.documents || [],
+      },
+      reviews: reviews.map(r => ({
+        rating: r.rating,
+        comment: r.comment,
+        createdAt: new Date(r.createdAt).toLocaleDateString(),
+      })),
+      tasks: enrichedTasks
+    });
+  } catch (err) {
+    console.error("❌ Failed to load tasker profile:", err.message);
+    res.status(500).json({ error: "Failed to fetch tasker profile" });
+  }
+});
 
 
 
