@@ -326,6 +326,49 @@ router.get("/reports", async (req, res) => {
   }
 });
 
+// GET /api/admin/clients/:id
+router.get("/clients/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const client = await User.findById(userId).lean();
+    if (!client || client.role !== "client") {
+      return res.status(404).json({ error: "Client not found" });
+    }
+
+    const tasks = await Task.find({ userId }).sort({ createdAt: -1 }).lean();
+    const reviews = await Review.find({ clientId: userId }).sort({ createdAt: -1 }).lean();
+
+    res.json({
+      client: {
+        _id: client._id,
+        name: client.name,
+        email: client.email,
+        phone: client.phone,
+        image: client.image || null,
+        isBlocked: !!client.isBlocked,
+      },
+      tasks: tasks.map(t => ({
+        title: t.title,
+        description: t.description,
+        location: t.location,
+        images: t.images || [],
+        category: t.category || "N/A",
+        createdAt: new Date(t.createdAt).toLocaleDateString(),
+      })),
+      reviews: reviews.map(r => ({
+        rating: r.rating,
+        comment: r.comment,
+        createdAt: new Date(r.createdAt).toLocaleDateString(),
+      }))
+    });
+  } catch (err) {
+    console.error("❌ Error fetching client profile:", err.message);
+    res.status(500).json({ error: "Failed to fetch client profile" });
+  }
+});
+
+
 
 
 
