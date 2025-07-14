@@ -14,15 +14,17 @@
 
     .sidebar {
       width: 220px;
-      background: #213729;
-      color: white;
+      background: white;
+      color: #215432;
       padding: 20px 0;
       height: 100vh;
+      border-right: 1px solid #ddd;
     }
 
-    .sidebar h2 {
-      text-align: center;
-      margin-bottom: 40px;
+    .sidebar img {
+      display: block;
+      margin: 0 auto 40px auto;
+      width: 100px;
     }
 
     .sidebar a {
@@ -30,14 +32,14 @@
       align-items: center;
       gap: 10px;
       padding: 12px 20px;
-      color: white;
+      color: #215432;
       text-decoration: none;
       font-weight: 500;
     }
 
     .sidebar a.active,
     .sidebar a:hover {
-      background: #215432;
+      background: #f1f8f4;
     }
 
     .main {
@@ -115,15 +117,11 @@
     .chart:last-child {
       grid-column: span 2;
     }
-
-    .icon {
-      width: 16px;
-    }
   </style>
 </head>
 <body>
   <div class="sidebar">
-    <h2>✅ TASK</h2>
+    <img src="211.png" alt="TASK logo" />
     <a class="active" href="#"><span>🏠</span> Dashboard</a>
     <a href="/admin/clients.html"><span>👥</span> Clients</a>
     <a href="/admin/taskers.html"><span>🛠️</span> Taskers</a>
@@ -135,7 +133,7 @@
     <h1>Dashboard</h1>
 
     <div class="stats" id="statsContainer">
-      <!-- JS will insert cards here -->
+      <!-- Stats inserted by JS -->
     </div>
 
     <div class="charts">
@@ -193,7 +191,7 @@
           <div class="stat-card"><h2>${stats.tasks}</h2><p>Total Tasks</p></div>
         `;
       } catch (err) {
-        console.error("Failed to load stats:", err);
+        console.error("Failed to fetch stats:", err);
       }
     }
 
