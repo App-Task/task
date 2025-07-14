@@ -21,8 +21,9 @@ router.get("/me", async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id).select(
-      "name email phone profileImage gender location experience skills about isVerified verificationStatus documents"
+      "name email phone callingCode rawPhone countryCode profileImage gender location experience skills about isVerified verificationStatus documents"
     );
+    
     
     
         if (!user) return res.status(404).json({ msg: "User not found" });
@@ -85,7 +86,11 @@ router.put("/me", async (req, res) => {
       experience,
       skills,
       about,
+      callingCode,
+      rawPhone,
+      countryCode,
     } = req.body;
+    
     
     
     if (name) user.name = name;
@@ -97,6 +102,11 @@ router.put("/me", async (req, res) => {
       }
       user.phone = phone;
     }
+
+    if (callingCode) user.callingCode = callingCode;
+if (rawPhone) user.rawPhone = rawPhone;
+if (countryCode) user.countryCode = countryCode;
+
     
     if (profileImage) user.profileImage = profileImage;
     
@@ -115,6 +125,9 @@ router.put("/me", async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone,
+        callingCode: user.callingCode || "",
+        rawPhone: user.rawPhone || "",
+        countryCode: user.countryCode || "",
         profileImage: user.profileImage || null,
         gender: user.gender || "",
         location: user.location || "",
@@ -122,6 +135,7 @@ router.put("/me", async (req, res) => {
         skills: user.skills || "",
         about: user.about || "",
       },
+      
     });
     
     

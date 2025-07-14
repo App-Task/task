@@ -4,7 +4,10 @@ const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true },
-    phone: { type: String, required: true },
+    phone: { type: String, required: true }, // keep for full format
+    callingCode: { type: String },           // e.g. "+966"
+    rawPhone: { type: String },              // e.g. "512345678"
+    countryCode: { type: String },           // e.g. "SA"
     password: { type: String, required: true },
     profileImage: { type: String },
     isBlocked: {

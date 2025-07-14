@@ -12,6 +12,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { fetchCurrentUser, updateUserProfile } from "../../services/auth";
+import CountryPicker from "react-native-country-picker-modal";
+
 
 
 import * as SecureStore from "expo-secure-store";
@@ -21,8 +23,11 @@ export default function EditProfileScreen({ navigation }) {
   const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("+966"); // default to KSA format
+  const [countryCode, setCountryCode] = useState("SA");
+  const [callingCode, setCallingCode] = useState("+966");
+  const [rawPhone, setRawPhone] = useState("");
 
+    
 
 
   // Load current user data
@@ -32,7 +37,19 @@ export default function EditProfileScreen({ navigation }) {
         const user = await fetchCurrentUser();
         setName(user.name || "");
         setEmail(user.email || "");
-        setPhone(user.phone || "+966"); // ✅ load full phone directly
+        if (user.callingCode && user.rawPhone) {
+          setCallingCode(user.callingCode);
+          setRawPhone(user.rawPhone);
+          setCountryCode(user.countryCode || "SA");
+        } else if (user.phone) {
+          const match = user.phone.match(/^\+(\d{1,4})(.*)$/);
+          if (match) {
+            setCallingCode("+" + match[1]);
+            setRawPhone(match[2].trim());
+            setCountryCode("SA"); // fallback
+          }
+        }
+        
       } catch (err) {
         Alert.alert("Error", "Failed to load user info");
       }
@@ -45,7 +62,15 @@ export default function EditProfileScreen({ navigation }) {
 
   const handleUpdate = async () => {
     try {
-      await updateUserProfile({ name, email, phone }); // ✅ send full phone string
+      await updateUserProfile({
+        name,
+        email,
+        phone: `${callingCode}${rawPhone.trim()}`,
+        countryCode,
+        callingCode,
+        rawPhone: rawPhone.trim(),
+      });
+      
       await SecureStore.setItemAsync("userName", name); // ✅ Store the updated name
       Alert.alert("Success", "Profile updated");
       navigation.goBack(); // ✅ Make sure this is here to return to the home screen
@@ -92,15 +117,31 @@ export default function EditProfileScreen({ navigation }) {
           textAlign={I18nManager.isRTL ? "right" : "left"}
         />
 
-<TextInput
-  style={styles.input}
-  value={phone}
-  onChangeText={setPhone}
-  keyboardType="phone-pad"
-  placeholder={t("register.phone")}
-  placeholderTextColor="#999"
-  textAlign={I18nManager.isRTL ? "right" : "left"}
-/>
+      <View style={styles.phoneContainer}>
+        <View style={styles.countryCodeInput}>
+          <CountryPicker
+            countryCode={countryCode}
+            withFilter
+            withFlag
+            withCountryNameButton
+            withCallingCode
+            withEmoji
+            onSelect={(country) => {
+              setCountryCode(country.cca2);
+              setCallingCode("+" + country.callingCode[0]);
+            }}
+          />
+        </View>
+        <TextInput
+          style={styles.phoneInput}
+          value={rawPhone}
+          onChangeText={setRawPhone}
+          keyboardType="phone-pad"
+          placeholder={t("register.phone")}
+          placeholderTextColor="#999"
+        />
+      </View>
+
 
 
   
@@ -171,14 +212,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   countryCodeInput: {
-    width: 80,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    fontSize: 16,
-    fontFamily: "Inter",
-    color: "#333",
+    justifyContent: "center",
+    paddingHorizontal: 10,
     backgroundColor: "#e0e0e0",
   },
+  
   phoneInput: {
     flex: 1,
     paddingVertical: 14,

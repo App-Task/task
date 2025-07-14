@@ -4,7 +4,8 @@ const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone, callingCode, rawPhone, countryCode } = req.body;
+
     const role = req.body.role?.toLowerCase() || "client";
 
     const normalizedEmail = email.trim().toLowerCase();
@@ -33,7 +34,11 @@ exports.register = async (req, res) => {
       phone: normalizedPhone,
       password: hashed,
       role,
+      callingCode,
+      rawPhone,
+      countryCode,
     });
+    
 
     res.status(201).json({
       msg: "User registered",
@@ -43,8 +48,12 @@ exports.register = async (req, res) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+        callingCode: user.callingCode,
+        rawPhone: user.rawPhone,
+        countryCode: user.countryCode,
       },
     });
+    
   } catch (err) {
     console.error("❌ Registration Error:", err.message);
     res.status(500).json({ msg: "Server error" });

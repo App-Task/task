@@ -70,9 +70,13 @@ export default function RegisterScreen({ navigation, route }) {
         name: name.trim(), 
         email: email.trim().toLowerCase(), 
         password, 
-        phone: `${callingCode}${phone.trim()}`,
-        role 
+        phone: `${callingCode}${phone.trim()}`, // full
+        role,
+        callingCode,
+        rawPhone: phone.trim(),
+        countryCode,
       });
+      
       
 
 
