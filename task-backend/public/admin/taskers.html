@@ -3,136 +3,272 @@
 <head>
   <meta charset="UTF-8" />
   <title>Admin – Taskers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: sans-serif; background: #f8f8f8; padding: 20px; }
-    h1 { color: #215432; text-align: center; }
-    .controls { display: flex; justify-content: space-between; margin-bottom: 20px; }
-    .search-input { padding: 8px; width: 250px; border-radius: 6px; border: 1px solid #ccc; }
-    .card {
-      background: white; border-radius: 10px; padding: 15px; margin-bottom: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      background: #f8f8f8;
     }
-    .actions button {
-      margin-right: 6px; padding: 6px 10px;
-      border: none; border-radius: 4px; cursor: pointer;
+
+    .sidebar {
+      width: 220px;
+      background: white;
+      color: #215432;
+      padding: 20px 0;
+      height: 100vh;
+      border-right: 1px solid #ddd;
     }
-    .block { background: #ff9800; color: white; }
-    .delete { background: #f44336; color: white; }
-    .unblock { background: #4caf50; color: white; }
-    .verify { background: #2196f3; color: white; }
-    .decline { background: #9c27b0; color: white; }
-    .doc-link { display: inline-block; margin-right: 10px; color: #1a73e8; text-decoration: none; }
+
+    .sidebar img {
+      display: block;
+      margin: 0 auto 40px auto;
+      width: 150px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      color: #215432;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .sidebar a.active,
+    .sidebar a:hover {
+      background: #f1f8f4;
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #000;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .search-input {
+      padding: 10px 12px;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f4f4f4;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .block-btn {
+      background: #ffb74d;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .delete-btn {
+      background: #ef5350;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .view-btn {
+      background: none;
+      color: #215432;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .status {
+      font-weight: bold;
+      padding: 6px 10px;
+      border-radius: 6px;
+      text-align: center;
+      width: 90px;
+    }
+
+    .verified {
+      background: #4caf50;
+      color: white;
+    }
+
+    .pending {
+      background: #ffb74d;
+      color: white;
+    }
+
+    .declined {
+      background: #ef5350;
+      color: white;
+    }
+
+    .pagination-buttons {
+      margin-top: 20px;
+    }
+
+    .pagination-buttons button {
+      padding: 6px 10px;
+      margin-right: 5px;
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-
-    <div style="margin-bottom: 20px;">
-        <a href="/admin/index.html" style="background: #215432; color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
-      </div>
-      
-  <h1>Taskers</h1>
-
-  <div class="controls">
-    <input type="text" id="search" class="search-input" placeholder="Search by name or email..." />
+  <div class="sidebar">
+    <img src="211.png" alt="TASK Logo" />
+    <a href="/admin/index.html">🏠 Dashboard</a>
+    <a href="/admin/clients.html">👥 Clients</a>
+    <a class="active" href="/admin/taskers.html">🛠️ Taskers</a>
+    <a href="/admin/tasks.html">📋 Tasks</a>
+    <a href="/admin/reports.html">❓ Reported Users</a>
   </div>
 
-  <div id="taskersContainer"></div>
+  <div class="main">
+    <div class="container">
+      <h1>Tasker List</h1>
+      <input type="text" id="search" class="search-input" placeholder="Search Clients..." />
+
+      <table id="taskersTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Actions</th>
+            <th>Verification Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="pagination-buttons" id="pagination"></div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
-  let allTaskers = [];
-  let currentPage = 1;
-  let totalTaskers = 0;
+  <script>
+    let allTaskers = [];
+    let currentPage = 1;
+    let totalTaskers = 0;
 
-  async function fetchTaskers() {
-    const res = await axios.get(`/api/admin/taskers?page=${currentPage}&limit=10`);
-    allTaskers = res.data.taskers;
-    totalTaskers = res.data.total;
-
-    renderTaskers(allTaskers);
-    renderPagination();
-  }
-
-  function renderTaskers(data) {
-  const container = document.getElementById("taskersContainer");
-  container.innerHTML = "";
-
-  data.forEach(t => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <h3>${t.name}</h3>
-      <p><strong>Email:</strong> ${t.email}</p>
-      <p><strong>Phone:</strong> ${t.phone}</p>
-      <p><strong>Location:</strong> ${t.location}</p>
-      <p><strong>Status:</strong> ${t.verificationStatus}</p>
-      ${t.image ? `<img src="${t.image}" alt="${t.name}" style="width:80px;height:80px;border-radius:8px;">` : ""}
-      <p><strong>Documents:</strong><br>
-        ${
-          t.documents.map((doc, i) => {
-            const url = doc;
-            return `<a class="doc-link" href="${url}" target="_blank">Doc ${i+1}</a>`;
-          }).join("")
-        }
-      </p>
-      <p><strong>Reviews:</strong><br>
-        ${t.reviews.length === 0 ? "No reviews" : t.reviews.map(r => `<div>⭐ ${r.rating} – ${r.comment}</div>`).join("")}
-      </p>
-      <div class="actions">
-        <button class="${t.isBlocked ? 'unblock' : 'block'}" onclick="toggleBlock('${t._id}', ${!t.isBlocked})">
-          ${t.isBlocked ? 'Unblock' : 'Block'}
-        </button>
-        <button class="delete" onclick="deleteTasker('${t._id}')">Delete</button>
-      </div>
-    `;
-    container.appendChild(div);
-  });
-
-  // ✅ Attach after rendering
-  document.querySelectorAll(".doc-link").forEach(link => {
-    link.addEventListener("click", (e) => {
-      const file = e.target.href.split("/").pop();
-      console.log(`📂 Opening document: ${file}`);
-    });
-  });
-}
-
-
-  function renderPagination() {
-    const totalPages = Math.ceil(totalTaskers / 10);
-    const controlsDiv = document.querySelector(".controls");
-
-    const old = document.querySelector(".pagination-buttons");
-    if (old) old.remove();
-
-    let html = '<div class="pagination-buttons">';
-    for (let i = 1; i <= totalPages; i++) {
-      html += `<button onclick="goToPage(${i})" style="margin-left: 6px;">${i}</button>`;
+    async function fetchTaskers() {
+      const res = await axios.get(`/api/admin/taskers?page=${currentPage}&limit=10`);
+      allTaskers = res.data.taskers;
+      totalTaskers = res.data.total;
+      renderTaskers(allTaskers);
+      renderPagination();
     }
-    html += '</div>';
-    controlsDiv.insertAdjacentHTML("beforeend", html);
-  }
 
-  function goToPage(page) {
-    currentPage = page;
-    fetchTaskers();
-  }
+    function renderTaskers(data) {
+      const tbody = document.querySelector("#taskersTable tbody");
+      tbody.innerHTML = "";
 
-  async function toggleBlock(id, block) {
-    const action = block ? "block" : "unblock";
-    await axios.patch(`/api/admin/taskers/${id}/${action}`);
-    fetchTaskers();
-  }
+      data.forEach(t => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${t.name}</td>
+          <td>${t.email}</td>
+          <td>${t.phone}</td>
+          <td class="actions">
+            <button class="block-btn" onclick="toggleBlock('${t._id}', ${!t.isBlocked})">
+              ${t.isBlocked ? 'Unblock' : 'Block'}
+            </button>
+            <button class="delete-btn" onclick="deleteTasker('${t._id}')">Delete</button>
+          </td>
+          <td><div class="status ${t.verificationStatus === 'accepted' ? 'verified' : t.verificationStatus === 'pending' ? 'pending' : 'declined'}">
+            ${t.verificationStatus === 'accepted' ? 'Verified' : t.verificationStatus === 'pending' ? 'Pending' : 'Declined'}
+          </div></td>
+          <td><button class="view-btn" onclick="viewProfile('${t._id}')">View profile</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
 
-  async function deleteTasker(id) {
-    if (confirm("Are you sure you want to delete this tasker?")) {
-      await axios.delete(`/api/admin/taskers/${id}`);
+    async function toggleBlock(id, block) {
+      const action = block ? "block" : "unblock";
+      await axios.patch(`/api/admin/taskers/${id}/${action}`);
       fetchTaskers();
     }
-  }
 
-  fetchTaskers();
-</script>
+    async function deleteTasker(id) {
+      if (confirm("Are you sure you want to delete this tasker?")) {
+        await axios.delete(`/api/admin/taskers/${id}`);
+        fetchTaskers();
+      }
+    }
 
+    function viewProfile(id) {
+      window.location.href = `/admin/tasker-profile.html?id=${id}`;
+    }
+
+    document.getElementById("search").addEventListener("input", e => {
+      const term = e.target.value.toLowerCase();
+      const filtered = allTaskers.filter(t => t.name.toLowerCase().includes(term) || t.email.toLowerCase().includes(term));
+      renderTaskers(filtered);
+    });
+
+    function renderPagination() {
+      const totalPages = Math.ceil(totalTaskers / 10);
+      const container = document.getElementById("pagination");
+      container.innerHTML = "";
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.onclick = () => {
+          currentPage = i;
+          fetchTaskers();
+        };
+        container.appendChild(btn);
+      }
+    }
+
+    fetchTaskers();
+  </script>
 </body>
 </html>
