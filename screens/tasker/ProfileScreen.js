@@ -56,7 +56,6 @@ export default function TaskerProfileScreen({ navigation }) {
       console.error("❌ Logout failed:", err.message);
     }
   };
-
   const handleChangeProfilePicture = async () => {
     Alert.alert(
       t("taskerProfile.managePhotoTitle"),
@@ -70,11 +69,38 @@ export default function TaskerProfileScreen({ navigation }) {
               aspect: [1, 1],
               quality: 0.5,
             });
-
+  
             if (!result.canceled) {
-              const uri = result.assets[0].uri;
-              setProfileImage(uri);
-              await updateUserProfile({ profileImage: uri });
+              const localUri = result.assets[0].uri;
+  
+              const formData = new FormData();
+              formData.append("image", {
+                uri: localUri,
+                type: "image/jpeg",
+                name: "profile.jpg",
+              });
+  
+              try {
+                const uploadRes = await fetch("https://task-kq94.onrender.com/api/upload", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                  },
+                  body: formData,
+                });
+  
+                const data = await uploadRes.json();
+  
+                if (data.imageUrl) {
+                  setProfileImage(data.imageUrl);
+                  await updateUserProfile({ profileImage: data.imageUrl });
+                } else {
+                  throw new Error("Upload failed");
+                }
+              } catch (err) {
+                console.error("❌ Upload failed:", err);
+                Alert.alert("Upload failed", "Could not upload image. Try again.");
+              }
             }
           },
         },
@@ -82,8 +108,13 @@ export default function TaskerProfileScreen({ navigation }) {
           text: t("taskerProfile.removePhoto"),
           style: "destructive",
           onPress: async () => {
-            setProfileImage(null);
-            await updateUserProfile({ profileImage: "" });
+            try {
+              await updateUserProfile({ profileImage: null });
+              setProfileImage(null);
+            } catch (err) {
+              console.error("❌ Failed to remove image:", err.message);
+              Alert.alert("Error", "Could not remove profile image.");
+            }
           },
         },
         { text: t("taskerProfile.cancel"), style: "cancel" },
@@ -91,6 +122,7 @@ export default function TaskerProfileScreen({ navigation }) {
       { cancelable: true }
     );
   };
+  
 
   const getInitials = (name) => {
     if (!name) return "?";

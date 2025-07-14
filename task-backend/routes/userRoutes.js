@@ -40,7 +40,6 @@ router.get("/users/:id", async (req, res) => {
   }
 });
 
-// ✅ PUT /api/users/me — update logged-in user's profile
 router.put("/me", verifyTokenMiddleware, async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -52,15 +51,22 @@ router.put("/me", verifyTokenMiddleware, async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // Update basic fields
+    // 🧑‍💻 Update standard fields
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
     user.phone = req.body.phone || user.phone;
-
-    // ✅ Add new fields for phone breakdown
     user.callingCode = req.body.callingCode || user.callingCode;
     user.rawPhone = req.body.rawPhone || user.rawPhone;
     user.countryCode = req.body.countryCode || user.countryCode;
+
+    // ✅ NEW: Handle profile image updates
+    if (req.body.hasOwnProperty("profileImage")) {
+      if (req.body.profileImage === "" || req.body.profileImage === null) {
+        user.profileImage = null; // 🧼 Remove image
+      } else {
+        user.profileImage = req.body.profileImage; // ✅ Save Cloudinary URL
+      }
+    }
 
     await user.save();
 
@@ -75,6 +81,7 @@ router.put("/me", verifyTokenMiddleware, async (req, res) => {
         rawPhone: user.rawPhone,
         countryCode: user.countryCode,
         role: user.role,
+        profileImage: user.profileImage || null,
       },
     });
   } catch (err) {
@@ -82,6 +89,7 @@ router.put("/me", verifyTokenMiddleware, async (req, res) => {
     res.status(500).json({ error: "Failed to update profile" });
   }
 });
+
 
 
 module.exports = router;
