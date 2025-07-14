@@ -39,6 +39,7 @@ router.get("/users/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch user" });
   }
 });
+
 // ✅ PUT /api/users/me — update logged-in user's profile
 router.put("/me", verifyTokenMiddleware, async (req, res) => {
   try {
@@ -51,18 +52,15 @@ router.put("/me", verifyTokenMiddleware, async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // Update fields
+    // Update basic fields
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
     user.phone = req.body.phone || user.phone;
+
+    // ✅ Add new fields for phone breakdown
     user.callingCode = req.body.callingCode || user.callingCode;
     user.rawPhone = req.body.rawPhone || user.rawPhone;
     user.countryCode = req.body.countryCode || user.countryCode;
-
-    // ✅ This line fixes your issue: update or remove profileImage
-    if (req.body.hasOwnProperty("profileImage")) {
-      user.profileImage = req.body.profileImage || null;
-    }
 
     await user.save();
 
@@ -77,7 +75,6 @@ router.put("/me", verifyTokenMiddleware, async (req, res) => {
         rawPhone: user.rawPhone,
         countryCode: user.countryCode,
         role: user.role,
-        profileImage: user.profileImage,
       },
     });
   } catch (err) {
@@ -85,7 +82,6 @@ router.put("/me", verifyTokenMiddleware, async (req, res) => {
     res.status(500).json({ error: "Failed to update profile" });
   }
 });
-
 
 
 module.exports = router;
