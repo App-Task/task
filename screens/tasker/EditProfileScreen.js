@@ -55,8 +55,15 @@ export default function EditProfileScreen() {
 
     fetchProfile();
   }, []);
-
   const handleSave = async () => {
+    if (!name || !gender || !location || !experience || !skills || !about) {
+      Alert.alert(
+        "Incomplete Profile",
+        "Please fill out all fields before saving your profile."
+      );
+      return;
+    }
+  
     try {
       const token = await getToken();
       const res = await fetch("https://task-kq94.onrender.com/api/auth/me", {
@@ -74,13 +81,13 @@ export default function EditProfileScreen() {
           about,
         }),
       });
-
+  
       const data = await res.json();
       if (res.ok) {
-        Alert.alert(t("taskerEditProfile.savedTitle"), t("taskerEditProfile.savedMessage"), [
+        Alert.alert("Profile Updated", "Your profile has been saved successfully.", [
           {
             text: "OK",
-            onPress: () => navigation.goBack(), // ✅ navigate back after save
+            onPress: () => navigation.goBack(),
           },
         ]);
       } else {
@@ -92,7 +99,7 @@ export default function EditProfileScreen() {
       Alert.alert("Error", "Something went wrong. Please try again.");
     }
   };
-
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* ✅ Top Back Button */}
@@ -102,6 +109,11 @@ export default function EditProfileScreen() {
   </TouchableOpacity>
   <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>
 </View>
+
+<Text style={{ fontSize: 16, fontWeight: "bold", color: "#213729", marginBottom: 20 }}>
+  To find jobs you must complete your profile. Fill out all fields below.
+</Text>
+
 
 
 

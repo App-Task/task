@@ -91,6 +91,18 @@ export default function ExploreTasksScreen({ navigation, route }) {
         setLoading(false);
         return;
       }
+
+      if (
+        !user.name || !user.gender || !user.location ||
+        !user.experience || !user.skills || !user.about
+      ) {
+        setShowVerifyBanner("incomplete");
+        setTasks([]);
+        setFilteredTasks([]);
+        setLoading(false);
+        return;
+      }
+      
   
       setShowVerifyBanner(false); // ✅ Hide if verified
   
@@ -218,11 +230,33 @@ setFilteredTasks(availableTasks);
     <View style={styles.container}>
       <Text style={styles.header}>{t("taskerExplore.header")}</Text>
 
-      {showVerifyBanner && (
+      {showVerifyBanner === true && (
   <View style={styles.verifyBanner}>
     <Text style={styles.verifyText}>
       You must be verified to explore and bid on tasks.
     </Text>
+  </View>
+)}
+
+{showVerifyBanner === "incomplete" && (
+  <View style={styles.verifyBanner}>
+    <Text style={styles.verifyText}>
+      To find jobs you must complete your profile.
+    </Text>
+    <TouchableOpacity
+onPress={() => navigation.navigate("EditTaskerProfile")}
+style={{
+        marginTop: 10,
+        backgroundColor: "#213729",
+        paddingVertical: 10,
+        borderRadius: 20,
+        paddingHorizontal: 18,
+      }}
+    >
+      <Text style={{ color: "#fff", fontFamily: "InterBold", textAlign: "center" }}>
+        Press here to finish your profile
+      </Text>
+    </TouchableOpacity>
   </View>
 )}
 
