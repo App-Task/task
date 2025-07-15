@@ -489,6 +489,35 @@ router.get("/tasks/:id", async (req, res) => {
 });
 
 
+// ✅ DELETE /api/admin/tasks/:id – Delete a task and its related data
+router.delete("/tasks/:id", async (req, res) => {
+  try {
+    const taskId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ error: "Invalid task ID" });
+    }
+
+    // Delete the task
+    const deletedTask = await Task.findByIdAndDelete(taskId);
+
+    if (!deletedTask) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    // Delete all bids, messages, and reviews related to this task
+    await Promise.all([
+      Bid.deleteMany({ taskId }),
+      Message.deleteMany({ taskId }),
+      Review.deleteMany({ taskId }),
+    ]);
+
+    res.json({ message: "Task and related data deleted successfully" });
+  } catch (err) {
+    console.error("❌ Failed to delete task:", err.message);
+    res.status(500).json({ error: "Failed to delete task" });
+  }
+});
 
 
 

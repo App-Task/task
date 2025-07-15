@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin – Task Details</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f2f2f2;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: white;
+      color: #215432;
+      padding: 20px 0;
+      height: 100vh;
+      border-right: 1px solid #ddd;
+    }
+
+    .sidebar img {
+      display: block;
+      margin: 0 auto 40px auto;
+      width: 150px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      color: #215432;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .sidebar a.active,
+    .sidebar a:hover {
+      background: #f1f8f4;
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .main h1 {
+      font-size: 24px;
+      color: #215432;
+      margin: 0;
+    }
+
+    .back-btn {
+      display: inline-block;
+      background: #f1f8f4;
+      color: #215432;
+      padding: 6px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-right: 10px;
+    }
+
+    .delete-btn {
+      background: #d9534f;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .task-info {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+
+    .task-info p {
+      margin: 6px 0;
+      font-size: 14px;
+    }
+
+    .task-info strong {
+      color: #215432;
+    }
+
+    .images {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .images img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    .section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+
+    .section h3 {
+      margin-bottom: 10px;
+      color: #215432;
+      font-size: 16px;
+    }
+
+    .section p {
+      background: #f8f8f8;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #333;
+      white-space: pre-line;
+    }
+
+    .review-rating {
+      color: #f0ad4e;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <img src="211.png" alt="TASK logo" />
+    <a href="/admin/index.html"><span>🏠</span> Dashboard</a>
+    <a href="/admin/clients.html"><span>👥</span> Clients</a>
+    <a href="/admin/taskers.html"><span>🛠️</span> Taskers</a>
+    <a class="active" href="/admin/tasks.html"><span>📋</span> Tasks</a>
+    <a href="/admin/reports.html"><span>🚨</span> Reported Users</a>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="main-header">
+      <div>
+        <a href="/admin/tasks.html" class="back-btn">← Back</a>
+        <h1 style="display:inline-block;">Task Details</h1>
+      </div>
+      <button class="delete-btn" id="deleteBtn">Delete</button>
+    </div>
+
+    <div class="task-info" id="taskInfo">
+      <p><strong>Client:</strong> —</p>
+      <p><strong>Tasker:</strong> —</p>
+      <p><strong>Date and Time Created:</strong> —</p>
+      <p><strong>Task Status:</strong> —</p>
+      <p><strong>Location:</strong> —</p>
+      <div><strong>Images:</strong>
+        <div class="images" id="imagesContainer"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Job Description</h3>
+      <p id="jobDescription">—</p>
+    </div>
+
+    <div class="section">
+      <h3>Review Written</h3>
+      <div class="review-rating" id="reviewRating">—</div>
+      <p id="reviewText">—</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskId = urlParams.get("id");
+
+    async function fetchTaskDetails() {
+      try {
+        const res = await axios.get("/api/admin/tasks/" + taskId);
+        const t = res.data;
+
+        document.querySelector("#taskInfo").innerHTML = 
+          '<p><strong>Client:</strong> ' + t.client.name + '</p>' +
+          '<p><strong>Tasker:</strong> ' + (t.tasker ? t.tasker.name : "—") + '</p>' +
+          '<p><strong>Date and Time Created:</strong> ' + new Date(t.createdAt).toLocaleDateString() + ' ' + new Date(t.createdAt).toLocaleTimeString() + '</p>' +
+          '<p><strong>Task Status:</strong> ' + t.status + '</p>' +
+          '<p><strong>Location:</strong> <a href="' + t.location + '" target="_blank">' + t.location + '</a></p>' +
+          '<div><strong>Images:</strong>' +
+            '<div class="images" id="imagesContainer"></div>' +
+          '</div>';
+
+        const imagesContainer = document.getElementById("imagesContainer");
+        imagesContainer.innerHTML = t.images.length
+          ? t.images.map(img => `<img src="${img}" onclick="window.open('${img}', '_blank')">`).join("")
+          : "—";
+
+        document.getElementById("jobDescription").textContent = t.description;
+
+        if (t.acceptedBid && t.acceptedBid.tasker) {
+          document.getElementById("reviewRating").textContent = "⭐ " + (t.acceptedBid.rating || "No rating");
+          document.getElementById("reviewText").textContent = t.acceptedBid.review || "No review written";
+        } else {
+          document.getElementById("reviewRating").textContent = "No review written yet";
+          document.getElementById("reviewText").textContent = "—";
+        }
+      } catch (err) {
+        console.error("Failed to fetch task details:", err);
+      }
+    }
+
+    document.getElementById("deleteBtn").addEventListener("click", async () => {
+      if (!confirm("Are you sure you want to delete this task?")) return;
+      try {
+        await axios.delete(`/api/admin/tasks/${taskId}`);
+        alert("Task deleted successfully");
+        window.location.href = "/admin/tasks.html";
+      } catch (err) {
+        console.error("Failed to delete task:", err);
+        alert("Failed to delete task");
+      }
+    });
+
+    fetchTaskDetails();
+  </script>
+</body>
+</html>
