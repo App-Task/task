@@ -1,5 +1,8 @@
 {
-  "welcome": "Reliable Help, Just a Task Away.",
+ "tagline": {
+    "main": "Reliable Help",
+    "sub": "Just a task away"
+  },
 "chooseRole": "Choose your role:",
 "role": {
   "client": "Client",

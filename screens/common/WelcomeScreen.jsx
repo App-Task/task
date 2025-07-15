@@ -90,7 +90,10 @@ export default function WelcomeScreen({ navigation }) {
           resizeMode="contain"
         />
 
-        <Text style={styles.title}>{t("welcome")}</Text>
+<Text style={styles.mainTitle}>{t("tagline.main")}</Text>
+<Text style={styles.subTitle}>{t("tagline.sub")}</Text>
+
+
 
         <TouchableOpacity onPress={toggleLanguage} style={styles.langSwitch}>
           <View style={styles.langBadge}>
@@ -201,4 +204,20 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 8,
   },
+
+  mainTitle: {
+    fontFamily: "InterBold",
+    fontSize: 28,
+    textAlign: "center",
+    color: "#215432",
+    marginBottom: 4,
+  },
+  subTitle: {
+    fontFamily: "InterBold",
+  fontSize: 28,
+  textAlign: "center",
+  color: "#215432",
+  marginBottom: 32,
+  },
+  
 });
