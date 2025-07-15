@@ -77,18 +77,37 @@ export default function ProfileScreen({ navigation }) {
             });
 
             if (!result.canceled) {
-              const selectedUri = result.assets[0].uri;
-              setProfileImage(selectedUri);
-
+              const localUri = result.assets[0].uri;
+            
+              const formData = new FormData();
+              formData.append("image", {
+                uri: localUri,
+                type: "image/jpeg",
+                name: `profile_${Date.now()}.jpg`,
+              });
+            
               try {
-                await updateUserProfile({ profileImage: selectedUri });
-                console.log("✅ Profile image updated");
-                loadUser(); // Refresh user info
+                const uploadRes = await fetch("https://task-kq94.onrender.com/api/upload/profile", {
+                  method: "POST",
+                  body: formData,
+                });
+            
+                const data = await uploadRes.json();
+            
+                if (data.imageUrl) {
+                  setProfileImage(data.imageUrl);
+                  await updateUserProfile({ profileImage: data.imageUrl });
+                  console.log("✅ Profile image updated");
+                  loadUser();
+                } else {
+                  throw new Error("Upload failed");
+                }
               } catch (err) {
-                console.error("❌ Failed to update profile image:", err.message);
-                Alert.alert("Error", "Could not save profile picture");
+                console.error("❌ Upload failed:", err.message);
+                Alert.alert("Upload failed", "Could not upload image. Try again.");
               }
             }
+            
           },
         },
         {

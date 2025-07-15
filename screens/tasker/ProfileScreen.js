@@ -84,17 +84,16 @@ export default function TaskerProfileScreen({ navigation }) {
               formData.append("image", {
                 uri: localUri,
                 type: "image/jpeg",
-                name: "profile.jpg",
+                name: `profile_${Date.now()}.jpg`,
               });
+              
   
               try {
-                const uploadRes = await fetch("https://task-kq94.onrender.com/api/upload", {
+                const uploadRes = await fetch("https://task-kq94.onrender.com/api/upload/profile", {
                   method: "POST",
-                  headers: {
-                    "Content-Type": "multipart/form-data",
-                  },
-                  body: formData,
+                  body: formData, // ✅ do NOT manually set headers; FormData handles it automatically
                 });
+                
   
                 const data = await uploadRes.json();
   
