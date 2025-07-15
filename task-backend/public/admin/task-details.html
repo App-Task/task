@@ -217,13 +217,14 @@
 
         document.getElementById("jobDescription").textContent = t.description;
 
-        if (t.acceptedBid && t.acceptedBid.tasker) {
-          document.getElementById("reviewRating").textContent = "⭐ " + (t.acceptedBid.rating || "No rating");
-          document.getElementById("reviewText").textContent = t.acceptedBid.review || "No review written";
+        if (t.review) {
+        document.getElementById("reviewRating").textContent = "⭐ " + t.review.rating + "/5";
+        document.getElementById("reviewText").textContent = t.review.comment;
         } else {
-          document.getElementById("reviewRating").textContent = "No review written yet";
-          document.getElementById("reviewText").textContent = "—";
+        document.getElementById("reviewRating").textContent = "No review written yet";
+        document.getElementById("reviewText").textContent = "—";
         }
+
       } catch (err) {
         console.error("Failed to fetch task details:", err);
       }

@@ -419,7 +419,7 @@ router.get("/taskers/:id", async (req, res) => {
   }
 });
 
-// ✅ GET /api/admin/tasks/:id – Fetch a single task with full details
+// ✅ GET /api/admin/tasks/:id – Fetch a single task with full details & review
 router.get("/tasks/:id", async (req, res) => {
   try {
     const taskId = req.params.id;
@@ -443,6 +443,9 @@ router.get("/tasks/:id", async (req, res) => {
       .lean();
 
     const accepted = taskBids.find((b) => b.status === "Accepted");
+
+    // ✅ Fetch review for this task (if exists)
+    const review = await Review.findOne({ taskId: task._id }).lean();
 
     res.json({
       _id: task._id,
@@ -479,6 +482,12 @@ router.get("/tasks/:id", async (req, res) => {
             taskerId: accepted.taskerId?._id,
             price: accepted.amount,
             message: accepted.message,
+          }
+        : null,
+      review: review
+        ? {
+            rating: review.rating,
+            comment: review.comment,
           }
         : null,
     });
