@@ -152,7 +152,9 @@
       document.getElementById("name").textContent = clientData.name;
       document.getElementById("email").textContent = "Email: " + clientData.email;
       document.getElementById("phone").textContent = "Number: " + clientData.phone;
-      document.getElementById("avatar").src = clientData.image || "https://via.placeholder.com/100";
+      document.getElementById("avatar").src =
+  clientData.profileImage || "https://via.placeholder.com/100";
+
 
       renderTasks(res.data.tasks);
       renderReviews(res.data.reviews);

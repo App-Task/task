@@ -165,7 +165,7 @@ router.get("/taskers", async (req, res) => {
         phone: t.phone || "N/A",
         location: t.location || "N/A",
         isBlocked: !!t.isBlocked,
-        image: t.image || null,
+        profileImage: t.profileImage || null,
         verificationStatus: t.verificationStatus || "pending",
         documents: t.documents || [],
         reviews: userReviews.map(r => ({
@@ -345,7 +345,7 @@ router.get("/clients/:id", async (req, res) => {
         name: client.name,
         email: client.email,
         phone: client.phone,
-        image: client.image || null,
+        profileImage: client.profileImage || null,
         isBlocked: !!client.isBlocked,
       },
       tasks: tasks.map(t => ({
@@ -398,7 +398,7 @@ router.get("/taskers/:id", async (req, res) => {
         name: tasker.name,
         email: tasker.email,
         phone: tasker.phone,
-        image: tasker.image || null,
+        profileImage: tasker.profileImage || null,
         location: tasker.location || "N/A",
         experience: tasker.experience || "N/A",
         about: tasker.about || "",

@@ -173,7 +173,9 @@ if (taskerData.verificationStatus === "accepted") {
       document.getElementById("location").textContent = "Location: " + taskerData.location;
       document.getElementById("experience").textContent = "Experience: " + taskerData.experience;
       document.getElementById("bio").textContent = taskerData.about;
-      document.getElementById("avatar").src = taskerData.image ? taskerData.image : "";
+      document.getElementById("avatar").src =
+  taskerData.profileImage || "https://via.placeholder.com/100";
+
 
 
       document.getElementById("documents").innerHTML = taskerData.documents.map((doc, i) =>
