@@ -3,155 +3,248 @@
 <head>
   <meta charset="UTF-8" />
   <title>Admin – Tasks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: sans-serif; background: #f8f8f8; padding: 20px; }
-    h1 { color: #215432; text-align: center; }
-    .controls { display: flex; gap: 10px; margin-bottom: 20px; }
-    .input { padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 200px; }
-    table { width: 100%; border-collapse: collapse; background: white; }
-    th, td { padding: 12px; border-bottom: 1px solid #ddd; }
-    th { background: #215432; color: white; text-align: left; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f2f2f2;
+      display: flex;
+    }
+
+    /* Sidebar (Same as index.html) */
+    .sidebar {
+      width: 220px;
+      background: white;
+      color: #215432;
+      padding: 20px 0;
+      height: 100vh;
+      border-right: 1px solid #ddd;
+    }
+
+    .sidebar img {
+      display: block;
+      margin: 0 auto 40px auto;
+      width: 150px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      color: #215432;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .sidebar a.active,
+    .sidebar a:hover {
+      background: #f1f8f4;
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .main h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #215432;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      padding: 10px 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 250px;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      padding: 14px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: #215432;
+      color: white;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .status.pending { background: #f0ad4e; }
+    .status.started { background: #f0ad4e; }
+    .status.completed { background: #5cb85c; }
+    .status.cancelled { background: #d9534f; }
+
+    .details-btn {
+      background: #215432;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .details-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Pagination */
+    .pagination {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .pagination button {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .pagination button.active {
+      background: #215432;
+      color: white;
+      border-color: #215432;
+    }
   </style>
 </head>
 <body>
-
-    <div style="margin-bottom: 20px;">
-        <a href="/admin/index.html" style="background: #215432; color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
-      </div>
-      
-  <h1>Tasks</h1>
-
-  <div class="controls">
-    <input type="text" class="input" id="search" placeholder="Search by title..." />
-    <select class="input" id="statusFilter">
-      <option value="">All Status</option>
-      <option value="Pending">Pending</option>
-      <option value="Started">Started</option>
-      <option value="Completed">Completed</option>
-      <option value="Cancelled">Cancelled</option>
-    </select>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <img src="211.png" alt="TASK logo" />
+    <a href="/admin/index.html"><span>🏠</span> Dashboard</a>
+    <a href="/admin/clients.html"><span>👥</span> Clients</a>
+    <a href="/admin/taskers.html"><span>🛠️</span> Taskers</a>
+    <a class="active" href="/admin/tasks.html"><span>📋</span> Tasks</a>
+    <a href="/admin/reports.html"><span>🚨</span> Reported Users</a>
   </div>
 
-  <table id="taskTable">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Location</th>
-        <th>Client</th>
-        <th>Tasker</th>
-        <th>Status</th>
-        <th>Created</th>
-        <th>Cancelled/Completed</th>
-        <th>Bids</th>
-        <th>Accepted Bid</th>
-        <th>Images</th>
+  <!-- Main -->
+  <div class="main">
+    <h1>Tasks</h1>
 
+    <div class="controls">
+      <input type="text" id="search" class="search-input" placeholder="Search by client name...">
+    </div>
 
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Tasker</th>
+          <th>Date Created</th>
+          <th>Status</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody id="taskTableBody"></tbody>
+    </table>
+
+    <div class="pagination" id="pagination"></div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
     let allTasks = [];
     let currentPage = 1;
     let totalTasks = 0;
-  
+
     async function fetchTasks() {
       const res = await axios.get(`/api/admin/tasks?page=${currentPage}&limit=10`);
       allTasks = res.data.tasks;
       totalTasks = res.data.total;
-  
       renderTasks(allTasks);
       renderPagination();
     }
-  
+
     function renderTasks(data) {
-      const tbody = document.querySelector("#taskTable tbody");
+      const tbody = document.getElementById("taskTableBody");
       tbody.innerHTML = "";
-  
+
       data.forEach(t => {
         const tr = document.createElement("tr");
+        const statusClass = 
+          t.status === "Pending" ? "pending" :
+          t.status === "Started" ? "started" :
+          t.status === "Completed" ? "completed" : "cancelled";
+
         tr.innerHTML = `
-  <td>${t.title}</td>
-  <td>${t.description}</td>
-  <td>${t.location}</td>
-  <td>${t.clientName}</td>
-  <td>${t.taskerName || "—"}</td>
-  <td>${t.status}</td>
-  <td>${new Date(t.createdAt).toLocaleString()}</td>
-  <td>${
-    t.completedAt
-      ? new Date(t.completedAt).toLocaleString()
-      : t.cancelledAt
-      ? new Date(t.cancelledAt).toLocaleString()
-      : "—"
-  }</td>
-  <td>
-    ${t.bids.length > 0
-      ? t.bids.map(b => `💰 ${b.price} – ${b.tasker}`).join("<br>")
-      : "—"}
-  </td>
-  <td>
-    ${t.acceptedBid
-      ? `✅ ${t.acceptedBid.tasker}<br>💰 ${t.acceptedBid.price}<br>${t.acceptedBid.message}`
-      : "—"}
-  </td>
-
-   <td>
-  ${t.images && t.images.length > 0
-    ? t.images.map((img, i) => `<a href="${img}" target="_blank">🖼️ Image ${i + 1}</a>`).join("<br>")
-    : "—"}
-</td>
-
-
-
- 
-`;
+          <td>${t.clientName}</td>
+          <td>${t.taskerName || "—"}</td>
+          <td>${new Date(t.createdAt).toLocaleDateString()}</td>
+          <td><span class="status ${statusClass}">${t.status}</span></td>
+          <td><a href="/admin/task-details.html?id=${t._id}" class="details-btn">View</a></td>
+        `;
 
         tbody.appendChild(tr);
       });
     }
-  
+
     function renderPagination() {
       const totalPages = Math.ceil(totalTasks / 10);
-      const controlsDiv = document.querySelector(".controls");
-  
-      // Remove old pagination
-      const old = document.querySelector(".pagination-buttons");
-      if (old) old.remove();
-  
-      // Create new pagination
-      let html = '<div class="pagination-buttons">';
+      const pagination = document.getElementById("pagination");
+      pagination.innerHTML = "";
+
       for (let i = 1; i <= totalPages; i++) {
-        html += `<button onclick="goToPage(${i})" style="margin-left: 6px;">${i}</button>`;
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        if (i === currentPage) btn.classList.add("active");
+        btn.addEventListener("click", () => {
+          currentPage = i;
+          fetchTasks();
+        });
+        pagination.appendChild(btn);
       }
-      html += '</div>';
-      controlsDiv.insertAdjacentHTML("beforeend", html);
     }
-  
-    function goToPage(page) {
-      currentPage = page;
-      fetchTasks();
-    }
-  
-    // Filters
+
     document.getElementById("search").addEventListener("input", (e) => {
       const term = e.target.value.toLowerCase();
-      const filtered = allTasks.filter(t => t.title.toLowerCase().includes(term));
+      const filtered = allTasks.filter(t => t.clientName.toLowerCase().includes(term));
       renderTasks(filtered);
     });
-  
-    document.getElementById("statusFilter").addEventListener("change", (e) => {
-      const value = e.target.value;
-      const filtered = value ? allTasks.filter(t => t.status === value) : allTasks;
-      renderTasks(filtered);
-    });
-  
+
     fetchTasks();
   </script>
-  
 </body>
+
 </html>

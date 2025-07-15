@@ -419,6 +419,76 @@ router.get("/taskers/:id", async (req, res) => {
   }
 });
 
+// ✅ GET /api/admin/tasks/:id – Fetch a single task with full details
+router.get("/tasks/:id", async (req, res) => {
+  try {
+    const taskId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ error: "Invalid task ID" });
+    }
+
+    const task = await Task.findById(taskId)
+      .populate("userId")
+      .populate("taskerId")
+      .lean();
+
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    // ✅ Fetch all bids for this task
+    const taskBids = await Bid.find({ taskId: task._id })
+      .populate("taskerId")
+      .lean();
+
+    const accepted = taskBids.find((b) => b.status === "Accepted");
+
+    res.json({
+      _id: task._id,
+      title: task.title,
+      description: task.description || "N/A",
+      images: task.images || [],
+      location: task.location || "N/A",
+      status: task.status,
+      createdAt: task.createdAt,
+      client: {
+        _id: task.userId?._id,
+        name: task.userId?.name || "N/A",
+        phone: task.userId?.phone || "N/A",
+      },
+      tasker: task.taskerId
+        ? {
+            _id: task.taskerId?._id,
+            name: task.taskerId?.name || "N/A",
+            phone: task.taskerId?.phone || "N/A",
+          }
+        : null,
+      cancelledAt: task.cancelledAt ? new Date(task.cancelledAt).toISOString() : null,
+      completedAt: task.completedAt ? new Date(task.completedAt).toISOString() : null,
+      bids: taskBids.map((b) => ({
+        tasker: b.taskerId?.name || "Unknown",
+        taskerId: b.taskerId?._id,
+        price: b.amount,
+        message: b.message,
+        status: b.status,
+      })),
+      acceptedBid: accepted
+        ? {
+            tasker: accepted.taskerId?.name || "Unknown",
+            taskerId: accepted.taskerId?._id,
+            price: accepted.amount,
+            message: accepted.message,
+          }
+        : null,
+    });
+  } catch (err) {
+    console.error("❌ Failed to fetch task details:", err.message);
+    res.status(500).json({ error: "Failed to fetch task details" });
+  }
+});
+
+
 
 
 
