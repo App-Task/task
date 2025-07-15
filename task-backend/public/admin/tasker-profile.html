@@ -186,19 +186,48 @@ if (taskerData.verificationStatus === "accepted") {
     }
 
     function renderTasks(tasks) {
-      document.getElementById("tasks").innerHTML = tasks.map(t => `
-        <div class="card">
-          <p><strong>Task Name</strong> – ${t.title}</p>
-          <p><strong>Category</strong> – ${t.category}</p>
-          <p><strong>Address</strong> – ${t.location}</p>
-          <p><strong>Job Description</strong> – ${t.description}</p>
-          ${t.images.length ? `<p><strong>Images</strong></p><div>${t.images.map(() => `<span class="gray-box"></span>`).join('')}</div>` : ""}
-          <p><strong>Bid Sent</strong> – ${t.bidAmount} BHD</p>
-          <p><strong>Status</strong> – ${t.bidStatus}</p>
-          <p><strong>Date Created</strong> – ${t.createdAt}</p>
-        </div>
-      `).join("");
-    }
+  const container = document.getElementById("tasks");
+  container.innerHTML = tasks.map(t => `
+    <div class="card">
+      <p><strong>Task Name</strong> – ${t.title}</p>
+      <p><strong>Category</strong> – ${t.category}</p>
+      <p><strong>Address</strong> – ${t.location}</p>
+      <p><strong>Job Description</strong> – ${t.description}</p>
+      ${t.images.length ? `<p><strong>Images</strong></p>
+        <div>${t.images.map(img => `
+          <img src="${img}" onclick="openFullScreen('${img}')" class="task-img" style="width:60px;height:60px;border-radius:4px;margin-right:4px;cursor:pointer;" />
+        `).join('')}</div>` : ""}
+      ${t.bidAmount ? `<p><strong>Bid Sent</strong> – ${t.bidAmount} BHD</p>` : ""}
+      ${t.bidStatus ? `<p><strong>Status</strong> – ${t.bidStatus}</p>` : ""}
+      <p><strong>Date Created</strong> – ${t.createdAt}</p>
+    </div>
+  `).join("");
+}
+
+function openFullScreen(src) {
+  const fullScreenDiv = document.createElement('div');
+  fullScreenDiv.style.position = 'fixed';
+  fullScreenDiv.style.top = '0';
+  fullScreenDiv.style.left = '0';
+  fullScreenDiv.style.width = '100vw';
+  fullScreenDiv.style.height = '100vh';
+  fullScreenDiv.style.backgroundColor = 'rgba(0,0,0,0.8)';
+  fullScreenDiv.style.display = 'flex';
+  fullScreenDiv.style.justifyContent = 'center';
+  fullScreenDiv.style.alignItems = 'center';
+  fullScreenDiv.style.cursor = 'pointer';
+  fullScreenDiv.onclick = () => document.body.removeChild(fullScreenDiv);
+
+  const img = document.createElement('img');
+  img.src = src;
+  img.style.maxWidth = '90%';
+  img.style.maxHeight = '90%';
+  img.style.borderRadius = '8px';
+
+  fullScreenDiv.appendChild(img);
+  document.body.appendChild(fullScreenDiv);
+}
+
 
     function renderReviews(reviews) {
       document.getElementById("reviews").innerHTML = reviews.map(r => `
