@@ -146,18 +146,19 @@ export default function RegisterScreen({ navigation, route }) {
 
 <View style={styles.phoneContainer}>
   <View style={styles.countryPickerWrapper}>
-    <CountryPicker
-      countryCode={countryCode}
-      withFilter
-      withFlag
-      withCountryNameButton
-      withCallingCode
-      withEmoji
-      onSelect={(selectedCountry) => {
-        setCountryCode(selectedCountry.cca2);
-        setCallingCode("+" + selectedCountry.callingCode[0]);
-      }}
-    />
+  <CountryPicker
+  countryCode={countryCode}
+  withFilter
+  withFlag
+  withCallingCodeButton
+  withCountryNameButton={false} // ❌ hides the country name
+  withEmoji
+  onSelect={(selectedCountry) => {
+    setCountryCode(selectedCountry.cca2);
+    setCallingCode("+" + selectedCountry.callingCode[0]);
+  }}
+/>
+
   </View>
   <TextInput
     style={styles.phoneInput}

@@ -163,8 +163,8 @@ const [rawPhone, setRawPhone] = useState("");
       countryCode={countryCode}
       withFilter
       withFlag
-      withCountryNameButton
-      withCallingCode
+      withCallingCodeButton
+      withCountryNameButton={false} // ✅ hides country name
       withEmoji
       onSelect={(country) => {
         setCountryCode(country.cca2);
@@ -181,6 +181,7 @@ const [rawPhone, setRawPhone] = useState("");
     placeholderTextColor="#999"
   />
 </View>
+
 
       <TextInput style={styles.input} value={gender} onChangeText={setGender} placeholder={t("taskerEditProfile.gender") || "Gender"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
       <TextInput style={styles.input} value={location} onChangeText={setLocation} placeholder={t("taskerEditProfile.location") || "Location"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />

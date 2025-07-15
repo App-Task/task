@@ -117,30 +117,30 @@ export default function EditProfileScreen({ navigation }) {
           textAlign={I18nManager.isRTL ? "right" : "left"}
         />
 
-      <View style={styles.phoneContainer}>
-        <View style={styles.countryCodeInput}>
-          <CountryPicker
-            countryCode={countryCode}
-            withFilter
-            withFlag
-            withCountryNameButton
-            withCallingCode
-            withEmoji
-            onSelect={(country) => {
-              setCountryCode(country.cca2);
-              setCallingCode("+" + country.callingCode[0]);
-            }}
-          />
-        </View>
-        <TextInput
-          style={styles.phoneInput}
-          value={rawPhone}
-          onChangeText={setRawPhone}
-          keyboardType="phone-pad"
-          placeholder={t("register.phone")}
-          placeholderTextColor="#999"
-        />
-      </View>
+<View style={styles.phoneContainer}>
+  <View style={styles.countryCodeInput}>
+    <CountryPicker
+      countryCode={countryCode}
+      withFilter
+      withFlag
+      withCallingCodeButton
+      withCountryNameButton={false} // ✅ hides country name
+      withEmoji
+      onSelect={(country) => {
+        setCountryCode(country.cca2);
+        setCallingCode("+" + country.callingCode[0]);
+      }}
+    />
+  </View>
+  <TextInput
+    style={styles.phoneInput}
+    value={rawPhone}
+    onChangeText={setRawPhone}
+    keyboardType="phone-pad"
+    placeholder={t("register.phone")}
+    placeholderTextColor="#999"
+  />
+</View>
 
 
 
