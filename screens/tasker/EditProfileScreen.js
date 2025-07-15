@@ -13,6 +13,8 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { getToken } from "../../services/authStorage";
+import CountryPicker from "react-native-country-picker-modal";
+
 
 export default function EditProfileScreen() {
   const { t } = useTranslation();
@@ -21,10 +23,15 @@ export default function EditProfileScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [gender, setGender] = useState("");
-  const [location, setLocation] = useState("");
-  const [experience, setExperience] = useState("");
-  const [skills, setSkills] = useState("");
-  const [about, setAbout] = useState("");
+const [location, setLocation] = useState("");
+const [experience, setExperience] = useState("");
+const [skills, setSkills] = useState("");
+const [about, setAbout] = useState("");
+
+// ✅ New phone-related state
+const [countryCode, setCountryCode] = useState("SA");
+const [callingCode, setCallingCode] = useState("+966");
+const [rawPhone, setRawPhone] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -45,6 +52,22 @@ export default function EditProfileScreen() {
           setExperience(data.experience || "");
           setSkills(data.skills || "");
           setAbout(data.about || "");
+
+
+          // ✅ Load phone details
+        if (data.callingCode && data.rawPhone) {
+          setCallingCode(data.callingCode);
+          setRawPhone(data.rawPhone);
+          setCountryCode(data.countryCode || "SA");
+        } else if (data.phone) {
+          const match = data.phone.match(/^\+(\d{1,4})(.*)$/);
+          if (match) {
+            setCallingCode("+" + match[1]);
+            setRawPhone(match[2].trim());
+            setCountryCode("SA"); // fallback
+          }
+        }
+
         } else {
           console.error("❌ Failed to fetch profile:", data.msg);
         }
@@ -79,7 +102,12 @@ export default function EditProfileScreen() {
           experience,
           skills,
           about,
+          phone: `${callingCode}${rawPhone.trim()}`,
+          callingCode,
+          rawPhone: rawPhone.trim(),
+          countryCode,
         }),
+        
       });
   
       const data = await res.json();
@@ -129,6 +157,31 @@ export default function EditProfileScreen() {
 />
 
       <TextInput style={styles.input} value={email} editable={false} placeholder={t("taskerEditProfile.email") || "Email"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+      <View style={styles.phoneContainer}>
+  <View style={styles.countryPickerWrapper}>
+    <CountryPicker
+      countryCode={countryCode}
+      withFilter
+      withFlag
+      withCountryNameButton
+      withCallingCode
+      withEmoji
+      onSelect={(country) => {
+        setCountryCode(country.cca2);
+        setCallingCode("+" + country.callingCode[0]);
+      }}
+    />
+  </View>
+  <TextInput
+    style={styles.phoneInput}
+    value={rawPhone}
+    onChangeText={setRawPhone}
+    keyboardType="phone-pad"
+    placeholder={t("register.phone") || "Phone Number"}
+    placeholderTextColor="#999"
+  />
+</View>
+
       <TextInput style={styles.input} value={gender} onChangeText={setGender} placeholder={t("taskerEditProfile.gender") || "Gender"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
       <TextInput style={styles.input} value={location} onChangeText={setLocation} placeholder={t("taskerEditProfile.location") || "Location"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
       <TextInput style={styles.input} value={experience} onChangeText={setExperience} placeholder={t("taskerEditProfile.experience") || "Experience"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
@@ -201,6 +254,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#ffffff",
   },
+
+  phoneContainer: {
+    flexDirection: "row",
+    width: "100%",
+    backgroundColor: "#f2f2f2",
+    borderRadius: 12,
+    marginBottom: 20,
+    overflow: "hidden",
+  },
+  
+  countryPickerWrapper: {
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    backgroundColor: "#e0e0e0",
+    borderRightWidth: 1,
+    borderRightColor: "#ccc",
+  },
+  
+  phoneInput: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#333",
+  },
+  
 });
 
   
