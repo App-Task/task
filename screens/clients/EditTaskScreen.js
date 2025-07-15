@@ -108,7 +108,7 @@ export default function EditTaskScreen({ route, navigation }) {
           />
           <TextInput
             style={styles.input}
-            placeholder="Price (SAR)"
+            placeholder="Price (BHD)"
             value={price}
             onChangeText={setPrice}
             keyboardType="numeric"
