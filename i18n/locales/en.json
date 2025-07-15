@@ -385,7 +385,9 @@
 "status": "Bid Status",
 "loadingBid": "Fetching your bid...",
 "loadingBidMessage": "Please wait while we load your bid details.",
-"submittingBid": "Submitting bid..."
+"submittingBid": "Submitting bid...",
+"invalidBidTitle": "Invalid Bid",
+  "invalidBidMessage": "Minimum bid amount is 0.1 BHD."
 }
 
 

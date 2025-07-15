@@ -97,6 +97,13 @@ const handleBid = async () => {
     Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.fillFields"));
     return;
   }
+  
+  if (Number(bidAmount) < 0.1) {
+    Alert.alert(t("taskerTaskDetails.invalidBidTitle"), t("taskerTaskDetails.invalidBidMessage"));
+    return;
+  }
+  
+  
 
   try {
     setSubmitting(true); // ✅ Show popup
@@ -152,6 +159,13 @@ const handleUpdateBid = async () => {
     Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.fillFields"));
     return;
   }
+  
+  if (Number(bidAmount) < 0.1) {
+    Alert.alert(t("taskerTaskDetails.invalidBidTitle"), t("taskerTaskDetails.invalidBidMessage"));
+    return;
+  }
+  
+  
 
   try {
     setSubmitting(true);

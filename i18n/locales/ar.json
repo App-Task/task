@@ -385,7 +385,9 @@
 "status": "حالة العرض",
  "loadingBid": "جاري تحميل عرض السعر الخاص بك...",
   "loadingBidMessage": "يرجى الانتظار أثناء تحميل تفاصيل عرضك.",
-  "submittingBid": "جاري تقديم العرض..."
+  "submittingBid": "جاري تقديم العرض...",
+  "invalidBidTitle": "عرض غير صالح",
+  "invalidBidMessage": "الحد الأدنى للمزايدة هو 0.1 دينار بحريني."
 
 
 }
