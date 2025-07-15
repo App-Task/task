@@ -48,20 +48,37 @@ export default function ProfileScreen({ navigation }) {
     }, [])
   );
 
-  const handleLogout = async () => {
-    try {
-      await removeToken();
-      Alert.alert(t("clientProfile.logoutAlertTitle"), t("clientProfile.logoutAlertMessage"));
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Welcome" }],
-      });
-      
-    } catch (err) {
-      console.error("❌ Logout failed:", err.message);
-    }
+  const handleLogout = () => {
+    Alert.alert(
+      t("clientProfile.logoutConfirmTitle"),
+      t("clientProfile.logoutConfirmMessage"),
+      [
+        {
+          text: t("clientProfile.cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("clientProfile.logout"),
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await removeToken();
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "Welcome" }],
+              });
+            } catch (err) {
+              console.error("❌ Logout failed:", err.message);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
-
+  
+  
+  
   const handleChangeProfilePicture = async () => {
     Alert.alert(
       t("clientProfile.managePhotoTitle"),

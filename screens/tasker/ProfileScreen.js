@@ -54,15 +54,36 @@ export default function TaskerProfileScreen({ navigation }) {
   }, [user]);
   
 
-  const handleLogout = async () => {
-    try {
-      await removeToken();
-      Alert.alert(t("taskerProfile.loggedOut"));
-      nav.reset({ index: 0, routes: [{ name: "Welcome" }] });
-    } catch (err) {
-      console.error("❌ Logout failed:", err.message);
-    }
+  const handleLogout = () => {
+    Alert.alert(
+      t("taskerProfile.logoutConfirmTitle"), 
+      t("taskerProfile.logoutConfirmMessage"),
+      [
+        {
+          text: t("taskerProfile.cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("taskerProfile.logout"),
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await removeToken();
+              nav.reset({
+                index: 0,
+                routes: [{ name: "Welcome" }],
+              });
+            } catch (err) {
+              console.error("❌ Logout failed:", err.message);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
+  
+  
   const handleChangeProfilePicture = async () => {
     Alert.alert(
       t("taskerProfile.managePhotoTitle"),

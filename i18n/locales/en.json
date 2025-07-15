@@ -201,7 +201,9 @@
     "managePhotoTitle": "Manage Profile Picture",
   "chooseNewPhoto": "Choose New Photo",
   "removePhoto": "Remove Photo",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "logoutConfirmTitle": "Are you sure you’d like to logout?",
+  "logoutConfirmMessage": "You will need to log in again to continue using the app."
   },
  "clientTaskDetails": {
   "description": "Description",
@@ -344,12 +346,14 @@
   "payments": "My Payments",
   "reviews": "My Reviews",
   "settings": "Settings",
-  "logout": "Log Out",
   "loggedOut": "You have been logged out.",
   "managePhotoTitle": "Manage Profile Picture",
   "chooseNewPhoto": "Choose New Photo",
   "removePhoto": "Remove Photo",
-  "cancel": "Cancel"
+  "logoutConfirmTitle": "Are you sure you’d like to logout?",
+  "logoutConfirmMessage": "You will need to log in again to continue using the app.",
+  "cancel": "Cancel",
+  "logout": "Logout"
 },
 "taskerSettings": {
   "title": "Settings",

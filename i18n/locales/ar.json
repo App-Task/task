@@ -202,7 +202,9 @@
   "managePhotoTitle": "إدارة صورة الملف الشخصي",
   "chooseNewPhoto": "اختر صورة جديدة",
   "removePhoto": "إزالة الصورة",
-  "cancel": "إلغاء"
+  "cancel": "إلغاء",
+  "logoutConfirmTitle": "هل أنت متأكد أنك تريد تسجيل الخروج؟"
+
 },
 
   "clientTaskDetails": {
@@ -349,7 +351,9 @@
   "managePhotoTitle": "إدارة صورة الملف الشخصي",
   "chooseNewPhoto": "اختر صورة جديدة",
   "removePhoto": "إزالة الصورة",
-  "cancel": "إلغاء"
+  "cancel": "إلغاء",
+  "logoutConfirmTitle": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+  "logoutConfirmMessage": "ستحتاج إلى تسجيل الدخول مرة أخرى لاستخدام التطبيق."
 },
 "taskerSettings": {
   "title": "الإعدادات",
