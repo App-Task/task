@@ -59,6 +59,16 @@ export default function RegisterScreen({ navigation, route }) {
       );
       return;
     }
+    // ✅ Password must contain at least one capital letter and one number
+const strongPasswordRegex = /^(?=.*[A-Z])(?=.*\d).+$/;
+if (!strongPasswordRegex.test(password)) {
+  Alert.alert(
+    "Weak Password",
+    "Password must contain at least one capital letter and one number."
+  );
+  return;
+}
+
     
   
     setIsRegistering(true); // ✅ show popup
