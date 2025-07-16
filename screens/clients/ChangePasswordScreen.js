@@ -34,6 +34,15 @@ export default function ChangePasswordScreen({ navigation }) {
       return;
     }
   
+    const strongPasswordRegex = /^(?=.*[A-Z])(?=.*\d).+$/;
+if (!strongPasswordRegex.test(newPass)) {
+  Alert.alert(
+    "Weak Password",
+    "New password must contain at least one capital letter and one number."
+  );
+  return;
+}
+
     if (newPass !== confirmPass) {
       Alert.alert("Mismatch", "New passwords do not match.");
       return;
