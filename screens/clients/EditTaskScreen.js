@@ -26,6 +26,14 @@ export default function EditTaskScreen({ route, navigation }) {
   const [price, setPrice] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const [errors, setErrors] = useState({
+    title: false,
+    description: false,
+    location: false,
+    price: false,
+  });
+  
+
   useEffect(() => {
     const loadTask = async () => {
       try {
@@ -44,10 +52,20 @@ export default function EditTaskScreen({ route, navigation }) {
   }, [taskId]);
 
   const handleUpdate = async () => {
-    if (!title || !description || !location || !price) {
+    const newErrors = {
+      title: !title.trim(),
+      description: !description.trim(),
+      location: !location.trim(),
+      price: !price.trim(),
+    };
+    
+    setErrors(newErrors);
+    
+    if (Object.values(newErrors).some(Boolean)) {
       Alert.alert(t("clientEditTask.missingTitle"), t("clientEditTask.missingFields"));
       return;
     }
+    
 
     try {
       await updateTaskById(taskId, {
@@ -82,38 +100,62 @@ export default function EditTaskScreen({ route, navigation }) {
           </View>
 
           <TextInput
-            style={styles.input}
-            placeholder="Task name"
-            value={title}
-            onChangeText={setTitle}
-            maxLength={30}
-            placeholderTextColor="#999"
-          />
-          <TextInput
-            style={[styles.input, styles.textarea]}
-            placeholder="Description"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            maxLength={150}
-            placeholderTextColor="#999"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Address"
-            value={location}
-            onChangeText={setLocation}
-            maxLength={100}
-            placeholderTextColor="#999"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Price (BHD)"
-            value={price}
-            onChangeText={setPrice}
-            keyboardType="numeric"
-            placeholderTextColor="#999"
-          />
+  style={[styles.input, errors.title && styles.errorInput]}
+  placeholder="Task name"
+  value={title}
+  onChangeText={(text) => {
+    setTitle(text);
+    if (errors.title && text.trim()) {
+      setErrors((prev) => ({ ...prev, title: false }));
+    }
+  }}
+  maxLength={30}
+  placeholderTextColor="#999"
+/>
+
+<TextInput
+  style={[styles.input, styles.textarea, errors.description && styles.errorInput]}
+  placeholder="Description"
+  value={description}
+  onChangeText={(text) => {
+    setDescription(text);
+    if (errors.description && text.trim()) {
+      setErrors((prev) => ({ ...prev, description: false }));
+    }
+  }}
+  multiline
+  maxLength={150}
+  placeholderTextColor="#999"
+/>
+
+<TextInput
+  style={[styles.input, errors.location && styles.errorInput]}
+  placeholder="Address"
+  value={location}
+  onChangeText={(text) => {
+    setLocation(text);
+    if (errors.location && text.trim()) {
+      setErrors((prev) => ({ ...prev, location: false }));
+    }
+  }}
+  maxLength={100}
+  placeholderTextColor="#999"
+/>
+
+<TextInput
+  style={[styles.input, errors.price && styles.errorInput]}
+  placeholder="Price (BHD)"
+  value={price}
+  onChangeText={(text) => {
+    setPrice(text);
+    if (errors.price && text.trim()) {
+      setErrors((prev) => ({ ...prev, price: false }));
+    }
+  }}
+  keyboardType="numeric"
+  placeholderTextColor="#999"
+/>
+
 
           <TouchableOpacity style={styles.button} onPress={handleUpdate}>
             <Text style={styles.buttonText}>{t("clientEditTask.save")}</Text>
@@ -175,4 +217,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
   },
+  errorInput: {
+    borderWidth: 1,
+    borderColor: "#ff4d4d",
+  },
+  
 });
