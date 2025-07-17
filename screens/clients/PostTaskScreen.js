@@ -194,53 +194,94 @@ if (errorFlag) {
       setPosting(false); // ✅ always hide popup
     }
   };
-  
-  
   const pickImages = async () => {
     if (images.length >= 3) {
       Alert.alert(t("clientPostTask.limitTitle"), t("clientPostTask.limitMsg"));
       return;
     }
   
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsMultipleSelection: false,
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.5,
+    Alert.alert(
+      t("clientPostTask.uploadChoiceTitle") || "Choose Image Source",
+      t("clientPostTask.uploadChoiceMsg") || "How would you like to upload the image?",
+      [
+        {
+          text: t("clientPostTask.takePhoto") || "Take Photo",
+          onPress: async () => {
+            const { status } = await ImagePicker.requestCameraPermissionsAsync();
+            if (status !== "granted") {
+              Alert.alert("Permission denied", "Camera access is required to take a photo.");
+              return;
+            }
+  
+            const result = await ImagePicker.launchCameraAsync({
+              allowsEditing: true,
+              quality: 0.5,
+            });
+  
+            if (!result.canceled) {
+              handleImageUpload(result.assets[0].uri);
+            }
+          },
+        },
+        {
+          text: t("clientPostTask.chooseFromLibrary") || "Choose from Library",
+          onPress: async () => {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== "granted") {
+              Alert.alert("Permission denied", "Library access is required.");
+              return;
+            }
+  
+            const result = await ImagePicker.launchImageLibraryAsync({
+              allowsMultipleSelection: false,
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              quality: 0.5,
+            });
+  
+            if (!result.canceled) {
+              handleImageUpload(result.assets[0].uri);
+            }
+          },
+        },
+        {
+          text: t("clientPostTask.cancel") || "Cancel",
+          style: "cancel",
+        },
+      ]
+    );
+  };
+  
+
+  const handleImageUpload = async (uri) => {
+    const formData = new FormData();
+    formData.append("image", {
+      uri,
+      type: "image/jpeg",
+      name: "upload.jpg",
     });
   
-    if (!result.canceled) {
-      const localUri = result.assets[0].uri;
-  
-      const formData = new FormData();
-      formData.append("image", {
-        uri: localUri,
-        type: "image/jpeg",
-        name: "upload.jpg",
+    try {
+      setImageUploading(true);
+      const response = await fetch("https://task-kq94.onrender.com/api/upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        body: formData,
       });
   
-      try {
-        setImageUploading(true);
-        const response = await fetch("https://task-kq94.onrender.com/api/upload", {
-          method: "POST",
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          body: formData,
-        });
+      const data = await response.json();
   
-        const data = await response.json();
-  
-        if (data.imageUrl) {
-          setImages([...images, data.imageUrl]);
-        } else {
-          throw new Error("Upload failed");
-        }
-      } catch (err) {
-        console.error("❌ Upload failed:", err);
-        Alert.alert("Upload failed", "Could not upload image. Try again.");
-      } finally {
-        setImageUploading(false);
+      if (data.imageUrl) {
+        setImages((prev) => [...prev, data.imageUrl]);
+      } else {
+        throw new Error("Upload failed");
       }
+    } catch (err) {
+      console.error("❌ Upload failed:", err);
+      Alert.alert("Upload failed", "Could not upload image. Try again.");
+    } finally {
+      setImageUploading(false);
     }
   };
   

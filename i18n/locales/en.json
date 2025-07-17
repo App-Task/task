@@ -178,7 +178,12 @@
     "shopping & delivery": "Shopping & Delivery",
     "yardwork services": "Yardwork Services",
     "dog walking": "Dog Walking",
-    "other": "Other"
+    "other": "Other",
+    "uploadChoiceTitle": "Choose Image Source",
+"uploadChoiceMsg": "How would you like to upload the image?",
+"takePhoto": "Take Photo",
+"chooseFromLibrary": "Choose from Library"
+
   },
     "postingNow": "Posting...",
     "uploadingImage": "Uploading image..."
