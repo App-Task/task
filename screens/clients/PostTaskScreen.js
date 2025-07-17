@@ -489,7 +489,7 @@ if (errorFlag) {
 
     </View>
   </View>
-)}
+)} //
 
 <Modal visible={previewVisible} transparent animationType="fade">
   <View style={styles.previewModalContainer}>
