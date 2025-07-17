@@ -296,18 +296,23 @@ if (errorFlag) {
     textAlign={I18nManager.isRTL ? "right" : "left"}
   />
 
-  <TextInput
-    style={[styles.input, styles.textarea, descError && { borderColor: "#c00", borderWidth: 2 }]}
+<TextInput
+  style={[styles.input, styles.textarea, descError && { borderColor: "#c00", borderWidth: 2 }]}
+  placeholder={t("clientPostTask.taskDescPlaceholder")}
+  placeholderTextColor="#999"
+  value={description}
+  onChangeText={(text) => {
+    const lines = text.split("\n");
+    if (lines.length <= 25) {
+      setDescription(text);
+    }
+  }}
+  multiline
+  maxLength={1000} // Optional: just to avoid massive input
+  textAlignVertical="top"
+  textAlign={I18nManager.isRTL ? "right" : "left"}
+/>
 
-    placeholder={t("clientPostTask.taskDescPlaceholder")}
-    placeholderTextColor="#999"
-    value={description}
-    onChangeText={setDescription}
-    maxLength={150}
-    multiline
-    textAlignVertical="top"
-    textAlign={I18nManager.isRTL ? "right" : "left"}
-  />
 
 <TouchableOpacity
   style={[
