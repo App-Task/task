@@ -58,9 +58,26 @@ export default function EditProfileScreen({ navigation }) {
   }, []);
   
   
-  
-
   const handleUpdate = async () => {
+    if (!name || !email || !rawPhone) {
+      Alert.alert("Missing Fields", "Please fill in all required fields.");
+      return;
+    }
+  
+    // ✅ Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      return;
+    }
+  
+    // ✅ Validate phone number format (8–15 digits)
+    const phoneRegex = /^[0-9]{8,15}$/;
+    if (!phoneRegex.test(rawPhone.trim())) {
+      Alert.alert("Invalid Phone Number", "Phone number must be 8 to 15 digits and contain only numbers.");
+      return;
+    }
+  
     try {
       await updateUserProfile({
         name,
@@ -70,14 +87,15 @@ export default function EditProfileScreen({ navigation }) {
         callingCode,
         rawPhone: rawPhone.trim(),
       });
-      
-      await SecureStore.setItemAsync("userName", name); // ✅ Store the updated name
+  
+      await SecureStore.setItemAsync("userName", name);
       Alert.alert("Success", "Profile updated");
-      navigation.goBack(); // ✅ Make sure this is here to return to the home screen
+      navigation.goBack();
     } catch (err) {
       Alert.alert("Error", "Failed to update profile");
     }
   };
+  
   
   return (
     <View style={styles.wrapper}>
@@ -106,16 +124,17 @@ export default function EditProfileScreen({ navigation }) {
           textAlign={I18nManager.isRTL ? "right" : "left"}
           maxLength={50}
         />
-  
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#999"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          textAlign={I18nManager.isRTL ? "right" : "left"}
-        />
+<TextInput
+  style={[styles.input, { color: "#999" }]} // Optional: gray text to show it's disabled
+  placeholder="Email"
+  placeholderTextColor="#999"
+  value={email}
+  editable={false} // ✅ disables editing
+  selectTextOnFocus={false} // ✅ prevents text selection
+  keyboardType="email-address"
+  textAlign={I18nManager.isRTL ? "right" : "left"}
+/>
+
 
 <View style={styles.phoneContainer}>
   <View style={styles.countryCodeInput}>

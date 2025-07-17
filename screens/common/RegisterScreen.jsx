@@ -68,6 +68,20 @@ if (!strongPasswordRegex.test(password)) {
   );
   return;
 }
+// ✅ Validate email format
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if (!emailRegex.test(email.trim())) {
+  Alert.alert("Invalid Email", "Please enter a valid email address.");
+  return;
+}
+
+// ✅ Validate phone number format (8–15 digits, no letters/spaces)
+const phoneRegex = /^[0-9]{8,15}$/;
+if (!phoneRegex.test(phone.trim())) {
+  Alert.alert("Invalid Phone Number", "Phone number must be 8 to 15 digits and contain only numbers.");
+  return;
+}
+
 
     
   

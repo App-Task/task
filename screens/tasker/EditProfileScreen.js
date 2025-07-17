@@ -87,6 +87,20 @@ const [rawPhone, setRawPhone] = useState("");
       return;
     }
   
+    // ✅ Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      return;
+    }
+  
+    // ✅ Phone number validation (8–15 digits)
+    const phoneRegex = /^[0-9]{8,15}$/;
+    if (!phoneRegex.test(rawPhone.trim())) {
+      Alert.alert("Invalid Phone Number", "Phone number must be 8 to 15 digits and contain only numbers.");
+      return;
+    }
+  
     try {
       const token = await getToken();
       const res = await fetch("https://task-kq94.onrender.com/api/auth/me", {
@@ -107,7 +121,6 @@ const [rawPhone, setRawPhone] = useState("");
           rawPhone: rawPhone.trim(),
           countryCode,
         }),
-        
       });
   
       const data = await res.json();
@@ -127,6 +140,7 @@ const [rawPhone, setRawPhone] = useState("");
       Alert.alert("Error", "Something went wrong. Please try again.");
     }
   };
+  
   
   return (
     <ScrollView contentContainerStyle={styles.container}>

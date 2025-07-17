@@ -147,7 +147,7 @@ export default function ProfileScreen({ navigation }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+<ScrollView contentContainerStyle={styles.container} style={{ backgroundColor: '#fff' }}>
 
 <View style={styles.headerWrapper}>
   <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
