@@ -201,11 +201,12 @@ if (errorFlag) {
     }
   
     Alert.alert(
-      t("clientPostTask.uploadChoiceTitle") || "Choose Image Source",
-      t("clientPostTask.uploadChoiceMsg") || "How would you like to upload the image?",
+      "Choose Image Source",
+      "How would you like to upload the image?",
+    
       [
         {
-          text: t("clientPostTask.takePhoto") || "Take Photo",
+          text: "Take Photo",
           onPress: async () => {
             const { status } = await ImagePicker.requestCameraPermissionsAsync();
             if (status !== "granted") {
@@ -224,7 +225,7 @@ if (errorFlag) {
           },
         },
         {
-          text: t("clientPostTask.chooseFromLibrary") || "Choose from Library",
+          text: "Choose from Library",
           onPress: async () => {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== "granted") {
@@ -244,7 +245,7 @@ if (errorFlag) {
           },
         },
         {
-          text: t("clientPostTask.cancel") || "Cancel",
+          text: "Cancel",
           style: "cancel",
         },
       ]
@@ -393,9 +394,10 @@ if (errorFlag) {
   />
 
   <TouchableOpacity style={styles.uploadBox} onPress={pickImages}>
-    <Text style={styles.uploadText}>
-      + {t("clientPostTask.uploadImage")} ({images.length}/3)
-    </Text>
+  <Text style={styles.uploadText}>
+  + Upload Image ({images.length}/3)
+</Text>
+
   </TouchableOpacity>
   {images.length > 0 && (
   <View style={{ marginTop: -16 }}>
@@ -481,9 +483,10 @@ if (errorFlag) {
 {imageUploading && (
   <View style={styles.postingOverlay}>
     <View style={styles.postingBox}>
-      <Text style={styles.postingText}>
-        {t("clientPostTask.uploadingImage") || "Uploading image..."}
-      </Text>
+    <Text style={styles.postingText}>
+  Uploading image...
+</Text>
+
     </View>
   </View>
 )}
