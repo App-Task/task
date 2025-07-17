@@ -492,7 +492,7 @@ if (errorFlag) {
   <View style={styles.previewModalContainer}>
     <TouchableOpacity
       style={styles.closeButton}
-      onPress={() => setPreviewVisible(false)}
+      onPress={() => setPreviewVisible(false)} //
     >
       <Text style={styles.closeButtonText}>×</Text>
     </TouchableOpacity>
