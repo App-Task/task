@@ -312,7 +312,7 @@ if (errorFlag) {
           {/* 🔔 Notifications button */}
           <View style={styles.notificationsIcon}>
   <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-    <Ionicons name="notifications-outline" size={24} color="#213729" />
+  <Ionicons name="notifications-outline" size={24} color="#ffffff" />
     {unreadCount > 0 && (
       <View style={styles.notificationDot}>
         <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
@@ -323,7 +323,11 @@ if (errorFlag) {
 
 
 
-      <ScrollView contentContainerStyle={styles.container}>
+<ScrollView
+  style={{ flex: 1, backgroundColor: "#215432" }}  // ✅ green background for the whole scroll area
+  contentContainerStyle={styles.container}
+>
+
         <Text style={styles.heading}>{t("clientPostTask.title")}</Text>
 
         <View style={styles.formContainer}>
@@ -507,19 +511,20 @@ if (errorFlag) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 60,
+    paddingTop: 120,
     paddingBottom: 40,
     paddingHorizontal: 24,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#215432", // ✅ dark green background like the screenshot
     minHeight: height,
   },
   heading: {
     fontFamily: "InterBold",
-    fontSize: 28,
-    color: "#213729",
+    fontSize: 32,
+    color: "#ffffff", // ✅ white text
     marginBottom: 30,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    textAlign: "left",
   },
+  
   formSection: {
     display: "flex",
     flexDirection: "column",
@@ -529,10 +534,12 @@ const styles = StyleSheet.create({
   
   
   input: {
-    backgroundColor: "#f2f2f2",
-    borderRadius: 12,
+    backgroundColor: "#ffffff", // White box like the screenshot
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ddd", // Light gray border
     paddingVertical: 14,
-    paddingHorizontal: 18,
+    paddingHorizontal: 16,
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
@@ -543,18 +550,21 @@ const styles = StyleSheet.create({
     height: 120,
   },
   categoryPicker: {
-    backgroundColor: "#f2f2f2", // match the input background
-    borderRadius: 12,
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
     paddingVertical: 14,
-    paddingHorizontal: 18,
+    paddingHorizontal: 16,
   },
   
   
-  
   uploadBox: {
-    backgroundColor: "#e8e8e8",
-    borderRadius: 12,
-    paddingVertical: 20,
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
@@ -579,15 +589,17 @@ const styles = StyleSheet.create({
   
   
   button: {
-    backgroundColor: "#213729",
-    paddingVertical: 16,
-    borderRadius: 30,
+    backgroundColor: "#ffffff", // ✅ white background
+    paddingVertical: 14,
+    borderRadius: 30, // ✅ fully rounded like screenshot
     alignItems: "center",
+    width: "100%",
+    marginTop: 30,
   },
   buttonText: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#ffffff",
+    color: "#215432", // ✅ green text
   },
   modalContainer: {
     flex: 1,

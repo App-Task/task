@@ -162,7 +162,7 @@
     "enterAddress": "Enter address or location",
     "budget": "Enter your budget",
     "uploadImage": "Upload Image",
-    "postBtn": "Post Task",
+    "postBtn": "+ Post Task",
     "cancel": "Cancel",
     "limitTitle": "Image Limit Reached",
     "limitMsg": "You can upload a maximum of 3 images.",
