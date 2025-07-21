@@ -7,7 +7,9 @@ import {
   I18nManager,
   StyleSheet,
   ActivityIndicator,
+  TextInput, // ✅ Add this
 } from "react-native";
+
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
@@ -18,6 +20,8 @@ export default function MessagesScreen({ navigation }) {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);      // ✅ NEW
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
 
   const fetchConversations = async (fromRefresh = false) => {
     try {
@@ -74,12 +78,14 @@ export default function MessagesScreen({ navigation }) {
         }
       >
         <View style={styles.row}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.name}>{item.name || "Unnamed User"}</Text>
-            <Text style={styles.message} numberOfLines={1}>
-              {item.lastMessage}
-            </Text>
-          </View>
+  <View style={styles.avatar} /> 
+  <View style={{ flex: 1 }}>
+    <Text style={styles.name}>{item.name || "Test User"}</Text>
+    <Text style={styles.message} numberOfLines={1}>
+      {item.lastMessage || "It is a long established fact that a reader..."}
+    </Text>
+  </View>
+
   
           <View style={styles.rightSide}>
             <Text style={styles.time}>{item.time}</Text>
@@ -98,6 +104,17 @@ export default function MessagesScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t("clientMessages.title")}</Text>
+      <View style={styles.searchBar}>
+  <TextInput
+    style={styles.searchInput}
+    placeholder="Search"
+    placeholderTextColor="#777"
+    value={searchQuery}
+    onChangeText={(text) => setSearchQuery(text)}
+  />
+</View>
+
+
 
       {loading && conversations.length === 0 ? (
         <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
@@ -105,7 +122,9 @@ export default function MessagesScreen({ navigation }) {
         <Text style={styles.empty}>{t("clientMessages.placeholder")}</Text>
       ) : (
 <FlatList
-  data={conversations}
+  data={conversations.filter((c) =>
+    c.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  )}
   keyExtractor={(item) => item.otherUserId}
   renderItem={renderItem}
   contentContainerStyle={{ paddingBottom: 40 }}
@@ -126,22 +145,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
-    paddingTop: 60,
+    paddingTop: 90,
     paddingHorizontal: 24,
   },
   title: {
     fontFamily: "InterBold",
-    fontSize: 24,
-    color: "#213729",
-    marginBottom: 30,
-    textAlign: "center",
+    fontSize: 28, // ✅ larger like screenshot
+    color: "#215432", // ✅ dark green
+    marginBottom: 20,
+    textAlign: "left", // ✅ left aligned
   },
+  
   card: {
-    backgroundColor: "#f2f2f2",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#d6e8b0", // ✅ light green border like screenshot
+    backgroundColor: "#ffffff", // ✅ flat white background
   },
+  
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -156,7 +180,7 @@ const styles = StyleSheet.create({
   message: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#555",
+    color: "#666",
     marginBottom: 4,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
@@ -200,5 +224,27 @@ const styles = StyleSheet.create({
   unreadCard: {
     backgroundColor: "#e5ffd4", // light green to highlight unread
   },
+
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#c1ff72", // ✅ lime green avatar
+    marginRight: 10,
+  },
+
+  searchBar: {
+    backgroundColor: "#f2f2f2",
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  searchInput: {
+    color: "#000",
+    fontFamily: "Inter",
+    fontSize: 14,
+  },
+  
   
 });
