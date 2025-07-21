@@ -90,8 +90,8 @@ export default function WelcomeScreen({ navigation }) {
           resizeMode="contain"
         />
 
-<Text style={styles.mainTitle}>{t("tagline.main")}</Text>
-<Text style={styles.subTitle}>{t("tagline.sub")}</Text>
+<Text style={styles.tagline}>Reliable Help Just a Task Away</Text>
+
 
 
 
@@ -141,13 +141,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffffff",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     paddingHorizontal: 30,
+    paddingTop: 20,
   },
   logo: {
-    width: width * 0.8,
-    height: width * 0.8,
-    marginBottom: -70,
+    width: width * 1.2, // smaller logo like in design
+    height: width * 1.2,
+    marginBottom: -210,
   },
   
   title: {
@@ -205,19 +206,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 
-  mainTitle: {
+  tagline: {
     fontFamily: "InterBold",
-    fontSize: 28,
-    textAlign: "center",
+    fontSize: 18,
     color: "#215432",
-    marginBottom: 4,
+    textAlign: "center",
+    marginBottom: 25,
   },
-  subTitle: {
-    fontFamily: "InterBold",
-  fontSize: 28,
-  textAlign: "center",
-  color: "#215432",
-  marginBottom: 32,
-  },
-  
 });
