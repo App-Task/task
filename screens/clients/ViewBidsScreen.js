@@ -128,7 +128,8 @@ export default function ViewBidsScreen({ route, navigation }) {
     navigation.navigate("Chat", { name, otherUserId });
   };
   const renderBid = ({ item }) => {
-    const isThisAccepted = item._id === acceptedBidId || item.status === "Accepted";
+    const isThisAccepted =
+      item._id === acceptedBidId || item.status === "Accepted";
     const alreadyPicked = acceptedBidId && item._id !== acceptedBidId;
   
     const review = reviews[item.taskerId?._id];
@@ -137,35 +138,48 @@ export default function ViewBidsScreen({ route, navigation }) {
   
     return (
       <View style={styles.card}>
-        {/* Header: Name + Price */}
-        <View style={styles.headerRow}>
+        {/* ✅ Tasker Info Header */}
+        <View style={styles.taskerHeader}>
           <View>
-            <Text style={styles.name}>{item.taskerId?.name || "Tasker"}</Text>
+            <Text style={styles.taskerName}>
+              {item.taskerId?.name || "Tasker"}
+            </Text>
             {average && (
-              <Text style={styles.review}>⭐ {average.toFixed(1)}</Text>
+              <Text style={styles.taskerRating}>⭐ {average.toFixed(1)}</Text>
             )}
           </View>
-          <Text style={styles.price}>{item.amount} BHD</Text>
+  
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("TaskerProfile", {
+                taskerId: item.taskerId?._id,
+              })
+            }
+          >
+            <Text style={styles.viewProfileText}>View Profile</Text>
+          </TouchableOpacity>
         </View>
   
-        {/* Message */}
-        {item.message ? (
-          <Text style={styles.message}>{item.message}</Text>
-        ) : null}
+        {/* ✅ Price and Message */}
+        <View style={{ padding: 16 }}>
+          <Text style={styles.priceOffered}>
+            Price offered:{" "}
+            <Text style={{ fontWeight: "bold" }}>{item.amount} BHD</Text>
+          </Text>
+          {item.message ? (
+            <Text style={styles.message}>{item.message}</Text>
+          ) : null}
+        </View>
   
-        {/* Action Buttons */}
+        {/* ✅ Buttons */}
         <View style={styles.buttonsRow}>
-          <TouchableOpacity style={styles.chatBtn} onPress={() => handleChat(item)}>
+          <TouchableOpacity
+            style={styles.chatBtn}
+            onPress={() => handleChat(item)}
+          >
             <Text style={styles.chatText}>{t("clientViewBids.chat")}</Text>
           </TouchableOpacity>
   
-          <TouchableOpacity
-  style={styles.chatBtn}
-  onPress={() => navigation.navigate("TaskerProfile", { taskerId: item.taskerId?._id })}
->
-  <Text style={styles.chatText}>View Profile</Text>
-</TouchableOpacity>
-
           <TouchableOpacity
             style={[
               styles.acceptBtn,
@@ -190,22 +204,24 @@ export default function ViewBidsScreen({ route, navigation }) {
                 : t("clientViewBids.accept")}
             </Text>
           </TouchableOpacity>
-
-
         </View>
       </View>
     );
   };
+  
   
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.headerRow}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="#213729" />
-          </TouchableOpacity>
-          <Text style={styles.title}>{t("clientViewBids.title")}</Text>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={30} color="#215432" />
+        </TouchableOpacity>
+        <Text style={styles.title}>{t("clientViewBids.title")}</Text>
           <View style={styles.backBtn} />
         </View>
 
@@ -253,52 +269,81 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
-    paddingTop: 40,
+    paddingTop: 10, // Reduced to push content closer to arrow
     paddingHorizontal: 20,
   },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
   backBtn: {
-    width: 24,
-    height: 24,
-    alignItems: "center",
+    width: 40,
+    height: 40,
+    alignItems: "flex-start",
     justifyContent: "center",
+    marginBottom: 20, // Small space below arrow
   },
+  
   title: {
     fontFamily: "InterBold",
-    fontSize: 20,
+    fontSize: 26,
     color: "#213729",
-    textAlign: "center",
-    flex: 1,
+    marginBottom: -30, // reduced spacing
   },
+  
   listContent: {
     paddingBottom: 60,
   },
   card: {
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#ffffff",
     borderRadius: 12,
-    padding: 18,
+    borderWidth: 1, // Add thin border
+    borderColor: "#cccccc", // Light gray border like in the picture
     marginBottom: 16,
+    overflow: "hidden", // So the green header connects perfectly to the white box
   },
-  header: {
+  
+
+  taskerHeader: {
+    backgroundColor: "#215432",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10,
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
-  name: {
+  
+
+  taskerName: {
+    fontFamily: "InterBold",
+    fontSize: 20,
+    color: "#ffffff",
+  },
+  taskerRating: {
+    fontFamily: "Inter",
+    fontSize: 13,
+    color: "#c1ff72", // Lime green stars
+    marginTop: 2,
+  },
+
+  taskerPrice: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#213729",
+    color: "#ffffff",
   },
-  price: {
+
+  viewProfileText: {
     fontFamily: "Inter",
-    fontSize: 16,
-    color: "#215432",
+    fontSize: 13,
+    color: "#ffffff",
+    textDecorationLine: "underline",
   },
+
+  priceOffered: {
+    fontFamily: "InterBold",
+    fontSize: 14,
+    color: "#000",
+    marginBottom: 6,
+  },
+  
   message: {
     fontFamily: "Inter",
     fontSize: 14,
@@ -311,23 +356,30 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   chatBtn: {
-    backgroundColor: "#c1ff72",
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#215432",
     paddingVertical: 10,
-    paddingHorizontal: 20,
     borderRadius: 30,
+    alignItems: "center",
+    marginRight: 8,
+    backgroundColor: "#ffffff",
   },
   chatText: {
-    color: "#213729",
+    color: "#215432",
     fontFamily: "InterBold",
   },
   acceptBtn: {
-    backgroundColor: "#213729",
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#215432",
     paddingVertical: 10,
-    paddingHorizontal: 20,
     borderRadius: 30,
+    alignItems: "center",
+    backgroundColor: "#ffffff",
   },
   acceptText: {
-    color: "#ffffff",
+    color: "#215432",
     fontFamily: "InterBold",
   },
   empty: {
@@ -337,18 +389,13 @@ const styles = StyleSheet.create({
     color: "#999",
     fontSize: 14,
   },
-  review: {
-    fontFamily: "Inter",
-    fontSize: 13,
-    color: "#555",
-    marginBottom: 6,
-    fontStyle: "italic",
-  },
   buttonsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 12,
+    marginTop: 10,
+    paddingHorizontal: 16,
+    paddingBottom: 12,
   },
 
 
@@ -375,5 +422,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#213729",
   },
+
+  
   
 });
