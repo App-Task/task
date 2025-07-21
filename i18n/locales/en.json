@@ -29,7 +29,7 @@
     "missingFields": "Please enter both email and password."
   },
   "register": {
-    "title": "Create an Account ",
+    "title": "Create Your Account ",
     "fullName": "Full Name",
     "email": "Email",
     "password": "Password",
@@ -42,9 +42,9 @@
   "fillAllFields": "Please fill out all fields.",
   "mismatchTitle": "Password Mismatch",
   "passwordMismatch": "Passwords do not match.",
-  "accept": "I accept the",
+  "termsText": "By signing up you agree to our",
+  "terms": "Terms & Conditions",
   "privacy": "Privacy Policy",
-  "terms": "Terms and Conditions",
   "and": "and",
   "termsRequiredTitle": "Terms Required",
   "termsRequiredMessage": "You must accept the Terms and Privacy Policy to continue."

@@ -37,7 +37,6 @@ export default function RegisterScreen({ navigation, route }) {
   const [secure1, setSecure1] = useState(true);
   const [secure2, setSecure2] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
 
 
@@ -52,13 +51,6 @@ export default function RegisterScreen({ navigation, route }) {
       return;
     }
 
-    if (!acceptedTerms) {
-      Alert.alert(
-        t("register.termsRequiredTitle", "Terms Required"),
-        t("register.termsRequiredMessage", "You must accept the Terms and Privacy Policy to continue.")
-      );
-      return;
-    }
     // ✅ Password must contain at least one capital letter and one number
 const strongPasswordRegex = /^(?=.*[A-Z])(?=.*\d).+$/;
 if (!strongPasswordRegex.test(password)) {
@@ -136,15 +128,11 @@ if (!phoneRegex.test(phone.trim())) {
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.topBar}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Ionicons name="arrow-back" size={24} color="#213729" />
+            <Ionicons name="arrow-back" size={30} color="#213729" />
           </TouchableOpacity>
         </View>
 
-        <Image
-          source={require("../../assets/images/21.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        
 
         <Text style={styles.title}>{t("register.title")}</Text>
 
@@ -231,34 +219,28 @@ if (!phoneRegex.test(phone.trim())) {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.termsContainer}>
-  <TouchableOpacity
-    onPress={() => setAcceptedTerms(!acceptedTerms)}
-    style={styles.checkbox}
-  >
-    <Ionicons
-      name={acceptedTerms ? "checkbox" : "square-outline"}
-      size={20}
-      color="#213729"
-    />
-    <Text style={styles.termsText}>
-      {t("register.accept")}{" "}
-      <Text
-        style={styles.linkText}
-        onPress={() => navigation.navigate("PrivacyPolicy")}
-      >
-        {t("register.privacy")}
-      </Text>{" "}
-      {t("register.and")}{" "}
-      <Text
-        style={styles.linkText}
-        onPress={() => navigation.navigate("TermsAndConditions")}
-      >
-        {t("register.terms")}
-      </Text>
-    </Text>
-  </TouchableOpacity>
+        <View style={{ alignSelf: "flex-start", marginBottom: 15 }}>
+  <Text style={styles.requirement}>• Password should have at least one number</Text>
+  <Text style={styles.requirement}>• Password should have at least one capital letter</Text>
+  <Text style={styles.requirement}>• Password should have at least one special character</Text>
 </View>
+
+<Text style={styles.termsText}>
+  {t("register.termsText")}{" "}
+  <Text
+    style={styles.linkText}
+    onPress={() => navigation.navigate("TermsAndConditions")}
+  >
+    {t("register.terms")}
+  </Text>{" "}
+  {t("register.and")}{" "}
+  <Text
+    style={styles.linkText}
+    onPress={() => navigation.navigate("PrivacyPolicy")}
+  >
+    {t("register.privacy")}
+  </Text>
+</Text>
 
 
         <TouchableOpacity style={styles.button} onPress={handleRegister}>
@@ -298,10 +280,11 @@ const styles = StyleSheet.create({
   topBar: {
     width: "100%",
     alignItems: "flex-start",
-    marginBottom: 10,
+    marginBottom: 40,
   },
   backBtn: {
-    padding: 10,
+    padding: 5,        // smaller padding so it looks like the image
+    borderRadius: 50,  // rounded feel (optional)
   },
   logo: {
     width: width * 0.6,
@@ -309,9 +292,11 @@ const styles = StyleSheet.create({
     marginBottom: -30,
   },
   title: {
-    fontSize: 26,
+    fontSize: 22,
     fontFamily: "InterBold",
-    color: "#213729",
+    color: "#215432",
+    alignSelf: "flex-start",
+    marginTop: 10,   // Push down below the back button
     marginBottom: 30,
   },
   input: {
@@ -346,12 +331,13 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   button: {
-    backgroundColor: "#213729",
-    paddingVertical: 14,
+    backgroundColor: "#215432", // mild green
+    paddingVertical: 16,
     borderRadius: 30,
     width: "100%",
     alignItems: "center",
     marginBottom: 20,
+    marginTop: 25, // Add some space above the button
   },
   buttonText: {
     color: "#ffffff",
@@ -362,9 +348,11 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 14,
     color: "#666",
+    textAlign: "center",
+    marginTop: 5,
   },
   loginLink: {
-    color: "#213729",
+    color: "#215432",
     fontFamily: "InterBold",
   },
 
@@ -421,27 +409,27 @@ const styles = StyleSheet.create({
 
   termsContainer: {
     width: "100%",
-    marginBottom: 16,
-  },
-  
-  checkbox: {
-    flexDirection: "row",
+    marginBottom: 20,
     alignItems: "center",
-    flexWrap: "wrap",
   },
-  
+
   termsText: {
-    marginLeft: 8,
     fontFamily: "Inter",
     fontSize: 13,
-    color: "#213729",
-    flexShrink: 1,
+    color: "#333",
+    textAlign: "center",
+    marginTop: 20,
   },
-  
   linkText: {
     fontFamily: "InterBold",
     color: "#215432",
-    textDecorationLine: "underline",
+  },
+
+  requirement: {
+    fontFamily: "Inter",
+    fontSize: 12,
+    color: "#333",
+    marginBottom: 2,
   },
   
   
