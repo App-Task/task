@@ -98,7 +98,7 @@ export default function LoginScreen({ navigation, route }) {
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.topBar}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Ionicons name="arrow-back" size={24} color="#213729" />
+            <Ionicons name="arrow-back" size={30} color="#213729" />
           </TouchableOpacity>
         </View>
 
@@ -171,21 +171,24 @@ const styles = StyleSheet.create({
   topBar: {
     width: "100%",
     alignItems: "flex-start",
-    marginBottom: 20,
-  },
-  backBtn: {
-    padding: 10,
-  },
-  title: {
-    fontSize: 26,
-    fontFamily: "InterBold",
-    color: "#213729",
     marginBottom: 40,
   },
+  backBtn: {
+    padding: 5,        // smaller padding so it looks like the image
+    borderRadius: 50,  // rounded feel (optional)
+  },
+  title: {
+    fontSize: 22,
+    fontFamily: "InterBold",
+    color: "#215432",  // mild green as in design
+    alignSelf: "flex-start",
+    marginBottom: 40,
+  },
+  
   input: {
     width: "100%",
     backgroundColor: "#f2f2f2",
-    borderRadius: 12,
+    borderRadius: 8,
     paddingVertical: 14,
     paddingHorizontal: 18,
     fontSize: 16,
@@ -198,7 +201,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#f2f2f2",
-    borderRadius: 12,
+    borderRadius: 8,
     marginBottom: 10,
   },
   passwordInput: {
@@ -214,16 +217,17 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   forgot: {
-    alignSelf: "flex-end",
+    textAlign: "center",
     fontFamily: "Inter",
-    fontSize: 14,
+    fontSize: 13,
     color: "#666",
-    marginBottom: 30,
+    marginBottom: 25,
+    marginTop: 10,
   },
   button: {
-    backgroundColor: "#213729",
-    paddingVertical: 14,
-    borderRadius: 30,
+    backgroundColor: "#215432", // mild green
+    paddingVertical: 16,
+    borderRadius: 30,           // already correct
     width: "100%",
     alignItems: "center",
     marginBottom: 20,
@@ -237,9 +241,10 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 14,
     color: "#666",
+    marginTop: 5,
   },
   registerLink: {
-    color: "#213729",
+    color: "#215432",
     fontFamily: "InterBold",
   },
 
