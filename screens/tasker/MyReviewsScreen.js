@@ -119,30 +119,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
-    paddingTop: 60,
+    paddingTop: 60, // ✅ reduced so content starts closer to top
     paddingHorizontal: 20,
   },
+  
   backBtn: {
     padding: 4,
-    marginBottom: 30, // ✅ adds space below the arrow before the title
+    marginBottom: 20, // ✅ smaller, neat spacing
   },
+  
 
   header: {
     fontFamily: "InterBold",
-    fontSize: 28, // ✅ larger like screenshot
-    color: "#215432", // ✅ green
-    textAlign: "left", // ✅ left aligned
-    flex: 1,
+    fontSize: 28,
+    color: "#215432",
+    textAlign: "left",
+    marginBottom: 10, // ✅ add this to separate from the cards
   },
+  
   
   card: {
     backgroundColor: "#ffffff",
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#ccc",
-    marginBottom: 500,
-    overflow: "hidden", // ✅ keeps green header attached
+    marginBottom: 16, // ✅ normal spacing
+    overflow: "hidden",
   },
+  
   
   reviewHeader: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
