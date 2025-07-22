@@ -286,7 +286,7 @@ export default function TaskerProfileScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 60,
+    paddingTop: 100,
     paddingBottom: 60,
     paddingHorizontal: 24,
     backgroundColor: "#ffffff",
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
-    marginBottom: 20,
+    marginBottom: 40,
   },
   verifiedText: {
     marginLeft: 8,
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
-    marginBottom: 20,
+    marginBottom: 40,
   },
   declinedText: {
     marginLeft: 8,
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
-    marginBottom: 20,
+    marginBottom: 40,
   },
   pendingText: {
     marginLeft: 8,
