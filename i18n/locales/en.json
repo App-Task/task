@@ -317,7 +317,9 @@
   "taskerReviews": {
     "title": "My Reviews",
     "average": "Average Rating",
-    "empty": "You have not received any reviews yet."
+    "empty": "You have not received any reviews yet.",
+    "averageText": "Your average rating: {{rating}} ⭐"
+
   },
   "taskerMyTasks": {
   "status": "Status",

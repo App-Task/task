@@ -63,35 +63,39 @@ export default function MyReviewsScreen({ navigation }) {
 
     const renderItem = ({ item }) => (
       <View style={styles.card}>
-        <View style={styles.reviewHeader}>
-          <Text style={styles.reviewer}>{item.clientId?.name || "Client"}</Text>
-          <View style={styles.stars}>{renderStars(item.rating)}</View>
-        </View>
-        {item.comment ? <Text style={styles.comment}>{item.comment}</Text> : null}
-      </View>
+  <View style={styles.ratingHeader}>
+    <Text style={styles.ratingText}>{item.rating} ⭐</Text>
+  </View>
+  <View style={{ padding: 16 }}>
+    <Text style={styles.reviewer}>
+      Client Name: {item.clientId?.name || "Client"}
+    </Text>
+    {item.comment ? <Text style={styles.comment}>{item.comment}</Text> : null}
+  </View>
+</View>
+
     );
     
 
   return (
     <View style={styles.container}>
       {/* Back Header */}
-      <View style={styles.headerRow}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons
-            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-            size={24}
-            color="#213729"
-          />
-        </TouchableOpacity>
-        <Text style={styles.header}>{t("taskerReviews.title")}</Text>
-        <View style={{ width: 24 }} />
-      </View>
+     {/* Back Arrow */}
+<TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+  <Ionicons
+    name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+    size={30}
+    color="#215432"
+  />
+</TouchableOpacity>
 
-      <View style={styles.averageBox}>
-        <Text style={styles.averageLabel}>{t("taskerReviews.average")}:</Text>
-        <Text style={styles.averageValue}>{averageRating}</Text>
-        <Ionicons name="star" size={22} color="#c1ff72" />
-      </View>
+{/* Title below the arrow */}
+<Text style={styles.header}>{t("taskerReviews.title")}</Text>
+
+<Text style={styles.averageText}>
+  {t("taskerReviews.averageText", { rating: averageRating })}
+</Text>
+
 
       {loading ? (
         <ActivityIndicator color="#213729" size="large" style={{ marginTop: 40 }} />
@@ -118,45 +122,28 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
   },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
   backBtn: {
     padding: 4,
+    marginBottom: 30, // ✅ adds space below the arrow before the title
   },
+
   header: {
     fontFamily: "InterBold",
-    fontSize: 22,
-    color: "#213729",
-    textAlign: "center",
+    fontSize: 28, // ✅ larger like screenshot
+    color: "#215432", // ✅ green
+    textAlign: "left", // ✅ left aligned
     flex: 1,
   },
-  averageBox: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  averageLabel: {
-    fontFamily: "Inter",
-    fontSize: 16,
-    color: "#213729",
-    marginRight: 8,
-  },
-  averageValue: {
-    fontFamily: "InterBold",
-    fontSize: 18,
-    color: "#213729",
-    marginRight: 6,
-  },
+  
   card: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ffffff",
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 500,
+    overflow: "hidden", // ✅ keeps green header attached
   },
+  
   reviewHeader: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
@@ -176,6 +163,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#444",
     textAlign: I18nManager.isRTL ? "right" : "left",
+    marginTop: 8,
   },
   empty: {
     fontFamily: "Inter",
@@ -184,4 +172,26 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 60,
   },
+  averageText: {
+    fontFamily: "Inter",
+    fontSize: 16,
+    color: "#555",
+    marginBottom: 20,
+  },
+  averageHighlight: {
+    fontFamily: "InterBold",
+    color: "#215432", // ✅ green rating
+  },
+  ratingHeader: {
+    backgroundColor: "#215432", // ✅ green top bar
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  ratingText: {
+    fontFamily: "InterBold",
+    fontSize: 14,
+    color: "#ffffff",
+  },
+  
+  
 });

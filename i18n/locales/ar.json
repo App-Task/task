@@ -313,7 +313,9 @@
   "taskerReviews": {
     "title": "تقييماتي",
     "average": "متوسط التقييم",
-    "empty": "لم تستلم أي تقييمات بعد."
+    "empty": "لم تستلم أي تقييمات بعد.",
+    "averageText": "تقييمك المتوسط: {{rating}} ⭐"
+
   },
  "taskerMyTasks": {
   "status": "الحالة",
