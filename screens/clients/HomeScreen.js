@@ -77,41 +77,56 @@ export default function ClientHomeScreen() {
     <TouchableOpacity
       onPress={() => navigation.navigate("TaskDetails", { task: item })}
     >
-      <Animated.View
-        entering={FadeInRight.duration(500)}
-        style={styles.taskItem}
-      >
-        {/* LEFT SIDE: Task title */}
-        <View style={styles.taskTextWrapper}>
-          <Text style={styles.taskTitle}>{item.title}</Text>
-        </View>
-  
-        {/* RIGHT SIDE: Status badge */}
-        <View style={styles.taskBadgeWrapper}>
+      <Animated.View entering={FadeInRight.duration(500)} style={styles.taskItem}>
+        {/* ✅ TOP ROW: Status + Date */}
+        <View style={styles.taskTopRow}>
           <View
             style={[
               styles.taskStatusBadge,
               {
                 backgroundColor:
-                  item.status === "Pending" ? "#c1ff72" : "#215432",
+                  item.status === "Pending"
+                    ? "#FFA500" // Orange for Pending
+                    : item.status === "Started"
+                    ? "#FFD700" // Yellow for Started
+                    : item.status === "Completed"
+                    ? "#38cb82" // Green for Completed
+                    : "#FF0000", // Red for Cancelled
+
               },
             ]}
           >
-            <Text
-              style={[
-                styles.taskStatusText,
-                {
-                  color: item.status === "Pending" ? "#213729" : "#ffffff",
-                },
-              ]}
-            >
-              {t(`clientHome.status.${item.status.toLowerCase()}`)}
-            </Text>
+            <Text style={[styles.taskStatusText]}>{item.status}</Text>
+
           </View>
+  
+          <Text style={styles.taskDate}>
+            {new Date(item.createdAt).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })}{" "}
+            •{" "}
+            {new Date(item.createdAt).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Text>
         </View>
+  
+        {/* ✅ Divider Line Above Title */}
+        <View style={styles.taskDivider} />
+
+        {/* ✅ TASK TITLE */}
+        <Text style={styles.taskTitle}>{item.title}</Text>
+
+  
+        {/* ✅ VIEW DETAILS LINK */}
+        <Text style={styles.viewDetails}>View Details</Text>
       </Animated.View>
     </TouchableOpacity>
   );
+  
   
 
   return (
@@ -171,13 +186,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
-    paddingTop: 60,
+    paddingTop: 120,
     paddingHorizontal: 24,
   },
   hello: {
-    fontSize: 24,
+    fontSize: 32,
     fontFamily: "InterBold",
-    color: "#213729",
+    color: "#3B5C48",
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   sub: {
@@ -189,12 +204,13 @@ const styles = StyleSheet.create({
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   button: {
-    backgroundColor: "#213729",
+    backgroundColor: "#2E4A3A",
     paddingVertical: 14,
-    borderRadius: 30,
+    borderRadius: 50, // full pill
     alignItems: "center",
     marginBottom: 30,
   },
+  
   buttonText: {
     color: "#ffffff",
     fontFamily: "InterBold",
@@ -208,14 +224,56 @@ const styles = StyleSheet.create({
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   taskItem: {
-    backgroundColor: "#f9f9f9",
-    padding: 16,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#dcdcdc", // lighter gray border
+    padding: 14,
     borderRadius: 12,
     marginBottom: 14,
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 1, // Android light shadow
+  },
+  
+  
+  taskTopRow: {
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 6,
   },
+  taskDate: {
+    fontSize: 12,
+    color: "#666",
+    fontFamily: "Inter",
+  },
+  taskStatusBadge: {
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  taskStatusText: {
+    color: "#ffffff",
+    fontFamily: "InterBold",
+    fontSize: 12,
+  },
+  viewDetails: {
+    color: "#213729", // ✅ same as title color
+    fontSize: 13,
+    fontFamily: "Inter",
+    marginTop: 4,
+    textDecorationLine: "underline", // ✅ underlined
+  },
+  taskDivider: {
+    height: 2,
+    backgroundColor: "#e0e0e0", // ✅ light gray line
+    marginVertical: 6,
+  },
+  
+  
+  
   taskTitle: {
     fontFamily: "Inter",
     fontSize: 16,
@@ -279,12 +337,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  
-  taskStatusText: {
-    fontSize: 12,
-    fontFamily: "InterBold",
-  },
-  
   
   
   
