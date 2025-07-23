@@ -278,7 +278,7 @@ style={{
   value={searchQuery}
   onChangeText={setSearchQuery}
   style={styles.searchInput}
-  placeholder={t("taskerExplore.searchPlaceholder", "Search by job title")}
+  placeholder={t("taskerExplore.searchPlaceholder", "Search by job title...")}
   placeholderTextColor="#ffffff"
 />
 
