@@ -303,7 +303,9 @@
     "price": "Price",
     "bids": "Bids",
     "viewDetails": "View Details",
-    "noTasks": "No tasks available right now."
+    "noTasks": "No tasks available right now.",
+    "greeting": "Hi {{name}},",
+  "subGreeting": "Let's find some tasks to do!"
   },
   "taskerMessages": {
     "title": "Messages"

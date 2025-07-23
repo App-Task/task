@@ -24,6 +24,8 @@ import axios from "axios";
 import { getToken } from "../../services/authStorage";
 import { fetchCurrentUser } from "../../services/auth"; // ✅ make sure path is correct
 import { useFocusEffect } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+
 
 const JOB_TYPES = ["Cleaning", "Moving", "Delivery", "Repairs"];
 
@@ -48,6 +50,8 @@ export default function ExploreTasksScreen({ navigation, route }) {
   const [showModal, setShowModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [showVerifyBanner, setShowVerifyBanner] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
 
 
   // Scroll animation logic
@@ -83,6 +87,7 @@ export default function ExploreTasksScreen({ navigation, route }) {
   const fetchTasks = async () => {
     try {
       const user = await fetchCurrentUser();
+      setCurrentUser(user); // ✅ Store user info
       console.log("👤 CURRENT USER:", user);
       if (!user.isVerified) {
         setShowVerifyBanner(true);
@@ -187,48 +192,56 @@ setFilteredTasks(availableTasks);
   
   const renderTask = ({ item }) => (
     <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
-<View style={styles.imageWrapper}>
-  {item.images?.length > 0 ? (
-    <Image source={{ uri: item.images[0] }} style={styles.image} />
-  ) : (
-    <View style={styles.placeholderImage}>
-      <Text style={styles.placeholderText}>No Image</Text>
-    </View>
-  )}
-</View>
+  {/* ✅ Green Header */}
+  <View style={styles.cardHeader}>
+    <Text style={styles.cardHeaderText}>
+      Posted: {new Date(item.createdAt).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })}{" "}
+      •{" "}
+      {new Date(item.createdAt).toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}
+    </Text>
+  </View>
 
-      <View style={styles.info}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.sub}>
-          {t("taskerExplore.location")}: {item.location}
-        </Text>
-        <Text style={styles.sub}>
-          {t("taskerExplore.price")}: {item.budget} BHD
-        </Text>
-        <Text style={styles.sub}>
-  {t("taskerExplore.bids")}: {item.bidCount || 0}
-</Text>
-<Text style={styles.sub}>
-  Posted: {formatDateTime(item.createdAt)}
-</Text>
+  {/* ✅ Card Body */}
+  <View style={styles.cardBody}>
+    <Text style={styles.title}>{item.title}</Text>
 
+    {/* ✅ View Details (Underlined) */}
+    <Text
+      style={styles.viewDetails}
+      onPress={() =>
+        navigation.navigate("TaskerTaskDetails", { task: item })
+      }
+    >
+      View Details
+    </Text>
+  </View>
+</Animated.View>
 
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() =>
-            navigation.navigate("TaskerTaskDetails", { task: item })
-          }
-        >
-          <Text style={styles.buttonText}>{t("taskerExplore.viewDetails")}</Text>
-        </TouchableOpacity>
-      </View>
-    </Animated.View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{t("taskerExplore.header")}</Text>
+      <View style={styles.headerRow}>
+  <View>
+    <Text style={styles.greeting}>
+      {t("taskerExplore.greeting", { name: currentUser?.name || "Tasker" })}
+    </Text>
+    <Text style={styles.subGreeting}>{t("taskerExplore.subGreeting")}</Text>
+  </View>
+
+  <TouchableOpacity onPress={() => setShowModal(true)}>
+  <Ionicons name="filter-outline" size={26} color="#213729" />
+</TouchableOpacity>
+
+</View>
+
 
       {showVerifyBanner === true && (
   <View style={styles.verifyBanner}>
@@ -266,18 +279,9 @@ style={{
   onChangeText={setSearchQuery}
   style={styles.searchInput}
   placeholder={t("taskerExplore.searchPlaceholder", "Search by job title")}
-  placeholderTextColor="#999"
+  placeholderTextColor="#ffffff"
 />
 
-
-      <TouchableOpacity
-        style={styles.filterButton}
-        onPress={() => setShowModal(true)}
-      >
-        <Text style={styles.filterText}>
-          {jobType ? `Filter: ${jobType}` : "Filter by job type"}
-        </Text>
-      </TouchableOpacity>
 
 
 
@@ -355,15 +359,16 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
   searchInput: {
-    height: 44,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    fontSize: 14,
-    marginBottom: 10,
+    height: 48,
+    backgroundColor: "#213729", // ✅ same dark green as screenshot
+    borderRadius: 30,            // ✅ fully rounded edges
+    paddingHorizontal: 18,
+    fontSize: 15,
+    marginBottom: 20,
     fontFamily: "Inter",
-    color: "#213729",
+    color: "#ffffff",            // ✅ white text when typing
   },
+  
   filterButton: {
     backgroundColor: "#e0e0e0",
     borderRadius: 10,
@@ -397,12 +402,36 @@ const styles = StyleSheet.create({
     marginTop: 80,
   },
   card: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ffffff",
     borderRadius: 12,
-    marginBottom: 20,
+    marginBottom: 20,        // ✅ more space between cards
+    marginHorizontal: 2,     // ✅ slight spacing from screen edges
+    borderWidth: 1,
+    borderColor: "#dcdcdc",
     overflow: "hidden",
-    elevation: 2,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3,
   },
+  cardBody: {
+    paddingVertical: 16,    // ✅ slightly more vertical spacing
+    paddingHorizontal: 18,
+  },
+  
+  
+  cardHeader: {
+    backgroundColor: "#213729", // ✅ dark green like screenshot
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  cardHeaderText: {
+    color: "#ffffff",
+    fontFamily: "InterBold",
+    fontSize: 12,
+  },
+  
   image: {
     width: "100%",
     height: 150,
@@ -412,10 +441,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: "InterBold",
-    fontSize: 18,
+    fontSize: 16,
     color: "#213729",
     marginBottom: 6,
     textAlign: I18nManager.isRTL ? "right" : "left",
+    marginTop: 4, // ✅ slight top margin for better spacing
   },
   sub: {
     fontFamily: "Inter",
@@ -487,6 +517,33 @@ const styles = StyleSheet.create({
     color: "#888",
     fontFamily: "Inter",
     fontSize: 14,
+  },
+  viewDetails: {
+    color: "#213729",
+    fontFamily: "InterBold",
+    fontSize: 13,
+    textDecorationLine: "underline", // ✅ underlined
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  greeting: {
+    fontFamily: "InterBold",
+    fontSize: 26,
+    color: "#213729",
+    marginTop: 30,
+  },
+  subGreeting: {
+    fontFamily: "Inter",
+    fontSize: 16,
+    color: "#666",
+  },
+  filterIcon: {
+    fontSize: 22,
+    color: "#213729",
   },
   
   
