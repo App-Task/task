@@ -178,126 +178,189 @@ allTasks.forEach((task) => {
   };
   
   const renderTask = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate("TaskDetails", { task: item })}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("TaskDetails", { task: item })}
+    >
       <View style={styles.card}>
+        {/* ✅ Date Row */}
+        <Text style={styles.cardDate}>
+          {new Date(item.createdAt).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}{" "}
+          •{" "}
+          {new Date(item.createdAt).toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </Text>
+  
+        {/* ✅ Divider Line Above Title */}
+        <View style={{ height: 1, backgroundColor: "#e0e0e0", marginVertical: 6 }} />
+  
+        {/* ✅ Task Title & Price */}
         <Text style={styles.cardTitle}>{item.title}</Text>
         <Text style={styles.cardPrice}>{item.budget} BHD</Text>
-        {activeTab === "Previous" && (
-        <Text style={{
+  
+       {/* ✅ Completed / Cancelled Label for Previous Tab */}
+{activeTab === "Previous" && (
+  <>
+    {item.status?.toLowerCase() === "completed" && (
+      <Text
+        style={{
           fontFamily: "InterBold",
-          color: item.status?.toLowerCase() === "cancelled" ? "#c00" : "#215432",
+          color: "#27a567",
           marginTop: 4,
-        }}>
-          {t(
-  `clientMyTasks.${item.status?.toLowerCase() === "cancelled" ? "cancelled" : "completed"}`,
-  item.status
+        }}
+      >
+        Completed
+      </Text>
+    )}
+    {item.status?.toLowerCase() === "cancelled" && (
+      <Text
+        style={{
+          fontFamily: "InterBold",
+          color: "#c00",
+          marginTop: 4,
+        }}
+      >
+        Cancelled by {item.cancelledBy === userId ? "you" : "Tasker"}
+      </Text>
+    )}
+  </>
 )}
-
-        </Text>
-      )}
 
   
-        <View style={styles.detailHint}>
-          <Text style={styles.detailHintText}>View Task Details</Text>
-          <Text style={styles.detailArrow}>›</Text>
-        </View>
-        
-      {/* ⬇️ ADD THIS BLOCK RIGHT HERE (inside renderTask) */}
-      {activeTab === "Cancelled" && item.cancelledBy && (
-  <Text style={{ fontFamily: "Inter", color: "#c00", marginTop: 8 }}>
-    Cancelled by {item.cancelledBy === userId ? "You" : "Tasker"}
-  </Text>
-)}
-{["Pending", "Started", "Cancelled"].includes(activeTab) && item.taskerId && (
-  <View style={{ marginTop: 10, flexDirection: "row", gap: 12 }}>
-    {/* View Profile Button */}
-    <TouchableOpacity
-      style={{
-        backgroundColor: "#213729",
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 30,
-      }}
-      onPress={() =>
-        navigation.navigate("TaskerProfile", {
-          taskerId: typeof item.taskerId === "string" ? item.taskerId : item.taskerId?._id,
-        })
-      }
-      
-    >
-      <Text style={{ color: "#fff", fontFamily: "InterBold", fontSize: 13 }}>
-        View Profile
-      </Text>
-    </TouchableOpacity>
+        {/* ✅ Cancelled By Info */}
+        {activeTab === "Cancelled" && item.cancelledBy && (
+          <Text
+            style={{ fontFamily: "Inter", color: "#c00", marginTop: 8 }}
+          >
+            Cancelled by {item.cancelledBy === userId ? "You" : "Tasker"}
+          </Text>
+        )}
+  
+        {/* ✅ View Details Hint */}
+        <Text style={styles.viewDetails}>View Task Details</Text>
 
-    {/* Report Tasker Button */}
-    <TouchableOpacity
-      style={{
-        backgroundColor: "#fff",
-        borderColor: "#213729",
-        borderWidth: 1,
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 30,
-      }}
-      disabled={reportingTaskId === item._id}
-      onPress={() => {
-        Alert.prompt(
-          "Report Tasker",
-          "Enter reason for reporting this tasker:",
-          [
-            { text: "Cancel", style: "cancel" },
-            {
-              text: "Submit",
-              onPress: async (reason) => {
-                try {
-                  setReportingTaskId(item._id);
-                  setIsReporting(true);
-                  const token = await SecureStore.getItemAsync("token");
-                  await fetch("https://task-kq94.onrender.com/api/reports", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                      reporterId: userId,
-                      reportedUserId: item.taskerId,
-                      reason,
-                      taskId: item._id,
-                    }),
-                  });
-                  setReportedTaskIds((prev) => [...prev, item._id]);
-                  Alert.alert("Reported", "Tasker has been reported successfully.");
-                } catch (err) {
-                  console.error("❌ Report error:", err.message);
-                  Alert.alert("Error", "Failed to submit report.");
-                } finally {
-                  setIsReporting(false);
-                  setReportingTaskId(null);
+  
+        {/* ✅ View Profile & Report Buttons */}
+        {["Pending", "Started", "Cancelled"].includes(activeTab) &&
+          item.taskerId && (
+            <View
+              style={{ marginTop: 10, flexDirection: "row", gap: 12 }}
+            >
+              {/* View Profile */}
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#213729",
+                  paddingVertical: 8,
+                  paddingHorizontal: 16,
+                  borderRadius: 30,
+                }}
+                onPress={() =>
+                  navigation.navigate("TaskerProfile", {
+                    taskerId:
+                      typeof item.taskerId === "string"
+                        ? item.taskerId
+                        : item.taskerId?._id,
+                  })
                 }
-              },
-            },
-          ],
-          "plain-text"
-        );
-      }}
-    >
-      <Text style={{ color: "#213729", fontFamily: "InterBold", fontSize: 13 }}>
-        Report Tasker
-      </Text>
-    </TouchableOpacity>
-  </View>
-)}
-
-
-
-
-
-    </View>
-      
+              >
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontFamily: "InterBold",
+                    fontSize: 13,
+                  }}
+                >
+                  View Profile
+                </Text>
+              </TouchableOpacity>
+  
+              {/* Report Tasker */}
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#fff",
+                  borderColor: "#213729",
+                  borderWidth: 1,
+                  paddingVertical: 8,
+                  paddingHorizontal: 16,
+                  borderRadius: 30,
+                }}
+                disabled={reportingTaskId === item._id}
+                onPress={() => {
+                  Alert.prompt(
+                    "Report Tasker",
+                    "Enter reason for reporting this tasker:",
+                    [
+                      { text: "Cancel", style: "cancel" },
+                      {
+                        text: "Submit",
+                        onPress: async (reason) => {
+                          try {
+                            setReportingTaskId(item._id);
+                            setIsReporting(true);
+                            const token =
+                              await SecureStore.getItemAsync("token");
+                            await fetch(
+                              "https://task-kq94.onrender.com/api/reports",
+                              {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization: `Bearer ${token}`,
+                                },
+                                body: JSON.stringify({
+                                  reporterId: userId,
+                                  reportedUserId: item.taskerId,
+                                  reason,
+                                  taskId: item._id,
+                                }),
+                              }
+                            );
+                            setReportedTaskIds((prev) => [
+                              ...prev,
+                              item._id,
+                            ]);
+                            Alert.alert(
+                              "Reported",
+                              "Tasker has been reported successfully."
+                            );
+                          } catch (err) {
+                            console.error("❌ Report error:", err.message);
+                            Alert.alert(
+                              "Error",
+                              "Failed to submit report."
+                            );
+                          } finally {
+                            setIsReporting(false);
+                            setReportingTaskId(null);
+                          }
+                        },
+                      },
+                    ],
+                    "plain-text"
+                  );
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#213729",
+                    fontFamily: "InterBold",
+                    fontSize: 13,
+                  }}
+                >
+                  Report Tasker
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+      </View>
     </TouchableOpacity>
   );
+  
   
 
   return (
@@ -505,11 +568,10 @@ const styles = StyleSheet.create({
   },
   tabs: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#e9e9e9",
     borderRadius: 30,
-    padding: 6,
+    padding: 4,
+    marginBottom: 20,
   },
   tab: {
     flex: 1,
@@ -518,35 +580,55 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   activeTab: {
-    backgroundColor: "#213729",
+    backgroundColor: "#213729", // dark green like screenshot
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3,
+    elevation: 2,
   },
   tabText: {
     fontFamily: "Inter",
-    color: "#213729",
+    color: "#555", // softer grey for inactive tabs
     fontSize: 14,
   },
   activeTabText: {
-    color: "#ffffff",
+    color: "#fff",
     fontFamily: "InterBold",
   },
+  
   card: {
-    backgroundColor: "#f9f9f9",
-    padding: 18,
-    borderRadius: 12,
-    marginBottom: 16,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    paddingVertical: 14,  // ✅ better vertical spacing
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    marginBottom: 18,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3,
+    elevation: 2,
   },
+  
+  
+  
   cardTitle: {
     fontFamily: "InterBold",
-    fontSize: 16,
+    fontSize: 17, // ✅ slightly larger
     color: "#213729",
     marginBottom: 6,
-    textAlign: I18nManager.isRTL ? "right" : "left", // ✅
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
+  
   cardPrice: {
-    fontFamily: "Inter",
-    fontSize: 14,
+    fontFamily: "InterBold", // ✅ bold like screenshot
+    fontSize: 15,
     color: "#215432",
+    marginBottom: 6,
   },
+  
   emptyText: {
     textAlign: "center",
     color: "#999",
@@ -566,12 +648,6 @@ const styles = StyleSheet.create({
     color: "#555",
   },
   
-  detailArrow: {
-    fontSize: 16,
-    color: "#555",
-    marginLeft: 4,
-    fontFamily: "InterBold",
-  },
   
   sectionTitle: {
     fontFamily: "InterBold",
@@ -606,6 +682,23 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     color: "#fff",
   },
+
+  cardDate: {
+    fontFamily: "Inter",
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 4,
+  },
+
+  viewDetails: {
+    color: "#213729",       // ✅ green like screenshot
+    fontFamily: "InterBold",
+    fontSize: 13,
+    marginTop: 8,           // ✅ proper spacing from previous content
+    textDecorationLine: "underline", // ✅ underlined
+  },
+  
+  
   
   
   
