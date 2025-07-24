@@ -181,17 +181,24 @@ export default function DocumentsScreen({ navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header */}
-      <View style={styles.headerRow}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons
-            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-            size={24}
-            color="#213729"
-          />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>{t("taskerDocuments.title")}</Text>
-        <View style={{ width: 24 }} />
-      </View>
+    {/* Back Button Only */}
+<View style={styles.headerRow}>
+  <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+    <Ionicons
+      name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+      size={30}
+      color="#213729"
+    />
+  </TouchableOpacity>
+</View>
+
+{/* Title + Description BELOW the arrow */}
+<Text style={styles.finalTitle}>Final Check!</Text>
+<Text style={styles.finalDesc}>
+  For verification, please upload your CPR. This keeps your account and our platform secure.
+</Text>
+
+
 
       {/* Document List */}
       {documents.length > 0 ? (
@@ -217,7 +224,11 @@ export default function DocumentsScreen({ navigation }) {
           </View>
         ))
       ) : (
-        <Text style={styles.empty}>{t("taskerDocuments.empty")}</Text>
+        <TouchableOpacity style={styles.uploadBox} onPress={uploadDocument}>
+  <Ionicons name="cloud-upload-outline" size={40} color="#999" />
+  <Text style={styles.uploadBoxText}>Upload Document</Text>
+</TouchableOpacity>
+
       )}
 
       {/* Upload */}
@@ -278,6 +289,8 @@ const styles = StyleSheet.create({
   },
   backBtn: {
     padding: 4,
+    borderRadius: 50,
+    marginTop: 10,
   },
   headerText: {
     fontFamily: "InterBold",
@@ -315,11 +328,45 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 30,
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 0, // no extra top margin, spacing handled by uploadBox
   },
+  
   buttonText: {
     fontFamily: "InterBold",
     fontSize: 16,
     color: "#ffffff",
   },
+  finalTitle: {
+    fontFamily: "InterBold",
+    fontSize: 22,
+    color: "#213729",
+    marginBottom: 6,
+    marginTop: 10,
+
+  },
+  finalDesc: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    lineHeight: 20,
+    marginBottom: 10, // adds consistent space before the upload box
+  },
+  
+  uploadBox: {
+    backgroundColor: "#f1f1f1",
+    borderRadius: 12,
+    paddingVertical: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 30, // increased spacing from title
+    marginBottom: 40, // added space before submit button
+  },
+  
+  uploadBoxText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#999",
+    marginTop: 8,
+  },
+  
 });
