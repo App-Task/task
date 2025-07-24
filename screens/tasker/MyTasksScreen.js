@@ -106,80 +106,65 @@ const res = await axios.get(url, {
       >
         <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
           {/* Title */}
-          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.dateText}>
+  {new Date(item.createdAt).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  })}{" "}
+  •{" "}
+  {new Date(item.createdAt).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}
+</Text>
+
+<View style={styles.cardDivider} />
+
+<Text style={styles.title}>{item.title}</Text>
+
   
           {/* Status Line */}
-          <Text
-            style={[
-              styles.sub,
-              item.status === "cancelled" && {
-                color: "#c00",
-                fontWeight: "bold",
-              },
-            ]}
-          >
-            {t("taskerMyTasks.status")}:{" "}
-            {item.status === "cancelled"
-              ? `Cancelled by ${cancelledByTasker ? "you" : "client"}`
-              : t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
-          </Text>
-
-          {tab === "previous" &&
-  item.status?.toLowerCase() === "cancelled" &&
-  item.cancelledBy && (
-    <Text style={styles.cancelText}>
-       Cancelled by{" "}
-      {typeof item.cancelledBy === "object"
-        ? item.cancelledBy._id === taskerId
-          ? "You"
-          : "Client"
-        : item.cancelledBy === taskerId
-        ? "You"
-        : "Client"}
-    </Text>
+          {tab === "previous" ? (
+  <Text
+    style={
+      item.status?.toLowerCase() === "completed"
+        ? styles.statusText
+        : styles.cancelledText
+    }
+  >
+    {item.status?.toLowerCase() === "completed"
+      ? "Completed"
+      : `Cancelled by ${item.cancelledBy?._id === taskerId ? "you" : "Client"}`}
+  </Text>
+) : (
+  <Text
+    style={[
+      styles.sub,
+      item.status === "cancelled" && {
+        color: "#c00",
+        fontWeight: "bold",
+      },
+    ]}
+  >
+    {t("taskerMyTasks.status")}:{" "}
+    {item.status === "cancelled"
+      ? `Cancelled by ${cancelledByTasker ? "you" : "client"}`
+      : t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
+  </Text>
 )}
 
-  
-          {/* Cancelled Notice */}
-          {item.status === "cancelled" && (
-            <View
-              style={{
-                backgroundColor: "#ffe5e5",
-                padding: 10,
-                borderRadius: 8,
-                borderColor: "#c00",
-                borderWidth: 1,
-                marginTop: 6,
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: "InterBold",
-                  fontSize: 14,
-                  color: "#c00",
-                  textAlign: I18nManager.isRTL ? "right" : "left",
-                }}
-              >
-                ❗ This task was cancelled by{" "}
-                {cancelledByTasker
-                  ? "you"
-                  : item.cancelledBy?.name || "the client"}
-              </Text>
-            </View>
-          )}
   
           {/* Action Buttons */}
 
-          {tab === "bidSent" && (
-  <TouchableOpacity
-    style={[styles.btn, { alignSelf: "flex-start", marginBottom: 10 }]}
-    onPress={() =>
-      navigation.navigate("TaskerTaskDetails", { task: item })
-    }
-  >
-<Text style={styles.btnText}>View Details</Text>
+          <TouchableOpacity
+  onPress={() =>
+    navigation.navigate("TaskerTaskDetails", { task: item })
+  }
+>
+  <Text style={styles.detailsLink}>View Details</Text>
 </TouchableOpacity>
-)}
+
 
           <View style={styles.actions}>
             {tab === "active" && (
@@ -390,26 +375,28 @@ const styles = StyleSheet.create({
   },
   tabs: {
     flexDirection: "row",
-    marginBottom: 20,
     justifyContent: "center",
+    backgroundColor: "#f2f2f2",
+    borderRadius: 30,
+    padding: 4,
+    marginBottom: 20,
   },
   tab: {
+    flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 24,
-    borderRadius: 20,
-    marginHorizontal: 10,
-    backgroundColor: "#f0f0f0",
+    borderRadius: 30,
+    alignItems: "center",
   },
   tabText: {
     fontFamily: "Inter",
     fontSize: 15,
-    color: "#666",
+    color: "#000",
   },
   activeTab: {
-    backgroundColor: "#c1ff72",
+    backgroundColor: "#213729", // dark green active state
   },
   activeTabText: {
-    color: "#213729",
+    color: "#ffffff",
     fontFamily: "InterBold",
   },
   empty: {
@@ -420,16 +407,18 @@ const styles = StyleSheet.create({
     color: "#999",
   },
   card: {
-    backgroundColor: "#f9f9f9",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#dcdcdc",
+    padding: 14,
+    marginBottom: 14,
   },
   title: {
     fontFamily: "InterBold",
-    fontSize: 18,
-    color: "#213729",
-    marginBottom: 6,
+  fontSize: 16,
+  color: "#000",
+  marginBottom: 4,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   sub: {
@@ -505,6 +494,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginTop: 4,
     borderRadius: 20,
+  },
+  dateText: {
+    fontFamily: "Inter",
+    fontSize: 12,
+    color: "#777",
+    marginBottom: 6,
+  },
+  statusText: {
+    fontFamily: "Inter",
+    fontSize: 13,
+    color: "#215432", // mild green for "Completed"
+  },
+  cancelledText: {
+    fontFamily: "Inter",
+    fontSize: 13,
+    color: "#c00", // red for cancelled
+  },
+  detailsLink: {
+    fontFamily: "InterBold",
+    fontSize: 13,
+    color: "#000",
+    textDecorationLine: "underline",
+    marginTop: 4,
+  },
+  cardDivider: {
+    height: 2,
+    backgroundColor: "#e0e0e0", // light grey line
+    marginBottom: 8,
   },
   
   
