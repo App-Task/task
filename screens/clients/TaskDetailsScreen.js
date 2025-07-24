@@ -30,6 +30,8 @@ export default function TaskDetailsScreen({ route, navigation }) {
   const [bids, setBids] = useState([]);
   const [completing, setCompleting] = useState(false);
 const [canceling, setCanceling] = useState(false);
+const [previewImage, setPreviewImage] = useState(null);
+
 
 
 
@@ -134,6 +136,22 @@ const [canceling, setCanceling] = useState(false);
       ]
     );
   };
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "Completed":
+        return { backgroundColor: "#4CAF50" }; // Green
+      case "Pending":
+        return { backgroundColor: "#FF9800" }; // Orange
+      case "Started":
+        return { backgroundColor: "#FFEB3B" }; // Yellow
+      case "Cancelled":
+        return { backgroundColor: "#F44336" }; // Red
+      default:
+        return { backgroundColor: "#999" }; // Grey fallback
+    }
+  };
+  
   
 // comment
   if (loading) {
@@ -146,175 +164,179 @@ const [canceling, setCanceling] = useState(false);
 
   const { title, description, location, budget, images = [] } = task;
 
+  
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         {/* Header */}
-        <View style={styles.headerRow}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="#213729" />
-          </TouchableOpacity>
-          <Text style={styles.heading} numberOfLines={1}>{title}</Text>
-          <View style={styles.backBtn} />
-        </View>
-
-        {/* Images */}
-{/* Images */}
-{images.length > 0 && (
-  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
-    {images.map((img, index) => (
-      <TouchableOpacity
-        key={index}
-        onPress={() => navigation.navigate("ImageViewer", { uri: img })}
-      >
-        <Image source={{ uri: img }} style={styles.image} />
-      </TouchableOpacity>
-    ))}
-  </ScrollView>
-)}
-
-
-        {/* Description */}
-        <Text style={styles.label}>{t("clientTaskDetails.description")}</Text>
-        <Text style={styles.text}>{description}</Text>
-
-        {/* Address */}
-        <Text style={styles.label}>{t("clientTaskDetails.address")}</Text>
-        <Text style={styles.text}>{location}</Text>
-
-        {/* Category */}
-        <Text style={styles.label}>{t("clientTaskDetails.category")}</Text>
-        <Text style={styles.text}>{task.category || t("clientTaskDetails.notProvided")}</Text>
-
-        {/* Status */}
-        <Text style={styles.label}>{t("clientTaskDetails.status")}</Text>
-        <Text style={styles.text}>{task.status}</Text>
-
-        {/* Bid Count */}
-        <Text style={styles.label}>{t("clientTaskDetails.bidCount")}</Text>
-        <Text style={styles.text}>{task.bidCount}</Text>
-
-        {/* Created At */}
-        <Text style={styles.label}>{t("clientTaskDetails.createdAt")}</Text>
-        <Text style={styles.text}>
-          {new Date(task.createdAt).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </Text>
-
-
-        {/* Price */}
-        <View style={styles.priceBox}>
-          <Text style={styles.priceLabel}>{t("clientTaskDetails.offeredPrice")}</Text>
-          <Text style={styles.price}>{budget} BHD</Text>
-        </View>
-
-        
-{/* Actions */}
-<View style={styles.actions}>
-  {/* Show if task is Pending */}
-  {task.status === "Pending" && (
-  <>
-    {bids.length > 0 ? (
-      <Text style={styles.notice}>
-        You can't edit this task because a tasker has already placed a bid.
-      </Text>
-    ) : (
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("EditTask", { task })}
-      >
-        <Text style={styles.buttonText}>{t("clientTaskDetails.editTask")}</Text>
-      </TouchableOpacity>
-    )}
-
-    <TouchableOpacity
-      style={styles.button}
-      onPress={() => navigation.navigate("ViewBids", { taskId: task._id })}
-    >
-      <Text style={styles.buttonText}>{t("clientTaskDetails.viewBids")}</Text>
-    </TouchableOpacity>
-  </>
-)}
-
-
-  {/* Show if task is Started */}
-  {task.status === "Started" && (
-  <TouchableOpacity
-  style={styles.button}
-  onPress={() => {
-    Alert.alert(
-      "Mark as Completed",
-      "Are you sure you want to mark this task as completed?",
-      [
-        { text: "No" },
-        {
-          text: "Yes",
-          onPress: async () => {
-            try {
-              setCompleting(true);
-              await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, {
-                method: "PATCH",
-              });
-              const updated = await getTaskById(task._id);
-              setCompleting(false);
-              navigation.navigate("ClientHome", {
-                screen: "Tasks",
-                params: {
-                  refreshTasks: true,
-                  targetTab: "Previous", // ✅ correct main tab
-                  subTab: "Completed",   // ✅ correct sub-tab
-                  unique: Date.now(),
-                },
-              });
-              
-            } catch (err) {
-              setCompleting(false);
-              console.error("❌ Failed to complete task:", err.message);
-              Alert.alert("Error", "Could not mark the task as completed.");
-            }
-          }
-          
-        },
-      ]
-    );
-  }}
->
-  <Text style={styles.buttonText}>Mark as Completed</Text>
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+  <Ionicons name="arrow-back" size={30} color="#213729" />
 </TouchableOpacity>
 
+<View style={styles.topContent}>
+  <View style={styles.topRow}>
+    <View style={{ flex: 1 }}>
+      <Text style={styles.heading}>{title}</Text>
+      <Text style={styles.subText}>Offered Price: {budget} BHD</Text>
+      <Text style={styles.subText}>
+        {new Date(task.createdAt).toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })}{" "}
+        • {new Date(task.createdAt).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </Text>
+    </View>
+
+    <View style={[styles.statusBadge, getStatusStyle(task.status)]}>
+      <Text style={styles.statusText}>{task.status}</Text>
+    </View>
+  </View>
+</View>
+
+
+
+
+<View style={styles.detailsBox}>
+  <Text style={styles.detailsText}>
+    <Text style={{ fontFamily: "InterBold" }}>Description: </Text>
+    {description}
+  </Text>
+
+  <Text style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}>
+    Images:
+  </Text>
+  <View style={styles.imageRow}>
+  {images.length > 0 ? (
+    images.map((img, index) => (
+      <TouchableOpacity key={index} onPress={() => setPreviewImage(img)}>
+        <Image source={{ uri: img }} style={styles.image} />
+      </TouchableOpacity>
+    ))
+  ) : (
+    <Text style={styles.detailsText}>No images</Text>
+  )}
+</View>
+
+
+  <Text style={[styles.detailsText, { marginTop: 12 }]}>
+    <Text style={{ fontFamily: "InterBold" }}>Location: </Text>
+    {location}
+  </Text>
+
+  <Text style={[styles.detailsText, { marginTop: 12 }]}>
+    <Text style={{ fontFamily: "InterBold" }}>Category: </Text>
+    {task.category || t("clientTaskDetails.notProvided")}
+  </Text>
+
+  <Text style={[styles.detailsText, { marginTop: 12 }]}>
+    <Text style={{ fontFamily: "InterBold" }}>Bid Count: </Text>
+    {task.bidCount}
+  </Text>
+
+  <Text style={[styles.detailsText, { marginTop: 12 }]}>
+    <Text style={{ fontFamily: "InterBold" }}>Created At: </Text>
+    {new Date(task.createdAt).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })}
+  </Text>
+
+  {/* Actions (now inside the green box) */}
+<View style={styles.actionsInside}>
+  {task.status === "Pending" && (
+    <>
+      {bids.length > 0 ? (
+        <Text style={styles.noticeInside}>
+          You can't edit this task because a tasker has already placed a bid.
+        </Text>
+      ) : (
+        <TouchableOpacity
+          style={styles.whiteButton}
+          onPress={() => navigation.navigate("EditTask", { task })}
+        >
+          <Text style={styles.whiteButtonText}>{t("clientTaskDetails.editTask")}</Text>
+        </TouchableOpacity>
+      )}
+
+      <TouchableOpacity
+        style={styles.whiteButton}
+        onPress={() => navigation.navigate("ViewBids", { taskId: task._id })}
+      >
+        <Text style={styles.whiteButtonText}>{t("clientTaskDetails.viewBids")}</Text>
+      </TouchableOpacity>
+    </>
   )}
 
-  {/* Cancel Task for Pending or Started */}
+  {task.status === "Started" && (
+    <TouchableOpacity
+      style={styles.whiteButton}
+      onPress={() => {
+        Alert.alert(
+          "Mark as Completed",
+          "Are you sure you want to mark this task as completed?",
+          [
+            { text: "No" },
+            {
+              text: "Yes",
+              onPress: async () => {
+                try {
+                  setCompleting(true);
+                  await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, {
+                    method: "PATCH",
+                  });
+                  const updated = await getTaskById(task._id);
+                  setCompleting(false);
+                  navigation.navigate("ClientHome", {
+                    screen: "Tasks",
+                    params: {
+                      refreshTasks: true,
+                      targetTab: "Previous",
+                      subTab: "Completed",
+                      unique: Date.now(),
+                    },
+                  });
+                } catch (err) {
+                  setCompleting(false);
+                  Alert.alert("Error", "Could not mark the task as completed.");
+                }
+              },
+            },
+          ]
+        );
+      }}
+    >
+      <Text style={styles.whiteButtonText}>Mark as Completed</Text>
+    </TouchableOpacity>
+  )}
+
   {(task.status === "Pending" || task.status === "Started") && (
-    <TouchableOpacity style={styles.secondaryButton} onPress={handleDelete}>
-      <Text style={styles.secondaryButtonText}>{t("clientTaskDetails.cancelTask")}</Text>
+    <TouchableOpacity style={styles.whiteButton} onPress={handleDelete}>
+      <Text style={styles.whiteButtonText}>{t("clientTaskDetails.cancelTask")}</Text>
     </TouchableOpacity>
   )}
 </View>
 
-{completing && (
-  <View style={styles.overlay}>
-    <View style={styles.overlayBox}>
-      <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
-      <Text style={styles.overlayText}>{t("clientTaskDetails.completingTask")}</Text>
-    </View>
+
+</View>
+
+        
+{previewImage && (
+  <View style={styles.previewOverlay}>
+    <TouchableOpacity
+      style={styles.closePreviewBtn}
+      onPress={() => setPreviewImage(null)}
+    >
+      <Ionicons name="close" size={30} color="#fff" />
+    </TouchableOpacity>
+    <Image source={{ uri: previewImage }} style={styles.previewImage} resizeMode="contain" />
   </View>
 )}
-
-{canceling && (
-  <View style={styles.overlay}>
-    <View style={styles.overlayBox}>
-      <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
-      <Text style={styles.overlayText}>{t("clientTaskDetails.cancelingTask")}</Text>
-
-    </View>
-  </View>
-)}
-
-
 
 
       </ScrollView>
@@ -333,32 +355,35 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 24,
+    justifyContent: "flex-start",
+    marginBottom: 16,
+    
   },
   heading: {
     fontFamily: "InterBold",
-    fontSize: 20,
+    fontSize: 30,
     color: "#213729",
-    textAlign: "center",
-    flex: 1,
+    marginBottom: 4,
   },
   backBtn: {
     width: 24,
     height: 24,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 26,
+    color: "#215432"
   },
   imageRow: {
-    marginBottom: 20,
-    paddingVertical: 4,
+    flexDirection: "row",
+    marginTop: 6,
   },
   image: {
-    width: 120,
-    height: 100,
-    borderRadius: 10,
-    marginRight: 10,
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 8,
   },
+  
   label: {
     fontFamily: "InterBold",
     fontSize: 16,
@@ -448,6 +473,94 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#213729",
   },
+  subText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    fontWeight: "900",
+    marginBottom: 2,
+  },
+  statusBadge: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    alignSelf: "flex-start",         // ✅ keeps it aligned at the top
+  },
+  statusText: {
+    color: "#fff",
+    fontFamily: "InterBold",
+    fontSize: 13,
+  },
+  detailsBox: {
+    backgroundColor: "#215432",
+    padding: 16,
+    borderRadius: 20,
+    marginTop: 16,
+    flex: 1,                    // ✅ makes it fill all remaining space
+    minHeight: Dimensions.get("window").height * 0.65,
+    justifyContent: "space-between", // ✅ pushes buttons to the bottom
+  },
   
   
+  
+  detailsText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#fff",
+    lineHeight: 20,
+  },
+  topContent: {
+    marginTop: 10,
+    marginBottom: 16,
+  },
+  actionsInside: {
+    marginTop: 20,
+  },
+  whiteButton: {
+    backgroundColor: "#ffffff",
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  whiteButtonText: {
+    color: "#215432", // dark green
+    fontFamily: "InterBold",
+    fontSize: 15,
+  },
+  noticeInside: {
+    marginBottom: 10,
+    fontSize: 14,
+    color: "#ffffff",
+    textAlign: "center",
+    fontFamily: "Inter",
+  },
+  topRow: {
+    flexDirection: "row",           // ✅ puts text and badge on same row
+    justifyContent: "space-between", // ✅ pushes badge to the far right
+    alignItems: "flex-start",
+  },
+  previewOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  previewImage: {
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height * 0.8,
+  },
+  closePreviewBtn: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+    zIndex: 1001,
+  },
+  
+
 });
