@@ -30,6 +30,8 @@ export default function TaskDetailsScreen({ route }) {
   const [submitting, setSubmitting] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [loadingBid, setLoadingBid] = useState(true); // ✅ NEW
+  const isBiddingAllowed = task.status === "Pending";
+
 
 
 
@@ -150,10 +152,16 @@ const handleBid = async () => {
 };
 
 const handleUpdateBid = async () => {
+  if (!existingBid) {
+    Alert.alert("No Bid Found", "You haven't submitted a bid for this task yet.");
+    return;
+  }
+
   if (task.status !== "Pending") {
     Alert.alert("Cannot Edit", "This task is no longer accepting bids.");
     return;
   }
+
 
   if (!bidAmount || !message) {
     Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.fillFields"));
@@ -204,136 +212,142 @@ const getStatusColor = (status) => {
   }
 };
 
+const getStatusStyle = (status) => {
+  switch (status) {
+    case "Completed":
+      return { backgroundColor: "#4CAF50" }; // Green
+    case "Pending":
+      return { backgroundColor: "#FF9800" }; // Orange
+    case "Started":
+      return { backgroundColor: "#FFEB3B" }; // Yellow
+    case "Cancelled":
+      return { backgroundColor: "#F44336" }; // Red
+    default:
+      return { backgroundColor: "#999" }; // Grey
+  }
+};
+
+
   
   return (
     <SafeAreaView style={styles.safeArea}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#213729" />
+        <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={30} color="#213729" />
       </TouchableOpacity>
 
       <ScrollView contentContainerStyle={styles.container}>
-        {task.images?.length > 0 && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageRow}>
-            {task.images.map((uri, i) => (
-  <TouchableOpacity key={i} onPress={() => setSelectedImage(uri)}>
-    <Image source={{ uri }} style={styles.image} />
-  </TouchableOpacity>
-))}
 
-          </ScrollView>
-        )}
-
-        <Text style={styles.title}>{task.title}</Text>
-
-        <Text style={styles.label}>{t("taskerTaskDetails.location")}</Text>
-        <Text style={styles.text}>{task.location}</Text>
-
-        <Text style={styles.label}>{t("taskerTaskDetails.price")}</Text>
-        <Text style={styles.text}>{task.budget} BHD</Text>
-        <Text style={styles.label}>{t("taskerTaskDetails.description")}</Text>
-        <Text style={styles.text}>{task.description || "-"}</Text>
-        <Text style={styles.label}>{t("taskerTaskDetails.category")}</Text>
-        <Text style={styles.text}>{task.category || "-"}</Text>
-
-
-
-        {existingBid && !existingBid.isAccepted && task.status === "Pending" ? (
-  <>
-    <Text style={styles.label}>{t("taskerTaskDetails.editYourBid")}</Text>
-    <TextInput
-      style={styles.input}
-      placeholder={t("taskerTaskDetails.bidAmount")}
-      value={bidAmount}
-      onChangeText={setBidAmount}
-      keyboardType="numeric"
-      textAlign={I18nManager.isRTL ? "right" : "left"}
-      placeholderTextColor="#999"
-    />
-    <TextInput
-      style={[styles.input, styles.textarea]}
-      placeholder={t("taskerTaskDetails.bidMessage")}
-      value={message}
-      onChangeText={setMessage}
-      multiline
-      maxLength={150}
-      textAlignVertical="top"
-      textAlign={I18nManager.isRTL ? "right" : "left"}
-      placeholderTextColor="#999"
-    />
-    <TouchableOpacity
-      style={[styles.button, submitting && { backgroundColor: "#ccc" }]}
-      onPress={handleUpdateBid}
-      disabled={submitting}
-    >
-      <Text style={styles.buttonText}>
-        {submitting ? t("taskerTaskDetails.submitting") : t("taskerTaskDetails.updateBid")}
+<View style={styles.topContent}>
+  <View style={styles.topRow}>
+    <View style={{ flex: 1 }}>
+      <Text style={styles.heading}>{task.title}</Text>
+      <Text style={styles.subText}>Offered Price: {task.budget} BHD</Text>
+      <Text style={styles.subText}>
+        {new Date(task.createdAt).toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })}{" "}
+        • {new Date(task.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
       </Text>
-    </TouchableOpacity>
-  </>
-) : loadingBid ? (
-  <View style={styles.existingBidBox}>
-    <Text style={styles.label}>{t("taskerTaskDetails.loadingBid")}</Text>
-    <Text style={styles.text}>...</Text>
-  </View>
-) : existingBid ? (
-  <View style={styles.existingBidBox}>
-    <Text style={styles.label}>Your Bid:</Text>
-    <Text style={styles.text}>{existingBid.amount} BHD</Text>
-    <Text style={styles.label}>Your Message:</Text>
-    <Text style={styles.text}>{existingBid.message}</Text>
+    </View>
 
-    {existingBid.status && (
-      <>
-        <Text style={styles.label}>{t("taskerTaskDetails.status")}</Text>
-        <Text style={[styles.text, { color: getStatusColor(existingBid.status) }]}>
-          {existingBid.status}
-        </Text>
-      </>
-    )}
+    <View style={[styles.statusBadge, getStatusStyle(task.status)]}>
+      <Text style={styles.statusText}>{task.status}</Text>
+    </View>
   </View>
-) : task.status !== "Pending" ? (
-  <Text style={styles.text}>
-    {t("taskerTaskDetails.taskClosedMessage") || "This task is no longer accepting bids."}
+</View>
+
+<View style={styles.detailsBox}>
+  <Text style={styles.detailsText}>
+    <Text style={{ fontFamily: "InterBold" }}>Description: </Text>
+    {task.description || "-"}
   </Text>
-) : (
-  <>
-    <Text style={styles.label}>{t("taskerTaskDetails.enterBid")}</Text>
-    <TextInput
-      style={styles.input}
-      placeholder={t("taskerTaskDetails.bidAmount")}
-      value={bidAmount}
-      onChangeText={setBidAmount}
-      keyboardType="numeric"
-      textAlign={I18nManager.isRTL ? "right" : "left"}
-      placeholderTextColor="#999"
-    />
-    <TextInput
-      style={[styles.input, styles.textarea]}
-      placeholder={t("taskerTaskDetails.bidMessage")}
-      value={message}
-      onChangeText={setMessage}
-      multiline
-      maxLength={150}
-      textAlignVertical="top"
-      textAlign={I18nManager.isRTL ? "right" : "left"}
-      placeholderTextColor="#999"
-    />
-    {!isVerified && (
-      <View style={styles.verifyBanner}>
-        <Text style={styles.verifyText}>You must be verified to place a bid.</Text>
-      </View>
+
+  <Text style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}>Images:</Text>
+  <View style={styles.imageRow}>
+    {task.images?.length > 0 ? (
+      task.images.map((uri, i) => (
+        <TouchableOpacity key={i} onPress={() => setSelectedImage(uri)}>
+          <Image source={{ uri }} style={styles.image} />
+        </TouchableOpacity>
+      ))
+    ) : (
+      <Text style={styles.detailsText}>No images</Text>
     )}
-    <TouchableOpacity
-      style={[styles.button, !isVerified && { backgroundColor: "#ccc" }]}
-      onPress={handleBid}
-      disabled={!isVerified}
-    >
-      <Text style={styles.buttonText}>
-        {t("taskerTaskDetails.submitBid")}
-      </Text>
-    </TouchableOpacity>
-  </>
-)}
+  </View>
+
+  <Text style={[styles.detailsText, { marginTop: 12 }]}>
+    <Text style={{ fontFamily: "InterBold" }}>Location: </Text>
+    {task.location}
+  </Text>
+
+  <Text style={[styles.detailsText, { marginTop: 12 }]}>
+    <Text style={{ fontFamily: "InterBold" }}>Category: </Text>
+    {task.category || "-"}
+  </Text>
+
+  {/* Place Your Bid */}
+  <Text style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}>Place Your Bid:</Text>
+  <TextInput
+  style={[
+    styles.input,
+    !isBiddingAllowed && { backgroundColor: "#ccc", color: "#666" }
+  ]}
+  placeholder="Bid (BHD)"
+  value={bidAmount}
+  onChangeText={isBiddingAllowed ? setBidAmount : undefined}
+  keyboardType="numeric"
+  editable={isBiddingAllowed}
+  selectTextOnFocus={isBiddingAllowed}
+  placeholderTextColor="#999"
+/>
+
+<TextInput
+  style={[
+    styles.input,
+    styles.textarea,
+    !isBiddingAllowed && { backgroundColor: "#ccc", color: "#666" }
+  ]}
+  placeholder="Message to Client (150 characters max).."
+  value={message}
+  onChangeText={isBiddingAllowed ? setMessage : undefined}
+  editable={isBiddingAllowed}
+  selectTextOnFocus={isBiddingAllowed}
+  multiline
+  maxLength={150}
+  textAlignVertical="top"
+  placeholderTextColor="#999"
+/>
+
+<TouchableOpacity
+  style={[
+    styles.whiteButton,
+    (!isVerified || !isBiddingAllowed) && { backgroundColor: "#ccc" }
+  ]}
+  onPress={
+    isBiddingAllowed
+      ? existingBid
+        ? handleUpdateBid
+        : handleBid
+      : null
+  }
+  disabled={!isVerified || !isBiddingAllowed}
+>
+  <Text style={styles.whiteButtonText}>
+    {!isBiddingAllowed
+      ? "Bidding Closed"
+      : existingBid
+      ? "Update Bid"
+      : "Submit Bid"}
+  </Text>
+</TouchableOpacity>
+
+
+
+</View>
+
+
 
 {selectedImage && (
   <View style={styles.fullScreenOverlay}>
@@ -387,14 +401,16 @@ const styles = StyleSheet.create({
   },
   imageRow: {
     flexDirection: "row",
-    marginBottom: 20,
+    marginTop: 6,
   },
+  
   image: {
-    width: width * 0.7,
-    height: 160,
-    borderRadius: 12,
-    marginRight: 14,
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 8,
   },
+  
   title: {
     fontFamily: "InterBold",
     fontSize: 22,
@@ -483,7 +499,7 @@ const styles = StyleSheet.create({
   closeButton: {
     position: "absolute",
     top: 40,
-    right: 20,
+    left: 20,
     zIndex: 10000,
     backgroundColor: "rgba(0,0,0,0.6)",
     borderRadius: 20,
@@ -513,6 +529,67 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 16,
     color: "#213729",
+  },
+  heading: {
+    fontFamily: "InterBold",
+    fontSize: 26,
+    color: "#213729",
+    marginBottom: 4,
+  },
+  subText: {
+    fontFamily: "Inter",
+    fontSize: 13,
+    color: "#666",
+    marginBottom: 2,
+    fontWeight: "900",
+  },
+  topContent: {
+    marginTop: 10,
+    marginBottom: 16,
+  },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  statusBadge: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+  },
+  statusText: {
+    color: "#fff",
+    fontFamily: "InterBold",
+    fontSize: 13,
+  },
+  detailsBox: {
+    backgroundColor: "#215432",
+    padding: 16,
+    borderRadius: 20,
+    marginTop: 16,
+    flex: 1, // ✅ fills the remaining space
+    minHeight: Dimensions.get("window").height * 0.7, // ✅ makes it tall even if content is small
+    justifyContent: "space-between", // ✅ pushes content & buttons apart
+  },
+  
+  detailsText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#fff",
+    lineHeight: 20,
+  },
+  whiteButton: {
+    backgroundColor: "#ffffff",
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  whiteButtonText: {
+    color: "#215432",
+    fontFamily: "InterBold",
+    fontSize: 15,
   },
   
   
