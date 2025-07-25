@@ -10,7 +10,9 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  Dimensions, // ✅ add this
 } from "react-native";
+
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { getTaskById, updateTaskById } from "../../services/taskService";
@@ -89,15 +91,19 @@ export default function EditTaskScreen({ route, navigation }) {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={80}
       >
-        <ScrollView contentContainerStyle={styles.container}>
-          {/* Header */}
-          <View style={styles.headerRow}>
-            <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-              <Ionicons name="arrow-back" size={24} color="#213729" />
-            </TouchableOpacity>
-            <Text style={styles.heading}>{t("clientEditTask.heading")}</Text>
-            <View style={styles.backBtn} />
-          </View>
+        {/* ✅ Header moved OUTSIDE the ScrollView */}
+{/* ✅ Arrow and Title are now separate */}
+<View style={styles.headerRow}>
+  <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+    <Ionicons name="arrow-back" size={30} color="#ffffff" />
+  </TouchableOpacity>
+</View>
+
+<Text style={styles.heading}>{t("clientEditTask.heading")}</Text>
+
+
+<ScrollView contentContainerStyle={styles.container}>
+
 
           <TextInput
   style={[styles.input, errors.title && styles.errorInput]}
@@ -167,20 +173,25 @@ export default function EditTaskScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#fff" },
   keyboardView: { flex: 1 },
+  safeArea: { flex: 1, backgroundColor: "#215432" }, // ✅ same green background
   container: {
+    paddingTop: 20,  // ✅ slightly less because header is now separate
+    paddingBottom: 40,
     paddingHorizontal: 24,
-    paddingBottom: 60,
-    paddingTop: 40,
-    backgroundColor: "#fff",
+    backgroundColor: "#215432",
+    minHeight: Dimensions.get("window").height,
   },
+  
+  
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 24,
+    paddingHorizontal: 24,
+    marginTop: 20,
+    marginBottom: 10, // ✅ space below arrow
   },
+  
   backBtn: {
     width: 24,
     height: 24,
@@ -189,34 +200,42 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontFamily: "InterBold",
-    fontSize: 20,
-    color: "#213729",
-    textAlign: "center",
-    flex: 1,
+    fontSize: 32,
+    color: "#ffffff",
+    marginBottom: 30,
+    marginTop: 60, // ✅ space above heading
+    textAlign: "left",
+    paddingHorizontal: 24, // ✅ aligns with arrow
   },
+  
   input: {
-    backgroundColor: "#f2f2f2",
-    borderRadius: 12,
+    backgroundColor: "#ffffff", // ✅ white box
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
     paddingVertical: 14,
-    paddingHorizontal: 18,
+    paddingHorizontal: 16,
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
     marginBottom: 20,
   },
+  
   textarea: { textAlignVertical: "top", height: 120 },
   button: {
-    backgroundColor: "#213729",
-    paddingVertical: 16,
+    backgroundColor: "#ffffff", // ✅ white background like PostTask
+    paddingVertical: 14,
     borderRadius: 30,
     alignItems: "center",
-    marginTop: 10,
+    width: "100%",
+    marginTop: 30,
   },
   buttonText: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#fff",
+    color: "#215432", // ✅ green text
   },
+  
   errorInput: {
     borderWidth: 1,
     borderColor: "#ff4d4d",

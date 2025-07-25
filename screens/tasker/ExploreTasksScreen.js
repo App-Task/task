@@ -27,7 +27,17 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
 
-const JOB_TYPES = ["Cleaning", "Moving", "Delivery", "Repairs"];
+const JOB_TYPES = [
+  "Handyman",
+  "Moving",
+  "IKEA assembly",
+  "Cleaning",
+  "Shopping & Delivery",
+  "Yardwork Services",
+  "Dog Walking",
+  "Other"
+];
+
 
 const formatDateTime = (isoString) => {
   const date = new Date(isoString);
