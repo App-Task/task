@@ -19,7 +19,8 @@ import * as ImagePicker from "expo-image-picker";
 
 
 
-export default function DocumentsScreen({ navigation }) {
+export default function DocumentsScreen({ navigation, route }) {
+  const fromRegister = route?.params?.fromRegister || false; // 👈 Detect if came from registration
   const { t } = useTranslation();
   const getMimeType = (filename) => {
     const ext = filename.split('.').pop().toLowerCase();
@@ -235,6 +236,21 @@ export default function DocumentsScreen({ navigation }) {
       <TouchableOpacity style={styles.button} onPress={uploadDocument}>
         <Text style={styles.buttonText}>{t("taskerDocuments.uploadBtn")}</Text>
       </TouchableOpacity>
+
+      {fromRegister && documents.length > 0 && (
+  <TouchableOpacity
+    style={[styles.button, { marginTop: 20 }]}
+    onPress={() =>
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "TaskerHome" }],
+      })
+    }
+  >
+    <Text style={styles.buttonText}>Continue to Home</Text>
+  </TouchableOpacity>
+)}
+
 
       <View style={{ height: 60 }} />
 

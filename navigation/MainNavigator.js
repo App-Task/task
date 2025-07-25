@@ -26,6 +26,7 @@ import PaymentMethodsScreen from "../screens/clients/PaymentMethodsScreen";
 import ImageViewerScreen from "../screens/clients/ImageViewerScreen"; // adjust path
 import TaskerProfileScreen from "../screens/tasker/TaskerProfileScreen";
 import NotificationsScreen from "../screens/clients/NotificationsScreen";
+import CompleteTaskerProfileScreen from "../screens/tasker/CompleteTaskerProfileScreen";
 
 
 
@@ -83,6 +84,7 @@ export default function MainNavigator() {
 
       {/* Tasker Home & Subscreens */}
 {/* Tasker Home & Subscreens */}
+<Stack.Screen name="CompleteTaskerProfile" component={CompleteTaskerProfileScreen} />
 <Stack.Screen name="TaskerHome" component={TaskerBottomTabNavigator} />
 <Stack.Screen name="Documents" component={DocumentsScreen} />
 <Stack.Screen name="BankAccount" component={BankAccountScreen} />

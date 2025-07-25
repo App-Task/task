@@ -21,6 +21,7 @@ import { storeToken } from "../../services/authStorage";
 
 
 
+
 const { width } = Dimensions.get("window");
 
 export default function RegisterScreen({ navigation, route }) {
@@ -108,11 +109,18 @@ if (!phoneRegex.test(phone.trim())) {
     await SecureStore.setItemAsync("userId", user.id);
     await SecureStore.setItemAsync("userName", user.name);
 
-    // Step 4: Navigate to the correct home screen
-    navigation.reset({
-      index: 0,
-      routes: [{ name: role === "tasker" ? "TaskerHome" : "ClientHome" }],
-    });
+    // Step 4: Navigate to the correct screen
+navigation.reset({
+  index: 0,
+  routes: [
+    {
+      name:
+        role === "tasker"
+          ? "CompleteTaskerProfile" // 👈 NEW mandatory profile setup screen
+          : "ClientHome",
+    },
+  ],
+});
   } catch (err) {
     Alert.alert(t("register.errorTitle"), err.message || "Something went wrong");
   } finally {

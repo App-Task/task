@@ -16,6 +16,8 @@ import { useTranslation } from "react-i18next";
 import { loginUser } from "../../services/auth";
 import { storeToken } from "../../services/authStorage";
 import * as SecureStore from "expo-secure-store";
+import { fetchCurrentUser } from "../../services/auth";
+
 
 const { width } = Dimensions.get("window");
 
@@ -65,7 +67,36 @@ export default function LoginScreen({ navigation, route }) {
           console.warn("⚠️ Invalid userId format. Skipping SecureStore save.");
         }
       
-        navigation.replace(role === "tasker" ? "TaskerHome" : "ClientHome");
+        if (role === "tasker") {
+          try {
+            const currentUser = await fetchCurrentUser();
+        
+            // ✅ Check if profile is incomplete
+            const profileIncomplete =
+              !currentUser.gender ||
+              !currentUser.location ||
+              !currentUser.experience ||
+              !currentUser.skills ||
+              !currentUser.about;
+        
+            // ✅ Check if no documents uploaded
+            const noDocuments = !currentUser.documents || currentUser.documents.length === 0;
+        
+            if (profileIncomplete) {
+              navigation.replace("CompleteTaskerProfile");
+            } else if (noDocuments) {
+              navigation.replace("Documents", { fromRegister: true });
+            } else {
+              navigation.replace("TaskerHome");
+            }
+          } catch (err) {
+            console.error("❌ Could not fetch user after login:", err.message);
+            navigation.replace("TaskerHome"); // fallback
+          }
+        } else {
+          navigation.replace("ClientHome");
+        }
+        
       }
        else {
         throw new Error(t("login.failedGeneric"));
