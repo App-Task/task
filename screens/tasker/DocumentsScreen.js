@@ -184,7 +184,20 @@ export default function DocumentsScreen({ navigation, route }) {
       {/* Header */}
     {/* Back Button Only */}
 <View style={styles.headerRow}>
-  <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+<TouchableOpacity
+  onPress={() => {
+    if (fromRegister) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "CompleteTaskerProfile" }],
+      });
+    } else {
+      navigation.goBack();
+    }
+  }}
+  style={styles.backBtn}
+>
+
     <Ionicons
       name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
       size={30}

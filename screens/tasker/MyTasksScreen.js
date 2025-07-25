@@ -316,7 +316,7 @@ const res = await axios.get(url, {
 
       {showVerifyBanner && (
   <View style={styles.verifyBanner}>
-    <Text style={styles.verifyText}>You must be verified to view your tasks.</Text>
+    <Text style={styles.verifyText}>Your documents still need to be verified (this may take up to 48 hours), Contact us</Text>
   </View>
 )}
 

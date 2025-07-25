@@ -256,7 +256,7 @@ setFilteredTasks(availableTasks);
       {showVerifyBanner === true && (
   <View style={styles.verifyBanner}>
     <Text style={styles.verifyText}>
-      You must be verified to explore and bid on tasks.
+    Your documents still need to be verified (this may take up to 48 hours), Contact us
     </Text>
   </View>
 )}
