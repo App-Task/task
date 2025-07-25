@@ -25,6 +25,10 @@ import { getToken } from "../../services/authStorage";
 import { fetchCurrentUser } from "../../services/auth"; // ✅ make sure path is correct
 import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import { Linking } from "react-native";
+
+
+
 
 
 const JOB_TYPES = [
@@ -253,13 +257,22 @@ setFilteredTasks(availableTasks);
 </View>
 
 
-      {showVerifyBanner === true && (
+{showVerifyBanner === true && (
   <View style={styles.verifyBanner}>
     <Text style={styles.verifyText}>
-    Your documents still need to be verified (this may take up to 48 hours), Contact us
+      Your documents still need to be verified (this may take up to 48 hours),{" "}
+      <Text
+        style={styles.contactLink}
+        onPress={() =>
+          Linking.openURL("mailto:Task.team.bh@gmail.com")
+        }
+      >
+        Contact us
+      </Text>
     </Text>
   </View>
 )}
+
 
 {showVerifyBanner === "incomplete" && (
   <View style={styles.verifyBanner}>
@@ -555,6 +568,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: "#213729",
   },
+  contactLink: {
+    color: "blue",
+    textDecorationLine: "underline",
+  },
+  
   
   
 });

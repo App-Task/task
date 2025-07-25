@@ -16,6 +16,8 @@ import { fetchCurrentUser } from "../../services/auth";
 import { useNavigation } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
 import { getToken } from "../../services/authStorage"; // make sure this import exists
+import { Linking } from "react-native";
+
 
 
 
@@ -314,11 +316,22 @@ const res = await axios.get(url, {
 </View>
 
 
-      {showVerifyBanner && (
+{showVerifyBanner && (
   <View style={styles.verifyBanner}>
-    <Text style={styles.verifyText}>Your documents still need to be verified (this may take up to 48 hours), Contact us</Text>
+    <Text style={styles.verifyText}>
+      Your documents still need to be verified (this may take up to 48 hours),{" "}
+      <Text
+        style={styles.contactLink}
+        onPress={() =>
+          Linking.openURL("mailto:Task.team.bh@gmail.com")
+        }
+      >
+        Contact us
+      </Text>
+    </Text>
   </View>
 )}
+
 
 
       {/* Task list */}
@@ -523,6 +536,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#e0e0e0", // light grey line
     marginBottom: 8,
   },
+  contactLink: {
+    color: "blue",
+    textDecorationLine: "underline",
+  },
+  
   
   
 });
