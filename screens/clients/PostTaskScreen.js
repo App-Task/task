@@ -22,6 +22,11 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import useUnreadNotifications from "../../hooks/useUnreadNotifications";
 
+import * as Location from "expo-location";
+import MapView, { Marker } from "react-native-maps";
+
+const [coords, setCoords] = useState(null); // { latitude, longitude }
+const [gettingLoc, setGettingLoc] = useState(false);
 
 
 
@@ -142,12 +147,18 @@ if (errorFlag) {
       const taskData = {
         title,
         description,
-        location,
+        location, // human-readable string shown in input
         budget: parseFloat(budget),
         category: selectedCategory,
         images,
         userId,
+        latitude: coords?.latitude ?? null,
+        longitude: coords?.longitude ?? null,
+        locationGeo: coords
+          ? { type: "Point", coordinates: [coords.longitude, coords.latitude] }
+          : null
       };
+      
   
       const response = await fetch("https://task-kq94.onrender.com/api/tasks", {
         method: "POST",
@@ -385,6 +396,47 @@ if (errorFlag) {
     onChangeText={setLocation}
     textAlign={I18nManager.isRTL ? "right" : "left"}
   />
+<TouchableOpacity
+  style={[styles.uploadBox, { marginTop: -4 }]}
+  onPress={async () => {
+    try {
+      setGettingLoc(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission needed", "Location access is required to pin your task.");
+        return;
+      }
+
+      const pos = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced
+      });
+
+      const { latitude, longitude } = pos.coords;
+      setCoords({ latitude, longitude });
+
+      // Optional: reverse geocode to fill the address field
+      const placemarks = await Location.reverseGeocodeAsync({ latitude, longitude });
+      if (placemarks?.length) {
+        const p = placemarks[0];
+        const nice =
+          [p.name, p.street, p.subregion, p.city, p.region, p.country]
+            .filter(Boolean).join(", ");
+        setLocation(nice || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+      } else {
+        setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+      }
+    } catch (e) {
+      console.log("get location error", e);
+      Alert.alert("Error", "Couldn't get your location. Try again.");
+    } finally {
+      setGettingLoc(false);
+    }
+  }}
+>
+  <Text style={styles.uploadText}>
+    {gettingLoc ? "Locating..." : "📍 Use current location"}
+  </Text>
+</TouchableOpacity>
 
   <TextInput
       style={[styles.input, budgetError && { borderColor: "#c00", borderWidth: 2 }]}

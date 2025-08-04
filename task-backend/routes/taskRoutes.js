@@ -5,15 +5,28 @@ const Task = require("../models/Task");
 const Notification = require("../models/Notification"); // ✅ for tasker notifications
 
 
-// ✅ POST /api/tasks - create new task with userId
+// ✅ POST /api/tasks - create new task with optional coordinates
 router.post("/", async (req, res) => {
   try {
-    const { title, description, location, budget, category, images, userId } = req.body;
+    const {
+      title,
+      description,
+      location,         // human-readable address (optional if coords exist)
+      budget,           // number or string
+      category,
+      images,
+      userId,
+      latitude,         // number (optional)
+      longitude,        // number (optional)
+      locationGeo       // optional GeoJSON from client
+    } = req.body;
 
-    // Basic validation
-    if (!title || !description || !location || !budget || !category || !userId) {
-      console.log("❌ Missing fields:", req.body);
+    // Basic validation: allow either location string OR coords
+    if (!title || !description || !budget || !category || !userId) {
       return res.status(400).json({ error: "Missing required fields." });
+    }
+    if (!location && (typeof latitude !== "number" || typeof longitude !== "number")) {
+      return res.status(400).json({ error: "Provide a location string or latitude+longitude." });
     }
 
     // Validate userId format
@@ -21,23 +34,38 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Invalid userId format." });
     }
 
-    const newTask = new Task({
+    // Ensure numeric budget
+    const budgetNumber = typeof budget === "string" ? parseFloat(budget) : budget;
+    if (Number.isNaN(budgetNumber)) {
+      return res.status(400).json({ error: "Budget must be a number." });
+    }
+
+    // Build GeoJSON if not supplied but coords exist
+    let geo = locationGeo;
+    if (!geo && typeof latitude === "number" && typeof longitude === "number") {
+      geo = { type: "Point", coordinates: [longitude, latitude] }; // [lng, lat]
+    }
+
+    const newTask = await Task.create({
       title,
       description,
-      location,
-      budget,
+      location: location || null,
+      budget: budgetNumber,
       category,
-      images,
+      images: Array.isArray(images) ? images : [],
       userId,
+      latitude: typeof latitude === "number" ? latitude : undefined,
+      longitude: typeof longitude === "number" ? longitude : undefined,
+      locationGeo: geo
     });
 
-    await newTask.save();
     res.status(201).json(newTask);
   } catch (err) {
-    console.error("❌ Task creation error:", err.message);
-    res.status(500).json({ error: "Failed to create task", details: err.message });
+    console.error("❌ Task creation error:", err);
+    res.status(500).json({ error: "Failed to create task" });
   }
 });
+
 
 // ✅ GET /api/tasks - fetch all tasks (admin/debug only)
 router.get("/", async (req, res) => {
