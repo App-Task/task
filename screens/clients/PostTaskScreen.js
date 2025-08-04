@@ -201,54 +201,55 @@ if (errorFlag) {
     }
   
     Alert.alert(
-      t("clientPostTask.uploadChoiceTitle") || "Choose Image Source",
-      t("clientPostTask.uploadChoiceMsg") || "How would you like to upload the image?",
+      t("clientPostTask.uploadChoiceTitle", { defaultValue: "Choose Image Source" }),
+      t("clientPostTask.uploadChoiceMsg", { defaultValue: "How would you like to upload the image?" }),
       [
         {
-          text: t("clientPostTask.takePhoto") || "Take Photo",
+          text: t("clientPostTask.takePhoto", { defaultValue: "Take Photo" }),
           onPress: async () => {
             const { status } = await ImagePicker.requestCameraPermissionsAsync();
             if (status !== "granted") {
               Alert.alert("Permission denied", "Camera access is required to take a photo.");
               return;
             }
-  
+    
             const result = await ImagePicker.launchCameraAsync({
               allowsEditing: true,
               quality: 0.5,
             });
-  
+    
             if (!result.canceled) {
               handleImageUpload(result.assets[0].uri);
             }
           },
         },
         {
-          text: t("clientPostTask.chooseFromLibrary") || "Choose from Library",
+          text: t("clientPostTask.chooseFromLibrary", { defaultValue: "Choose from Library" }),
           onPress: async () => {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== "granted") {
               Alert.alert("Permission denied", "Library access is required.");
               return;
             }
-  
+    
             const result = await ImagePicker.launchImageLibraryAsync({
               allowsMultipleSelection: false,
               mediaTypes: ImagePicker.MediaTypeOptions.Images,
               quality: 0.5,
             });
-  
+    
             if (!result.canceled) {
               handleImageUpload(result.assets[0].uri);
             }
           },
         },
         {
-          text: t("clientPostTask.cancel") || "Cancel",
+          text: t("clientPostTask.cancel", { defaultValue: "Cancel" }),
           style: "cancel",
         },
       ]
     );
+    
   };
   
 
