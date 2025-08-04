@@ -462,65 +462,68 @@ if (errorFlag) {
     value={location}
     onChangeText={setLocation}
     textAlign={I18nManager.isRTL ? "right" : "left"}
-  />{/* Use current location */}
-  <TouchableOpacity
-    style={[styles.uploadBox, { marginTop: -4 }]}
-    onPress={async () => {
-      try {
-        setGettingLoc(true);
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("Permission needed", "Location access is required to pin your task.");
-          return;
+  />
+  
+  {/* Location buttons with equal spacing */}
+  <View style={styles.locationButtonsContainer}>
+    <TouchableOpacity
+      style={styles.locationButton}
+      onPress={async () => {
+        try {
+          setGettingLoc(true);
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== "granted") {
+            Alert.alert("Permission needed", "Location access is required to pin your task.");
+            return;
+          }
+    
+          const pos = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced
+          });
+    
+          const { latitude, longitude } = pos.coords;
+          setCoords({ latitude, longitude });
+    
+          // Reverse geocode to fill the address
+          const placemarks = await Location.reverseGeocodeAsync({ latitude, longitude });
+          if (placemarks?.length) {
+            const p = placemarks[0];
+            const nice = [p.name, p.street, p.subregion, p.city, p.region, p.country]
+              .filter(Boolean)
+              .join(", ");
+            setLocation(nice || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+          } else {
+            setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+          }
+        } catch (e) {
+          console.log("get location error", e);
+          Alert.alert("Error", "Couldn't get your location. Try again.");
+        } finally {
+          setGettingLoc(false);
         }
+      }}
+    >
+      <Text style={styles.locationButtonText}>
+        {gettingLoc ? "Locating..." : "Use Current Location"}
+      </Text>
+    </TouchableOpacity>
+    
+    <TouchableOpacity
+      style={styles.locationButton}
+      onPress={openMapPicker}
+    >
+      <Text style={styles.locationButtonText}>Select on Map</Text>
+    </TouchableOpacity>
+  </View>
   
-        const pos = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced
-        });
-  
-        const { latitude, longitude } = pos.coords;
-        setCoords({ latitude, longitude });
-  
-        // Reverse geocode to fill the address
-        const placemarks = await Location.reverseGeocodeAsync({ latitude, longitude });
-        if (placemarks?.length) {
-          const p = placemarks[0];
-          const nice = [p.name, p.street, p.subregion, p.city, p.region, p.country]
-            .filter(Boolean)
-            .join(", ");
-          setLocation(nice || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-        } else {
-          setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-        }
-      } catch (e) {
-        console.log("get location error", e);
-        Alert.alert("Error", "Couldn't get your location. Try again.");
-      } finally {
-        setGettingLoc(false);
-      }
-    }}
-  >
-    <Text style={styles.uploadText}>
-      {gettingLoc ? "Locating..." : "Use current location"}
-    </Text>
-  </TouchableOpacity>
-  
-  {/* NEW: Pick on map (opens modal even if no coords yet) */}
-  <TouchableOpacity
-    style={[styles.uploadBox, { marginTop: 8 }]}
-    onPress={openMapPicker}
-  >
-    <Text style={styles.uploadText}>🧭 Pick location on map</Text>
-  </TouchableOpacity>
-  
-  {/* Preview (readonly) if coords are set */}
+  {/* Map preview if coordinates are set */}
   {coords && (
-    <View style={{ marginTop: 8 }}>
-      <View style={{ height: 180, borderRadius: 10, overflow: "hidden" }}>
+    <View style={styles.mapPreviewContainer}>
+      <View style={styles.mapPreview}>
         <MapView
           style={{ flex: 1 }}
           pointerEvents="none"
-          initialRegion={{
+          region={{
             latitude: coords.latitude,
             longitude: coords.longitude,
             latitudeDelta: 0.01,
@@ -530,16 +533,16 @@ if (errorFlag) {
           <Marker coordinate={coords} />
         </MapView>
       </View>
-  
+      
       <TouchableOpacity
-        style={[styles.uploadBox, { marginTop: 8 }]}
+        style={styles.editLocationButton}
         onPress={openMapPicker}
       >
-        <Text style={styles.uploadText}>🗺️ Edit pin on map</Text>
+        <Text style={styles.editLocationText}>Edit Location</Text>
       </TouchableOpacity>
     </View>
   )}
-  
+
 
   <TextInput
       style={[styles.input, budgetError && { borderColor: "#c00", borderWidth: 2 }]}
@@ -558,7 +561,7 @@ if (errorFlag) {
     </Text>
   </TouchableOpacity>
   {images.length > 0 && (
-  <View style={{ marginTop: -16 }}>
+  <View style={styles.imagePreviewContainer}>
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
       {images.map((img, index) => (
         <View key={index} style={styles.imageWrapper}>
@@ -663,12 +666,10 @@ if (errorFlag) {
 {/* Map Picker Modal */}
 <Modal visible={mapVisible} animationType="slide" transparent={false}>
   <View style={{ flex: 1, backgroundColor: "#fff" }}>
-    <View style={{ height: 60, justifyContent: "center", paddingHorizontal: 16 }}>
-      <Text style={{ fontSize: 18, fontWeight: "600", color: "#213729" }}>
-        Move the pin to the exact spot
-      </Text>
-      <Text style={{ color: "#666", marginTop: 2, fontSize: 12 }}>
-        Tap map to place pin, or drag the pin
+    <View style={styles.mapHeader}>
+      <Text style={styles.mapHeaderTitle}>Select Task Location</Text>
+      <Text style={styles.mapHeaderSubtitle}>
+        Tap on the map to place your pin, or drag the existing pin
       </Text>
     </View>
 
@@ -699,7 +700,7 @@ if (errorFlag) {
         <Text style={styles.mapBtnText}>Cancel</Text>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.mapBtn, styles.mapConfirm]} onPress={confirmMapLocation}>
-        <Text style={[styles.mapBtnText, { color: "#fff" }]}>Use this location</Text>
+        <Text style={[styles.mapBtnText, { color: "#fff" }]}>Confirm Location</Text>
       </TouchableOpacity>
     </View>
   </View>
@@ -767,7 +768,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
   },
   uploadText: {
     fontFamily: "Inter",
@@ -899,7 +899,7 @@ const styles = StyleSheet.create({
   formContainer: {
     display: "flex",
     flexDirection: "column",
-    gap: 16, // increased for better visual breathing space
+    gap: 16, // equal spacing between all form elements
     marginBottom: 40,
   },
   notificationsIcon: {
@@ -1019,6 +1019,72 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "InterBold",
     color: "#213729",
+  },
+  mapHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+    backgroundColor: "#fff",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "#eee",
+  },
+  mapHeaderTitle: {
+    fontSize: 20,
+    fontFamily: "InterBold",
+    color: "#213729",
+    marginBottom: 4,
+  },
+  mapHeaderSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 2,
+  },
+  mapPreviewContainer: {
+    marginTop: 10,
+    borderRadius: 10,
+    overflow: "hidden",
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  mapPreview: {
+    width: "100%",
+    height: 180,
+  },
+  editLocationButton: {
+    paddingVertical: 10,
+    alignItems: "center",
+    backgroundColor: "#f2f2f2",
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  editLocationText: {
+    fontSize: 14,
+    color: "#215432",
+    fontFamily: "InterBold",
+  },
+  locationButtonsContainer: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  locationButton: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  locationButtonText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#333",
+  },
+  imagePreviewContainer: {
+    marginTop: 8,
+    marginBottom: 8,
   },
 
   
