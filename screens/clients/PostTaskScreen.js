@@ -25,9 +25,6 @@ import useUnreadNotifications from "../../hooks/useUnreadNotifications";
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
 
-const [coords, setCoords] = useState(null); // { latitude, longitude }
-const [gettingLoc, setGettingLoc] = useState(false);
-
 
 
 
@@ -66,9 +63,79 @@ export default function PostTaskScreen() {
   const [budgetError, setBudgetError] = useState(false);
 
 
+  const [coords, setCoords] = useState(null); // { latitude, longitude }
+  const [gettingLoc, setGettingLoc] = useState(false);
+
+const [mapVisible, setMapVisible] = useState(false);
+const [tempCoords, setTempCoords] = useState(null);   // used inside the modal
+const [tempRegion, setTempRegion] = useState(null);   // MapView region while editing
+  
 
 
 
+
+// Helper: reverse geocode and set the address field
+const applyReverseGeocode = async (lat, lng) => {
+  try {
+    const placemarks = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
+    if (placemarks?.length) {
+      const p = placemarks[0];
+      const nice = [p.name, p.street, p.subregion, p.city, p.region, p.country]
+        .filter(Boolean)
+        .join(", ");
+      setLocation(nice || `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+    } else {
+      setLocation(`${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+    }
+  } catch {
+    setLocation(`${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+  }
+};
+
+// Open the map picker; if no coords yet, get current location first
+const openMapPicker = async () => {
+  try {
+    if (!coords) {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission needed", "Location access is required to set your pin.");
+        return;
+      }
+      const pos = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      const { latitude, longitude } = pos.coords;
+      setCoords({ latitude, longitude });
+      setTempCoords({ latitude, longitude });
+      setTempRegion({
+        latitude,
+        longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    } else {
+      setTempCoords(coords);
+      setTempRegion({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    }
+    setMapVisible(true);
+  } catch (e) {
+    console.log("openMapPicker error", e);
+    Alert.alert("Error", "Couldn't open the map.");
+  }
+};
+
+// Confirm the location chosen in the modal
+const confirmMapLocation = async () => {
+  if (!tempCoords) return;
+  setCoords(tempCoords);
+  await applyReverseGeocode(tempCoords.latitude, tempCoords.longitude);
+  setMapVisible(false);
+};
 
 const deleteImage = (index) => {
   const updatedImages = [...images];
@@ -395,48 +462,84 @@ if (errorFlag) {
     value={location}
     onChangeText={setLocation}
     textAlign={I18nManager.isRTL ? "right" : "left"}
-  />
-<TouchableOpacity
-  style={[styles.uploadBox, { marginTop: -4 }]}
-  onPress={async () => {
-    try {
-      setGettingLoc(true);
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert("Permission needed", "Location access is required to pin your task.");
-        return;
+  />{/* Use current location */}
+  <TouchableOpacity
+    style={[styles.uploadBox, { marginTop: -4 }]}
+    onPress={async () => {
+      try {
+        setGettingLoc(true);
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Permission needed", "Location access is required to pin your task.");
+          return;
+        }
+  
+        const pos = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced
+        });
+  
+        const { latitude, longitude } = pos.coords;
+        setCoords({ latitude, longitude });
+  
+        // Reverse geocode to fill the address
+        const placemarks = await Location.reverseGeocodeAsync({ latitude, longitude });
+        if (placemarks?.length) {
+          const p = placemarks[0];
+          const nice = [p.name, p.street, p.subregion, p.city, p.region, p.country]
+            .filter(Boolean)
+            .join(", ");
+          setLocation(nice || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+        } else {
+          setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+        }
+      } catch (e) {
+        console.log("get location error", e);
+        Alert.alert("Error", "Couldn't get your location. Try again.");
+      } finally {
+        setGettingLoc(false);
       }
-
-      const pos = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced
-      });
-
-      const { latitude, longitude } = pos.coords;
-      setCoords({ latitude, longitude });
-
-      // Optional: reverse geocode to fill the address field
-      const placemarks = await Location.reverseGeocodeAsync({ latitude, longitude });
-      if (placemarks?.length) {
-        const p = placemarks[0];
-        const nice =
-          [p.name, p.street, p.subregion, p.city, p.region, p.country]
-            .filter(Boolean).join(", ");
-        setLocation(nice || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-      } else {
-        setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-      }
-    } catch (e) {
-      console.log("get location error", e);
-      Alert.alert("Error", "Couldn't get your location. Try again.");
-    } finally {
-      setGettingLoc(false);
-    }
-  }}
->
-  <Text style={styles.uploadText}>
-    {gettingLoc ? "Locating..." : "📍 Use current location"}
-  </Text>
-</TouchableOpacity>
+    }}
+  >
+    <Text style={styles.uploadText}>
+      {gettingLoc ? "Locating..." : "Use current location"}
+    </Text>
+  </TouchableOpacity>
+  
+  {/* NEW: Pick on map (opens modal even if no coords yet) */}
+  <TouchableOpacity
+    style={[styles.uploadBox, { marginTop: 8 }]}
+    onPress={openMapPicker}
+  >
+    <Text style={styles.uploadText}>🧭 Pick location on map</Text>
+  </TouchableOpacity>
+  
+  {/* Preview (readonly) if coords are set */}
+  {coords && (
+    <View style={{ marginTop: 8 }}>
+      <View style={{ height: 180, borderRadius: 10, overflow: "hidden" }}>
+        <MapView
+          style={{ flex: 1 }}
+          pointerEvents="none"
+          initialRegion={{
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }}
+        >
+          <Marker coordinate={coords} />
+        </MapView>
+      </View>
+  
+      <TouchableOpacity
+        style={[styles.uploadBox, { marginTop: 8 }]}
+        onPress={openMapPicker}
+      >
+        <Text style={styles.uploadText}>🗺️ Edit pin on map</Text>
+      </TouchableOpacity>
+    </View>
+  )}
+  
 
   <TextInput
       style={[styles.input, budgetError && { borderColor: "#c00", borderWidth: 2 }]}
@@ -557,6 +660,50 @@ if (errorFlag) {
   </View>
 </Modal>
 
+{/* Map Picker Modal */}
+<Modal visible={mapVisible} animationType="slide" transparent={false}>
+  <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={{ height: 60, justifyContent: "center", paddingHorizontal: 16 }}>
+      <Text style={{ fontSize: 18, fontWeight: "600", color: "#213729" }}>
+        Move the pin to the exact spot
+      </Text>
+      <Text style={{ color: "#666", marginTop: 2, fontSize: 12 }}>
+        Tap map to place pin, or drag the pin
+      </Text>
+    </View>
+
+    {tempRegion && (
+      <MapView
+        style={{ flex: 1 }}
+        initialRegion={tempRegion}
+        onPress={(e) => {
+          const { latitude, longitude } = e.nativeEvent.coordinate;
+          setTempCoords({ latitude, longitude });
+        }}
+      >
+        {tempCoords && (
+          <Marker
+            coordinate={tempCoords}
+            draggable
+            onDragEnd={(e) => {
+              const { latitude, longitude } = e.nativeEvent.coordinate;
+              setTempCoords({ latitude, longitude });
+            }}
+          />
+        )}
+      </MapView>
+    )}
+
+    <View style={styles.mapFooter}>
+      <TouchableOpacity style={[styles.mapBtn, styles.mapCancel]} onPress={() => setMapVisible(false)}>
+        <Text style={styles.mapBtnText}>Cancel</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={[styles.mapBtn, styles.mapConfirm]} onPress={confirmMapLocation}>
+        <Text style={[styles.mapBtnText, { color: "#fff" }]}>Use this location</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
 
     </KeyboardAvoidingView>
   );
@@ -847,7 +994,33 @@ const styles = StyleSheet.create({
     color: "#333",
     marginTop: -2,
   },
-  
+  mapFooter: {
+    flexDirection: "row",
+    gap: 12,
+    padding: 16,
+    backgroundColor: "#fff",
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: "#eee",
+  },
+  mapBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  mapCancel: {
+    backgroundColor: "#f2f2f2",
+  },
+  mapConfirm: {
+    backgroundColor: "#215432",
+  },
+  mapBtnText: {
+    fontSize: 16,
+    fontFamily: "InterBold",
+    color: "#213729",
+  },
+
   
   
   

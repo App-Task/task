@@ -21,12 +21,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
-      ],
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
       "package": "com.task.app"
     },
     "web": {
@@ -51,9 +46,7 @@
         "projectId": "02016b9f-21ea-402a-987c-c3691146d194"
       }
     },
-    "runtimeVersion": {
-      "policy": "1.0.0"
-    },
+    "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/02016b9f-21ea-402a-987c-c3691146d194"
     }
