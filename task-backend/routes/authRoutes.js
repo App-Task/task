@@ -4,6 +4,13 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const { register, login } = require("../controllers/authController");
+const crypto = require("crypto");
+const { sendResetCodeEmail } = require("../utils/mailer"); // ⬅️ you'll create this file (already sent to you)
+
+function hashCode(email, code) {
+  return crypto.createHash("sha256").update(`${email.toLowerCase()}:${code}`).digest("hex");
+}
+
 
 // Register endpoint
 router.post("/register", register);
@@ -144,5 +151,90 @@ if ("profileImage" in req.body) user.profileImage = profileImage;
     res.status(500).json({ msg: "Server error" });
   }
 });
+
+
+// ✅ Forgot Password - Send 6-digit code
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+  const genericMsg = { msg: "If this email exists, we sent a reset code." };
+
+  if (!email) return res.status(200).json(genericMsg);
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user) return res.status(200).json(genericMsg);
+
+  const now = Date.now();
+  if (user.passwordResetLastSentAt && now - user.passwordResetLastSentAt.getTime() < 60 * 1000) {
+    return res.status(200).json(genericMsg); // silently throttle
+  }
+
+  const code = (crypto.randomInt(100000, 1000000)).toString(); // 6-digit
+  const hash = hashCode(email, code);
+
+  user.passwordResetCodeHash = hash;
+  user.passwordResetExpires = new Date(now + 15 * 60 * 1000); // 15 mins
+  user.passwordResetAttempts = 0;
+  user.passwordResetLastSentAt = new Date(now);
+  await user.save();
+
+  try {
+    await sendResetCodeEmail({ to: email, code });
+  } catch (err) {
+    console.error("Resend error:", err.message);
+  }
+
+  return res.status(200).json(genericMsg);
+});
+
+// ✅ Reset Password - Confirm code and set new password
+router.post("/reset-password", async (req, res) => {
+  const { email, code, newPassword } = req.body;
+  const genericError = { msg: "Invalid code or it has expired." };
+
+  if (!email || !code || !newPassword) {
+    return res.status(400).json({ msg: "Missing fields." });
+  }
+
+  const strongPw = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+  if (!strongPw.test(newPassword)) {
+    return res.status(400).json({ msg: "Weak password." });
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user || !user.passwordResetCodeHash || !user.passwordResetExpires) {
+    return res.status(400).json(genericError);
+  }
+
+  if (user.passwordResetExpires.getTime() < Date.now()) {
+    return res.status(400).json(genericError);
+  }
+
+  if (user.passwordResetAttempts >= 5) {
+    return res.status(400).json(genericError);
+  }
+
+  const hash = hashCode(email, code);
+  if (hash !== user.passwordResetCodeHash) {
+    user.passwordResetAttempts += 1;
+    await user.save();
+    return res.status(400).json(genericError);
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(newPassword, salt);
+
+  user.passwordResetCodeHash = undefined;
+  user.passwordResetExpires = undefined;
+  user.passwordResetAttempts = 0;
+  user.passwordResetLastSentAt = undefined;
+  if (typeof user.markPasswordChanged === "function") {
+    user.markPasswordChanged();
+  }
+
+  await user.save();
+
+  return res.status(200).json({ msg: "Password updated. You can now log in." });
+});
+
 
 module.exports = router;

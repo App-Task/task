@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     
+    // ✅ For password reset logic
+passwordResetCodeHash: { type: String },
+passwordResetExpires: { type: Date },
+passwordResetAttempts: { type: Number, default: 0 },
+passwordResetLastSentAt: { type: Date },
 
     // ✅ NEW FIELD: User role
     role: {
@@ -43,5 +48,6 @@ const userSchema = new mongoose.Schema(
 
   
 );
+
 
 module.exports = mongoose.model("User", userSchema);

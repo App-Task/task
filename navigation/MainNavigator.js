@@ -7,7 +7,8 @@ import LoginScreen from "../screens/common/LoginScreen";
 import RegisterScreen from "../screens/common/RegisterScreen";
 import TermsAndConditionsScreen from "../screens/common/TermsAndConditionsScreen";
 import PrivacyPolicyScreen from "../screens/common/PrivacyPolicyScreen";
-
+import ForgotPasswordRequest from "../screens/common/ForgotPasswordRequest";
+import ForgotPasswordReset from "../screens/common/ForgotPasswordReset";
 
 
 import BottomTabNavigator from "./BottomTabNavigator"; // Client-side bottom tabs
@@ -53,6 +54,9 @@ export default function MainNavigator() {
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} />
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+
+<Stack.Screen name="ForgotPasswordRequest" component={ForgotPasswordRequest} />
+<Stack.Screen name="ForgotPasswordReset" component={ForgotPasswordReset} />
       
 
 
