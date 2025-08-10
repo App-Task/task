@@ -55,7 +55,7 @@ export default function LoginScreen({ navigation, route }) {
           if (response.user.role !== role) {
             Alert.alert(
               t("login.failedTitle"),
-              `This account is registered as a ${response.user.role}, not a ${role}.`
+              t("login.roleConflictMessage", { userRole: response.user.role, selectedRole: role })
             );
             setIsLoggingIn(false);
             return;
@@ -106,12 +106,22 @@ export default function LoginScreen({ navigation, route }) {
       if (err.response?.status === 403) {
         Alert.alert(
           t("login.failedTitle"),
-          t("login.blockedAccount", "Your account has been blocked by the admin.")
+          t("login.blockedAccount")
         );
       } else {
+        // Map common backend error messages to translated versions
+        const errorMessage = err.response?.data?.msg || err.message;
+        let translatedError;
+        
+        if (errorMessage === "Invalid credentials") {
+          translatedError = t("login.invalidCredentials");
+        } else {
+          translatedError = errorMessage || t("login.failedGeneric");
+        }
+        
         Alert.alert(
           t("login.failedTitle"),
-          err.response?.data?.msg || err.message || t("login.failedGeneric")
+          translatedError
         );
       }
       
@@ -160,7 +170,7 @@ export default function LoginScreen({ navigation, route }) {
         </View>
 
         <TouchableOpacity onPress={() => navigation.navigate("ForgotPasswordRequest")}>
-  <Text style={styles.forgot}>Forgot Password?</Text>
+  <Text style={styles.forgot}>{t("login.forgotPassword")}</Text>
 </TouchableOpacity>
 
 
@@ -181,7 +191,7 @@ export default function LoginScreen({ navigation, route }) {
       {isLoggingIn && (
   <View style={styles.loadingOverlay}>
     <View style={styles.loadingBox}>
-      <Text style={styles.loadingText}>{t("login.loggingIn", "Logging in...")}</Text>
+      <Text style={styles.loadingText}>{t("login.loggingIn")}</Text>
     </View>
   </View>
 )}

@@ -107,7 +107,7 @@ export default function MessagesScreen({ navigation }) {
       <View style={styles.searchBar}>
   <TextInput
     style={styles.searchInput}
-    placeholder="Search"
+    placeholder={t("clientMessages.search")}
     placeholderTextColor="#777"
     value={searchQuery}
     onChangeText={(text) => setSearchQuery(text)}

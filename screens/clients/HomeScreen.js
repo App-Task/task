@@ -49,7 +49,7 @@ export default function ClientHomeScreen() {
       setTasks(data);
     } catch (err) {
       console.error("❌ Failed to fetch tasks:", err.message);
-      Alert.alert("Error", "Could not load tasks.");
+      Alert.alert(t("clientHome.errorTitle"), t("clientHome.loadTasksError"));
     } finally {
       if (isRefresh) {
         setRefreshing(false);
@@ -96,18 +96,18 @@ export default function ClientHomeScreen() {
               },
             ]}
           >
-            <Text style={[styles.taskStatusText]}>{item.status}</Text>
+            <Text style={[styles.taskStatusText]}>{t(`clientHome.status.${item.status.toLowerCase()}`)}</Text>
 
           </View>
   
           <Text style={styles.taskDate}>
-            {new Date(item.createdAt).toLocaleDateString("en-GB", {
+            {new Date(item.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
               day: "2-digit",
               month: "short",
               year: "numeric",
             })}{" "}
             •{" "}
-            {new Date(item.createdAt).toLocaleTimeString("en-GB", {
+            {new Date(item.createdAt).toLocaleTimeString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
               hour: "2-digit",
               minute: "2-digit",
             })}
@@ -122,7 +122,7 @@ export default function ClientHomeScreen() {
 
   
         {/* ✅ VIEW DETAILS LINK */}
-        <Text style={styles.viewDetails}>View Details</Text>
+        <Text style={styles.viewDetails}>{t("clientHome.viewDetails")}</Text>
       </Animated.View>
     </TouchableOpacity>
   );

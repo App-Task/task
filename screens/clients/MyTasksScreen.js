@@ -109,7 +109,7 @@ allTasks.forEach((task) => {
       
         } catch (err) {
           console.error("❌ Failed to fetch tasks:", err.message);
-          Alert.alert("Error", t("clientMyTasks.fetchError"));
+          Alert.alert(t("clientMyTasks.errorTitle"), t("clientMyTasks.fetchError"));
         } finally {
           setLoading(false);
         }
@@ -164,7 +164,7 @@ allTasks.forEach((task) => {
   
       setSubmittingReview(false); // ✅ Hide overlay
   
-      Alert.alert("Thank you!", "Your review was submitted.");
+      Alert.alert(t("clientMyTasks.thankYouTitle"), t("clientMyTasks.reviewSubmittedMessage"));
       setShowReview(false);
       setReviewTask(null);
       setRating(0);
@@ -173,7 +173,7 @@ allTasks.forEach((task) => {
       navigation.setParams({});
     } catch (err) {
       setSubmittingReview(false); // ✅ Hide on error
-      Alert.alert("Error", "Failed to submit review.");
+      Alert.alert(t("clientMyTasks.errorTitle"), t("clientMyTasks.reviewFailedMessage"));
     }
   };
   
@@ -184,13 +184,13 @@ allTasks.forEach((task) => {
       <View style={styles.card}>
         {/* ✅ Date Row */}
         <Text style={styles.cardDate}>
-          {new Date(item.createdAt).toLocaleDateString("en-GB", {
+          {new Date(item.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
             day: "2-digit",
             month: "short",
             year: "numeric",
           })}{" "}
           •{" "}
-          {new Date(item.createdAt).toLocaleTimeString("en-GB", {
+          {new Date(item.createdAt).toLocaleTimeString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
             hour: "2-digit",
             minute: "2-digit",
           })}
@@ -214,7 +214,7 @@ allTasks.forEach((task) => {
           marginTop: 4,
         }}
       >
-        Completed
+        {t("clientMyTasks.completed")}
       </Text>
     )}
     {item.status?.toLowerCase() === "cancelled" && (
@@ -225,7 +225,7 @@ allTasks.forEach((task) => {
           marginTop: 4,
         }}
       >
-        Cancelled by {item.cancelledBy === userId ? "you" : "Tasker"}
+        {item.cancelledBy === userId ? t("clientMyTasks.cancelledByYou") : t("clientMyTasks.cancelledByTasker")}
       </Text>
     )}
   </>
@@ -237,12 +237,12 @@ allTasks.forEach((task) => {
           <Text
             style={{ fontFamily: "Inter", color: "#c00", marginTop: 8 }}
           >
-            Cancelled by {item.cancelledBy === userId ? "You" : "Tasker"}
+            {item.cancelledBy === userId ? t("clientMyTasks.cancelledByYou") : t("clientMyTasks.cancelledByTasker")}
           </Text>
         )}
   
         {/* ✅ View Details Hint */}
-        <Text style={styles.viewDetails}>View Task Details</Text>
+        <Text style={styles.viewDetails}>{t("clientMyTasks.viewTaskDetails")}</Text>
 
   
         {/* ✅ View Profile & Report Buttons */}
@@ -275,7 +275,7 @@ allTasks.forEach((task) => {
                     fontSize: 13,
                   }}
                 >
-                  View Profile
+                  {t("clientMyTasks.viewProfile")}
                 </Text>
               </TouchableOpacity>
   
@@ -292,12 +292,12 @@ allTasks.forEach((task) => {
                 disabled={reportingTaskId === item._id}
                 onPress={() => {
                   Alert.prompt(
-                    "Report Tasker",
-                    "Enter reason for reporting this tasker:",
+                    t("clientMyTasks.reportPromptTitle"),
+                    t("clientMyTasks.reportPromptMessage"),
                     [
-                      { text: "Cancel", style: "cancel" },
+                      { text: t("clientMyTasks.cancel"), style: "cancel" },
                       {
-                        text: "Submit",
+                        text: t("clientMyTasks.submit"),
                         onPress: async (reason) => {
                           try {
                             setReportingTaskId(item._id);
@@ -325,14 +325,14 @@ allTasks.forEach((task) => {
                               item._id,
                             ]);
                             Alert.alert(
-                              "Reported",
-                              "Tasker has been reported successfully."
+                              t("clientMyTasks.reportedTitle"),
+                              t("clientMyTasks.reportedMessage")
                             );
                           } catch (err) {
                             console.error("❌ Report error:", err.message);
                             Alert.alert(
-                              "Error",
-                              "Failed to submit report."
+                              t("clientMyTasks.errorTitle"),
+                              t("clientMyTasks.reportFailedMessage")
                             );
                           } finally {
                             setIsReporting(false);
@@ -352,7 +352,7 @@ allTasks.forEach((task) => {
                     fontSize: 13,
                   }}
                 >
-                  Report Tasker
+                  {t("clientMyTasks.reportTasker")}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -403,7 +403,7 @@ allTasks.forEach((task) => {
         />
 
         <Text style={{ fontFamily: "Inter", fontSize: 12, color: "#999", marginTop: 4 }}>
-          {comment.length}/300 characters
+          {t("clientMyTasks.charactersCount", { count: comment.length })}
         </Text>
 
         <TouchableOpacity
@@ -549,7 +549,7 @@ allTasks.forEach((task) => {
     }}>
       <ActivityIndicator size="large" color="#213729" />
       <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#213729" }}>
-        Submitting Report...
+        {t("clientMyTasks.submittingReport")}
       </Text>
     </View>
   </View>

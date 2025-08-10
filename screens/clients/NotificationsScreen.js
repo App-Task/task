@@ -68,7 +68,7 @@ export default function NotificationsScreen() {
       <Text style={styles.cardTitle}>{item.title}</Text>
       <Text style={styles.cardDesc}>{item.message}</Text>
       <Text style={styles.cardTime}>
-        {new Date(item.createdAt).toLocaleString("en-GB", {
+        {new Date(item.createdAt).toLocaleString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
           hour: "2-digit",
           minute: "2-digit",
           day: "numeric",

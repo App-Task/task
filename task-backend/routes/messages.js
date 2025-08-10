@@ -124,8 +124,8 @@ const senderUser = await User.findById(senderId);
 const notification = new Notification({
   userId: receiver,
   type: "message",
-  title: "New Message",
-  message: `New message from ${senderUser?.name || "someone"}`,
+  title: "رسالة جديدة",
+  message: `رسالة جديدة من ${senderUser?.name || "شخص ما"}`,
   relatedTaskId: taskId || undefined,
 });
 

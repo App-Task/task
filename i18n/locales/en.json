@@ -26,7 +26,10 @@
     "blockedAccount": "Your account has been blocked by the admin.",
     "failedGeneric": "Something went wrong. Please try again.",
     "missingTitle": "Missing Information",
-    "missingFields": "Please enter both email and password."
+    "missingFields": "Please enter both email and password.",
+    "loggingIn": "Logging in...",
+    "roleConflictMessage": "This account is registered as a {{userRole}}, not a {{selectedRole}}.",
+    "invalidCredentials": "Invalid credentials"
   },
   "register": {
     "title": "Create Your Account ",
@@ -110,6 +113,9 @@
     "postTaskBtn": "Post a Task",
     "yourTasks": "Your Tasks",
     "noTasks": "You haven't posted any tasks yet.",
+    "viewDetails": "View Details",
+    "errorTitle": "Error",
+    "loadTasksError": "Could not load tasks.",
     "status": {
       "pending": "Pending",
       "started": "Started",
@@ -119,7 +125,8 @@
   },
   "clientMessages": {
     "title": "Messages",
-    "placeholder": "No messages yet"
+    "placeholder": "No messages yet",
+    "search": "Search"
   },
   "clientPayments": {
     "title": "My Payments",
@@ -134,9 +141,28 @@
     "started": "In Progress",
     "completed": "Completed",
     "cancelled": "Cancelled",
-    "previous": "Previous",
-    "noTasks": "No tasks in {{status}} status currently",
-    "fetchError": "An error occurred while fetching your tasks."
+      "previous": "Previous",
+  "noTasks": "No tasks in {{status}} status currently",
+  "fetchError": "An error occurred while fetching your tasks.",
+  "viewTaskDetails": "View Task Details",
+  "completed": "Completed",
+  "cancelledByYou": "Cancelled by you",
+  "cancelledByTasker": "Cancelled by Tasker",
+  "viewProfile": "View Profile",
+  "reportTasker": "Report Tasker",
+  "reportPromptTitle": "Report Tasker",
+  "reportPromptMessage": "Enter reason for reporting this tasker:",
+  "cancel": "Cancel",
+  "submit": "Submit",
+  "reportedTitle": "Reported",
+  "reportedMessage": "Tasker has been reported successfully.",
+  "errorTitle": "Error",
+  "reportFailedMessage": "Failed to submit report.",
+  "thankYouTitle": "Thank you!",
+  "reviewSubmittedMessage": "Your review was submitted.",
+  "reviewFailedMessage": "Failed to submit review.",
+  "submittingReport": "Submitting Report...",
+  "charactersCount": "{{count}}/300 characters"
 }
 ,
   "clientNotifications": {
@@ -186,7 +212,29 @@
 
   },
     "postingNow": "Posting...",
-    "uploadingImage": "Uploading image..."
+    "uploadingImage": "Uploading image...",
+    "useCurrentLocation": "Use Current Location",
+    "selectOnMap": "Select on Map",
+    "editLocation": "Edit Location",
+    "locating": "Locating...",
+    "permissionNeeded": "Permission needed",
+    "locationPermissionMessage": "Location access is required to pin your task.",
+    "mapPermissionMessage": "Location access is required to set your pin.",
+    "errorTitle": "Error",
+    "locationError": "Couldn't get your location. Try again.",
+    "mapError": "Couldn't open the map.",
+    "userNotLoggedIn": "User not logged in. Please sign in again.",
+    "uploadFailed": "Upload failed",
+    "uploadFailedMessage": "Could not upload image. Try again.",
+    "postError": "Could not post task. Try again.",
+    "permissionDenied": "Permission denied",
+    "cameraPermissionMessage": "Camera access is required to take a photo.",
+    "libraryPermissionMessage": "Library access is required.",
+    "ok": "OK",
+    "selectTaskLocation": "Select Task Location",
+    "mapInstructions": "Tap on the map to place your pin, or drag the existing pin",
+    "cancel": "Cancel",
+    "confirmLocation": "Confirm Location"
 
 
   },
@@ -223,7 +271,29 @@
   "bidCount": "Number of Bids",
   "notProvided": "Not provided",
   "completingTask": "Marking as completed...",
-  "cancelingTask": "Cancelling task..."
+  "cancelingTask": "Cancelling task...",
+  "offeredPrice": "Offered Price",
+  "description": "Description",
+  "location": "Location",
+  "images": "Images",
+  "noImages": "No images",
+  "category": "Category",
+  "bidCount": "Bid Count",
+  "createdAt": "Created At",
+  "markCompleted": "Mark as Completed",
+  "markCompletedConfirmTitle": "Mark as Completed",
+  "markCompletedConfirmMessage": "Are you sure you want to mark this task as completed?",
+  "cancelTaskConfirmTitle": "Cancel Task",
+  "cancelTaskConfirmMessage": "Are you sure you want to cancel this task?",
+  "no": "No",
+  "yes": "Yes",
+  "taskCancelled": "Task Cancelled",
+  "errorTitle": "Error",
+  "loadTaskError": "Failed to load task.",
+  "userIdNotFound": "User ID not found.",
+  "cancelTaskError": "Failed to cancel task.",
+  "markCompletedError": "Could not mark the task as completed.",
+  "editNotAllowed": "You can't edit this task because a tasker has already placed a bid."
 },
   "clientViewBids": {
     "title": "Bids Received",

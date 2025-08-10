@@ -26,7 +26,10 @@
   "blockedAccount": "تم حظر حسابك من قبل الإدارة.",
   "failedGeneric": "حدث خطأ ما. حاول مرة أخرى.",
   "missingTitle": "معلومات ناقصة",
-  "missingFields": "يرجى إدخال البريد الإلكتروني وكلمة المرور."
+  "missingFields": "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
+  "loggingIn": "جاري تسجيل الدخول...",
+  "roleConflictMessage": "هذا الحساب مسجل كـ {{userRole}}، وليس كـ {{selectedRole}}.",
+  "invalidCredentials": "بيانات الدخول غير صحيحة"
   },
   "register": {
     "title": "إنشاء حساب ",
@@ -111,6 +114,9 @@
     "postTaskBtn": "أنشئ مهمة",
     "yourTasks": "مهامك",
     "noTasks": "لم تقم بإنشاء أي مهام بعد.",
+    "viewDetails": "عرض التفاصيل",
+    "errorTitle": "خطأ",
+    "loadTasksError": "تعذر تحميل المهام.",
     "status": {
       "pending": "قيد الانتظار",
       "started": "قيد التنفيذ",
@@ -120,7 +126,8 @@
   },
   "clientMessages": {
     "title": "الرسائل",
-    "placeholder": "لا توجد رسائل بعد"
+    "placeholder": "لا توجد رسائل بعد",
+    "search": "البحث"
   },
   "clientPayments": {
     "title": "مدفوعاتي",
@@ -137,7 +144,26 @@
   "cancelled": "ملغي",
   "previous": "المهام السابقة",
   "noTasks": "لا توجد مهام في حالة {{status}} حالياً",
-  "fetchError": "حدث خطأ أثناء تحميل المهام."
+  "fetchError": "حدث خطأ أثناء تحميل المهام.",
+  "viewTaskDetails": "عرض تفاصيل المهمة",
+  "completed": "مكتملة",
+  "cancelledByYou": "ألغيت بواسطتك",
+  "cancelledByTasker": "ألغيت بواسطة مقدم الخدمة",
+  "viewProfile": "عرض الملف الشخصي",
+  "reportTasker": "الإبلاغ عن مقدم الخدمة",
+  "reportPromptTitle": "الإبلاغ عن مقدم الخدمة",
+  "reportPromptMessage": "أدخل سبب الإبلاغ عن مقدم الخدمة:",
+  "cancel": "إلغاء",
+  "submit": "إرسال",
+  "reportedTitle": "تم الإبلاغ",
+  "reportedMessage": "تم الإبلاغ عن مقدم الخدمة بنجاح.",
+  "errorTitle": "خطأ",
+  "reportFailedMessage": "فشل في إرسال البلاغ.",
+  "thankYouTitle": "شكراً لك!",
+  "reviewSubmittedMessage": "تم إرسال تقييمك.",
+  "reviewFailedMessage": "فشل في إرسال التقييم.",
+  "submittingReport": "جاري إرسال البلاغ...",
+  "charactersCount": "{{count}}/300 حرف"
 }
 ,
   "clientNotifications": {
@@ -182,7 +208,29 @@
     "other": "أخرى"
   },
     "postingNow": "جاري النشر...",
-    "uploadingImage": "جارٍ تحميل الصورة..."
+    "uploadingImage": "جارٍ تحميل الصورة...",
+    "useCurrentLocation": "استخدام الموقع الحالي",
+    "selectOnMap": "اختيار على الخريطة",
+    "editLocation": "تعديل الموقع",
+    "locating": "جاري تحديد الموقع...",
+    "permissionNeeded": "مطلوب إذن",
+    "locationPermissionMessage": "مطلوب الوصول للموقع لتحديد مهمتك.",
+    "mapPermissionMessage": "مطلوب الوصول للموقع لتعيين دبوسك.",
+    "errorTitle": "خطأ",
+    "locationError": "تعذر الحصول على موقعك. حاول مرة أخرى.",
+    "mapError": "تعذر فتح الخريطة.",
+    "userNotLoggedIn": "المستخدم غير مسجل الدخول. يرجى تسجيل الدخول مرة أخرى.",
+    "uploadFailed": "فشل التحميل",
+    "uploadFailedMessage": "تعذر تحميل الصورة. حاول مرة أخرى.",
+    "postError": "تعذر نشر المهمة. حاول مرة أخرى.",
+    "permissionDenied": "تم رفض الإذن",
+    "cameraPermissionMessage": "مطلوب الوصول للكاميرا لالتقاط صورة.",
+    "libraryPermissionMessage": "مطلوب الوصول لمكتبة الصور.",
+    "ok": "موافق",
+    "selectTaskLocation": "اختيار موقع المهمة",
+    "mapInstructions": "اضغط على الخريطة لوضع دبوسك، أو اسحب الدبوس الموجود",
+    "cancel": "إلغاء",
+    "confirmLocation": "تأكيد الموقع"
 
 
   },
@@ -220,7 +268,29 @@
   "bidCount": "عدد العروض",
   "notProvided": "لم يتم التقديم",
    "completingTask": "جارٍ إنهاء المهمة...",
-  "cancelingTask": "جارٍ إلغاء المهمة..."
+  "cancelingTask": "جارٍ إلغاء المهمة...",
+  "offeredPrice": "السعر المعروض",
+  "description": "الوصف",
+  "location": "الموقع",
+  "images": "الصور",
+  "noImages": "لا توجد صور",
+  "category": "الفئة",
+  "bidCount": "عدد العروض",
+  "createdAt": "تاريخ الإنشاء",
+  "markCompleted": "تحديد كمكتملة",
+  "markCompletedConfirmTitle": "تحديد كمكتملة",
+  "markCompletedConfirmMessage": "هل أنت متأكد أنك تريد تحديد هذه المهمة كمكتملة؟",
+  "cancelTaskConfirmTitle": "إلغاء المهمة",
+  "cancelTaskConfirmMessage": "هل أنت متأكد أنك تريد إلغاء هذه المهمة؟",
+  "no": "لا",
+  "yes": "نعم",
+  "taskCancelled": "تم إلغاء المهمة",
+  "errorTitle": "خطأ",
+  "loadTaskError": "فشل في تحميل المهمة.",
+  "userIdNotFound": "لم يتم العثور على معرف المستخدم.",
+  "cancelTaskError": "فشل في إلغاء المهمة.",
+  "markCompletedError": "تعذر تحديد المهمة كمكتملة.",
+  "editNotAllowed": "لا يمكنك تعديل هذه المهمة لأن مقدم خدمة قد قدم عرضاً بالفعل."
 },
   "clientViewBids": {
     "title": "العروض المستلمة",

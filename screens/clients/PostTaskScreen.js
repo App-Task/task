@@ -98,7 +98,7 @@ const openMapPicker = async () => {
     if (!coords) {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("Permission needed", "Location access is required to set your pin.");
+        Alert.alert(t("clientPostTask.permissionNeeded"), t("clientPostTask.mapPermissionMessage"));
         return;
       }
       const pos = await Location.getCurrentPositionAsync({
@@ -125,7 +125,7 @@ const openMapPicker = async () => {
     setMapVisible(true);
   } catch (e) {
     console.log("openMapPicker error", e);
-    Alert.alert("Error", "Couldn't open the map.");
+    Alert.alert(t("clientPostTask.errorTitle"), t("clientPostTask.mapError"));
   }
 };
 
@@ -207,7 +207,7 @@ if (errorFlag) {
   
       if (!userId) {
         setPosting(false);
-        Alert.alert("Error", "User not logged in. Please sign in again.");
+        Alert.alert(t("clientPostTask.errorTitle"), t("clientPostTask.userNotLoggedIn"));
         return;
       }
   
@@ -249,7 +249,7 @@ if (errorFlag) {
         t("clientPostTask.successMessage"),
         [
           {
-            text: "OK",
+            text: t("clientPostTask.ok"),
             onPress: () => {
               setTimeout(() => {
                 navigation.navigate("Home");
@@ -267,7 +267,7 @@ if (errorFlag) {
       setSelectedCategory(null);
     } catch (err) {
       console.error("❌ Post error:", err.message);
-      Alert.alert("Error", "Could not post task. Try again.");
+      Alert.alert(t("clientPostTask.errorTitle"), t("clientPostTask.postError"));
     } finally {
       setPosting(false); // ✅ always hide popup
     }
@@ -287,7 +287,7 @@ if (errorFlag) {
           onPress: async () => {
             const { status } = await ImagePicker.requestCameraPermissionsAsync();
             if (status !== "granted") {
-              Alert.alert("Permission denied", "Camera access is required to take a photo.");
+              Alert.alert(t("clientPostTask.permissionDenied"), t("clientPostTask.cameraPermissionMessage"));
               return;
             }
     
@@ -306,7 +306,7 @@ if (errorFlag) {
           onPress: async () => {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== "granted") {
-              Alert.alert("Permission denied", "Library access is required.");
+              Alert.alert(t("clientPostTask.permissionDenied"), t("clientPostTask.libraryPermissionMessage"));
               return;
             }
     
@@ -358,7 +358,7 @@ if (errorFlag) {
       }
     } catch (err) {
       console.error("❌ Upload failed:", err);
-      Alert.alert("Upload failed", "Could not upload image. Try again.");
+      Alert.alert(t("clientPostTask.uploadFailed"), t("clientPostTask.uploadFailedMessage"));
     } finally {
       setImageUploading(false);
     }
@@ -473,7 +473,7 @@ if (errorFlag) {
           setGettingLoc(true);
           const { status } = await Location.requestForegroundPermissionsAsync();
           if (status !== "granted") {
-            Alert.alert("Permission needed", "Location access is required to pin your task.");
+            Alert.alert(t("clientPostTask.permissionNeeded"), t("clientPostTask.locationPermissionMessage"));
             return;
           }
     
@@ -497,14 +497,14 @@ if (errorFlag) {
           }
         } catch (e) {
           console.log("get location error", e);
-          Alert.alert("Error", "Couldn't get your location. Try again.");
+          Alert.alert(t("clientPostTask.errorTitle"), t("clientPostTask.locationError"));
         } finally {
           setGettingLoc(false);
         }
       }}
     >
       <Text style={styles.locationButtonText}>
-        {gettingLoc ? "Locating..." : "Use Current Location"}
+        {gettingLoc ? t("clientPostTask.locating") : t("clientPostTask.useCurrentLocation")}
       </Text>
     </TouchableOpacity>
     
@@ -512,7 +512,7 @@ if (errorFlag) {
       style={styles.locationButton}
       onPress={openMapPicker}
     >
-      <Text style={styles.locationButtonText}>Select on Map</Text>
+      <Text style={styles.locationButtonText}>{t("clientPostTask.selectOnMap")}</Text>
     </TouchableOpacity>
   </View>
   
@@ -538,7 +538,7 @@ if (errorFlag) {
         style={styles.editLocationButton}
         onPress={openMapPicker}
       >
-        <Text style={styles.editLocationText}>Edit Location</Text>
+        <Text style={styles.editLocationText}>{t("clientPostTask.editLocation")}</Text>
       </TouchableOpacity>
     </View>
   )}
@@ -667,9 +667,9 @@ if (errorFlag) {
 <Modal visible={mapVisible} animationType="slide" transparent={false}>
   <View style={{ flex: 1, backgroundColor: "#fff" }}>
     <View style={styles.mapHeader}>
-      <Text style={styles.mapHeaderTitle}>Select Task Location</Text>
+      <Text style={styles.mapHeaderTitle}>{t("clientPostTask.selectTaskLocation")}</Text>
       <Text style={styles.mapHeaderSubtitle}>
-        Tap on the map to place your pin, or drag the existing pin
+        {t("clientPostTask.mapInstructions")}
       </Text>
     </View>
 
@@ -697,10 +697,10 @@ if (errorFlag) {
 
     <View style={styles.mapFooter}>
       <TouchableOpacity style={[styles.mapBtn, styles.mapCancel]} onPress={() => setMapVisible(false)}>
-        <Text style={styles.mapBtnText}>Cancel</Text>
+        <Text style={styles.mapBtnText}>{t("clientPostTask.cancel")}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.mapBtn, styles.mapConfirm]} onPress={confirmMapLocation}>
-        <Text style={[styles.mapBtnText, { color: "#fff" }]}>Confirm Location</Text>
+        <Text style={[styles.mapBtnText, { color: "#fff" }]}>{t("clientPostTask.confirmLocation")}</Text>
       </TouchableOpacity>
     </View>
   </View>

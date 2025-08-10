@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   Alert,
   ActivityIndicator,
+  I18nManager,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
@@ -55,7 +56,7 @@ const [previewImage, setPreviewImage] = useState(null);
       setBids(bidData);
     } catch (err) {
       console.error("❌ Task fetch failed:", err.message);
-      Alert.alert("Error", "Failed to load task.");
+      Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.loadTaskError"));
     } finally {
       setLoading(false);
     }
@@ -65,15 +66,15 @@ const [previewImage, setPreviewImage] = useState(null);
     console.log("🟡 [Cancel Flow] User pressed 'Cancel Task'");
   
     Alert.alert(
-      "Cancel Task",
-      "Are you sure you want to cancel this task?",
+      t("clientTaskDetails.cancelTaskConfirmTitle"),
+      t("clientTaskDetails.cancelTaskConfirmMessage"),
       [
         {
-          text: "No",
+          text: t("clientTaskDetails.no"),
           onPress: () => console.log("🟡 [Cancel Flow] Cancel aborted by user"),
         },
         {
-          text: "Yes",
+          text: t("clientTaskDetails.yes"),
           onPress: () => {
             console.log("🟡 [Cancel Flow] User confirmed cancellation");
   
@@ -81,7 +82,7 @@ const [previewImage, setPreviewImage] = useState(null);
               console.log("🔍 Retrieved userId:", clientId);
   
               if (!clientId) {
-                Alert.alert("Error", "User ID not found.");
+                Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.userIdNotFound"));
                 console.log("❌ No userId in SecureStore, cannot proceed");
                 return;
               }
@@ -111,7 +112,7 @@ const [previewImage, setPreviewImage] = useState(null);
   
                 setCanceling(false); // ✅ Hide popup
   
-                Alert.alert("Task Cancelled");
+                Alert.alert(t("clientTaskDetails.taskCancelled"));
                 console.log("✅ Task cancelled successfully, navigating back to task list");
   
                 navigation.navigate("ClientHome", {
@@ -128,7 +129,7 @@ const [previewImage, setPreviewImage] = useState(null);
               } catch (err) {
                 setCanceling(false); // ✅ Hide on error
                 console.log("❌ Error during cancel request:", err.message);
-                Alert.alert("Error", "Failed to cancel task.");
+                Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.cancelTaskError"));
               }
             });
           },
@@ -178,14 +179,14 @@ const [previewImage, setPreviewImage] = useState(null);
   <View style={styles.topRow}>
     <View style={{ flex: 1 }}>
       <Text style={styles.heading}>{title}</Text>
-      <Text style={styles.subText}>Offered Price: {budget} BHD</Text>
+      <Text style={styles.subText}>{t("clientTaskDetails.offeredPrice")}: {budget} BHD</Text>
       <Text style={styles.subText}>
-        {new Date(task.createdAt).toLocaleDateString(undefined, {
+        {new Date(task.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
           year: "numeric",
           month: "short",
           day: "numeric",
         })}{" "}
-        • {new Date(task.createdAt).toLocaleTimeString([], {
+        • {new Date(task.createdAt).toLocaleTimeString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
           hour: "2-digit",
           minute: "2-digit",
         })}
@@ -193,7 +194,7 @@ const [previewImage, setPreviewImage] = useState(null);
     </View>
 
     <View style={[styles.statusBadge, getStatusStyle(task.status)]}>
-      <Text style={styles.statusText}>{task.status}</Text>
+      <Text style={styles.statusText}>{t(`clientHome.status.${task.status.toLowerCase()}`)}</Text>
     </View>
   </View>
 </View>
@@ -203,12 +204,12 @@ const [previewImage, setPreviewImage] = useState(null);
 
 <View style={styles.detailsBox}>
   <Text style={styles.detailsText}>
-    <Text style={{ fontFamily: "InterBold" }}>Description: </Text>
+    <Text style={{ fontFamily: "InterBold" }}>{t("clientTaskDetails.description")}: </Text>
     {description}
   </Text>
 
   <Text style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}>
-    Images:
+    {t("clientTaskDetails.images")}:
   </Text>
   <View style={styles.imageRow}>
   {images.length > 0 ? (
@@ -218,29 +219,29 @@ const [previewImage, setPreviewImage] = useState(null);
       </TouchableOpacity>
     ))
   ) : (
-    <Text style={styles.detailsText}>No images</Text>
+    <Text style={styles.detailsText}>{t("clientTaskDetails.noImages")}</Text>
   )}
 </View>
 
 
   <Text style={[styles.detailsText, { marginTop: 12 }]}>
-    <Text style={{ fontFamily: "InterBold" }}>Location: </Text>
+    <Text style={{ fontFamily: "InterBold" }}>{t("clientTaskDetails.location")}: </Text>
     {location}
   </Text>
 
   <Text style={[styles.detailsText, { marginTop: 12 }]}>
-    <Text style={{ fontFamily: "InterBold" }}>Category: </Text>
+    <Text style={{ fontFamily: "InterBold" }}>{t("clientTaskDetails.category")}: </Text>
     {task.category || t("clientTaskDetails.notProvided")}
   </Text>
 
   <Text style={[styles.detailsText, { marginTop: 12 }]}>
-    <Text style={{ fontFamily: "InterBold" }}>Bid Count: </Text>
+    <Text style={{ fontFamily: "InterBold" }}>{t("clientTaskDetails.bidCount")}: </Text>
     {task.bidCount}
   </Text>
 
   <Text style={[styles.detailsText, { marginTop: 12 }]}>
-    <Text style={{ fontFamily: "InterBold" }}>Created At: </Text>
-    {new Date(task.createdAt).toLocaleDateString(undefined, {
+    <Text style={{ fontFamily: "InterBold" }}>{t("clientTaskDetails.createdAt")}: </Text>
+    {new Date(task.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -253,7 +254,7 @@ const [previewImage, setPreviewImage] = useState(null);
     <>
       {bids.length > 0 ? (
         <Text style={styles.noticeInside}>
-          You can't edit this task because a tasker has already placed a bid.
+          {t("clientTaskDetails.editNotAllowed")}
         </Text>
       ) : (
         <TouchableOpacity
@@ -278,12 +279,12 @@ const [previewImage, setPreviewImage] = useState(null);
       style={styles.whiteButton}
       onPress={() => {
         Alert.alert(
-          "Mark as Completed",
-          "Are you sure you want to mark this task as completed?",
+          t("clientTaskDetails.markCompletedConfirmTitle"),
+          t("clientTaskDetails.markCompletedConfirmMessage"),
           [
-            { text: "No" },
+            { text: t("clientTaskDetails.no") },
             {
-              text: "Yes",
+              text: t("clientTaskDetails.yes"),
               onPress: async () => {
                 try {
                   setCompleting(true);
@@ -303,7 +304,7 @@ const [previewImage, setPreviewImage] = useState(null);
                   });
                 } catch (err) {
                   setCompleting(false);
-                  Alert.alert("Error", "Could not mark the task as completed.");
+                  Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.markCompletedError"));
                 }
               },
             },
@@ -311,7 +312,7 @@ const [previewImage, setPreviewImage] = useState(null);
         );
       }}
     >
-      <Text style={styles.whiteButtonText}>Mark as Completed</Text>
+      <Text style={styles.whiteButtonText}>{t("clientTaskDetails.markCompleted")}</Text>
     </TouchableOpacity>
   )}
 
@@ -340,6 +341,25 @@ const [previewImage, setPreviewImage] = useState(null);
 
 
       </ScrollView>
+
+      {/* Loading overlays */}
+      {completing && (
+        <View style={styles.overlay}>
+          <View style={styles.overlayBox}>
+            <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
+            <Text style={styles.overlayText}>{t("clientTaskDetails.completingTask")}</Text>
+          </View>
+        </View>
+      )}
+
+      {canceling && (
+        <View style={styles.overlay}>
+          <View style={styles.overlayBox}>
+            <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
+            <Text style={styles.overlayText}>{t("clientTaskDetails.cancelingTask")}</Text>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }

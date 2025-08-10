@@ -26,8 +26,8 @@ if (task && taskerId) {
   const notif = new Notification({
     userId: taskerId,
     type: "review",
-    title: "New Review",
-    message: `You received a review from the client for “${task.title}”.`,
+    title: "تقييم جديد",
+    message: `تلقيت تقييماً من العميل للمهمة "${task.title}".`,
     relatedTaskId: task._id,
   });
   await notif.save();
