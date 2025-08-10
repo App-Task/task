@@ -126,7 +126,7 @@ export default function TaskerProfileScreen({ navigation }) {
                 }
               } catch (err) {
                 console.error("❌ Upload failed:", err);
-                Alert.alert("Upload failed", "Could not upload image. Try again.");
+                Alert.alert(t("taskerProfile.uploadFailed"), t("taskerProfile.uploadFailedMessage"));
               }
             }
           },
@@ -146,7 +146,7 @@ export default function TaskerProfileScreen({ navigation }) {
         
             } catch (err) {
               console.error("❌ Failed to remove image:", err.message);
-              Alert.alert("Error", "Could not remove profile image.");
+              Alert.alert(t("taskerProfile.removePhotoError"), t("taskerProfile.removePhotoErrorMessage"));
             }
           },
         },
@@ -192,17 +192,17 @@ export default function TaskerProfileScreen({ navigation }) {
       {user.verificationStatus === "accepted" ? (
   <View style={styles.verifiedBadge}>
     <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
-    <Text style={styles.verifiedText}>Verified Tasker</Text>
+    <Text style={styles.verifiedText}>{t("taskerProfile.verifiedTasker")}</Text>
   </View>
 ) : user.verificationStatus === "declined" ? (
   <View style={styles.declinedBadge}>
     <Ionicons name="close-circle" size={18} color="#ff4444" />
-    <Text style={styles.declinedText}>Verification Declined</Text>
+    <Text style={styles.declinedText}>{t("taskerProfile.verificationDeclined")}</Text>
   </View>
 ) : (
   <View style={styles.pendingBadge}>
     <Ionicons name="time" size={18} color="#FFA500" />
-    <Text style={styles.pendingText}>Verification Pending</Text>
+    <Text style={styles.pendingText}>{t("taskerProfile.verificationPending")}</Text>
   </View>
 )}
 
@@ -220,7 +220,7 @@ export default function TaskerProfileScreen({ navigation }) {
     style={styles.rowItem}
     onPress={() => navigation.navigate("ChangePassword")}
   >
-    <Text style={styles.rowText}>Change Password</Text>
+    <Text style={styles.rowText}>{t("taskerProfile.changePassword")}</Text>
     <Ionicons name="chevron-forward" size={20} color="#999" />
   </TouchableOpacity>
 

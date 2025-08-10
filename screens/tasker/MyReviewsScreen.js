@@ -68,7 +68,7 @@ export default function MyReviewsScreen({ navigation }) {
   </View>
   <View style={{ padding: 16 }}>
     <Text style={styles.reviewer}>
-      Client Name: {item.clientId?.name || "Client"}
+      {t("taskerReviews.clientName")} {item.clientId?.name || "Client"}
     </Text>
     {item.comment ? <Text style={styles.comment}>{item.comment}</Text> : null}
   </View>
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 28,
     color: "#215432",
-    textAlign: "left",
+    textAlign: I18nManager.isRTL ? "right" : "left",
     marginBottom: 10, // ✅ add this to separate from the cards
   },
   
@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 16,
     color: "#213729",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   stars: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
@@ -181,6 +182,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#555",
     marginBottom: 20,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   averageHighlight: {
     fontFamily: "InterBold",

@@ -50,5 +50,19 @@ router.patch("/mark-read", async (req, res) => {
   }
 });
 
+// ✅ DELETE /api/notifications/clear-all - Clear all notifications for testing
+router.delete("/clear-all", async (req, res) => {
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const userId = decoded.userId || decoded.id;
+    await Notification.deleteMany({ userId });
+    res.json({ success: true, message: "All notifications cleared" });
+  } catch (err) {
+    console.error("❌ Error clearing notifications:", err.message);
+    res.status(500).json({ error: "Failed to clear notifications" });
+  }
+});
 
 module.exports = router;

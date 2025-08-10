@@ -8,11 +8,14 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   SafeAreaView,
+  I18nManager,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import axios from "axios";
 
 export default function TaskerProfileScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { taskerId } = route.params;
   const [tasker, setTasker] = useState(null);
   const [reviewData, setReviewData] = useState({ average: null, reviews: [] });
@@ -51,7 +54,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
   if (!tasker) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <Text style={styles.error}>Failed to load tasker profile.</Text>
+        <Text style={styles.error}>{t("taskerProfile.loadError")}</Text>
       </SafeAreaView>
     );
   }
@@ -78,18 +81,18 @@ export default function TaskerProfileScreen({ route, navigation }) {
   <Text style={styles.name}>{tasker.name}</Text>
 
   <Text style={styles.profileDetails}>
-    <Text style={styles.profileLabel}>Location: </Text>
-    {tasker.location || "Not provided"}
+    <Text style={styles.profileLabel}>{t("taskerProfile.location")} </Text>
+    {tasker.location || t("taskerProfile.notProvided")}
   </Text>
 
   <Text style={styles.profileDetails}>
-    <Text style={styles.profileLabel}>Experience: </Text>
-    {tasker.experience || "Not provided"}
+    <Text style={styles.profileLabel}>{t("taskerProfile.experience")} </Text>
+    {tasker.experience || t("taskerProfile.notProvided")}
   </Text>
 
   <Text style={styles.profileDetails}>
-    <Text style={styles.profileLabel}>Skills: </Text>
-    {tasker.skills || "Not provided"}
+    <Text style={styles.profileLabel}>{t("taskerProfile.skills")} </Text>
+    {tasker.skills || t("taskerProfile.notProvided")}
   </Text>
 </View>
 
@@ -97,15 +100,15 @@ export default function TaskerProfileScreen({ route, navigation }) {
 <View style={styles.greenSection}>
   {/* About */}
   <Text style={styles.aboutTitle}>
-    <Text style={styles.aboutBold}>About: </Text>
-    {tasker.about || "Not provided"}
+    <Text style={styles.aboutBold}>{t("taskerProfile.about")} </Text>
+    {tasker.about || t("taskerProfile.notProvided")}
   </Text>
 
   {/* Reviews Header */}
   <View style={styles.reviewsHeader}>
-    <Text style={styles.reviewsTitle}>Reviews</Text>
+    <Text style={styles.reviewsTitle}>{t("taskerProfile.reviews")}</Text>
     <Text style={styles.reviewsAvg}>
-      Avg Rating:{" "}
+      {t("taskerProfile.avgRating")}{" "}
       {reviewData.reviews.length
         ? (
             reviewData.reviews.reduce((sum, r) => sum + r.rating, 0) /
@@ -117,12 +120,12 @@ export default function TaskerProfileScreen({ route, navigation }) {
 
   {/* Reviews List */}
   {reviewData.reviews.length === 0 ? (
-    <Text style={styles.noReviews}>No reviews yet</Text>
+    <Text style={styles.noReviews}>{t("taskerProfile.noReviews")}</Text>
   ) : (
     reviewData.reviews.map((rev, idx) => (
       <View key={idx} style={styles.reviewCard}>
         <Text style={styles.reviewDate}>
-          {new Date(rev.createdAt).toLocaleDateString("en-GB", {
+          {new Date(rev.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
             day: "2-digit",
             month: "short",
             year: "numeric",
@@ -202,7 +205,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: "InterBold",
     color: "#215432",
-    textAlign: "left", // ✅ left-aligned
+    textAlign: I18nManager.isRTL ? "right" : "left",
     marginBottom: 6,
   },
   review: {
@@ -252,7 +255,7 @@ const styles = StyleSheet.create({
   profileDetails: {
     fontSize: 14,
     color: "#555",
-    textAlign: "left", // ✅ left-aligned
+    textAlign: I18nManager.isRTL ? "right" : "left",
     marginBottom: 4,
   },
   

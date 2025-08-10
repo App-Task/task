@@ -9,8 +9,11 @@ import {
   StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 export default function SettingsScreen({ navigation }) {
+  const { t } = useTranslation();
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header with Back Button */}
@@ -22,14 +25,14 @@ export default function SettingsScreen({ navigation }) {
             color="#213729"
           />
         </TouchableOpacity>
-        <Text style={styles.header}>Settings</Text>
+        <Text style={styles.header}>{t("taskerSettings.title")}</Text>
         <View style={{ width: 24 }} />
       </View>
 
       {/* Items */}
       <TouchableOpacity style={styles.item}>
         <Ionicons name="information-circle-outline" size={20} color="#215432" />
-        <Text style={styles.text}>About</Text>
+        <Text style={styles.text}>{t("taskerSettings.about")}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -37,7 +40,7 @@ export default function SettingsScreen({ navigation }) {
   onPress={() => navigation.navigate("PrivacyPolicy")}
 >
   <Ionicons name="shield-checkmark-outline" size={20} color="#215432" />
-  <Text style={styles.text}>Privacy Policy</Text>
+  <Text style={styles.text}>{t("taskerSettings.privacy")}</Text>
 </TouchableOpacity>
 
 
@@ -46,17 +49,17 @@ export default function SettingsScreen({ navigation }) {
         onPress={() => navigation.navigate("TermsAndConditions")}
       >
         <Ionicons name="document-text-outline" size={20} color="#215432" />
-        <Text style={styles.text}>Terms and Conditions</Text>
+        <Text style={styles.text}>{t("taskerSettings.terms")}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.item}>
         <Ionicons name="help-circle-outline" size={20} color="#215432" />
-        <Text style={styles.text}>FAQ</Text>
+        <Text style={styles.text}>{t("taskerSettings.faq")}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.item}>
         <Ionicons name="chatbubbles-outline" size={20} color="#215432" />
-        <Text style={styles.text}>Contact Us</Text>
+        <Text style={styles.text}>{t("taskerSettings.contact")}</Text>
       </TouchableOpacity>
 
 

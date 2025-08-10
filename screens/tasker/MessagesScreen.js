@@ -112,7 +112,7 @@ export default function TaskerMessagesScreen({ navigation }) {
       <View style={styles.searchBar}>
   <TextInput
     style={styles.searchInput}
-    placeholder="Search"
+    placeholder={t("taskerMessages.searchPlaceholder")}
     placeholderTextColor="#777"
     value={searchQuery}
     onChangeText={(text) => setSearchQuery(text)}
@@ -123,7 +123,7 @@ export default function TaskerMessagesScreen({ navigation }) {
       {loading && conversations.length === 0 ? (
         <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
       ) : conversations.length === 0 ? (
-<Text style={styles.empty}>No messages yet</Text>
+<Text style={styles.empty}>{t("taskerMessages.empty")}</Text>
       ) : (
         <FlatList
         data={conversations.filter((c) =>

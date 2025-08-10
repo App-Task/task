@@ -80,7 +80,7 @@ const res = await axios.get(url, {
         } else {
           console.log("❌ General error object:", err);
         }
-        Alert.alert("Error", "Failed to load tasks.");
+        Alert.alert(t("taskerMyTasks.errorTitle"), t("taskerMyTasks.loadError"));
       } finally {
         setLoading(false);
       }
@@ -109,13 +109,13 @@ const res = await axios.get(url, {
         <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
           {/* Title */}
           <Text style={styles.dateText}>
-  {new Date(item.createdAt).toLocaleDateString("en-GB", {
+  {new Date(item.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   })}{" "}
   •{" "}
-  {new Date(item.createdAt).toLocaleTimeString("en-GB", {
+  {new Date(item.createdAt).toLocaleTimeString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
     hour: "2-digit",
     minute: "2-digit",
   })}
@@ -136,8 +136,8 @@ const res = await axios.get(url, {
     }
   >
     {item.status?.toLowerCase() === "completed"
-      ? "Completed"
-      : `Cancelled by ${item.cancelledBy?._id === taskerId ? "you" : "Client"}`}
+      ? t("taskerMyTasks.completed")
+      : `${item.cancelledBy?._id === taskerId ? t("taskerMyTasks.cancelledByYou") : t("taskerMyTasks.cancelledByClient")}`}
   </Text>
 ) : (
   <Text
@@ -151,7 +151,7 @@ const res = await axios.get(url, {
   >
     {t("taskerMyTasks.status")}:{" "}
     {item.status === "cancelled"
-      ? `Cancelled by ${cancelledByTasker ? "you" : "client"}`
+      ? `${cancelledByTasker ? t("taskerMyTasks.cancelledByYou") : t("taskerMyTasks.cancelledByClient")}`
       : t(`taskerMyTasks.statusTypes.${item.status.toLowerCase()}`)}
   </Text>
 )}
@@ -164,7 +164,7 @@ const res = await axios.get(url, {
     navigation.navigate("TaskerTaskDetails", { task: item })
   }
 >
-  <Text style={styles.detailsLink}>View Details</Text>
+  <Text style={styles.detailsLink}>{t("taskerMyTasks.viewDetails")}</Text>
 </TouchableOpacity>
 
 
@@ -190,12 +190,12 @@ const res = await axios.get(url, {
   disabled={reportingTaskId === item._id}
   onPress={() => {
     Alert.prompt(
-      "Report Client",
-      "Enter reason for reporting this client:",
+      t("taskerMyTasks.reportClient"),
+      t("taskerMyTasks.reportPrompt"),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("taskerMyTasks.reportCancel"), style: "cancel" },
         {
-          text: "Submit",
+          text: t("taskerMyTasks.reportSubmit"),
           onPress: async (reason) => {
             try {
               setReportingTaskId(item._id);
@@ -209,10 +209,10 @@ const res = await axios.get(url, {
               }, {
                 headers: { Authorization: `Bearer ${token}` }
               });
-              Alert.alert("Reported", "Client has been reported successfully.");
+              Alert.alert(t("taskerMyTasks.reportedTitle"), t("taskerMyTasks.reportedMessage"));
             } catch (err) {
               console.error("❌ Report error:", err.message);
-              Alert.alert("Error", "Failed to submit report.");
+              Alert.alert(t("taskerMyTasks.errorTitle"), t("taskerMyTasks.reportError"));
             } finally {
               setReportingTaskId(null);
               setIsReporting(false);
@@ -236,10 +236,10 @@ const res = await axios.get(url, {
               <TouchableOpacity
                 style={[styles.btn, styles.dangerBtn]}
                 onPress={() => {
-                  Alert.alert("Are you sure you want to cancel?", "", [
-                    { text: "No", style: "cancel" },
+                  Alert.alert(t("taskerMyTasks.cancelConfirm"), "", [
+                    { text: t("taskerMyTasks.no"), style: "cancel" },
                     {
-                      text: "Yes",
+                      text: t("taskerMyTasks.yes"),
                       onPress: async () => {
                         try {
                           const res = await axios.put(
@@ -253,7 +253,7 @@ const res = await axios.get(url, {
                           );
   
                           if (res.status === 200) {
-                            Alert.alert("Cancelled successfully");
+                            Alert.alert(t("taskerMyTasks.cancelSuccess"));
                             setTasks((prev) =>
                               prev.filter((t) => t._id !== item._id)
                             );
@@ -261,8 +261,8 @@ const res = await axios.get(url, {
                         } catch (err) {
                           console.error("❌ Cancel error:", err);
                           Alert.alert(
-                            "Error",
-                            err.response?.data?.msg || "Something went wrong."
+                            t("taskerMyTasks.errorTitle"),
+                            err.response?.data?.msg || t("taskerMyTasks.cancelError")
                           );
                         }
                       },
@@ -310,7 +310,7 @@ const res = await axios.get(url, {
     style={[styles.tab, tab === "previous" && styles.activeTab]}
   >
     <Text style={[styles.tabText, tab === "previous" && styles.activeTabText]}>
-      Previous
+      {t("taskerMyTasks.previous")}
     </Text>
   </TouchableOpacity>
 </View>
@@ -319,14 +319,14 @@ const res = await axios.get(url, {
 {showVerifyBanner && (
   <View style={styles.verifyBanner}>
     <Text style={styles.verifyText}>
-      Your documents still need to be verified (this may take up to 48 hours),{" "}
+      {t("taskerMyTasks.verifyPending")}{" "}
       <Text
         style={styles.contactLink}
         onPress={() =>
           Linking.openURL("mailto:Task.team.bh@gmail.com")
         }
       >
-        Contact us
+        {t("taskerMyTasks.contactUs")}
       </Text>
     </Text>
   </View>
@@ -366,7 +366,7 @@ const res = await axios.get(url, {
     }}>
       <ActivityIndicator size="large" color="#213729" />
       <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#213729" }}>
-        Submitting Report...
+        {t("taskerMyTasks.submittingReport")}
       </Text>
     </View>
   </View>

@@ -123,7 +123,7 @@ export default function DocumentsScreen({ navigation, route }) {
                 );
               } catch (err) {
                 console.error("❌ Upload error:", err.response?.data || err.message);
-                Alert.alert("Upload Failed", "Could not upload document. Please try again.");
+                Alert.alert(t("taskerDocuments.uploadFailedTitle"), t("taskerDocuments.uploadFailedMessage"));
               } finally {
                 setUploading(false); // hide loading popup
               }
@@ -173,7 +173,7 @@ export default function DocumentsScreen({ navigation, route }) {
       setDocuments((prev) => prev.filter((doc) => doc.id !== id));
     } catch (err) {
       console.error("❌ Error deleting document:", err.response?.data || err.message);
-      Alert.alert("Delete Failed", "Could not delete document.");
+      Alert.alert(t("taskerDocuments.deleteFailedTitle"), t("taskerDocuments.deleteFailedMessage"));
     }
   };
   
@@ -207,9 +207,9 @@ export default function DocumentsScreen({ navigation, route }) {
 </View>
 
 {/* Title + Description BELOW the arrow */}
-<Text style={styles.finalTitle}>Final Check!</Text>
+<Text style={styles.finalTitle}>{t("taskerDocuments.finalTitle")}</Text>
 <Text style={styles.finalDesc}>
-  For verification, please upload your CPR. This keeps your account and our platform secure.
+  {t("taskerDocuments.finalDesc")}
 </Text>
 
 
@@ -240,7 +240,7 @@ export default function DocumentsScreen({ navigation, route }) {
       ) : (
         <TouchableOpacity style={styles.uploadBox} onPress={uploadDocument}>
   <Ionicons name="cloud-upload-outline" size={40} color="#999" />
-  <Text style={styles.uploadBoxText}>Upload Document</Text>
+  <Text style={styles.uploadBoxText}>{t("taskerDocuments.uploadDocument")}</Text>
 </TouchableOpacity>
 
       )}
@@ -260,7 +260,7 @@ export default function DocumentsScreen({ navigation, route }) {
       })
     }
   >
-    <Text style={styles.buttonText}>Continue to Home</Text>
+    <Text style={styles.buttonText}>{t("taskerDocuments.continueToHome")}</Text>
   </TouchableOpacity>
 )}
 
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     color: "#213729",
     marginBottom: 6,
     marginTop: 10,
-
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   finalDesc: {
     fontFamily: "Inter",
@@ -379,6 +379,7 @@ const styles = StyleSheet.create({
     color: "#666",
     lineHeight: 20,
     marginBottom: 10, // adds consistent space before the upload box
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   
   uploadBox: {
@@ -396,6 +397,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#999",
     marginTop: 8,
+    textAlign: "center",
   },
   
 });

@@ -43,9 +43,9 @@ const JOB_TYPES = [
 ];
 
 
-const formatDateTime = (isoString) => {
+const formatDateTime = (isoString, isRTL = false) => {
   const date = new Date(isoString);
-  return date.toLocaleString("en-US", {
+  return date.toLocaleString(isRTL ? "ar-SA" : "en-US", {
     weekday: "short",
     hour: "numeric",
     minute: "numeric",
@@ -209,13 +209,13 @@ setFilteredTasks(availableTasks);
   {/* ✅ Green Header */}
   <View style={styles.cardHeader}>
     <Text style={styles.cardHeaderText}>
-      Posted: {new Date(item.createdAt).toLocaleDateString("en-GB", {
+      {t("taskerExplore.posted")}: {new Date(item.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
         day: "2-digit",
         month: "short",
         year: "numeric",
       })}{" "}
       •{" "}
-      {new Date(item.createdAt).toLocaleTimeString("en-GB", {
+      {new Date(item.createdAt).toLocaleTimeString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
         hour: "2-digit",
         minute: "2-digit",
       })}
@@ -233,7 +233,7 @@ setFilteredTasks(availableTasks);
         navigation.navigate("TaskerTaskDetails", { task: item })
       }
     >
-      View Details
+      {t("taskerExplore.viewDetails")}
     </Text>
   </View>
 </Animated.View>
@@ -260,14 +260,14 @@ setFilteredTasks(availableTasks);
 {showVerifyBanner === true && (
   <View style={styles.verifyBanner}>
     <Text style={styles.verifyText}>
-      Your documents still need to be verified (this may take up to 48 hours),{" "}
+      {t("taskerExplore.verifyPending")}{" "}
       <Text
         style={styles.contactLink}
         onPress={() =>
           Linking.openURL("mailto:Task.team.bh@gmail.com")
         }
       >
-        Contact us
+        {t("taskerExplore.contactUs")}
       </Text>
     </Text>
   </View>
@@ -277,7 +277,7 @@ setFilteredTasks(availableTasks);
 {showVerifyBanner === "incomplete" && (
   <View style={styles.verifyBanner}>
     <Text style={styles.verifyText}>
-      To find jobs you must complete your profile.
+      {t("taskerExplore.incompleteProfile")}
     </Text>
     <TouchableOpacity
 onPress={() => navigation.navigate("EditTaskerProfile")}
@@ -290,7 +290,7 @@ style={{
       }}
     >
       <Text style={{ color: "#fff", fontFamily: "InterBold", textAlign: "center" }}>
-        Press here to finish your profile
+        {t("taskerExplore.finishProfile")}
       </Text>
     </TouchableOpacity>
   </View>
@@ -301,7 +301,7 @@ style={{
   value={searchQuery}
   onChangeText={setSearchQuery}
   style={styles.searchInput}
-  placeholder={t("taskerExplore.searchPlaceholder", "Search by job title...")}
+  placeholder={t("taskerExplore.searchPlaceholder")}
   placeholderTextColor="#ffffff"
 />
 
@@ -323,7 +323,7 @@ style={{
                   setShowModal(false);
                 }}
               >
-                <Text style={styles.optionText}>{type}</Text>
+                <Text style={styles.optionText}>{t(`taskerExplore.jobTypes.${type.toLowerCase()}`)}</Text>
               </TouchableOpacity>
             ))}
             <TouchableOpacity
@@ -333,7 +333,7 @@ style={{
                 setShowModal(false);
               }}
             >
-              <Text style={[styles.optionText, { color: "red" }]}>Clear Filter</Text>
+              <Text style={[styles.optionText, { color: "red" }]}>{t("taskerExplore.clearFilter")}</Text>
             </TouchableOpacity>
           </View>
         </Pressable>

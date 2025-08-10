@@ -81,8 +81,8 @@ const [rawPhone, setRawPhone] = useState("");
   const handleSave = async () => {
     if (!name || !gender || !location || !experience || !skills || !about) {
       Alert.alert(
-        "Incomplete Profile",
-        "Please fill out all fields before saving your profile."
+        t("taskerEditProfile.incompleteTitle"),
+        t("taskerEditProfile.incompleteMessage")
       );
       return;
     }
@@ -90,14 +90,14 @@ const [rawPhone, setRawPhone] = useState("");
     // ✅ Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      Alert.alert(t("taskerEditProfile.invalidEmailTitle"), t("taskerEditProfile.invalidEmailMessage"));
       return;
     }
   
     // ✅ Phone number validation (8–15 digits)
     const phoneRegex = /^[0-9]{8,15}$/;
     if (!phoneRegex.test(rawPhone.trim())) {
-      Alert.alert("Invalid Phone Number", "Phone number must be 8 to 15 digits and contain only numbers.");
+      Alert.alert(t("taskerEditProfile.invalidPhoneTitle"), t("taskerEditProfile.invalidPhoneMessage"));
       return;
     }
   
@@ -125,19 +125,19 @@ const [rawPhone, setRawPhone] = useState("");
   
       const data = await res.json();
       if (res.ok) {
-        Alert.alert("Profile Updated", "Your profile has been saved successfully.", [
+        Alert.alert(t("taskerEditProfile.updateSuccessTitle"), t("taskerEditProfile.updateSuccessMessage"), [
           {
-            text: "OK",
+            text: t("taskerEditProfile.ok"),
             onPress: () => navigation.goBack(),
           },
         ]);
       } else {
         console.error("❌ Update failed:", data);
-        Alert.alert("Error", data.msg || "Failed to update profile.");
+        Alert.alert(t("taskerEditProfile.errorTitle"), data.msg || t("taskerEditProfile.updateFailedMessage"));
       }
     } catch (err) {
       console.error("❌ Error saving profile:", err.message);
-      Alert.alert("Error", "Something went wrong. Please try again.");
+      Alert.alert(t("taskerEditProfile.errorTitle"), t("taskerEditProfile.generalErrorMessage"));
     }
   };
   
@@ -152,8 +152,8 @@ const [rawPhone, setRawPhone] = useState("");
   <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>
 </View>
 
-<Text style={{ fontSize: 16, fontWeight: "bold", color: "#213729", marginBottom: 20 }}>
-  To find jobs you must complete your profile. Fill out all fields below.
+<Text style={{ fontSize: 16, fontWeight: "bold", color: "#213729", marginBottom: 20, textAlign: I18nManager.isRTL ? "right" : "left" }}>
+  {t("taskerEditProfile.instruction")}
 </Text>
 
 
