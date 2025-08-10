@@ -30,6 +30,7 @@ export default function WelcomeScreen({ navigation }) {
   useEffect(() => {
     const preload = async () => {
       await Asset.loadAsync(require("../../assets/images/21.png"));
+      await Asset.loadAsync(require("../../assets/images/22.png"));
       await requestPermissions();
       setReady(true);
     };
@@ -85,12 +86,12 @@ export default function WelcomeScreen({ navigation }) {
     <>
       <View style={styles.container}>
         <Image
-          source={require("../../assets/images/21.png")}
+          source={i18n.language === "ar" ? require("../../assets/images/22.png") : require("../../assets/images/21.png")}
           style={styles.logo}
           resizeMode="contain"
         />
 
-<Text style={styles.tagline}>Reliable Help Just a Task Away</Text>
+        <Text style={styles.tagline}>{t("tagline")}</Text>
 
 
 
