@@ -14,6 +14,7 @@ import { getToken } from "../../services/authStorage"; // adjust if path differs
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { useNavigation } from "@react-navigation/native";
+import i18n from "i18next";
 
 export default function TaskerNotificationsScreen({ navigation, setUnreadNotifications }) {
   const { t } = useTranslation();
@@ -69,6 +70,20 @@ export default function TaskerNotificationsScreen({ navigation, setUnreadNotific
       fetchAndHandleNotifications();
     }, [])
   );
+
+  // ✅ Listen for language changes
+  useEffect(() => {
+    const languageChangeHandler = () => {
+      setNotifications([]);
+      fetchAndHandleNotifications();
+    };
+    
+    i18n.on('languageChanged', languageChangeHandler);
+    
+    return () => {
+      i18n.off('languageChanged', languageChangeHandler);
+    };
+  }, []);
 
 
   const translateNotification = (text) => {

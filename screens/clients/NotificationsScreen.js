@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import i18n from "i18next";
 
 
 
@@ -61,6 +62,18 @@ export default function NotificationsScreen() {
 
   useEffect(() => {
     fetchNotifications();
+    
+    // Listen for language changes and clear notifications
+    const languageChangeHandler = () => {
+      setNotifications([]);
+      fetchNotifications();
+    };
+    
+    i18n.on('languageChanged', languageChangeHandler);
+    
+    return () => {
+      i18n.off('languageChanged', languageChangeHandler);
+    };
   }, []);
 
   const translateNotification = (text, type = 'title') => {
