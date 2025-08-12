@@ -249,6 +249,7 @@
     "terms": "Terms & Conditions",
     "faqs": "FAQs",
     "contactAdmin": "Contact Admin",
+    "language": "Language",
     "logout": "Log Out",
     "logoutAlertTitle": "Logged Out",
     "logoutAlertMessage": "You have been successfully logged out.",
@@ -544,6 +545,7 @@
   "terms": "Terms and Conditions",
   "faq": "FAQ",
   "contact": "Contact Us",
+  "language": "Language",
   "logout": "Log Out",
   "logoutMsg": "You’ve been logged out successfully."
 },

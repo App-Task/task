@@ -11,9 +11,38 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
+import * as SecureStore from "expo-secure-store";
+import Toast from "react-native-toast-message";
+import * as Updates from "expo-updates";
+import { updateNotificationLanguage } from "../../services/notificationService";
 
 export default function SettingsScreen({ navigation }) {
   const { t } = useTranslation();
+
+  const toggleLanguage = async () => {
+    const newLang = i18n.language === "en" ? "ar" : "en";
+    const isRTL = newLang === "ar";
+
+    // Update existing notifications to new language
+    await updateNotificationLanguage(newLang);
+
+    await SecureStore.setItemAsync("appLanguage", newLang);
+    await SecureStore.setItemAsync("appRTL", JSON.stringify(isRTL));
+    await i18n.changeLanguage(newLang);
+
+    Toast.show({
+      type: "success",
+      text1: newLang === "en" ? t("language.changedEn") : t("language.changedAr"),
+      position: "bottom",
+      visibilityTime: 2000,
+    });
+
+    if (I18nManager.isRTL !== isRTL) {
+      I18nManager.forceRTL(isRTL);
+      await Updates.reloadAsync();
+    }
+  };
   
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -70,10 +99,19 @@ export default function SettingsScreen({ navigation }) {
         <Text style={styles.text}>{t("taskerSettings.contact")}</Text>
       </TouchableOpacity>
 
-
+      <TouchableOpacity style={styles.item} onPress={toggleLanguage}>
+        <Ionicons name="language" size={20} color="#215432" />
+        <Text style={styles.text}>{t("taskerSettings.language")}</Text>
+        <View style={styles.languageIndicator}>
+          <Text style={styles.languageText}>
+            {i18n.language === "en" ? "English" : "العربية"}
+          </Text>
+        </View>
+      </TouchableOpacity>
 
       <View style={{ height: 40 }} />
     </ScrollView>
+    <Toast />
   );
 }
 
@@ -114,6 +152,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 16,
     color: "#213729",
+    flex: 1,
   },
   logout: {
     backgroundColor: "#c1ff72",
@@ -121,5 +160,13 @@ const styles = StyleSheet.create({
   logoutText: {
     fontFamily: "InterBold",
     color: "#213729",
+  },
+  languageIndicator: {
+    marginLeft: "auto",
+  },
+  languageText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#999",
   },
 });

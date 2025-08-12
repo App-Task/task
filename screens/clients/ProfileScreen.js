@@ -16,7 +16,11 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Linking } from "react-native";
 import useUnreadNotifications from "../../hooks/useUnreadNotifications";
 import * as SecureStore from "expo-secure-store";
-
+import i18n from "i18next";
+import Toast from "react-native-toast-message";
+import * as Updates from "expo-updates";
+import { I18nManager } from "react-native";
+import { updateNotificationLanguage } from "../../services/notificationService";
 
 import { fetchCurrentUser, updateUserProfile } from "../../services/auth";
 import * as ImagePicker from "expo-image-picker";
@@ -47,6 +51,30 @@ export default function ProfileScreen({ navigation }) {
       loadUser();
     }, [])
   );
+
+  const toggleLanguage = async () => {
+    const newLang = i18n.language === "en" ? "ar" : "en";
+    const isRTL = newLang === "ar";
+
+    // Update existing notifications to new language
+    await updateNotificationLanguage(newLang);
+
+    await SecureStore.setItemAsync("appLanguage", newLang);
+    await SecureStore.setItemAsync("appRTL", JSON.stringify(isRTL));
+    await i18n.changeLanguage(newLang);
+
+    Toast.show({
+      type: "success",
+      text1: newLang === "en" ? t("language.changedEn") : t("language.changedAr"),
+      position: "bottom",
+      visibilityTime: 2000,
+    });
+
+    if (I18nManager.isRTL !== isRTL) {
+      I18nManager.forceRTL(isRTL);
+      await Updates.reloadAsync();
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -242,12 +270,23 @@ export default function ProfileScreen({ navigation }) {
 
 
 
+        <TouchableOpacity style={styles.rowItem} onPress={toggleLanguage}>
+          <Text style={styles.rowText}>{t("clientProfile.language")}</Text>
+          <View style={styles.languageIndicator}>
+            <Text style={styles.languageText}>
+              {i18n.language === "en" ? "English" : "العربية"}
+            </Text>
+            <Ionicons name="language" size={20} color="#999" />
+          </View>
+        </TouchableOpacity>
+
         <TouchableOpacity style={[styles.rowItem, styles.logoutRow]} onPress={handleLogout}>
           <Text style={[styles.rowText, styles.logoutText]}>{t("clientProfile.logout")}</Text>
           <Ionicons name="log-out-outline" size={20} color="#213729" />
         </TouchableOpacity>
       </View>
     </ScrollView>
+    <Toast />
   );
 }
 
@@ -354,6 +393,14 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "bold",
   },
-  
-
+  languageIndicator: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  languageText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#999",
+  },
 });
