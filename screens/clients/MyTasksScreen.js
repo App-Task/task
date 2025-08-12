@@ -385,6 +385,7 @@ allTasks.forEach((task) => {
 
         <TextInput
           placeholder={t("clientReview.commentPlaceholder", "Leave a comment...")}
+          placeholderTextColor="#999"
           value={comment}
           onChangeText={(text) => {
             if (text.length <= 300) setComment(text);
@@ -397,6 +398,8 @@ allTasks.forEach((task) => {
             marginTop: 16,
             fontFamily: "Inter",
             fontSize: 14,
+            color: "#333",
+            textAlignVertical: "top",
           }}
           multiline
           maxLength={300}
