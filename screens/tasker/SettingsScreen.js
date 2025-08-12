@@ -7,6 +7,7 @@ import {
   Alert,
   I18nManager,
   StyleSheet,
+  Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
@@ -30,7 +31,10 @@ export default function SettingsScreen({ navigation }) {
       </View>
 
       {/* Items */}
-      <TouchableOpacity style={styles.item}>
+      <TouchableOpacity 
+        style={styles.item}
+        onPress={() => navigation.navigate("AboutUs")}
+      >
         <Ionicons name="information-circle-outline" size={20} color="#215432" />
         <Text style={styles.text}>{t("taskerSettings.about")}</Text>
       </TouchableOpacity>
@@ -52,12 +56,16 @@ export default function SettingsScreen({ navigation }) {
         <Text style={styles.text}>{t("taskerSettings.terms")}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item}>
-        <Ionicons name="help-circle-outline" size={20} color="#215432" />
-        <Text style={styles.text}>{t("taskerSettings.faq")}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.item}>
+      <TouchableOpacity 
+        style={styles.item}
+        onPress={() => {
+          const mailto = "mailto:Task.team.bh@gmail.com";
+          Linking.openURL(mailto).catch((err) => {
+            console.error("❌ Failed to open email:", err.message);
+            Alert.alert("Error", "Could not open your email app.");
+          });
+        }}
+      >
         <Ionicons name="chatbubbles-outline" size={20} color="#215432" />
         <Text style={styles.text}>{t("taskerSettings.contact")}</Text>
       </TouchableOpacity>

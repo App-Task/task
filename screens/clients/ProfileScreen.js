@@ -200,7 +200,10 @@ export default function ProfileScreen({ navigation }) {
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.rowItem}>
+        <TouchableOpacity 
+          style={styles.rowItem}
+          onPress={() => navigation.navigate("AboutUs")}
+        >
           <Text style={styles.rowText}>{t("clientProfile.aboutUs")}</Text>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>

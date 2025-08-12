@@ -617,13 +617,25 @@
 "loadingBid": "Fetching your bid...",
 "loadingBidMessage": "Please wait while we load your bid details.",
 "submittingBid": "Submitting bid...",
-"invalidBidTitle": "Invalid Bid",
-  "invalidBidMessage": "Minimum bid amount is 0.1 BHD."
+  "invalidBidTitle": "Invalid Bid",
+  "invalidBidMessage": "Minimum bid amount is 0.1 BHD.",
+  "alreadyBidTitle": "Already Bid",
+  "alreadyBidMessage": "You've already submitted a bid for this task.",
+  "accessDeniedTitle": "Access Denied",
+  "accessDeniedMessage": "You must be verified to place a bid.",
+  "ok": "OK",
+  "bidSubmitError": "Something went wrong while submitting the bid.",
+  "noBidFoundTitle": "No Bid Found",
+  "noBidFoundMessage": "You haven't submitted a bid for this task yet.",
+  "cannotEditTitle": "Cannot Edit",
+  "cannotEditMessage": "This task is no longer accepting bids.",
+  "bidUpdateError": "Something went wrong while updating the bid.",
+  "images": "Images",
+  "noImages": "No images",
+  "biddingClosed": "Bidding Closed"
+},
+"aboutUs": {
+  "title": "About Us",
+  "description": "Our aim is to connect busy people who need a helping hand in their lives with nearby people who are able and willing to help. Helping both live a better life!"
 }
-
-
-
-
-
-
 }

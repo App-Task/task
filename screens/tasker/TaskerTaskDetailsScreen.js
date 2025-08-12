@@ -91,7 +91,7 @@ const [existingBid, setExistingBid] = useState(null); // ✅ NEW
 
 const handleBid = async () => {
   if (existingBid) {
-    Alert.alert("Already Bid", "You’ve already submitted a bid for this task.");
+    Alert.alert(t("taskerTaskDetails.alreadyBidTitle"), t("taskerTaskDetails.alreadyBidMessage"));
     return;
   }
 
@@ -114,7 +114,7 @@ const handleBid = async () => {
 
     if (!user.isVerified) {
       setSubmitting(false);
-      Alert.alert("Access Denied", "You must be verified to place a bid.");
+      Alert.alert(t("taskerTaskDetails.accessDeniedTitle"), t("taskerTaskDetails.accessDeniedMessage"));
       return;
     }
 
@@ -132,7 +132,7 @@ const handleBid = async () => {
       t("taskerTaskDetails.bidSent"),
       [
         {
-          text: "OK",
+          text: t("taskerTaskDetails.ok"),
           onPress: () => {
             navigation.setParams({ refresh: true });
             navigation.goBack();
@@ -147,18 +147,18 @@ const handleBid = async () => {
   } catch (err) {
     console.error("❌ Bid error:", err.message);
     setSubmitting(false);
-    Alert.alert("Error", "Something went wrong while submitting the bid.");
+    Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.bidSubmitError"));
   }
 };
 
 const handleUpdateBid = async () => {
   if (!existingBid) {
-    Alert.alert("No Bid Found", "You haven't submitted a bid for this task yet.");
+    Alert.alert(t("taskerTaskDetails.noBidFoundTitle"), t("taskerTaskDetails.noBidFoundMessage"));
     return;
   }
 
   if (task.status !== "Pending") {
-    Alert.alert("Cannot Edit", "This task is no longer accepting bids.");
+    Alert.alert(t("taskerTaskDetails.cannotEditTitle"), t("taskerTaskDetails.cannotEditMessage"));
     return;
   }
 
@@ -186,14 +186,14 @@ const handleUpdateBid = async () => {
     Alert.alert(
       t("taskerTaskDetails.successTitle"),
       t("taskerTaskDetails.bidSent"),
-      [{ text: "OK", onPress: () => navigation.goBack() }]
+      [{ text: t("taskerTaskDetails.ok"), onPress: () => navigation.goBack() }]
     );
     
 
     setExistingBid(res.data); // update local state
   } catch (err) {
     console.error("❌ Update bid error:", err.message);
-    Alert.alert("Error", "Something went wrong while updating the bid.");
+    Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.bidUpdateError"));
   } finally {
     setSubmitting(false);
   }
@@ -241,14 +241,14 @@ const getStatusStyle = (status) => {
   <View style={styles.topRow}>
     <View style={{ flex: 1 }}>
       <Text style={styles.heading}>{task.title}</Text>
-      <Text style={styles.subText}>Offered Price: {task.budget} BHD</Text>
+      <Text style={styles.subText}>{t("taskerTaskDetails.price")}: {task.budget} BHD</Text>
       <Text style={styles.subText}>
-        {new Date(task.createdAt).toLocaleDateString(undefined, {
+        {new Date(task.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
           year: "numeric",
           month: "short",
           day: "numeric",
         })}{" "}
-        • {new Date(task.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+        • {new Date(task.createdAt).toLocaleTimeString(I18nManager.isRTL ? "ar-SA" : "en-GB", { hour: "2-digit", minute: "2-digit" })}
       </Text>
     </View>
 
@@ -260,11 +260,11 @@ const getStatusStyle = (status) => {
 
 <View style={styles.detailsBox}>
   <Text style={styles.detailsText}>
-    <Text style={{ fontFamily: "InterBold" }}>Description: </Text>
+    <Text style={{ fontFamily: "InterBold" }}>{t("taskerTaskDetails.description")}: </Text>
     {task.description || "-"}
   </Text>
 
-  <Text style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}>Images:</Text>
+  <Text style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}>{t("taskerTaskDetails.images")}:</Text>
   <View style={styles.imageRow}>
     {task.images?.length > 0 ? (
       task.images.map((uri, i) => (
@@ -273,34 +273,35 @@ const getStatusStyle = (status) => {
         </TouchableOpacity>
       ))
     ) : (
-      <Text style={styles.detailsText}>No images</Text>
+      <Text style={styles.detailsText}>{t("taskerTaskDetails.noImages")}</Text>
     )}
   </View>
 
   <Text style={[styles.detailsText, { marginTop: 12 }]}>
-    <Text style={{ fontFamily: "InterBold" }}>Location: </Text>
+    <Text style={{ fontFamily: "InterBold" }}>{t("taskerTaskDetails.location")}: </Text>
     {task.location}
   </Text>
 
   <Text style={[styles.detailsText, { marginTop: 12 }]}>
-    <Text style={{ fontFamily: "InterBold" }}>Category: </Text>
+    <Text style={{ fontFamily: "InterBold" }}>{t("taskerTaskDetails.category")}: </Text>
     {task.category || "-"}
   </Text>
 
   {/* Place Your Bid */}
-  <Text style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}>Place Your Bid:</Text>
+  <Text style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}>{t("taskerTaskDetails.enterBid")}:</Text>
   <TextInput
   style={[
     styles.input,
     !isBiddingAllowed && { backgroundColor: "#ccc", color: "#666" }
   ]}
-  placeholder="Bid (BHD)"
+  placeholder={t("taskerTaskDetails.bidAmount")}
   value={bidAmount}
   onChangeText={isBiddingAllowed ? setBidAmount : undefined}
   keyboardType="numeric"
   editable={isBiddingAllowed}
   selectTextOnFocus={isBiddingAllowed}
   placeholderTextColor="#999"
+  textAlign={I18nManager.isRTL ? "right" : "left"}
 />
 
 <TextInput
@@ -309,7 +310,7 @@ const getStatusStyle = (status) => {
     styles.textarea,
     !isBiddingAllowed && { backgroundColor: "#ccc", color: "#666" }
   ]}
-  placeholder="Message to Client (150 characters max).."
+  placeholder={t("taskerTaskDetails.bidMessage")}
   value={message}
   onChangeText={isBiddingAllowed ? setMessage : undefined}
   editable={isBiddingAllowed}
@@ -318,6 +319,7 @@ const getStatusStyle = (status) => {
   maxLength={150}
   textAlignVertical="top"
   placeholderTextColor="#999"
+  textAlign={I18nManager.isRTL ? "right" : "left"}
 />
 
 <TouchableOpacity
@@ -336,10 +338,10 @@ const getStatusStyle = (status) => {
 >
   <Text style={styles.whiteButtonText}>
     {!isBiddingAllowed
-      ? "Bidding Closed"
+      ? t("taskerTaskDetails.biddingClosed")
       : existingBid
-      ? "Update Bid"
-      : "Submit Bid"}
+      ? t("taskerTaskDetails.updateBid")
+      : t("taskerTaskDetails.submitBid")}
   </Text>
 </TouchableOpacity>
 
@@ -400,7 +402,7 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   imageRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     marginTop: 6,
   },
   
@@ -408,7 +410,8 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 8,
-    marginRight: 8,
+    marginRight: I18nManager.isRTL ? 0 : 8,
+    marginLeft: I18nManager.isRTL ? 8 : 0,
   },
   
   title: {
@@ -535,6 +538,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     color: "#213729",
     marginBottom: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   subText: {
     fontFamily: "Inter",
@@ -542,6 +546,7 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 2,
     fontWeight: "900",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   topContent: {
     marginTop: 10,
@@ -578,6 +583,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#fff",
     lineHeight: 20,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   whiteButton: {
     backgroundColor: "#ffffff",
