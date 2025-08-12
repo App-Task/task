@@ -471,7 +471,8 @@
   "cancelError": "Something went wrong.",
   "verifyPending": "Your documents still need to be verified (this may take up to 48 hours),",
   "contactUs": "Contact us",
-  "submittingReport": "Submitting Report..."
+  "submittingReport": "Submitting Report...",
+  "cancelling": "Cancelling..."
 },
 
   "taskerNotifications": {

@@ -32,6 +32,7 @@ export default function TaskerMyTasksScreen() {
   const [showVerifyBanner, setShowVerifyBanner] = useState(false);
   const [reportingTaskId, setReportingTaskId] = useState(null);
   const [isReporting, setIsReporting] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
 
 
@@ -242,6 +243,7 @@ const res = await axios.get(url, {
                       text: t("taskerMyTasks.yes"),
                       onPress: async () => {
                         try {
+                          setIsCancelling(true);
                           const res = await axios.put(
                             `https://task-kq94.onrender.com/api/tasks/${item._id}/cancel`,
                             { cancelledBy: taskerId },
@@ -264,6 +266,8 @@ const res = await axios.get(url, {
                             t("taskerMyTasks.errorTitle"),
                             err.response?.data?.msg || t("taskerMyTasks.cancelError")
                           );
+                        } finally {
+                          setIsCancelling(false);
                         }
                       },
                     },
@@ -367,6 +371,29 @@ const res = await axios.get(url, {
       <ActivityIndicator size="large" color="#213729" />
       <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#213729" }}>
         {t("taskerMyTasks.submittingReport")}
+      </Text>
+    </View>
+  </View>
+)}
+
+{isCancelling && (
+  <View style={{
+    position: "absolute",
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  }}>
+    <View style={{
+      backgroundColor: "#fff",
+      padding: 24,
+      borderRadius: 16,
+      alignItems: "center",
+    }}>
+      <ActivityIndicator size="large" color="#213729" />
+      <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#213729" }}>
+        {t("taskerMyTasks.cancelling")}
       </Text>
     </View>
   </View>

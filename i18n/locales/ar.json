@@ -467,7 +467,8 @@
   "cancelError": "حدث خطأ ما.",
   "verifyPending": "مستنداتك ما زالت تحتاج للمراجعة (قد يستغرق الأمر حتى 48 ساعة)،",
   "contactUs": "تواصل معنا",
-  "submittingReport": "جاري إرسال البلاغ..."
+  "submittingReport": "جاري إرسال البلاغ...",
+  "cancelling": "جاري الإلغاء..."
 },
   "taskerNotifications": {
     "title": "الإشعارات",
