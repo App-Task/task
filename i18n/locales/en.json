@@ -482,6 +482,26 @@
       "message": "New message"
     }
   },
+  "notification": {
+    "newMessage": "New Message",
+    "newMessageFrom": "New message from {{name}}",
+    "someone": "someone",
+    "newBid": "New Bid on Your Task",
+    "newBidMessage": "A new bid was placed on your task \"{{title}}\"",
+    "hired": "You've Been Hired!",
+    "hiredMessage": "You've been hired for the task \"{{title}}\"",
+    "newReview": "New Review",
+    "newReviewMessage": "You received a review from the client for task \"{{title}}\"",
+    "taskCancelled": "Task Cancelled",
+    "taskCancelledByClient": "The task \"{{title}}\" was cancelled by the client",
+    "taskCancelledByTasker": "The task \"{{title}}\" was cancelled by the tasker",
+    "taskCancelledByYou": "The task \"{{title}}\" was cancelled by you",
+    "taskCompleted": "Task Completed",
+    "taskCompletedMessage": "The task \"{{title}}\" has been marked as completed",
+    "verificationStatus": "Verification Status",
+    "verificationApproved": "Your documents were approved. You're now verified!",
+    "verificationDeclined": "Your documents were declined. Please re-upload to get verified."
+  },
   "taskerProfile": {
   "edit": "Edit Profile",
   "documents": "Uploaded Documents",

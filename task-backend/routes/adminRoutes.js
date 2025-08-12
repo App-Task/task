@@ -38,11 +38,10 @@ router.patch("/verify-tasker/:id", async (req, res) => {
     await Notification.create({
         userId: tasker._id,
         type: "verification",
-        title: "Verification Status",
-        message:
-          status === "accepted"
-            ? "Your documents were approved. You're now verified!"
-            : "Your documents were declined. Please re-upload to get verified.",
+        title: "notification.verificationStatus",
+        message: status === "accepted"
+            ? "notification.verificationApproved"
+            : "notification.verificationDeclined",
       });
       
 

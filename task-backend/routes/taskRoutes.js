@@ -205,10 +205,10 @@ task.completedAt = null; // clear if it was previously completed
       await Notification.create({
         userId: task.taskerId,
         type: "task",
-        title: "Task Cancelled",
+        title: "notification.taskCancelled",
         message: isClient
-          ? `The task “${task.title}” was cancelled by the client.`
-          : `The task “${task.title}” was cancelled by you.`,
+          ? `notification.taskCancelledByClient|${task.title}`
+          : `notification.taskCancelledByYou|${task.title}`,
         relatedTaskId: task._id,
       });
     }
@@ -217,10 +217,10 @@ task.completedAt = null; // clear if it was previously completed
     await Notification.create({
       userId: task.userId,
       type: "task",
-      title: "Task Cancelled",
+      title: "notification.taskCancelled",
       message: isTasker
-        ? `The task “${task.title}” was cancelled by the tasker.`
-        : `The task “${task.title}” was cancelled by you.`,
+        ? `notification.taskCancelledByTasker|${task.title}`
+        : `notification.taskCancelledByYou|${task.title}`,
       relatedTaskId: task._id,
     });
 
@@ -252,8 +252,8 @@ if (task.taskerId) {
   const notif = new Notification({
     userId: task.taskerId,
     type: "task",
-    title: "Task Completed",
-    message: `The task “${task.title}” has been marked as completed.`,
+    title: "notification.taskCompleted",
+    message: `notification.taskCompletedMessage|${task.title}`,
     relatedTaskId: task._id,
   });
   await notif.save();

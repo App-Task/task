@@ -477,6 +477,26 @@
       "message": "رسالة جديدة"
     }
   },
+  "notification": {
+    "newMessage": "رسالة جديدة",
+    "newMessageFrom": "رسالة جديدة من {{name}}",
+    "someone": "شخص ما",
+    "newBid": "عرض جديد على مهمتك",
+    "newBidMessage": "تم تقديم عرض جديد على مهمتك \"{{title}}\"",
+    "hired": "تم توظيفك!",
+    "hiredMessage": "تم توظيفك للمهمة \"{{title}}\"",
+    "newReview": "تقييم جديد",
+    "newReviewMessage": "تلقيت تقييماً من العميل للمهمة \"{{title}}\"",
+    "taskCancelled": "تم إلغاء المهمة",
+    "taskCancelledByClient": "تم إلغاء المهمة \"{{title}}\" من قبل العميل",
+    "taskCancelledByTasker": "تم إلغاء المهمة \"{{title}}\" من قبل مقدم الخدمة",
+    "taskCancelledByYou": "تم إلغاء المهمة \"{{title}}\" من قبلك",
+    "taskCompleted": "تم إنجاز المهمة",
+    "taskCompletedMessage": "تم تحديد المهمة \"{{title}}\" كمكتملة",
+    "verificationStatus": "حالة التحقق",
+    "verificationApproved": "تم الموافقة على مستنداتك. أنت الآن معتمد!",
+    "verificationDeclined": "تم رفض مستنداتك. يرجى إعادة التحميل للحصول على الاعتماد."
+  },
   "taskerProfile": {
   "edit": "تعديل الملف الشخصي",
   "documents": "المستندات المرفوعة",

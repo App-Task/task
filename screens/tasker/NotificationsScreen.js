@@ -71,6 +71,25 @@ export default function TaskerNotificationsScreen({ navigation, setUnreadNotific
   );
 
 
+  const translateNotification = (text) => {
+    if (!text) return '';
+    
+    // Check if it's a translation key
+    if (text.includes('notification.')) {
+      // Handle messages with parameters (format: "key|param")
+      if (text.includes('|')) {
+        const [key, param] = text.split('|');
+        const translatedParam = param === 'someone' ? t('notification.someone') : param;
+        return t(key, { name: translatedParam, title: translatedParam });
+      }
+      // Handle simple translation keys
+      return t(text);
+    }
+    
+    // Return original text if not a translation key
+    return text;
+  };
+
   const renderItem = ({ item }) => (
     <Animated.View
       entering={FadeInRight.duration(400)}
@@ -80,7 +99,7 @@ export default function TaskerNotificationsScreen({ navigation, setUnreadNotific
       ]}
     >
       <Text style={styles.message}>
-        {item.type === "message" ? item.message : `${item.title}: ${item.message}`}
+        {item.type === "message" ? translateNotification(item.message) : `${translateNotification(item.title)}: ${translateNotification(item.message)}`}
       </Text>
   
       <Text style={styles.time}>

@@ -63,10 +63,29 @@ export default function NotificationsScreen() {
     fetchNotifications();
   }, []);
 
+  const translateNotification = (text, type = 'title') => {
+    if (!text) return '';
+    
+    // Check if it's a translation key
+    if (text.includes('notification.')) {
+      // Handle messages with parameters (format: "key|param")
+      if (text.includes('|')) {
+        const [key, param] = text.split('|');
+        const translatedParam = param === 'someone' ? t('notification.someone') : param;
+        return t(key, { name: translatedParam, title: translatedParam });
+      }
+      // Handle simple translation keys
+      return t(text);
+    }
+    
+    // Return original text if not a translation key
+    return text;
+  };
+
   const renderItem = ({ item }) => (
     <View style={[styles.card, !item.isRead && styles.unreadCard]}>
-      <Text style={styles.cardTitle}>{item.title}</Text>
-      <Text style={styles.cardDesc}>{item.message}</Text>
+      <Text style={styles.cardTitle}>{translateNotification(item.title)}</Text>
+      <Text style={styles.cardDesc}>{translateNotification(item.message)}</Text>
       <Text style={styles.cardTime}>
         {new Date(item.createdAt).toLocaleString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
           hour: "2-digit",

@@ -45,8 +45,8 @@ await Task.findByIdAndUpdate(taskId, { $inc: { bidCount: 1 } });
       const notification = new Notification({
         userId: task.userId,
         type: "bid",
-        title: "عرض جديد على مهمتك",
-        message: `تم تقديم عرض جديد على مهمتك "${task.title}"`,
+        title: "notification.newBid",
+        message: `notification.newBidMessage|${task.title}`,
         relatedTaskId: taskId,
         relatedBidId: bid._id,
       });
@@ -115,8 +115,8 @@ router.put("/:bidId/accept", async (req, res) => {
       const notifyTasker = new Notification({
         userId: updatedTask.taskerId,
         type: "bid",
-        title: "تم توظيفك",
-        message: `تم توظيفك للمهمة "${updatedTask.title}"`,
+        title: "notification.hired",
+        message: `notification.hiredMessage|${updatedTask.title}`,
         relatedTaskId: updatedTask._id,
       });
       await notifyTasker.save();
