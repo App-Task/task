@@ -74,7 +74,6 @@ export default function TaskerNotificationsScreen({ navigation, setUnreadNotific
   // ✅ Listen for language changes
   useEffect(() => {
     const languageChangeHandler = () => {
-      setNotifications([]);
       fetchAndHandleNotifications();
     };
     

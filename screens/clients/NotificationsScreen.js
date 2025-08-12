@@ -63,9 +63,8 @@ export default function NotificationsScreen() {
   useEffect(() => {
     fetchNotifications();
     
-    // Listen for language changes and clear notifications
+    // Listen for language changes and refresh notifications
     const languageChangeHandler = () => {
-      setNotifications([]);
       fetchNotifications();
     };
     

@@ -20,7 +20,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "i18next";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
-import { clearAllNotifications } from "../../services/notificationService";
+import { updateNotificationLanguage } from "../../services/notificationService";
 
 const { width } = Dimensions.get("window");
 
@@ -58,8 +58,8 @@ export default function WelcomeScreen({ navigation }) {
     const newLang = i18n.language === "en" ? "ar" : "en";
     const isRTL = newLang === "ar";
 
-    // Clear previous notifications before changing language
-    await clearAllNotifications();
+    // Update existing notifications to new language
+    await updateNotificationLanguage(newLang);
 
     await SecureStore.setItemAsync("appLanguage", newLang);
     await SecureStore.setItemAsync("appRTL", JSON.stringify(isRTL));

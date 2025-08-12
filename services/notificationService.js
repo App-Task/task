@@ -2,9 +2,37 @@ import axios from "axios";
 import { getToken } from "./authStorage";
 
 /**
- * Clear all notifications for the current user
- * This is useful when changing languages to remove old notifications
- * that were in the previous language
+ * Update all existing notification language to match the new language
+ * This translates all existing notifications to the new language
+ */
+export const updateNotificationLanguage = async (newLanguage) => {
+  try {
+    const token = await getToken();
+    if (!token) {
+      console.log("No token found, skipping notification language update");
+      return;
+    }
+
+    const response = await axios.patch(
+      "https://task-kq94.onrender.com/api/notifications/update-language",
+      { language: newLanguage },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("✅ Notifications language updated successfully");
+    return response.data;
+  } catch (error) {
+    console.error("❌ Failed to update notification language:", error.message);
+    // Don't throw error to avoid blocking language change
+  }
+};
+
+/**
+ * Clear all notifications for the current user (keeping this for backward compatibility)
  */
 export const clearAllNotifications = async () => {
   try {
