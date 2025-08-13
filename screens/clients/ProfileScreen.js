@@ -227,10 +227,10 @@ export default function ProfileScreen({ navigation }) {
   style={styles.rowItem}
   onPress={() => {
     const mailto = "mailto:task.team.bh@gmail.com";
-    Linking.openURL(mailto).catch((err) => {
-      console.error("❌ Failed to open email:", err.message);
-      Alert.alert("Error", "Could not open your email app.");
-    });
+            Linking.openURL(mailto).catch((err) => {
+              console.error("❌ Failed to open email:", err.message);
+              Alert.alert(t("common.errorTitle"), t("common.emailOpenError"));
+            });
   }}
 >
   <Text style={styles.rowText}>{t("clientProfile.contactAdmin")}</Text>

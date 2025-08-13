@@ -63,7 +63,7 @@ export default function SettingsScreen({ navigation }) {
             const mailto = "mailto:Task.team.bh@gmail.com";
             Linking.openURL(mailto).catch((err) => {
               console.error("❌ Failed to open email:", err.message);
-              Alert.alert("Error", "Could not open your email app.");
+              Alert.alert(t("common.errorTitle"), t("common.emailOpenError"));
             });
           }}
         >

@@ -43,12 +43,12 @@ export default function WelcomeScreen({ navigation }) {
     try {
       const { status: locationStatus } = await Location.requestForegroundPermissionsAsync();
       if (locationStatus !== "granted") {
-        Alert.alert("Location Access", "Location permission denied.");
+        Alert.alert(t("common.locationAccessTitle"), t("common.locationAccessDenied"));
       }
 
       const { status: notifStatus } = await Notifications.requestPermissionsAsync();
       if (notifStatus !== "granted") {
-        Alert.alert("Notifications", "Notifications permission denied.");
+        Alert.alert(t("common.notificationsTitle"), t("common.notificationsDenied"));
       }
     } catch (err) {
       console.error("Permission error:", err);

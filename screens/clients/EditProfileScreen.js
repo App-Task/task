@@ -51,7 +51,7 @@ export default function EditProfileScreen({ navigation }) {
         }
         
       } catch (err) {
-        Alert.alert("Error", "Failed to load user info");
+        Alert.alert(t("common.errorTitle"), t("common.errorGeneric"));
       }
     };
     loadUser();
@@ -60,21 +60,21 @@ export default function EditProfileScreen({ navigation }) {
   
   const handleUpdate = async () => {
     if (!name || !email || !rawPhone) {
-      Alert.alert("Missing Fields", "Please fill in all required fields.");
+      Alert.alert(t("register.missingFields"), t("register.fillAllFields"));
       return;
     }
   
     // ✅ Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      Alert.alert(t("taskerEditProfile.invalidEmailTitle"), t("taskerEditProfile.invalidEmailMessage"));
       return;
     }
   
     // ✅ Validate phone number format (8–15 digits)
     const phoneRegex = /^[0-9]{8,15}$/;
     if (!phoneRegex.test(rawPhone.trim())) {
-      Alert.alert("Invalid Phone Number", "Phone number must be 8 to 15 digits and contain only numbers.");
+      Alert.alert(t("taskerEditProfile.invalidPhoneTitle"), t("taskerEditProfile.invalidPhoneMessage"));
       return;
     }
   
@@ -89,10 +89,10 @@ export default function EditProfileScreen({ navigation }) {
       });
   
       await SecureStore.setItemAsync("userName", name);
-      Alert.alert("Success", "Profile updated");
+      Alert.alert(t("taskerEditProfile.updateSuccessTitle"), t("taskerEditProfile.updateSuccessMessage"));
       navigation.goBack();
     } catch (err) {
-      Alert.alert("Error", "Failed to update profile");
+      Alert.alert(t("common.errorTitle"), t("taskerEditProfile.updateFailedMessage"));
     }
   };
   

@@ -562,6 +562,7 @@ const styles = StyleSheet.create({
   cardBody: {
     paddingVertical: 16,
     paddingHorizontal: 18,
+    alignItems: "flex-start",
   },
   cardHeader: {
     backgroundColor: "#213729",
@@ -578,7 +579,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#213729",
     marginBottom: 6,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    textAlign: "left",
     marginTop: 4,
   },
   viewDetails: {

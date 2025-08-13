@@ -646,4 +646,46 @@
   "title": "About Us",
   "description": "Our aim is to connect busy people who need a helping hand in their lives with nearby people who are able and willing to help. Helping both live a better life!"
 }
+  ,
+  "common": {
+    "errorTitle": "Error",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "ok": "OK",
+    "continue": "Continue",
+    "emailOpenError": "Could not open your email app.",
+    "locationAccessTitle": "Location Access",
+    "locationAccessDenied": "Location permission denied.",
+    "notificationsTitle": "Notifications",
+    "notificationsDenied": "Notifications permission denied."
+  },
+  "taskerCompleteProfile": {
+    "title": "Complete Your Profile",
+    "subText": "For security and better matching with clients, you must complete your profile before continuing.",
+    "namePlaceholder": "Full Name",
+    "phonePlaceholder": "Phone Number",
+    "selectGender": "Select Gender",
+    "selectLocation": "Select Location",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "locationBahrain": "Bahrain",
+    "locationSaudiArabia": "Saudi Arabia",
+    "experiencePlaceholder": "Experience",
+    "skillsPlaceholder": "Skills (comma separated)",
+    "aboutPlaceholder": "About You",
+    "saveAndContinue": "Save & Continue",
+    "savingProfile": "Saving your profile...",
+    "incompleteTitle": "Incomplete Profile",
+    "incompleteMessage": "Please fill out all fields before continuing.",
+    "invalidPhoneTitle": "Invalid Phone Number",
+    "invalidPhoneMessage": "Phone number must be 8 to 15 digits and contain only numbers.",
+    "completedTitle": "Profile Completed",
+    "completedMessage": "Your profile has been set up successfully."
+  },
+  "clientViewBids": {
+    "acceptError": "Something went wrong while accepting the bid."
+  },
+  "clientEditTask": {
+    "loadError": "Failed to load task",
+    "updateError": "Failed to update task"
+  }
 }

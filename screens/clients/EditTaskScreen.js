@@ -45,7 +45,7 @@ export default function EditTaskScreen({ route, navigation }) {
         setLocation(task.location || "");
         setPrice(task.budget?.toString() || "");
       } catch (err) {
-        Alert.alert("Error", "Failed to load task");
+        Alert.alert(t("common.errorTitle"), t("clientEditTask.loadError"));
       } finally {
         setLoading(false);
       }
@@ -78,7 +78,7 @@ export default function EditTaskScreen({ route, navigation }) {
       });
       navigation.goBack();
     } catch (err) {
-      Alert.alert("Error", "Failed to update task");
+      Alert.alert(t("common.errorTitle"), t("clientEditTask.updateError"));
     }
   };
 

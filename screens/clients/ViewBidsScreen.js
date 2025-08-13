@@ -116,7 +116,7 @@ export default function ViewBidsScreen({ route, navigation }) {
     } catch (err) {
       setAccepting(false); // Hide on error too
       console.error("❌ Accept bid error:", err.message);
-      Alert.alert("Error", "Something went wrong while accepting the bid.");
+      Alert.alert(t("common.errorTitle"), t("clientViewBids.acceptError"));
     }
   };
   

@@ -641,4 +641,46 @@
   "title": "معلومات عنا",
   "description": "هدفنا هو ربط الأشخاص المشغولين الذين يحتاجون إلى يد المساعدة في حياتهم بالأشخاص القريبين القادرين والراغبين في المساعدة. مساعدة كلاهما على عيش حياة أفضل!"
 }
+  ,
+  "common": {
+    "errorTitle": "خطأ",
+    "errorGeneric": "حدث خطأ ما. حاول مرة أخرى.",
+    "ok": "حسناً",
+    "continue": "متابعة",
+    "emailOpenError": "تعذر فتح تطبيق البريد.",
+    "locationAccessTitle": "الوصول إلى الموقع",
+    "locationAccessDenied": "تم رفض إذن الموقع.",
+    "notificationsTitle": "الإشعارات",
+    "notificationsDenied": "تم رفض إذن الإشعارات."
+  },
+  "taskerCompleteProfile": {
+    "title": "أكمل ملفك الشخصي",
+    "subText": "لأمان أفضل وتطابق أدق مع العملاء، يجب عليك إكمال ملفك الشخصي قبل المتابعة.",
+    "namePlaceholder": "الاسم الكامل",
+    "phonePlaceholder": "رقم الجوال",
+    "selectGender": "اختر الجنس",
+    "selectLocation": "اختر الموقع",
+    "genderMale": "ذكر",
+    "genderFemale": "أنثى",
+    "locationBahrain": "البحرين",
+    "locationSaudiArabia": "السعودية",
+    "experiencePlaceholder": "الخبرة",
+    "skillsPlaceholder": "المهارات (مفصولة بفواصل)",
+    "aboutPlaceholder": "نبذة عنك",
+    "saveAndContinue": "حفظ ومتابعة",
+    "savingProfile": "جاري حفظ ملفك...",
+    "incompleteTitle": "ملف غير مكتمل",
+    "incompleteMessage": "يرجى ملء جميع الحقول قبل المتابعة.",
+    "invalidPhoneTitle": "رقم هاتف غير صالح",
+    "invalidPhoneMessage": "يجب أن يكون رقم الهاتف بين 8 و15 رقماً ويحتوي على أرقام فقط.",
+    "completedTitle": "تم اكتمال الملف",
+    "completedMessage": "تم إعداد ملفك الشخصي بنجاح."
+  },
+  "clientViewBids": {
+    "acceptError": "حدث خطأ أثناء قبول العرض."
+  },
+  "clientEditTask": {
+    "loadError": "فشل في تحميل المهمة",
+    "updateError": "فشل في تحديث المهمة"
+  }
 }

@@ -76,13 +76,13 @@ export default function CompleteTaskerProfileScreen() {
 
   const handleSave = async () => {
     if (!name || !gender || !location || !experience || !skills || !about || !rawPhone) {
-      Alert.alert("Incomplete Profile", "Please fill out all fields before continuing.");
+      Alert.alert(t("taskerCompleteProfile.incompleteTitle"), t("taskerCompleteProfile.incompleteMessage"));
       return;
     }
 
     const phoneRegex = /^[0-9]{8,15}$/;
     if (!phoneRegex.test(rawPhone.trim())) {
-      Alert.alert("Invalid Phone Number", "Phone number must be 8 to 15 digits and contain only numbers.");
+      Alert.alert(t("taskerCompleteProfile.invalidPhoneTitle"), t("taskerCompleteProfile.invalidPhoneMessage"));
       return;
     }
 
@@ -113,9 +113,9 @@ export default function CompleteTaskerProfileScreen() {
 
       const data = await res.json();
       if (res.ok) {
-        Alert.alert("Profile Completed", "Your profile has been set up successfully.", [
+        Alert.alert(t("taskerCompleteProfile.completedTitle"), t("taskerCompleteProfile.completedMessage"), [
             {
-              text: "Continue",
+              text: t("common.continue"),
               onPress: () =>
                 navigation.reset({
                   index: 0,
@@ -131,11 +131,11 @@ export default function CompleteTaskerProfileScreen() {
           
       } else {
         console.error("❌ Update failed:", data);
-        Alert.alert("Error", data.msg || "Failed to complete profile.");
+        Alert.alert(t("common.errorTitle"), data.msg || t("common.errorGeneric"));
       }
     } catch (err) {
       console.error("❌ Error saving profile:", err.message);
-      Alert.alert("Error", "Something went wrong. Please try again.");
+      Alert.alert(t("common.errorTitle"), t("common.errorGeneric"));
     } finally {
         setLoading(false); // ✅ Hide loader
       }
@@ -145,18 +145,16 @@ export default function CompleteTaskerProfileScreen() {
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.headerRow}>
         <Ionicons name="person-circle-outline" size={60} color="#213729" />
-        <Text style={styles.header}>{t("taskerEditProfile.title") || "Complete Your Profile"}</Text>
+        <Text style={styles.header}>{t("taskerCompleteProfile.title")}</Text>
       </View>
 
-      <Text style={styles.subText}>
-        For security and better matching with clients, you must complete your profile before continuing.
-      </Text>
+      <Text style={styles.subText}>{t("taskerCompleteProfile.subText")}</Text>
 
       <TextInput
         style={styles.input}
         value={name}
         onChangeText={setName}
-        placeholder="Full Name"
+        placeholder={t("taskerCompleteProfile.namePlaceholder")}
         textAlign={I18nManager.isRTL ? "right" : "left"}
         placeholderTextColor="#999"
         />
@@ -183,7 +181,7 @@ export default function CompleteTaskerProfileScreen() {
           value={rawPhone}
           onChangeText={setRawPhone}
           keyboardType="phone-pad"
-          placeholder="Phone Number"
+          placeholder={t("taskerCompleteProfile.phonePlaceholder")}
           placeholderTextColor="#999"
         />
       </View>
@@ -200,7 +198,7 @@ export default function CompleteTaskerProfileScreen() {
 
   {showGenderDropdown && (
     <View style={styles.dropdown}>
-      {["Male", "Female"].map((option) => (
+      {[t("taskerCompleteProfile.genderMale"), t("taskerCompleteProfile.genderFemale")].map((option) => (
         <TouchableOpacity
           key={option}
           style={styles.dropdownItem}
@@ -227,7 +225,7 @@ export default function CompleteTaskerProfileScreen() {
 
   {showLocationDropdown && (
     <View style={styles.dropdown}>
-      {["Bahrain", "Saudi Arabia"].map((option) => (
+      {[t("taskerCompleteProfile.locationBahrain"), t("taskerCompleteProfile.locationSaudiArabia")].map((option) => (
         <TouchableOpacity
           key={option}
           style={styles.dropdownItem}
@@ -248,7 +246,7 @@ export default function CompleteTaskerProfileScreen() {
         style={styles.input}
         value={experience}
         onChangeText={setExperience}
-        placeholder="Experience"
+        placeholder={t("taskerCompleteProfile.experiencePlaceholder")}
         textAlign={I18nManager.isRTL ? "right" : "left"}
         placeholderTextColor="#999"
       />
@@ -256,7 +254,7 @@ export default function CompleteTaskerProfileScreen() {
         style={styles.input}
         value={skills}
         onChangeText={setSkills}
-        placeholder="Skills (comma separated)"
+        placeholder={t("taskerCompleteProfile.skillsPlaceholder")}
         textAlign={I18nManager.isRTL ? "right" : "left"}
         placeholderTextColor="#999"
       />
@@ -264,7 +262,7 @@ export default function CompleteTaskerProfileScreen() {
         style={[styles.input, styles.textarea]}
         value={about}
         onChangeText={setAbout}
-        placeholder="About You"
+        placeholder={t("taskerCompleteProfile.aboutPlaceholder")}
         textAlign={I18nManager.isRTL ? "right" : "left"}
         textAlignVertical="top"
         placeholderTextColor="#999"
@@ -273,7 +271,7 @@ export default function CompleteTaskerProfileScreen() {
       />
 
       <TouchableOpacity style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>Save & Continue</Text>
+        <Text style={styles.buttonText}>{t("taskerCompleteProfile.saveAndContinue")}</Text>
       </TouchableOpacity>
 
 
@@ -300,9 +298,9 @@ export default function CompleteTaskerProfileScreen() {
         alignItems: "center",
       }}
     >
-      <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
-        Saving your profile...
-      </Text>
+        <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+         {t("taskerCompleteProfile.savingProfile")}
+        </Text>
     </View>
   </View>
 )}
