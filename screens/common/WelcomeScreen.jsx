@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   logo: {
     width: width * 1.2, // smaller logo like in design
     height: width * 1.2,
-    marginBottom: -210,
+    marginBottom: -200,
   },
   
   title: {
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#215432",
     textAlign: "center",
-    marginBottom: 25,
+    marginBottom: 30,
   },
   loadingOverlay: {
     position: "absolute",

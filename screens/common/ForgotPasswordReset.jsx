@@ -31,7 +31,7 @@ export default function ForgotPasswordReset({ navigation, route }) {
     if (!strongPw.test(newPassword)) {
       return Alert.alert(
         "Weak Password",
-        "Password must be at least 8 characters, contain an uppercase letter and a number."
+        "Password must include at least 8 characters, one uppercase letter, and one number."
       );
     }
 
@@ -54,37 +54,43 @@ export default function ForgotPasswordReset({ navigation, route }) {
         <Ionicons name="arrow-back" size={28} color="#213729" />
       </TouchableOpacity>
 
-      <Text style={styles.title}>Enter reset code & new password</Text>
+      <Text style={styles.title}>Reset your password</Text>
+      <Text style={styles.subtitle}>
+        Enter the 6-digit code sent to your email and create a new password.
+      </Text>
 
+      <Text style={styles.label}>Email address</Text>
+      <TextInput
+  style={[styles.input, styles.disabledInput]}
+  value={email}
+  editable={false}
+  selectTextOnFocus={false}
+/>
+
+
+      <Text style={styles.label}>6-digit reset code</Text>
       <TextInput
         style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="6-digit code"
+        placeholder="e.g. 123456"
         value={code}
         onChangeText={setCode}
         keyboardType="number-pad"
         maxLength={6}
       />
 
+      <Text style={styles.label}>New password</Text>
       <TextInput
         style={styles.input}
-        placeholder="New password"
+        placeholder="Must include capital letter & number"
         secureTextEntry
         value={newPassword}
         onChangeText={setNewPassword}
       />
 
+      <Text style={styles.label}>Confirm new password</Text>
       <TextInput
         style={styles.input}
-        placeholder="Confirm new password"
+        placeholder="Repeat your new password"
         secureTextEntry
         value={confirmPassword}
         onChangeText={setConfirmPassword}
@@ -113,7 +119,19 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: "InterBold",
     color: "#215432",
-    marginBottom: 30,
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#666",
+    fontFamily: "Inter",
+    marginBottom: 25,
+  },
+  label: {
+    fontSize: 13,
+    color: "#444",
+    marginBottom: 6,
+    fontFamily: "InterBold",
   },
   input: {
     backgroundColor: "#f2f2f2",
@@ -123,6 +141,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     marginBottom: 18,
+    fontFamily: "Inter",
   },
   button: {
     backgroundColor: "#215432",
@@ -136,4 +155,9 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 16,
   },
+  disabledInput: {
+    backgroundColor: "#e0e0e0",
+    color: "#888",
+  },
+  
 });

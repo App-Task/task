@@ -20,7 +20,7 @@ export default function ForgotPasswordRequest({ navigation }) {
     setLoading(true);
     try {
       await forgotPassword(email.trim().toLowerCase());
-      Alert.alert("Check Your Email", "If this email exists, we sent a reset code.");
+      Alert.alert("Request Received", "A password reset code has been sent to your email.");
       navigation.navigate("ForgotPasswordReset", { email: email.trim().toLowerCase() });
     } catch (err) {
       console.error("❌ Forgot Password Error:", err.message);
