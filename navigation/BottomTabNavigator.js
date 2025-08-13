@@ -7,6 +7,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 
 import ClientHomeScreen from "../screens/clients/HomeScreen";
+import { useTranslation } from "react-i18next";
 import PostTaskScreen from "../screens/clients/PostTaskScreen";
 import ProfileScreen from "../screens/clients/ProfileScreen";
 import MyTasksScreen from "../screens/clients/MyTasksScreen";
@@ -16,6 +17,7 @@ import NotificationsScreen from "../screens/clients/NotificationsScreen";
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabNavigator() {
+  const { t } = useTranslation();
   const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchUnreadMessages = async () => {
@@ -80,13 +82,14 @@ export default function BottomTabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={ClientHomeScreen} />
-      <Tab.Screen name="Tasks" component={MyTasksScreen} />
-      <Tab.Screen name="Post" component={PostTaskScreen} />
+      <Tab.Screen name="Home" component={ClientHomeScreen} options={{ title: t("TaskBottomNav.explore") }} />
+      <Tab.Screen name="Tasks" component={MyTasksScreen} options={{ title: t("TaskBottomNav.myTasks") }} />
+      <Tab.Screen name="Post" component={PostTaskScreen} options={{ title: t("clientHome.postTaskBtn") }} />
       <Tab.Screen
   name="Messages"
   component={MessagesScreen}
   options={{
+    title: t("TaskBottomNav.messages"),
     tabBarBadge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null,
     tabBarBadgeStyle: {
       backgroundColor: "#213729",
@@ -102,7 +105,7 @@ export default function BottomTabNavigator() {
 
 
 
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: t("TaskBottomNav.profile") }} />
     </Tab.Navigator>
   );
 }
