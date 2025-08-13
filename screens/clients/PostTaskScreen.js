@@ -16,6 +16,9 @@ import {
   I18nManager,
   Linking,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; // ✅ add this
+import { Ionicons } from "@expo/vector-icons"; // (you already have this in the file)
+
 import * as ImagePicker from "expo-image-picker";
 import * as SecureStore from "expo-secure-store";
 import { useTranslation } from "react-i18next";
@@ -718,14 +721,26 @@ if (errorFlag) {
 
 {/* Map Picker Modal */}
 <Modal visible={mapVisible} animationType="slide" transparent={false}>
-  <View style={{ flex: 1, backgroundColor: "#fff" }}>
-    <View style={styles.mapHeader}>
-      <Text style={styles.mapHeaderTitle}>{t("clientPostTask.selectTaskLocation")}</Text>
-      <Text style={styles.mapHeaderSubtitle}>
-        {t("clientPostTask.mapInstructions")}
-      </Text>
+  <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    {/* Header like AboutUs */}
+    <View style={styles.modalHeaderRow}>
+      <TouchableOpacity onPress={() => setMapVisible(false)} style={styles.modalBackBtn}>
+        <Ionicons
+          name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+          size={24}
+          color="#213729"
+        />
+      </TouchableOpacity>
+      <Text style={styles.modalHeader}>{t("clientPostTask.selectTaskLocation")}</Text>
+      <View style={{ width: 24 }} />
     </View>
 
+    {/* Optional subtitle under the header */}
+    <Text style={styles.modalHeaderSubtitle}>
+      {t("clientPostTask.mapInstructions")}
+    </Text>
+
+    {/* Map */}
     {tempRegion && (
       <MapView
         style={{ flex: 1 }}
@@ -748,6 +763,7 @@ if (errorFlag) {
       </MapView>
     )}
 
+    {/* Footer buttons */}
     <View style={styles.mapFooter}>
       <TouchableOpacity style={[styles.mapBtn, styles.mapCancel]} onPress={() => setMapVisible(false)}>
         <Text style={styles.mapBtnText}>{t("clientPostTask.cancel")}</Text>
@@ -756,8 +772,9 @@ if (errorFlag) {
         <Text style={[styles.mapBtnText, { color: "#fff" }]}>{t("clientPostTask.confirmLocation")}</Text>
       </TouchableOpacity>
     </View>
-  </View>
+  </SafeAreaView>
 </Modal>
+
 
     </KeyboardAvoidingView>
   );
@@ -1141,6 +1158,31 @@ const styles = StyleSheet.create({
   },
 
   
+  modalHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 6,         // SafeAreaView already handles status bar cutout
+    paddingBottom: 8,
+    backgroundColor: "#fff",
+  },
+  modalBackBtn: {
+    padding: 4,
+  },
+  modalHeader: {
+    fontFamily: "InterBold",
+    fontSize: 20,
+    color: "#213729",
+    textAlign: "center",
+    flex: 1,
+  },
+  modalHeaderSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    paddingHorizontal: 20,
+    marginBottom: 8,
+  },
   
   
   
