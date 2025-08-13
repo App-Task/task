@@ -614,6 +614,8 @@
   "bidSent": "Your bid has been submitted.",
   "errorTitle": "Error",
   "editYourBid": "Edit Your Bid",
+      "openInMaps": "Open in Google Maps",
+    "mapPreview": "Map preview of task location",
 "updateBid": "Update Bid",
 "submitting": "Submitting...",
 "status": "Bid Status",

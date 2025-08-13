@@ -597,6 +597,8 @@
 "taskerTaskDetails": {
   "location": "الموقع",
   "price": "السعر المعروض",
+      "openInMaps": "افتح في خرائط جوجل",
+    "mapPreview": "معاينة موقع المهمة على الخريطة",
   "description": "وصف المهمة",
   "category": "الفئة",
   "enterBid": "أدخل عرضك",

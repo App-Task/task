@@ -383,15 +383,15 @@ const getStatusStyle = (status) => {
   }
   style={[styles.whiteButton, { marginTop: 8 }]}
 >
-  <Text style={styles.whiteButtonText}>
-    {t("taskerTaskDetails.openInMaps") || "Open in Google Maps"}
-  </Text>
+<Text style={styles.whiteButtonText}>
+  {t("taskerTaskDetails.openInMaps")}
+</Text>
 </TouchableOpacity>
 
 
-    <Text style={styles.mapNote}>
-      {t("taskerTaskDetails.mapPreview") || "Map preview of task location"}
-    </Text>
+<Text style={styles.mapNote}>
+  {t("taskerTaskDetails.mapPreview")}
+</Text>
   </View>
 ) : (
   <Text style={[styles.detailsText, { marginTop: 6, opacity: 0.8 }]}>
