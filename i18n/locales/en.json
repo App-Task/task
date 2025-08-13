@@ -394,6 +394,8 @@
   },
   "taskerExplore": {
     "header": "Explore Tasks",
+    "sortNearest": "Sort by nearest"
+,
     "location": "Location",
     "price": "Price",
     "bids": "Bids",

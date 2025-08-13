@@ -4,13 +4,13 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  Image,
   TextInput,
   I18nManager,
   ActivityIndicator,
   StyleSheet,
   Modal,
   Pressable,
+  Alert,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import Animated, {
@@ -22,15 +22,13 @@ import Animated, {
 } from "react-native-reanimated";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
-import { fetchCurrentUser } from "../../services/auth"; // ✅ make sure path is correct
+import { fetchCurrentUser } from "../../services/auth";
 import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { Linking } from "react-native";
+import * as Location from "expo-location"; // ✅ NEW (import)
 
-
-
-
-
+// --------------------------
 const JOB_TYPES = [
   "Handyman",
   "Moving",
@@ -39,9 +37,8 @@ const JOB_TYPES = [
   "Shopping & Delivery",
   "Yardwork Services",
   "Dog Walking",
-  "Other"
+  "Other",
 ];
-
 
 const formatDateTime = (isoString, isRTL = false) => {
   const date = new Date(isoString);
@@ -53,8 +50,47 @@ const formatDateTime = (isoString, isRTL = false) => {
   });
 };
 
+// ✅ NEW (helpers: haversine & safe task coords)
+const toRad = (v) => (v * Math.PI) / 180;
+const haversineKm = (a, b) => {
+  const R = 6371;
+  const dLat = toRad(b.lat - a.lat);
+  const dLon = toRad(b.lon - a.lon);
+  const lat1 = toRad(a.lat);
+  const lat2 = toRad(b.lat);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+};
 
-export default function ExploreTasksScreen({ navigation, route }) {
+// Tries multiple shapes: task.latitude/longitude, task.location.{latitude,longitude}, task.location.coords.{latitude,longitude}
+const getTaskCoords = (task) => {
+  const c1 =
+    typeof task.latitude === "number" && typeof task.longitude === "number"
+      ? { lat: task.latitude, lon: task.longitude }
+      : null;
+
+  const loc = task.location;
+  const c2 =
+    loc &&
+    typeof loc.latitude === "number" &&
+    typeof loc.longitude === "number"
+      ? { lat: loc.latitude, lon: loc.longitude }
+      : null;
+
+  const coords = loc?.coords;
+  const c3 =
+    coords &&
+    typeof coords.latitude === "number" &&
+    typeof coords.longitude === "number"
+      ? { lat: coords.latitude, lon: coords.longitude }
+      : null;
+
+  return c1 || c2 || c3 || null;
+};
+
+export default function ExploreTasksScreen({ navigation }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);
@@ -65,7 +101,11 @@ export default function ExploreTasksScreen({ navigation, route }) {
   const [refreshing, setRefreshing] = useState(false);
   const [showVerifyBanner, setShowVerifyBanner] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-
+  const [userId, setUserId] = useState(null);
+// ✅ NEW (sorting state + device coords)
+const [sortMode, setSortMode] = useState("none");
+const [userCoords, setUserCoords] = useState(null);
+const [locLoading, setLocLoading] = useState(false);
 
 
   // Scroll animation logic
@@ -96,13 +136,11 @@ export default function ExploreTasksScreen({ navigation, route }) {
       ],
     };
   });
-  const [userId, setUserId] = useState(null);
 
   const fetchTasks = async () => {
     try {
       const user = await fetchCurrentUser();
-      setCurrentUser(user); // ✅ Store user info
-      console.log("👤 CURRENT USER:", user);
+      setCurrentUser(user);
       if (!user.isVerified) {
         setShowVerifyBanner(true);
         setTasks([]);
@@ -112,8 +150,12 @@ export default function ExploreTasksScreen({ navigation, route }) {
       }
 
       if (
-        !user.name || !user.gender || !user.location ||
-        !user.experience || !user.skills || !user.about
+        !user.name ||
+        !user.gender ||
+        !user.location ||
+        !user.experience ||
+        !user.skills ||
+        !user.about
       ) {
         setShowVerifyBanner("incomplete");
         setTasks([]);
@@ -121,49 +163,54 @@ export default function ExploreTasksScreen({ navigation, route }) {
         setLoading(false);
         return;
       }
-      
-  
-      setShowVerifyBanner(false); // ✅ Hide if verified
-  
+
+      setShowVerifyBanner(false);
+
       const token = await getToken();
-  
+
       // Get current user data
-      const userRes = await axios.get("https://task-kq94.onrender.com/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const userRes = await axios.get(
+        "https://task-kq94.onrender.com/api/auth/me",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       const currentUserId = userRes.data._id;
       setUserId(currentUserId);
-  
+
       // Get all tasks
-const taskRes = await axios.get("https://task-kq94.onrender.com/api/tasks", {
-  headers: { Authorization: `Bearer ${token}` },
-});
-const allTasks = taskRes.data;
+      const taskRes = await axios.get(
+        "https://task-kq94.onrender.com/api/tasks",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const allTasks = taskRes.data;
 
-// 🔁 Get all bids made by this tasker
-const bidRes = await axios.get(`https://task-kq94.onrender.com/api/bids/tasker/${user._id}`, {
-  headers: { Authorization: `Bearer ${token}` },
-});
-const bidTaskIds = bidRes.data.map((bid) =>
-  typeof bid.taskId === "object" ? bid.taskId._id : bid.taskId
-);
+      // Get all bids made by this tasker
+      const bidRes = await axios.get(
+        `https://task-kq94.onrender.com/api/bids/tasker/${user._id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const bidTaskIds = bidRes.data.map((bid) =>
+        typeof bid.taskId === "object" ? bid.taskId._id : bid.taskId
+      );
 
-// ✅ Exclude tasks already bid on
-const availableTasks = allTasks.filter(
-  (task) => !bidTaskIds.includes(task._id)
-);
+      // Exclude tasks already bid on
+      const availableTasks = allTasks.filter(
+        (task) => !bidTaskIds.includes(task._id)
+      );
 
-setTasks(availableTasks);
-setFilteredTasks(availableTasks);
+      // ✅ NEW (precompute hasCoords to speed later filtering)
+      const enriched = availableTasks.map((t) => ({
+        ...t,
+        __coords: getTaskCoords(t), // null or {lat,lon}
+      }));
 
+      setTasks(enriched);
+      setFilteredTasks(enriched);
     } catch (err) {
-      console.error("❌ Error fetching tasks:", err.message);
+      console.error("❌ Error fetching tasks:", err?.message);
     } finally {
       setLoading(false);
     }
   };
-  
-  
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -174,146 +221,226 @@ setFilteredTasks(availableTasks);
   useFocusEffect(
     React.useCallback(() => {
       fetchTasks();
-      return () => {}; // clean-up if needed
+      return () => {};
     }, [])
   );
-  
-
-  
 
   useEffect(() => {
     filterTasks();
-  }, [searchQuery, jobType, tasks]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, jobType, tasks, sortMode, userCoords]);
+
+  // ✅ NEW (ask for location only when user enables "nearest")
+  const ensureLocation = async () => {
+    try {
+      setLocLoading(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          t("common.permissionRequired") || "Permission required",
+          t("common.locationExplain") ||
+            "We need your location to sort tasks by nearest."
+        );
+        setSortMode("none");
+        return;
+      }
+      const pos = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      setUserCoords({
+        lat: pos.coords.latitude,
+        lon: pos.coords.longitude,
+      });
+    } catch (e) {
+      console.log("Location error:", e);
+      Alert.alert(
+        t("common.locationError") || "Location error",
+        t("common.locationTryAgain") ||
+          "Could not get your location. Try again later."
+      );
+      setSortMode("none");
+    } finally {
+      setLocLoading(false);
+    }
+  };
 
   const filterTasks = () => {
     let result = tasks.filter(
       (task) => task.status === "Pending" && task.userId !== userId
     );
-  
+
     if (searchQuery.trim()) {
       const text = searchQuery.toLowerCase();
-      result = result.filter((task) =>
-        task.title?.toLowerCase().includes(text)
-      );
+      result = result.filter((task) => task.title?.toLowerCase().includes(text));
     }
-  
+
     if (jobType) {
       result = result.filter((task) => task.category === jobType);
     }
-  
+
+    // ✅ NEW (compute & sort by nearest if enabled and coords exist)
+    if (sortMode === "nearest" && userCoords) {
+      result = result
+        .map((task) => {
+          const c = task.__coords || getTaskCoords(task);
+          if (!c) return { ...task, __distanceKm: null };
+          const d = haversineKm(userCoords, c);
+          return { ...task, __distanceKm: d };
+        })
+        .sort((a, b) => {
+          // Tasks with distance first, sorted ascending; then those without coords
+          const da = a.__distanceKm;
+          const db = b.__distanceKm;
+          if (da == null && db == null) return 0;
+          if (da == null) return 1;
+          if (db == null) return -1;
+          return da - db;
+        });
+    } else {
+      // remove any stale distance when not sorting by nearest
+      result = result.map((t) => ({ ...t, __distanceKm: undefined }));
+    }
+
     setFilteredTasks(result);
   };
-  
+
   const renderTask = ({ item }) => (
     <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
-  {/* ✅ Green Header */}
-  <View style={styles.cardHeader}>
-    <Text style={styles.cardHeaderText}>
-      {t("taskerExplore.posted")}: {new Date(item.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      })}{" "}
-      •{" "}
-      {new Date(item.createdAt).toLocaleTimeString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })}
-    </Text>
-  </View>
+      {/* Header */}
+      <View style={styles.cardHeader}>
+        <Text style={styles.cardHeaderText}>
+          {t("taskerExplore.posted")}:
+          {" " +
+            new Date(item.createdAt).toLocaleDateString(
+              I18nManager.isRTL ? "ar-SA" : "en-GB",
+              {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              }
+            )}
+          {" • " +
+            new Date(item.createdAt).toLocaleTimeString(
+              I18nManager.isRTL ? "ar-SA" : "en-GB",
+              {
+                hour: "2-digit",
+                minute: "2-digit",
+              }
+            )}
+        </Text>
+      </View>
 
-  {/* ✅ Card Body */}
-  <View style={styles.cardBody}>
-    <Text style={styles.title}>{item.title}</Text>
+      {/* Body */}
+      <View style={styles.cardBody}>
+        <Text style={styles.title}>{item.title}</Text>
 
-    {/* ✅ View Details (Underlined) */}
-    <Text
-      style={styles.viewDetails}
-      onPress={() =>
-        navigation.navigate("TaskerTaskDetails", { task: item })
-      }
-    >
-      {t("taskerExplore.viewDetails")}
-    </Text>
-  </View>
-</Animated.View>
+        {/* ✅ NEW (distance pill if available) */}
+        {typeof item.__distanceKm === "number" && (
+          <View style={styles.distancePill}>
+            <Ionicons name="location-outline" size={14} color="#213729" />
+            <Text style={styles.distanceText}>
+              {item.__distanceKm.toFixed(1)} km
+            </Text>
+          </View>
+        )}
 
+        <Text
+          style={styles.viewDetails}
+          onPress={() => navigation.navigate("TaskerTaskDetails", { task: item })}
+        >
+          {t("taskerExplore.viewDetails")}
+        </Text>
+      </View>
+    </Animated.View>
   );
 
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-  <View>
-    <Text style={styles.greeting}>
-      {t("taskerExplore.greeting", { name: currentUser?.name || "Tasker" })}
-    </Text>
-    <Text style={styles.subGreeting}>{t("taskerExplore.subGreeting")}</Text>
-  </View>
+        <View>
+          <Text style={styles.greeting}>
+            {t("taskerExplore.greeting", { name: currentUser?.name || "Tasker" })}
+          </Text>
+          <Text style={styles.subGreeting}>{t("taskerExplore.subGreeting")}</Text>
+        </View>
 
-  <TouchableOpacity onPress={() => setShowModal(true)}>
-  <Ionicons name="filter-outline" size={26} color="#213729" />
-</TouchableOpacity>
+        <TouchableOpacity onPress={() => setShowModal(true)}>
+          <Ionicons name="filter-outline" size={26} color="#213729" />
+        </TouchableOpacity>
+      </View>
 
-</View>
+      {showVerifyBanner === true && (
+        <View style={styles.verifyBanner}>
+          <Text style={styles.verifyText}>
+            {t("taskerExplore.verifyPending")}{" "}
+            <Text
+              style={styles.contactLink}
+              onPress={() => Linking.openURL("mailto:Task.team.bh@gmail.com")}
+            >
+              {t("taskerExplore.contactUs")}
+            </Text>
+          </Text>
+        </View>
+      )}
 
+      {showVerifyBanner === "incomplete" && (
+        <View style={styles.verifyBanner}>
+          <Text style={styles.verifyText}>
+            {t("taskerExplore.incompleteProfile")}
+          </Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("EditTaskerProfile")}
+            style={{
+              marginTop: 10,
+              backgroundColor: "#213729",
+              paddingVertical: 10,
+              borderRadius: 20,
+              paddingHorizontal: 18,
+            }}
+          >
+            <Text
+              style={{
+                color: "#fff",
+                fontFamily: "InterBold",
+                textAlign: "center",
+              }}
+            >
+              {t("taskerExplore.finishProfile")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
-{showVerifyBanner === true && (
-  <View style={styles.verifyBanner}>
-    <Text style={styles.verifyText}>
-      {t("taskerExplore.verifyPending")}{" "}
-      <Text
-        style={styles.contactLink}
-        onPress={() =>
-          Linking.openURL("mailto:Task.team.bh@gmail.com")
-        }
-      >
-        {t("taskerExplore.contactUs")}
-      </Text>
-    </Text>
-  </View>
-)}
+      <TextInput
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        style={styles.searchInput}
+        placeholder={t("taskerExplore.searchPlaceholder")}
+        placeholderTextColor="#ffffff"
+      />
 
+      {/* ✅ NEW (tiny chips to show active filters/sort) */}
+      <View style={{ flexDirection: "row", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+        {jobType && (
+          <View style={styles.chip}>
+            <Text style={styles.chipText}>{jobType}</Text>
+          </View>
+        )}
+        {sortMode === "nearest" && (
+          <View style={[styles.chip, { backgroundColor: "#e8f4ec", borderColor: "#c9e5d3" }]}>
+            <Ionicons name="navigate-outline" size={14} color="#213729" />
+            <Text style={[styles.chipText, { marginLeft: 4 }]}>
+              {locLoading ? (t("common.loading") || "Loading…") : (t("taskerExplore.nearest") || "Nearest")}
+            </Text>
+          </View>
+        )}
+      </View>
 
-{showVerifyBanner === "incomplete" && (
-  <View style={styles.verifyBanner}>
-    <Text style={styles.verifyText}>
-      {t("taskerExplore.incompleteProfile")}
-    </Text>
-    <TouchableOpacity
-onPress={() => navigation.navigate("EditTaskerProfile")}
-style={{
-        marginTop: 10,
-        backgroundColor: "#213729",
-        paddingVertical: 10,
-        borderRadius: 20,
-        paddingHorizontal: 18,
-      }}
-    >
-      <Text style={{ color: "#fff", fontFamily: "InterBold", textAlign: "center" }}>
-        {t("taskerExplore.finishProfile")}
-      </Text>
-    </TouchableOpacity>
-  </View>
-)}
-
-
-<TextInput
-  value={searchQuery}
-  onChangeText={setSearchQuery}
-  style={styles.searchInput}
-  placeholder={t("taskerExplore.searchPlaceholder")}
-  placeholderTextColor="#ffffff"
-/>
-
-
-
-
+      {/* Filter / Sort Modal */}
       <Modal visible={showModal} transparent animationType="fade">
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setShowModal(false)}
-        >
+        <Pressable style={styles.modalOverlay} onPress={() => setShowModal(false)}>
           <View style={styles.modalSheet}>
+            {/* Job Type */}
             {JOB_TYPES.map((type) => (
               <TouchableOpacity
                 key={type}
@@ -323,17 +450,51 @@ style={{
                   setShowModal(false);
                 }}
               >
-                <Text style={styles.optionText}>{t(`taskerExplore.jobTypes.${type.toLowerCase()}`)}</Text>
+                <Text style={styles.optionText}>
+                  {t(`taskerExplore.jobTypes.${type.toLowerCase()}`) || type}
+                </Text>
               </TouchableOpacity>
             ))}
+
+            {/* Divider */}
+            <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
+
+            {/* ✅ NEW (Sort by nearest toggle) */}
+            <TouchableOpacity
+              style={[styles.optionItem, { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}
+              onPress={async () => {
+                if (sortMode === "nearest") {
+                  setSortMode("none");
+                  setShowModal(false);
+                  return;
+                }
+                setSortMode("nearest");
+                setShowModal(false);
+                if (!userCoords) await ensureLocation();
+              }}
+            >
+              <Text style={[styles.optionText, { fontFamily: "InterBold" }]}>
+                {t("taskerExplore.sortNearest") || "Sort by nearest"}
+              </Text>
+              <Ionicons
+                name={sortMode === "nearest" ? "radio-button-on" : "radio-button-off"}
+                size={20}
+                color="#213729"
+              />
+            </TouchableOpacity>
+
+            {/* Clear filters */}
             <TouchableOpacity
               style={[styles.optionItem, { borderTopWidth: 1, borderColor: "#ddd" }]}
               onPress={() => {
                 setJobType(null);
+                setSortMode("none"); // ✅ NEW
                 setShowModal(false);
               }}
             >
-              <Text style={[styles.optionText, { color: "red" }]}>{t("taskerExplore.clearFilter")}</Text>
+              <Text style={[styles.optionText, { color: "red" }]}>
+                {t("taskerExplore.clearFilter")}
+              </Text>
             </TouchableOpacity>
           </View>
         </Pressable>
@@ -367,55 +528,15 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
   },
-  header: {
-    fontFamily: "InterBold",
-    fontSize: 22,
-    color: "#213729",
-    marginBottom: 10,
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  label: {
-    fontFamily: "Inter",
-    fontSize: 14,
-    color: "#213729",
-    marginBottom: 6,
-    marginLeft: 2,
-  },
   searchInput: {
     height: 48,
-    backgroundColor: "#213729", // ✅ same dark green as screenshot
-    borderRadius: 30,            // ✅ fully rounded edges
+    backgroundColor: "#213729",
+    borderRadius: 30,
     paddingHorizontal: 18,
     fontSize: 15,
-    marginBottom: 20,
+    marginBottom: 12, // a bit tighter to fit chips
     fontFamily: "Inter",
-    color: "#ffffff",            // ✅ white text when typing
-  },
-  
-  filterButton: {
-    backgroundColor: "#e0e0e0",
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    alignSelf: "flex-start",
-    marginBottom: 20,
-  },
-  filterText: {
-    fontFamily: "Inter",
-    fontSize: 14,
-    color: "#213729",
-  },
-  scrollAnimation: {
-    backgroundColor: "#dff0d8",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignSelf: "center",
-    marginBottom: 10,
-  },
-  scrollAnimationText: {
-    color: "#213729",
-    fontFamily: "Inter",
+    color: "#ffffff",
   },
   empty: {
     fontFamily: "Inter",
@@ -427,8 +548,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#ffffff",
     borderRadius: 12,
-    marginBottom: 20,        // ✅ more space between cards
-    marginHorizontal: 2,     // ✅ slight spacing from screen edges
+    marginBottom: 20,
+    marginHorizontal: 2,
     borderWidth: 1,
     borderColor: "#dcdcdc",
     overflow: "hidden",
@@ -439,13 +560,11 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   cardBody: {
-    paddingVertical: 16,    // ✅ slightly more vertical spacing
+    paddingVertical: 16,
     paddingHorizontal: 18,
   },
-  
-  
   cardHeader: {
-    backgroundColor: "#213729", // ✅ dark green like screenshot
+    backgroundColor: "#213729",
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
@@ -454,40 +573,36 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 12,
   },
-  
-  image: {
-    width: "100%",
-    height: 150,
-  },
-  info: {
-    padding: 16,
-  },
   title: {
     fontFamily: "InterBold",
     fontSize: 16,
     color: "#213729",
     marginBottom: 6,
     textAlign: I18nManager.isRTL ? "right" : "left",
-    marginTop: 4, // ✅ slight top margin for better spacing
+    marginTop: 4,
   },
-  sub: {
-    fontFamily: "Inter",
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 4,
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  button: {
-    marginTop: 10,
-    backgroundColor: "#213729",
-    paddingVertical: 12,
-    borderRadius: 30,
-    alignItems: "center",
-  },
-  buttonText: {
+  viewDetails: {
+    color: "#213729",
     fontFamily: "InterBold",
-    color: "#ffffff",
-    fontSize: 14,
+    fontSize: 13,
+    textDecorationLine: "underline",
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  greeting: {
+    fontFamily: "InterBold",
+    fontSize: 26,
+    color: "#213729",
+    marginTop: 30,
+  },
+  subGreeting: {
+    fontFamily: "Inter",
+    fontSize: 16,
+    color: "#666",
   },
   modalOverlay: {
     flex: 1,
@@ -509,7 +624,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#213729",
   },
-
   verifyBanner: {
     backgroundColor: "#fff4e6",
     padding: 14,
@@ -522,57 +636,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
   },
-  imageWrapper: {
-    width: "100%",
-    height: 150,
-    backgroundColor: "#eee",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  placeholderImage: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#e0e0e0",
-  },
-  placeholderText: {
-    color: "#888",
-    fontFamily: "Inter",
-    fontSize: 14,
-  },
-  viewDetails: {
-    color: "#213729",
-    fontFamily: "InterBold",
-    fontSize: 13,
-    textDecorationLine: "underline", // ✅ underlined
-  },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  greeting: {
-    fontFamily: "InterBold",
-    fontSize: 26,
-    color: "#213729",
-    marginTop: 30,
-  },
-  subGreeting: {
-    fontFamily: "Inter",
-    fontSize: 16,
-    color: "#666",
-  },
-  filterIcon: {
-    fontSize: 22,
-    color: "#213729",
-  },
   contactLink: {
     color: "blue",
     textDecorationLine: "underline",
   },
-  
-  
-  
+  // ✅ NEW (distance pill + chips)
+  distancePill: {
+    alignSelf: "flex-start",
+    borderWidth: 1,
+    borderColor: "#dfe7e1",
+    backgroundColor: "#f4f8f5",
+    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  distanceText: {
+    color: "#213729",
+    fontFamily: "Inter",
+    fontSize: 12,
+  },
+  chip: {
+    borderWidth: 1,
+    borderColor: "#e3e3e3",
+    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    backgroundColor: "#fafafa",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  chipText: {
+    fontFamily: "Inter",
+    fontSize: 12,
+    color: "#213729",
+  },
 });

@@ -390,6 +390,8 @@
   },
   "taskerExplore": {
     "header": "استكشاف المهام",
+    "sortNearest": "الترتيب حسب الأقرب"
+,
     "location": "الموقع",
     "price": "السعر",
     "bids": "العروض",
