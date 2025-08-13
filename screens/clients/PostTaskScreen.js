@@ -14,6 +14,7 @@ import {
   FlatList,
   Image,
   I18nManager,
+  Linking,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as SecureStore from "expo-secure-store";
@@ -21,6 +22,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import useUnreadNotifications from "../../hooks/useUnreadNotifications";
+
 
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
@@ -39,6 +41,21 @@ const rawCategories = [
   "Dog Walking",
   "Other"
 ];
+const openInGoogleMaps = async (lat, lng, labelRaw = "Task Location") => {
+  try {
+    const label = encodeURIComponent(labelRaw || "Task Location");
+    const appUrl = `comgooglemaps://?q=${lat},${lng}(${label})&center=${lat},${lng}&zoom=14`;
+    const canOpenApp = await Linking.canOpenURL(appUrl);
+    if (canOpenApp) {
+      await Linking.openURL(appUrl);
+      return;
+    }
+    const webUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    await Linking.openURL(webUrl);
+  } catch (e) {
+    Alert.alert("Error", "Could not open Google Maps on this device.");
+  }
+};
 
 
 export default function PostTaskScreen() {
@@ -452,17 +469,36 @@ if (errorFlag) {
         : t("clientPostTask.selectCategory")}
     </Text>
   </TouchableOpacity>
-
   <TextInput
-
   style={[styles.input, locationError && { borderColor: "#c00", borderWidth: 2 }]}
-  
-    placeholder={t("clientPostTask.enterAddress")}
-    placeholderTextColor="#999"
-    value={location}
-    onChangeText={setLocation}
-    textAlign={I18nManager.isRTL ? "right" : "left"}
-  />
+  placeholder={t("clientPostTask.enterAddress")}
+  placeholderTextColor="#999"
+  value={location}
+  onChangeText={setLocation}
+  onBlur={async () => {
+    // When the user types an address manually, geocode it to set coords
+    try {
+      if (!location) return;
+      // If user pasted "lat,lng" set coords directly
+      const match = location.match(/-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?/);
+      if (match) {
+        const [lat, lng] = match[0].split(",").map(v => parseFloat(v.trim()));
+        if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+          setCoords({ latitude: lat, longitude: lng });
+          return;
+        }
+      }
+      const res = await Location.geocodeAsync(location);
+      if (res && res[0]) {
+        setCoords({ latitude: res[0].latitude, longitude: res[0].longitude });
+      }
+    } catch (e) {
+      // ignore; user can still pick on map
+    }
+  }}
+  textAlign={I18nManager.isRTL ? "right" : "left"}
+/>
+
   
   {/* Location buttons with equal spacing */}
   <View style={styles.locationButtonsContainer}>
@@ -518,30 +554,46 @@ if (errorFlag) {
   
   {/* Map preview if coordinates are set */}
   {coords && (
-    <View style={styles.mapPreviewContainer}>
-      <View style={styles.mapPreview}>
-        <MapView
-          style={{ flex: 1 }}
-          pointerEvents="none"
-          region={{
-            latitude: coords.latitude,
-            longitude: coords.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}
-        >
-          <Marker coordinate={coords} />
-        </MapView>
-      </View>
-      
-      <TouchableOpacity
-        style={styles.editLocationButton}
-        onPress={openMapPicker}
+  <View style={styles.mapPreviewContainer}>
+    <View style={styles.mapPreview}>
+      <MapView
+        style={{ flex: 1 }}
+        pointerEvents="none"
+        region={{
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        }}
       >
-        <Text style={styles.editLocationText}>{t("clientPostTask.editLocation")}</Text>
-      </TouchableOpacity>
+        <Marker coordinate={coords} />
+      </MapView>
     </View>
-  )}
+
+    <TouchableOpacity
+      style={styles.editLocationButton}
+      onPress={openMapPicker}
+    >
+      <Text style={styles.editLocationText}>{t("clientPostTask.editLocation")}</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={[styles.editLocationButton, { marginTop: 6, backgroundColor: "#e7f0e9" }]}
+      onPress={() =>
+        openInGoogleMaps(
+          coords.latitude,
+          coords.longitude,
+          title || "Task Location"
+        )
+      }
+    >
+      <Text style={styles.editLocationText}>
+        {t("clientPostTask.openInGoogleMaps") || "Open in Google Maps"}
+      </Text>
+    </TouchableOpacity>
+  </View>
+)}
+
 
 
   <TextInput

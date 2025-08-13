@@ -10,13 +10,20 @@ import {
   I18nManager,
   StyleSheet,
   Dimensions,
+  Linking,            // ✅ add this
+
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Platform, Linking } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons"; // ✅ icon package
 import { useNavigation } from "@react-navigation/native"; // ✅ for back navigation
 import axios from "axios";
 import { fetchCurrentUser } from "../../services/auth"; // or your actual path
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
+import { Linking } from "react-native";
+
 
 
 const { width } = Dimensions.get("window");
@@ -31,6 +38,30 @@ export default function TaskDetailsScreen({ route }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [loadingBid, setLoadingBid] = useState(true); // ✅ NEW
   const isBiddingAllowed = task.status === "Pending";
+  const [coords, setCoords] = useState(null);
+const [geoError, setGeoError] = useState(null);
+
+
+const openInGoogleMaps = async (lat, lng, labelRaw = "Task Location") => {
+  try {
+    const label = encodeURIComponent(labelRaw || "Task Location");
+
+    // 1) Try Google Maps app (deep link)
+    // Works on both iOS & Android if the app is installed
+    const appUrl = `comgooglemaps://?q=${lat},${lng}(${label})&center=${lat},${lng}&zoom=14`;
+    const canOpenApp = await Linking.canOpenURL(appUrl);
+    if (canOpenApp) {
+      await Linking.openURL(appUrl);
+      return;
+    }
+
+    // 2) Fallback: open Google Maps in the browser
+    const webUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    await Linking.openURL(webUrl);
+  } catch (e) {
+    Alert.alert("Error", "Could not open Google Maps on this device.");
+  }
+};
 
 
 
@@ -66,6 +97,8 @@ export default function TaskDetailsScreen({ route }) {
     };
   }, []);
 
+
+
   useEffect(() => {
     const fetchFullTask = async () => {
       try {
@@ -78,6 +111,48 @@ export default function TaskDetailsScreen({ route }) {
   
     fetchFullTask();
   }, []);
+
+
+  useEffect(() => {
+    let cancelled = false;
+  
+    (async () => {
+      try {
+        // A) If your API already returns numbers, use them
+        if (typeof task?.latitude === "number" && typeof task?.longitude === "number") {
+          if (!cancelled) setCoords({ latitude: task.latitude, longitude: task.longitude });
+          return;
+        }
+  
+        // B) If task.location is "lat,lng" string, parse it
+        if (typeof task?.location === "string") {
+          const match = task.location.match(/-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?/);
+          if (match) {
+            const [lat, lng] = match[0].split(",").map(v => parseFloat(v.trim()));
+            if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+              if (!cancelled) setCoords({ latitude: lat, longitude: lng });
+              return;
+            }
+          }
+        }
+  
+        // C) Otherwise geocode the address text
+        if (task?.location) {
+          const results = await Location.geocodeAsync(task.location);
+          if (results && results[0] && !cancelled) {
+            setCoords({ latitude: results[0].latitude, longitude: results[0].longitude });
+          }
+        }
+      } catch (e) {
+        if (!cancelled) setGeoError(e.message || "Geocoding failed");
+      }
+    })();
+  
+    return () => {
+      cancelled = true;
+    };
+  }, [task?.location, task?.latitude, task?.longitude]);
+  
   
   
   
@@ -281,6 +356,51 @@ const getStatusStyle = (status) => {
     <Text style={{ fontFamily: "InterBold" }}>{t("taskerTaskDetails.location")}: </Text>
     {task.location}
   </Text>
+
+  {coords ? (
+  <View style={{ marginTop: 10 }}>
+    <MapView
+      style={styles.map}
+      initialRegion={{
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      }}
+      pointerEvents="none" // preview only so it doesn't fight scroll
+    >
+      <Marker coordinate={coords} />
+    </MapView>
+
+    {/* Optional: open in external maps */}
+    <TouchableOpacity
+  onPress={() =>
+    openInGoogleMaps(
+      coords.latitude,
+      coords.longitude,
+      task?.title || "Task Location"
+    )
+  }
+  style={[styles.whiteButton, { marginTop: 8 }]}
+>
+  <Text style={styles.whiteButtonText}>
+    {t("taskerTaskDetails.openInMaps") || "Open in Google Maps"}
+  </Text>
+</TouchableOpacity>
+
+
+    <Text style={styles.mapNote}>
+      {t("taskerTaskDetails.mapPreview") || "Map preview of task location"}
+    </Text>
+  </View>
+) : (
+  <Text style={[styles.detailsText, { marginTop: 6, opacity: 0.8 }]}>
+    {geoError
+      ? (t("taskerTaskDetails.mapUnavailable") || "Map unavailable for this address")
+      : (t("taskerTaskDetails.locating") || "Locating on map…")}
+  </Text>
+)}
+
 
   <Text style={[styles.detailsText, { marginTop: 12 }]}>
     <Text style={{ fontFamily: "InterBold" }}>{t("taskerTaskDetails.category")}: </Text>
@@ -598,6 +718,22 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   
+  map: {
+    width: "100%",
+    height: 180,
+    borderRadius: 12,
+    overflow: "hidden",
+    marginTop: 6,
+    backgroundColor: "#e6e6e6",
+  },
+  mapNote: {
+    fontFamily: "Inter",
+    fontSize: 12,
+    color: "#fff",
+    opacity: 0.85,
+    marginTop: 6,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
   
   
   

@@ -13,7 +13,8 @@
       "bundleIdentifier": "com.task.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSLocationWhenInUseUsageDescription": "We use your location to show where the task is."
+        "NSLocationWhenInUseUsageDescription": "We use your location to show where the task is.",
+        "LSApplicationQueriesSchemes": ["comgooglemaps"]
       }
     },
     "android": {
