@@ -719,7 +719,13 @@ if (errorFlag) {
 </Modal>
 
 {/* Map Picker Modal */}
-<Modal visible={mapVisible} animationType="slide" transparent={false}>
+<Modal
+  visible={mapVisible}
+  animationType="slide"
+  transparent={false}
+  presentationStyle="fullScreen"        // iOS nice full-screen
+  statusBarTranslucent                  // Android: avoid overlap
+>
   <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
     {/* Header like AboutUs */}
     <View style={styles.modalHeaderRow}>
