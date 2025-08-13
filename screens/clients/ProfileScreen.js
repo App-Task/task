@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,6 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  ActivityIndicator,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,12 +15,7 @@ import { removeToken } from "../../services/authStorage";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Linking } from "react-native";
 import useUnreadNotifications from "../../hooks/useUnreadNotifications";
-import * as SecureStore from "expo-secure-store";
-import i18n from "i18next";
-import Toast from "react-native-toast-message";
-import * as Updates from "expo-updates";
-import { I18nManager } from "react-native";
-import { updateNotificationLanguage } from "../../services/notificationService";
+ 
 
 import { fetchCurrentUser, updateUserProfile } from "../../services/auth";
 import * as ImagePicker from "expo-image-picker";
@@ -33,7 +27,6 @@ export default function ProfileScreen({ navigation }) {
   const unreadCount = useUnreadNotifications();
   const [user, setUser] = useState({ name: "", email: "", profileImage: null });
   const [profileImage, setProfileImage] = useState(null);
-  const [switchingLanguage, setSwitchingLanguage] = useState(false);
   
 
   const loadUser = async () => {
@@ -53,36 +46,6 @@ export default function ProfileScreen({ navigation }) {
       loadUser();
     }, [])
   );
-
-  const toggleLanguage = async () => {
-    setSwitchingLanguage(true);
-    
-    try {
-      const newLang = i18n.language === "en" ? "ar" : "en";
-      const isRTL = newLang === "ar";
-
-      // Update existing notifications to new language
-      await updateNotificationLanguage(newLang);
-
-      await SecureStore.setItemAsync("appLanguage", newLang);
-      await SecureStore.setItemAsync("appRTL", JSON.stringify(isRTL));
-      await i18n.changeLanguage(newLang);
-
-      Toast.show({
-        type: "success",
-        text1: newLang === "en" ? t("language.changedEn") : t("language.changedAr"),
-        position: "bottom",
-        visibilityTime: 2000,
-      });
-
-      if (I18nManager.isRTL !== isRTL) {
-        I18nManager.forceRTL(isRTL);
-        await Updates.reloadAsync();
-      }
-    } finally {
-      setSwitchingLanguage(false);
-    }
-  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -279,15 +242,7 @@ export default function ProfileScreen({ navigation }) {
 
 
 
-        <TouchableOpacity style={styles.rowItem} onPress={toggleLanguage}>
-          <Text style={styles.rowText}>{t("clientProfile.language")}</Text>
-          <View style={styles.languageIndicator}>
-            <Text style={styles.languageText}>
-              {i18n.language === "en" ? "English" : "العربية"}
-            </Text>
-            <Ionicons name="language" size={20} color="#999" />
-          </View>
-        </TouchableOpacity>
+        
 
         <TouchableOpacity style={[styles.rowItem, styles.logoutRow]} onPress={handleLogout}>
           <Text style={[styles.rowText, styles.logoutText]}>{t("clientProfile.logout")}</Text>
@@ -296,17 +251,7 @@ export default function ProfileScreen({ navigation }) {
       </View>
     </ScrollView>
     
-    {/* Language switching loading popup */}
-    {switchingLanguage && (
-      <View style={styles.loadingOverlay}>
-        <View style={styles.loadingBox}>
-          <ActivityIndicator size="large" color="#213729" />
-          <Text style={styles.loadingText}>{t("language.switching")}</Text>
-        </View>
-      </View>
-    )}
     
-    <Toast />
     </>
   );
 }
@@ -413,45 +358,5 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 10,
     fontWeight: "bold",
-  },
-  languageIndicator: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  languageText: {
-    fontFamily: "Inter",
-    fontSize: 14,
-    color: "#999",
-  },
-  loadingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000,
-  },
-  loadingBox: {
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    padding: 30,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    minWidth: 200,
-  },
-  loadingText: {
-    fontFamily: "Inter",
-    fontSize: 16,
-    color: "#213729",
-    marginTop: 15,
-    textAlign: "center",
   },
 });
