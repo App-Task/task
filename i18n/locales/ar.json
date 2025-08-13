@@ -391,6 +391,7 @@
   "taskerExplore": {
     "header": "استكشاف المهام",
     "sortNearest": "الترتيب حسب الأقرب"
+,  "nearest": "الأقرب"
 ,
     "location": "الموقع",
     "price": "السعر",

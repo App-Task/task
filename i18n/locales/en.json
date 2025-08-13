@@ -395,7 +395,7 @@
   "taskerExplore": {
     "header": "Explore Tasks",
     "sortNearest": "Sort by nearest"
-,
+,"nearest": "Nearest",
     "location": "Location",
     "price": "Price",
     "bids": "Bids",
