@@ -17,6 +17,8 @@ import {
   Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"; // ✅ add this
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 import * as ImagePicker from "expo-image-picker";
 import * as SecureStore from "expo-secure-store";
@@ -80,6 +82,7 @@ export default function PostTaskScreen() {
   const [descError, setDescError] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [budgetError, setBudgetError] = useState(false);
+  const insets = useSafeAreaInsets();
 
 
   const [coords, setCoords] = useState(null); // { latitude, longitude }
@@ -114,6 +117,9 @@ const applyReverseGeocode = async (lat, lng) => {
 // Open the map picker; if no coords yet, get current location first
 const openMapPicker = async () => {
   try {
+    // ✅ show UI immediately so safe-area applies on first open
+    setMapVisible(true);
+
     if (!coords) {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -141,7 +147,6 @@ const openMapPicker = async () => {
         longitudeDelta: 0.01,
       });
     }
-    setMapVisible(true);
   } catch (e) {
     console.log("openMapPicker error", e);
     Alert.alert(t("clientPostTask.errorTitle"), t("clientPostTask.mapError"));
@@ -723,11 +728,11 @@ if (errorFlag) {
   visible={mapVisible}
   animationType="slide"
   transparent={false}
-  presentationStyle="fullScreen"        // iOS nice full-screen
-  statusBarTranslucent                  // Android: avoid overlap
+  presentationStyle="fullScreen"
+  statusBarTranslucent={Platform.OS === "android"} // translucent only on Android
 >
-  <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-    {/* Header like AboutUs */}
+  {/* Use View + paddingTop=insets.top so the header is pushed down on first render */}
+  <View style={{ flex: 1, backgroundColor: "#fff", paddingTop: insets.top }}>
     <View style={styles.modalHeaderRow}>
       <TouchableOpacity onPress={() => setMapVisible(false)} style={styles.modalBackBtn}>
         <Ionicons
@@ -740,12 +745,10 @@ if (errorFlag) {
       <View style={{ width: 24 }} />
     </View>
 
-    {/* Optional subtitle under the header */}
     <Text style={styles.modalHeaderSubtitle}>
       {t("clientPostTask.mapInstructions")}
     </Text>
 
-    {/* Map */}
     {tempRegion && (
       <MapView
         style={{ flex: 1 }}
@@ -768,7 +771,6 @@ if (errorFlag) {
       </MapView>
     )}
 
-    {/* Footer buttons */}
     <View style={styles.mapFooter}>
       <TouchableOpacity style={[styles.mapBtn, styles.mapCancel]} onPress={() => setMapVisible(false)}>
         <Text style={styles.mapBtnText}>{t("clientPostTask.cancel")}</Text>
@@ -777,8 +779,9 @@ if (errorFlag) {
         <Text style={[styles.mapBtnText, { color: "#fff" }]}>{t("clientPostTask.confirmLocation")}</Text>
       </TouchableOpacity>
     </View>
-  </SafeAreaView>
+  </View>
 </Modal>
+
 
 
     </KeyboardAvoidingView>
@@ -1168,10 +1171,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    paddingTop: 6,         // SafeAreaView already handles status bar cutout
+    paddingTop: 0,          // was 6; not needed with insets
     paddingBottom: 8,
     backgroundColor: "#fff",
   },
+  
   modalBackBtn: {
     padding: 4,
   },
