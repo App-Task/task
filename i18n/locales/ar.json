@@ -185,6 +185,7 @@
   },
   "clientPostTask": {
     "title": "نشر مهمة",
+        "openInGoogleMaps": "افتح في خرائط جوجل",
     "taskTitlePlaceholder": "أدخل عنوان المهمة (15 حرفًا كحد أقصى)",
     "taskDescPlaceholder": "صف مهمتك (150 حرفًا كحد أقصى)",
     "selectCategory": "اختر الفئة",

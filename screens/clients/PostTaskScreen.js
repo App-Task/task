@@ -587,9 +587,10 @@ if (errorFlag) {
         )
       }
     >
-      <Text style={styles.editLocationText}>
-        {t("clientPostTask.openInGoogleMaps") || "Open in Google Maps"}
-      </Text>
+<Text style={styles.editLocationText}>
+  {t("clientPostTask.openInGoogleMaps")}
+</Text>
+
     </TouchableOpacity>
   </View>
 )}
