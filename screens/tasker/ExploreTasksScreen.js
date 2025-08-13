@@ -357,7 +357,7 @@ const [locLoading, setLocLoading] = useState(false);
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <View>
+        <View style={styles.headerTexts}>
           <Text style={styles.greeting}>
             {t("taskerExplore.greeting", { name: currentUser?.name || "Tasker" })}
           </Text>
@@ -588,21 +588,27 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   headerRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
+  },
+  headerTexts: {
+    flex: 1,
+    alignItems: I18nManager.isRTL ? "flex-end" : "flex-start",
   },
   greeting: {
     fontFamily: "InterBold",
     fontSize: 26,
     color: "#213729",
     marginTop: 30,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   subGreeting: {
     fontFamily: "Inter",
     fontSize: 16,
     color: "#666",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   modalOverlay: {
     flex: 1,

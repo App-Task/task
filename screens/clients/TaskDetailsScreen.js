@@ -171,9 +171,16 @@ const [previewImage, setPreviewImage] = useState(null);
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         {/* Header */}
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-  <Ionicons name="arrow-back" size={30} color="#213729" />
-</TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.backBtn, I18nManager.isRTL && { alignSelf: "flex-end" }]}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons
+            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+            size={30}
+            color="#213729"
+          />
+        </TouchableOpacity>
 
 <View style={styles.topContent}>
   <View style={styles.topRow}>
@@ -384,6 +391,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#213729",
     marginBottom: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   backBtn: {
     width: 24,
@@ -394,14 +402,15 @@ const styles = StyleSheet.create({
     color: "#215432"
   },
   imageRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     marginTop: 6,
   },
   image: {
     width: 60,
     height: 60,
     borderRadius: 8,
-    marginRight: 8,
+    marginRight: I18nManager.isRTL ? 0 : 8,
+    marginLeft: I18nManager.isRTL ? 8 : 0,
   },
   
   label: {
@@ -417,6 +426,7 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 10,
     lineHeight: 22,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   priceBox: {
     backgroundColor: "#f2f2f2",
@@ -499,12 +509,13 @@ const styles = StyleSheet.create({
     color: "#666",
     fontWeight: "900",
     marginBottom: 2,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   statusBadge: {
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 12,
-    alignSelf: "flex-start",         // ✅ keeps it aligned at the top
+    alignSelf: I18nManager.isRTL ? "flex-end" : "flex-start",         // ✅ keeps it aligned at the top
   },
   statusText: {
     color: "#fff",
@@ -528,6 +539,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#fff",
     lineHeight: 20,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   topContent: {
     marginTop: 10,
@@ -556,7 +568,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
   },
   topRow: {
-    flexDirection: "row",           // ✅ puts text and badge on same row
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",           // ✅ puts text and badge on same row
     justifyContent: "space-between", // ✅ pushes badge to the far right
     alignItems: "flex-start",
   },
@@ -578,7 +590,8 @@ const styles = StyleSheet.create({
   closePreviewBtn: {
     position: "absolute",
     top: 40,
-    left: 20,
+    left: I18nManager.isRTL ? undefined : 20,
+    right: I18nManager.isRTL ? 20 : undefined,
     zIndex: 1001,
   },
   

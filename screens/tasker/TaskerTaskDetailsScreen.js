@@ -306,7 +306,7 @@ const getStatusStyle = (status) => {
   
   return (
     <SafeAreaView style={styles.safeArea}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={[styles.backButton, I18nManager.isRTL && { alignSelf: "flex-end" }]} onPress={() => navigation.goBack()}>
         <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={30} color="#213729" />
       </TouchableOpacity>
 
@@ -622,7 +622,8 @@ const styles = StyleSheet.create({
   closeButton: {
     position: "absolute",
     top: 40,
-    left: 20,
+    left: I18nManager.isRTL ? undefined : 20,
+    right: I18nManager.isRTL ? 20 : undefined,
     zIndex: 10000,
     backgroundColor: "rgba(0,0,0,0.6)",
     borderRadius: 20,
@@ -673,7 +674,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   topRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
@@ -681,7 +682,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 12,
-    alignSelf: "flex-start",
+    alignSelf: I18nManager.isRTL ? "flex-end" : "flex-start",
   },
   statusText: {
     color: "#fff",
