@@ -26,6 +26,7 @@ const { width } = Dimensions.get("window");
 
 export default function WelcomeScreen({ navigation }) {
   const [ready, setReady] = useState(false);
+  const [switchingLanguage, setSwitchingLanguage] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -55,26 +56,32 @@ export default function WelcomeScreen({ navigation }) {
   };
 
   const toggleLanguage = async () => {
-    const newLang = i18n.language === "en" ? "ar" : "en";
-    const isRTL = newLang === "ar";
+    setSwitchingLanguage(true);
+    
+    try {
+      const newLang = i18n.language === "en" ? "ar" : "en";
+      const isRTL = newLang === "ar";
 
-    // Update existing notifications to new language
-    await updateNotificationLanguage(newLang);
+      // Update existing notifications to new language
+      await updateNotificationLanguage(newLang);
 
-    await SecureStore.setItemAsync("appLanguage", newLang);
-    await SecureStore.setItemAsync("appRTL", JSON.stringify(isRTL));
-    await i18n.changeLanguage(newLang);
+      await SecureStore.setItemAsync("appLanguage", newLang);
+      await SecureStore.setItemAsync("appRTL", JSON.stringify(isRTL));
+      await i18n.changeLanguage(newLang);
 
-    Toast.show({
-      type: "success",
-      text1: newLang === "en" ? t("language.changedEn") : t("language.changedAr"),
-      position: "bottom",
-      visibilityTime: 2000,
-    });
+      Toast.show({
+        type: "success",
+        text1: newLang === "en" ? t("language.changedEn") : t("language.changedAr"),
+        position: "bottom",
+        visibilityTime: 2000,
+      });
 
-    if (I18nManager.isRTL !== isRTL) {
-      I18nManager.forceRTL(isRTL);
-      await Updates.reloadAsync();
+      if (I18nManager.isRTL !== isRTL) {
+        I18nManager.forceRTL(isRTL);
+        await Updates.reloadAsync();
+      }
+    } finally {
+      setSwitchingLanguage(false);
     }
   };
 
@@ -129,6 +136,16 @@ export default function WelcomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Language switching loading popup */}
+      {switchingLanguage && (
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator size="large" color="#213729" />
+            <Text style={styles.loadingText}>{t("language.switching")}</Text>
+          </View>
+        </View>
+      )}
 
       <Toast />
     </>
@@ -217,5 +234,35 @@ const styles = StyleSheet.create({
     color: "#215432",
     textAlign: "center",
     marginBottom: 25,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  loadingBox: {
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    padding: 30,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    minWidth: 200,
+  },
+  loadingText: {
+    fontFamily: "Inter",
+    fontSize: 16,
+    color: "#213729",
+    marginTop: 15,
+    textAlign: "center",
   },
 });

@@ -78,7 +78,7 @@ router.patch("/update-language", async (req, res) => {
       return res.status(400).json({ error: "Invalid language. Must be 'en' or 'ar'" });
     }
 
-    // Translation mappings
+    // Translation mappings with reverse lookup capability
     const translations = {
       en: {
         // Message notifications
@@ -141,29 +141,77 @@ router.patch("/update-language", async (req, res) => {
     // Get all notifications for this user
     const notifications = await Notification.find({ userId });
 
+    // Simple hardcoded translation maps
+    const simpleTranslations = {
+      en: {
+        // From Arabic to English
+        "رسالة جديدة": "New Message",
+        "عرض جديد على مهمتك": "New Bid on Your Task",
+        "تم توظيفك!": "You've Been Hired!",
+        "تقييم جديد": "New Review",
+        "تم إلغاء المهمة": "Task Cancelled",
+        "تم إنجاز المهمة": "Task Completed",
+        "حالة التحقق": "Verification Status",
+        "تم الموافقة على مستنداتك. أنت الآن معتمد!": "Your documents were approved. You're now verified!",
+        "تم رفض مستنداتك. يرجى إعادة التحميل للحصول على الاعتماد.": "Your documents were declined. Please re-upload to get verified.",
+        
+        // Keep English as English
+        "New Message": "New Message",
+        "New Bid on Your Task": "New Bid on Your Task",
+        "You've Been Hired!": "You've Been Hired!",
+        "New Review": "New Review",
+        "Task Cancelled": "Task Cancelled",
+        "Task Completed": "Task Completed",
+        "Verification Status": "Verification Status",
+        "Your documents were approved. You're now verified!": "Your documents were approved. You're now verified!",
+        "Your documents were declined. Please re-upload to get verified.": "Your documents were declined. Please re-upload to get verified."
+      },
+      ar: {
+        // From English to Arabic
+        "New Message": "رسالة جديدة",
+        "New Bid on Your Task": "عرض جديد على مهمتك",
+        "You've Been Hired!": "تم توظيفك!",
+        "New Review": "تقييم جديد",
+        "Task Cancelled": "تم إلغاء المهمة",
+        "Task Completed": "تم إنجاز المهمة",
+        "Verification Status": "حالة التحقق",
+        "Your documents were approved. You're now verified!": "تم الموافقة على مستنداتك. أنت الآن معتمد!",
+        "Your documents were declined. Please re-upload to get verified.": "تم رفض مستنداتك. يرجى إعادة التحميل للحصول على الاعتماد.",
+        
+        // Keep Arabic as Arabic
+        "رسالة جديدة": "رسالة جديدة",
+        "عرض جديد على مهمتك": "عرض جديد على مهمتك",
+        "تم توظيفك!": "تم توظيفك!",
+        "تقييم جديد": "تقييم جديد",
+        "تم إلغاء المهمة": "تم إلغاء المهمة",
+        "تم إنجاز المهمة": "تم إنجاز المهمة",
+        "حالة التحقق": "حالة التحقق",
+        "تم الموافقة على مستنداتك. أنت الآن معتمد!": "تم الموافقة على مستنداتك. أنت الآن معتمد!",
+        "تم رفض مستنداتك. يرجى إعادة التحميل للحصول على الاعتماد.": "تم رفض مستنداتك. يرجى إعادة التحميل للحصول على الاعتماد."
+      }
+    };
+
     // Update each notification
     for (const notification of notifications) {
       let newTitle = notification.title;
       let newMessage = notification.message;
 
-      // Translate title if it's a translation key
-      if (newTitle.startsWith('notification.')) {
-        const key = newTitle;
-        if (translations[language][key]) {
-          newTitle = translations[language][key];
-        }
+      // Translate title using simple lookup
+      if (simpleTranslations[language][notification.title]) {
+        newTitle = simpleTranslations[language][notification.title];
       }
 
-      // Translate message if it's a translation key
-      if (newMessage.includes('notification.') && newMessage.includes('|')) {
-        const [key, param] = newMessage.split('|');
-        if (translations[language][key]) {
-          newMessage = translations[language][key] + param + (key.includes('Message') || key.includes('ByClient') || key.includes('ByTasker') || key.includes('ByYou') ? '"' : '');
-        }
-      } else if (newMessage.startsWith('notification.')) {
-        const key = newMessage;
-        if (translations[language][key]) {
-          newMessage = translations[language][key];
+      // Translate message using simple lookup or partial matching
+      if (simpleTranslations[language][notification.message]) {
+        newMessage = simpleTranslations[language][notification.message];
+      } else {
+        // Handle messages with parameters
+        for (const [originalText, translatedText] of Object.entries(simpleTranslations[language])) {
+          if (notification.message.startsWith(originalText) && originalText.length < notification.message.length) {
+            const param = notification.message.substring(originalText.length);
+            newMessage = translatedText + param;
+            break;
+          }
         }
       }
 

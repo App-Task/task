@@ -13,7 +13,8 @@
 "tagline": "مساعدة موثوقة على بُعد مهمة واحدة",
 "language": {
   "changedEn": "Language changed to English",
-  "changedAr": "تم تغيير اللغة إلى العربية"
+  "changedAr": "تم تغيير اللغة إلى العربية",
+  "switching": "جاري تغيير اللغة..."
 },
   "login": {
     "welcomeBack": "مرحبًا بعودتك ",

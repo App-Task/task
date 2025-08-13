@@ -88,19 +88,57 @@ export default function TaskerNotificationsScreen({ navigation, setUnreadNotific
   const translateNotification = (text) => {
     if (!text) return '';
     
-    // Check if it's a translation key
+    const currentLang = i18n.language;
+    
+    // Hardcoded translations for all notification patterns
+    const translations = {
+      // English notifications
+      "New Message": currentLang === "ar" ? "رسالة جديدة" : "New Message",
+      "New Bid on Your Task": currentLang === "ar" ? "عرض جديد على مهمتك" : "New Bid on Your Task",
+      "You've Been Hired!": currentLang === "ar" ? "تم توظيفك!" : "You've Been Hired!",
+      "New Review": currentLang === "ar" ? "تقييم جديد" : "New Review",
+      "Task Cancelled": currentLang === "ar" ? "تم إلغاء المهمة" : "Task Cancelled",
+      "Task Completed": currentLang === "ar" ? "تم إنجاز المهمة" : "Task Completed",
+      "Verification Status": currentLang === "ar" ? "حالة التحقق" : "Verification Status",
+      "Your documents were approved. You're now verified!": currentLang === "ar" ? "تم الموافقة على مستنداتك. أنت الآن معتمد!" : "Your documents were approved. You're now verified!",
+      "Your documents were declined. Please re-upload to get verified.": currentLang === "ar" ? "تم رفض مستنداتك. يرجى إعادة التحميل للحصول على الاعتماد." : "Your documents were declined. Please re-upload to get verified.",
+      
+      // Arabic notifications  
+      "رسالة جديدة": currentLang === "ar" ? "رسالة جديدة" : "New Message",
+      "عرض جديد على مهمتك": currentLang === "ar" ? "عرض جديد على مهمتك" : "New Bid on Your Task",
+      "تم توظيفك!": currentLang === "ar" ? "تم توظيفك!" : "You've Been Hired!",
+      "تقييم جديد": currentLang === "ar" ? "تقييم جديد" : "New Review",
+      "تم إلغاء المهمة": currentLang === "ar" ? "تم إلغاء المهمة" : "Task Cancelled",
+      "تم إنجاز المهمة": currentLang === "ar" ? "تم إنجاز المهمة" : "Task Completed",
+      "حالة التحقق": currentLang === "ar" ? "حالة التحقق" : "Verification Status",
+      "تم الموافقة على مستنداتك. أنت الآن معتمد!": currentLang === "ar" ? "تم الموافقة على مستنداتك. أنت الآن معتمد!" : "Your documents were approved. You're now verified!",
+      "تم رفض مستنداتك. يرجى إعادة التحميل للحصول على الاعتماد.": currentLang === "ar" ? "تم رفض مستنداتك. يرجى إعادة التحميل للحصول على الاعتماد." : "Your documents were declined. Please re-upload to get verified."
+    };
+    
+    // Check for exact matches first
+    if (translations[text]) {
+      return translations[text];
+    }
+    
+    // Handle messages with parameters (like "New message from John")
+    for (const [key, value] of Object.entries(translations)) {
+      if (text.startsWith(key) && key.length < text.length) {
+        const param = text.substring(key.length);
+        return value + param;
+      }
+    }
+    
+    // Handle translation keys (fallback)
     if (text.includes('notification.')) {
-      // Handle messages with parameters (format: "key|param")
       if (text.includes('|')) {
         const [key, param] = text.split('|');
-        const translatedParam = param === 'someone' ? t('notification.someone') : param;
+        const translatedParam = param === 'someone' ? (currentLang === "ar" ? "شخص ما" : "someone") : param;
         return t(key, { name: translatedParam, title: translatedParam });
       }
-      // Handle simple translation keys
       return t(text);
     }
     
-    // Return original text if not a translation key
+    // Return original text if no translation found
     return text;
   };
 
