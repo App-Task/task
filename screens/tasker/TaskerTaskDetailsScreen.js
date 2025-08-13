@@ -10,19 +10,19 @@ import {
   I18nManager,
   StyleSheet,
   Dimensions,
-  Linking,            // ✅ add this
-
+  Linking,
 } from "react-native";
+
+
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Platform, Linking } from "react-native";
 import { useTranslation } from "react-i18next";
-import { Ionicons } from "@expo/vector-icons"; // ✅ icon package
-import { useNavigation } from "@react-navigation/native"; // ✅ for back navigation
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import { fetchCurrentUser } from "../../services/auth"; // or your actual path
+import { fetchCurrentUser } from "../../services/auth";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-import { Linking } from "react-native";
+
 
 
 
