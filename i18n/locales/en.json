@@ -184,6 +184,7 @@
   },
   "clientPostTask": {
     "title": "Post a Task",
+        "openInGoogleMaps": "Open in Google Maps",
     "taskTitlePlaceholder": "Enter task title (max 15 characters)",
     "taskDescPlaceholder": "Describe your task (max 150 characters)",
     "selectCategory": "Select Category",

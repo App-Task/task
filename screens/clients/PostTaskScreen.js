@@ -17,7 +17,6 @@ import {
   Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"; // ✅ add this
-import { Ionicons } from "@expo/vector-icons"; // (you already have this in the file)
 
 import * as ImagePicker from "expo-image-picker";
 import * as SecureStore from "expo-secure-store";
