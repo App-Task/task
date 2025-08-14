@@ -14,11 +14,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { getToken } from "../../services/authStorage";
 import CountryPicker from "react-native-country-picker-modal";
+import i18n from "i18next";
+
 
 
 export default function EditProfileScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation();
+  const isRTL = I18nManager.isRTL || i18n.language?.startsWith("ar");
+
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -146,11 +150,25 @@ const [rawPhone, setRawPhone] = useState("");
     <ScrollView contentContainerStyle={styles.container}>
       {/* ✅ Top Back Button */}
       <View style={styles.headerRow}>
-  <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-    <Ionicons name="arrow-back" size={24} color="#213729" />
+  <TouchableOpacity
+    style={[
+      styles.backButton,
+      isRTL ? { right: 0, left: undefined } : { left: 0, right: undefined }
+    ]}
+    onPress={() => navigation.goBack()}
+  >
+<Ionicons
+  name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+  size={24}
+  color="#213729"
+/>
+
+
   </TouchableOpacity>
+
   <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>
 </View>
+
 
 <Text style={{ fontSize: 16, fontWeight: "bold", color: "#213729", marginBottom: 20, textAlign: I18nManager.isRTL ? "right" : "left" }}>
   {t("taskerEditProfile.instruction")}
@@ -228,12 +246,13 @@ const styles = StyleSheet.create({
 
   backButton: {
     position: "absolute",
-    left: 0,
     top: 0,
     bottom: 0,
     justifyContent: "center",
-    paddingHorizontal: 4,
+    paddingHorizontal: 4
   },
+  
+  
 
   header: {
     fontFamily: "InterBold",

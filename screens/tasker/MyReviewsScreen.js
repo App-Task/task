@@ -125,8 +125,12 @@ const styles = StyleSheet.create({
   
   backBtn: {
     padding: 4,
-    marginBottom: 20, // ✅ smaller, neat spacing
+    marginBottom: 20,                           // spacing under the arrow
+    alignSelf: I18nManager.isRTL ? "flex-end" : "flex-start",  // ➜ moves arrow to the right in Arabic
+    marginLeft: I18nManager.isRTL ? 0 : 0,      // keep if you want extra offsets
+    marginRight: I18nManager.isRTL ? 0 : 0
   },
+  
   
 
   header: {
