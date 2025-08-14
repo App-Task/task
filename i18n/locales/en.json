@@ -682,10 +682,35 @@
     "completedMessage": "Your profile has been set up successfully."
   },
   "clientViewBids": {
-    "acceptError": "Something went wrong while accepting the bid."
+    "title": "Task Bids",
+    "chat": "Chat",
+    "accept": "Accept",
+    "acceptedLabel": "Accepted",
+    "alreadySelectedLabel": "Tasker already selected",
+    "viewProfile": "View Profile",
+    "priceOffered": "Price offered",
+    "currency": "BHD",
+    "noBids": "No bids yet.",
+    "acceptingBid": "Accepting bid...",
+    "acceptedTitle": "Bid Accepted",
+    "acceptedMessage": "{{name}} has been selected for this task.",
+    "acceptError": "Couldn't accept the bid. Please try again.",
+    "loadError": "Failed to load bids. Please try again.",
+    "taskerFallbackName": "Tasker"
+  },
+  "common": {
+    "errorTitle": "Error",
+    "ok": "OK"
   },
   "clientEditTask": {
-    "loadError": "Failed to load task",
-    "updateError": "Failed to update task"
+    "heading": "Edit Task",
+    "loadError": "Failed to load task details. Please try again.",
+    "missingTitle": "Missing Information",
+    "missingFields": "Please fill in all the required fields before saving.",
+    "updateError": "Failed to update the task. Please try again.",
+    "save": "Save Changes"
+  },
+  "common": {
+    "errorTitle": "Error"
   }
 }

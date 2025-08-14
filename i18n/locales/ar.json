@@ -677,10 +677,35 @@
     "completedMessage": "تم إعداد ملفك الشخصي بنجاح."
   },
   "clientViewBids": {
-    "acceptError": "حدث خطأ أثناء قبول العرض."
+    "title": "عروض المهمة",
+    "chat": "محادثة",
+    "accept": "قبول",
+    "acceptedLabel": "تم القبول",
+    "alreadySelectedLabel": "تم اختيار عامل بالفعل",
+    "viewProfile": "عرض الملف الشخصي",
+    "priceOffered": "السعر المقترح",
+    "currency": "BHD",
+    "noBids": "لا توجد عروض حتى الآن.",
+    "acceptingBid": "جارٍ قبول العرض...",
+    "acceptedTitle": "تم قبول العرض",
+    "acceptedMessage": "تم اختيار {{name}} لهذه المهمة.",
+    "acceptError": "تعذّر قبول العرض. حاول مرة أخرى.",
+    "loadError": "فشل تحميل العروض. حاول مرة أخرى.",
+    "taskerFallbackName": "عامل"
+  },
+  "common": {
+    "errorTitle": "خطأ",
+    "ok": "حسناً"
   },
   "clientEditTask": {
-    "loadError": "فشل في تحميل المهمة",
-    "updateError": "فشل في تحديث المهمة"
+    "heading": "تعديل المهمة",
+    "loadError": "فشل في تحميل تفاصيل المهمة. يرجى المحاولة مرة أخرى.",
+    "missingTitle": "معلومات ناقصة",
+    "missingFields": "يرجى ملء جميع الحقول المطلوبة قبل الحفظ.",
+    "updateError": "فشل في تحديث المهمة. يرجى المحاولة مرة أخرى.",
+    "save": "حفظ التغييرات"
+  },
+  "common": {
+    "errorTitle": "خطأ"
   }
 }
