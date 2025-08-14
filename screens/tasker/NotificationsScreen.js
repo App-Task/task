@@ -168,7 +168,7 @@ export default function TaskerNotificationsScreen({ navigation, setUnreadNotific
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{t("taskerNotifications.title")}</Text>
+<Text style={styles.title}>{t("taskerNotifications.title")}</Text>
 
       {loading ? (
         <ActivityIndicator color="#213729" size="large" style={{ marginTop: 40 }} />
@@ -194,16 +194,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
-    paddingTop: 60,
-    paddingHorizontal: 20,
+    paddingTop: 90,          // match messages screen
+    paddingHorizontal: 24,   // match messages screen
   },
-  header: {
+  title: {
     fontFamily: "InterBold",
-    fontSize: 22,
-    color: "#213729",
+    fontSize: 28,            // larger, like messages screen
+    color: "#215432",        // dark green
     marginBottom: 20,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    textAlign: "left",       // left aligned (consistent)
   },
+  
   empty: {
     fontFamily: "Inter",
     fontSize: 16,
