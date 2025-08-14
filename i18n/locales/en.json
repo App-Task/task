@@ -702,15 +702,19 @@
     "errorTitle": "Error",
     "ok": "OK"
   },
-  "clientEditTask": {
+"clientEditTask": {
     "heading": "Edit Task",
     "loadError": "Failed to load task details. Please try again.",
     "missingTitle": "Missing Information",
     "missingFields": "Please fill in all the required fields before saving.",
     "updateError": "Failed to update the task. Please try again.",
-    "save": "Save Changes"
+    "save": "Save Changes",
+    "placeholders": {
+      "title": "Task name",
+      "description": "Description",
+      "location": "Address",
+      "price": "Price ({{currency}})"
+    }
   },
-  "common": {
-    "errorTitle": "Error"
-  }
+  "common": { "errorTitle": "Error" }
 }

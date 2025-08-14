@@ -10,7 +10,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Dimensions, // ✅ add this
+  Dimensions
 } from "react-native";
 
 import { useTranslation } from "react-i18next";
@@ -18,7 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { getTaskById, updateTaskById } from "../../services/taskService";
 
 export default function EditTaskScreen({ route, navigation }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { task } = route.params;
   const taskId = task._id;
 
@@ -34,7 +34,6 @@ export default function EditTaskScreen({ route, navigation }) {
     location: false,
     price: false,
   });
-  
 
   useEffect(() => {
     const loadTask = async () => {
@@ -51,7 +50,7 @@ export default function EditTaskScreen({ route, navigation }) {
       }
     };
     loadTask();
-  }, [taskId]);
+  }, [taskId, t]);
 
   const handleUpdate = async () => {
     const newErrors = {
@@ -60,14 +59,13 @@ export default function EditTaskScreen({ route, navigation }) {
       location: !location.trim(),
       price: !price.trim(),
     };
-    
+
     setErrors(newErrors);
-    
+
     if (Object.values(newErrors).some(Boolean)) {
       Alert.alert(t("clientEditTask.missingTitle"), t("clientEditTask.missingFields"));
       return;
     }
-    
 
     try {
       await updateTaskById(taskId, {
@@ -84,6 +82,8 @@ export default function EditTaskScreen({ route, navigation }) {
 
   if (loading) return <Text style={{ marginTop: 100, textAlign: "center" }}>Loading...</Text>;
 
+  const dirStyle = { writingDirection: i18n.language?.startsWith("ar") ? "rtl" : "ltr" };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -91,77 +91,73 @@ export default function EditTaskScreen({ route, navigation }) {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={80}
       >
-        {/* ✅ Header moved OUTSIDE the ScrollView */}
-{/* ✅ Arrow and Title are now separate */}
-<View style={styles.headerRow}>
-  <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-    <Ionicons name="arrow-back" size={30} color="#ffffff" />
-  </TouchableOpacity>
-</View>
+        {/* Header */}
+        <View style={styles.headerRow}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={30} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
 
-<Text style={styles.heading}>{t("clientEditTask.heading")}</Text>
+        <Text style={styles.heading}>{t("clientEditTask.heading")}</Text>
 
-
-<ScrollView contentContainerStyle={styles.container}>
-
+        {/* Key the ScrollView to language so placeholders refresh on switch */}
+        <ScrollView key={i18n.language} contentContainerStyle={styles.container}>
+          <TextInput
+            style={[styles.input, dirStyle, errors.title && styles.errorInput]}
+            placeholder={t("clientEditTask.placeholders.title")}
+            value={title}
+            onChangeText={(text) => {
+              setTitle(text);
+              if (errors.title && text.trim()) {
+                setErrors((prev) => ({ ...prev, title: false }));
+              }
+            }}
+            maxLength={30}
+            placeholderTextColor="#999"
+          />
 
           <TextInput
-  style={[styles.input, errors.title && styles.errorInput]}
-  placeholder="Task name"
-  value={title}
-  onChangeText={(text) => {
-    setTitle(text);
-    if (errors.title && text.trim()) {
-      setErrors((prev) => ({ ...prev, title: false }));
-    }
-  }}
-  maxLength={30}
-  placeholderTextColor="#999"
-/>
+            style={[styles.input, styles.textarea, dirStyle, errors.description && styles.errorInput]}
+            placeholder={t("clientEditTask.placeholders.description")}
+            value={description}
+            onChangeText={(text) => {
+              setDescription(text);
+              if (errors.description && text.trim()) {
+                setErrors((prev) => ({ ...prev, description: false }));
+              }
+            }}
+            multiline
+            maxLength={150}
+            placeholderTextColor="#999"
+          />
 
-<TextInput
-  style={[styles.input, styles.textarea, errors.description && styles.errorInput]}
-  placeholder="Description"
-  value={description}
-  onChangeText={(text) => {
-    setDescription(text);
-    if (errors.description && text.trim()) {
-      setErrors((prev) => ({ ...prev, description: false }));
-    }
-  }}
-  multiline
-  maxLength={150}
-  placeholderTextColor="#999"
-/>
+          <TextInput
+            style={[styles.input, dirStyle, errors.location && styles.errorInput]}
+            placeholder={t("clientEditTask.placeholders.location")}
+            value={location}
+            onChangeText={(text) => {
+              setLocation(text);
+              if (errors.location && text.trim()) {
+                setErrors((prev) => ({ ...prev, location: false }));
+              }
+            }}
+            maxLength={100}
+            placeholderTextColor="#999"
+          />
 
-<TextInput
-  style={[styles.input, errors.location && styles.errorInput]}
-  placeholder="Address"
-  value={location}
-  onChangeText={(text) => {
-    setLocation(text);
-    if (errors.location && text.trim()) {
-      setErrors((prev) => ({ ...prev, location: false }));
-    }
-  }}
-  maxLength={100}
-  placeholderTextColor="#999"
-/>
-
-<TextInput
-  style={[styles.input, errors.price && styles.errorInput]}
-  placeholder="Price (BHD)"
-  value={price}
-  onChangeText={(text) => {
-    setPrice(text);
-    if (errors.price && text.trim()) {
-      setErrors((prev) => ({ ...prev, price: false }));
-    }
-  }}
-  keyboardType="numeric"
-  placeholderTextColor="#999"
-/>
-
+          <TextInput
+            style={[styles.input, dirStyle, errors.price && styles.errorInput]}
+            placeholder={t("clientEditTask.placeholders.price", { currency: "BHD" })}
+            value={price}
+            onChangeText={(text) => {
+              setPrice(text);
+              if (errors.price && text.trim()) {
+                setErrors((prev) => ({ ...prev, price: false }));
+              }
+            }}
+            keyboardType="numeric"
+            placeholderTextColor="#999"
+          />
 
           <TouchableOpacity style={styles.button} onPress={handleUpdate}>
             <Text style={styles.buttonText}>{t("clientEditTask.save")}</Text>
@@ -174,24 +170,21 @@ export default function EditTaskScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   keyboardView: { flex: 1 },
-  safeArea: { flex: 1, backgroundColor: "#215432" }, // ✅ same green background
+  safeArea: { flex: 1, backgroundColor: "#215432" }, // same green background
   container: {
-    paddingTop: 20,  // ✅ slightly less because header is now separate
+    paddingTop: 20,  // slightly less because header is now separate
     paddingBottom: 40,
     paddingHorizontal: 24,
     backgroundColor: "#215432",
     minHeight: Dimensions.get("window").height,
   },
-  
-  
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 24,
     marginTop: 20,
-    marginBottom: 10, // ✅ space below arrow
+    marginBottom: 10, // space below arrow
   },
-  
   backBtn: {
     width: 24,
     height: 24,
@@ -203,13 +196,12 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: "#ffffff",
     marginBottom: 30,
-    marginTop: 60, // ✅ space above heading
+    marginTop: 60, // space above heading
     textAlign: "left",
-    paddingHorizontal: 24, // ✅ aligns with arrow
+    paddingHorizontal: 24, // aligns with arrow
   },
-  
   input: {
-    backgroundColor: "#ffffff", // ✅ white box
+    backgroundColor: "#ffffff",
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#ddd",
@@ -220,10 +212,9 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 20,
   },
-  
   textarea: { textAlignVertical: "top", height: 120 },
   button: {
-    backgroundColor: "#ffffff", // ✅ white background like PostTask
+    backgroundColor: "#ffffff",
     paddingVertical: 14,
     borderRadius: 30,
     alignItems: "center",
@@ -233,12 +224,10 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#215432", // ✅ green text
+    color: "#215432",
   },
-  
   errorInput: {
     borderWidth: 1,
     borderColor: "#ff4d4d",
   },
-  
 });

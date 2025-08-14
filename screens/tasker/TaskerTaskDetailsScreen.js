@@ -717,6 +717,7 @@ const styles = StyleSheet.create({
     color: "#215432",
     fontFamily: "InterBold",
     fontSize: 15,
+    
   },
   
   map: {

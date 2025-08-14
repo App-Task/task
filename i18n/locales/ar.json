@@ -703,9 +703,13 @@
     "missingTitle": "معلومات ناقصة",
     "missingFields": "يرجى ملء جميع الحقول المطلوبة قبل الحفظ.",
     "updateError": "فشل في تحديث المهمة. يرجى المحاولة مرة أخرى.",
-    "save": "حفظ التغييرات"
+    "save": "حفظ التغييرات",
+    "placeholders": {
+      "title": "اسم المهمة",
+      "description": "الوصف",
+      "location": "العنوان",
+      "price": "السعر ({{currency}})"
+    }
   },
-  "common": {
-    "errorTitle": "خطأ"
-  }
+  "common": { "errorTitle": "خطأ" }
 }
