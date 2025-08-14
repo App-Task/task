@@ -78,50 +78,40 @@ export default function ClientHomeScreen() {
       onPress={() => navigation.navigate("TaskDetails", { task: item })}
     >
       <Animated.View entering={FadeInRight.duration(500)} style={styles.taskItem}>
-        {/* ✅ TOP ROW: Date above Status Badge */}
+        {/* ✅ TOP ROW: Status + Date */}
         <View style={styles.taskTopRow}>
-          <View style={styles.badgeAndDate}>
-            <View style={styles.taskDateWrapper}>
-              <Text style={styles.taskDate}>
-                {new Date(item.createdAt).toLocaleDateString(
-                  I18nManager.isRTL ? "ar-SA" : "en-GB",
-                  {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  }
-                )}{" "}
-                •{" "}
-                {new Date(item.createdAt).toLocaleTimeString(
-                  I18nManager.isRTL ? "ar-SA" : "en-GB",
-                  {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }
-                )}
-              </Text>
-            </View>
+          <View
+            style={[
+              styles.taskStatusBadge,
+              {
+                backgroundColor:
+                  item.status === "Pending"
+                    ? "#FFA500" // Orange for Pending
+                    : item.status === "Started"
+                    ? "#FFD700" // Yellow for Started
+                    : item.status === "Completed"
+                    ? "#38cb82" // Green for Completed
+                    : "#FF0000", // Red for Cancelled
 
-            <View
-              style={[
-                styles.taskStatusBadge,
-                {
-                  backgroundColor:
-                    item.status === "Pending"
-                      ? "#FFA500"
-                      : item.status === "Started"
-                      ? "#FFD700"
-                      : item.status === "Completed"
-                      ? "#38cb82"
-                      : "#FF0000",
-                },
-              ]}
-            >
-              <Text style={styles.taskStatusText}>
-                {t(`clientHome.status.${item.status.toLowerCase()}`)}
-              </Text>
-            </View>
+              },
+            ]}
+          >
+            <Text style={[styles.taskStatusText]}>{t(`clientHome.status.${item.status.toLowerCase()}`)}</Text>
+
           </View>
+  
+          <Text style={styles.taskDate}>
+            {new Date(item.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })}{" "}
+            •{" "}
+            {new Date(item.createdAt).toLocaleTimeString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Text>
         </View>
   
         {/* ✅ Divider Line Above Title */}
@@ -245,31 +235,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 1, // Android light shadow
-    alignItems: "flex-start",
   },
   
   
   taskTopRow: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 6,
-  },
-  badgeAndDate: {
-    flexDirection: "row",
-    alignItems: "center",
   },
   taskDate: {
     fontSize: 12,
     color: "#666",
     fontFamily: "Inter",
-    textAlign: "left",
-    alignSelf: "flex-start",
   },
-  taskDateWrapper: {
-    marginLeft: I18nManager.isRTL ? 0 : 12,
-    marginRight: I18nManager.isRTL ? 12 : 0,
-  },
-  
   taskStatusBadge: {
     borderRadius: 6,
     paddingHorizontal: 10,
@@ -286,8 +265,6 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     marginTop: 4,
     textDecorationLine: "underline", // ✅ underlined
-    alignSelf: "flex-start",
-    textAlign: "left",
   },
   taskDivider: {
     height: 2,
@@ -301,7 +278,6 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 16,
     color: "#213729",
-    textAlign: "left",
   },
   badge: {
     borderRadius: 20,
