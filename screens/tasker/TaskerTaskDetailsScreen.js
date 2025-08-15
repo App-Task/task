@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   input: {
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#ffffff", // changed from #f2f2f2
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 18,
@@ -565,6 +565,7 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 16,
   },
+  
   textarea: {
     height: 120,
   },

@@ -341,7 +341,7 @@ const res = await axios.get(url, {
 
       {/* Task list */}
       {loading ? (
-        <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color="#215433" style={{ marginTop: 40 }} />
       ) : tasks.length === 0 ? (
         <Text style={styles.empty}>{t("taskerMyTasks.noTasks")}</Text>
       ) : (
@@ -369,8 +369,8 @@ const res = await axios.get(url, {
       borderRadius: 16,
       alignItems: "center",
     }}>
-      <ActivityIndicator size="large" color="#213729" />
-      <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#213729" }}>
+      <ActivityIndicator size="large" color="#215433" />
+      <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#215433" }}>
         {t("taskerMyTasks.submittingReport")}
       </Text>
     </View>
@@ -392,8 +392,8 @@ const res = await axios.get(url, {
       borderRadius: 16,
       alignItems: "center",
     }}>
-      <ActivityIndicator size="large" color="#213729" />
-      <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#213729" }}>
+      <ActivityIndicator size="large" color="#215433" />
+      <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#215433" }}>
         {t("taskerMyTasks.cancelling")}
       </Text>
     </View>
@@ -405,14 +405,14 @@ const res = await axios.get(url, {
         <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20 }}>
           {isReporting ? (
             <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40 }}>
-              <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 12 }} />
-              <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+              <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 12 }} />
+              <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#215433" }}>
                 {t("taskerMyTasks.submittingReport", "Submitting report...")}
               </Text>
             </View>
           ) : (
             <>
-              <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#213729", marginBottom: 12 }}>
+              <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#215433", marginBottom: 12 }}>
                 {t("taskerMyTasks.reportClient", "Report Client")}
               </Text>
 
@@ -470,7 +470,7 @@ const res = await axios.get(url, {
                 <TouchableOpacity
                   style={{
                     flex: 1,
-                    backgroundColor: reportReason.trim() ? "#213729" : "#ccc",
+                    backgroundColor: reportReason.trim() ? "#215433" : "#ccc",
                     paddingVertical: 12,
                     borderRadius: 30,
                     alignItems: "center",
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   activeTab: {
-    backgroundColor: "#213729", // dark green
+    backgroundColor: "#215433", // dark green
   },
   activeTabText: {
     color: "#ffffff",
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
   btn: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     borderRadius: 30,
     marginTop: 10,
   },
@@ -578,10 +578,10 @@ const styles = StyleSheet.create({
   secondaryBtn: {
     backgroundColor: "#ffffff",
     borderWidth: 1,
-    borderColor: "#213729",
+    borderColor: "#215433",
   },
   secondaryText: {
-    color: "#213729",
+    color: "#215433",
   },
   dangerBtn: {
     backgroundColor: "#fff5f5",
