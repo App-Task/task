@@ -182,6 +182,8 @@ export default function ChatScreen({ route, navigation }) {
         onChangeText={setMessage}
         style={styles.input}
         placeholder={t("clientChat.placeholder")}
+        placeholderTextColor="#666" // ⬅️ Add this for darker placeholder
+
       />
       <TouchableOpacity
         style={[
@@ -313,9 +315,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     borderRadius: 30,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 16,
     fontSize: 14,
-    color: "#333",
+    color: "#000", // ⬅️ Darker text
   },
   sendButton: {
     marginLeft: 10,

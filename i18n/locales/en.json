@@ -400,7 +400,7 @@
     "price": "Price",
     "bids": "Bids",
     "viewDetails": "View Details",
-    "noTasks": "No tasks available right now.",
+    "noTasks": "No tasks available right now",
     "greeting": "Hi {{name}},",
   "subGreeting": "Let's find some tasks to do!",
   "searchPlaceholder": "Search by job title...",
@@ -482,7 +482,7 @@
 
   "taskerNotifications": {
     "title": "Notifications",
-    "empty": "No notifications at the moment.",
+    "empty": "No notifications at the moment",
     "types": {
       "hired": "You've been hired",
       "message": "New message"
