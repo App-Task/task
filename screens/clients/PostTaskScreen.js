@@ -82,6 +82,7 @@ export default function PostTaskScreen() {
   const [descError, setDescError] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [budgetError, setBudgetError] = useState(false);
+  const [coordsError, setCoordsError] = useState(false);
   const insets = useSafeAreaInsets();
 
 
@@ -157,6 +158,7 @@ const openMapPicker = async () => {
 const confirmMapLocation = async () => {
   if (!tempCoords) return;
   setCoords(tempCoords);
+  setCoordsError(false); // Clear error when coordinates are set
   await applyReverseGeocode(tempCoords.latitude, tempCoords.longitude);
   setMapVisible(false);
 };
@@ -213,6 +215,13 @@ if (!selectedCategory) {
   errorFlag = true;
 } else {
   setCategoryError(false);
+}
+
+if (!coords || !coords.latitude || !coords.longitude) {
+  setCoordsError(true);
+  errorFlag = true;
+} else {
+  setCoordsError(false);
 }
 
 if (errorFlag) {
@@ -479,12 +488,14 @@ if (errorFlag) {
         const [lat, lng] = match[0].split(",").map(v => parseFloat(v.trim()));
         if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
           setCoords({ latitude: lat, longitude: lng });
+          setCoordsError(false); // Clear error when coordinates are set
           return;
         }
       }
       const res = await Location.geocodeAsync(location);
       if (res && res[0]) {
         setCoords({ latitude: res[0].latitude, longitude: res[0].longitude });
+        setCoordsError(false); // Clear error when coordinates are set
       }
     } catch (e) {
       // ignore; user can still pick on map
@@ -493,11 +504,16 @@ if (errorFlag) {
   textAlign={I18nManager.isRTL ? "right" : "left"}
 />
 
+  {coordsError && (
+    <Text style={styles.errorText}>
+      {t("clientPostTask.locationRequired", "Please select a location on Google Maps")}
+    </Text>
+  )}
   
   {/* Location buttons with equal spacing */}
-  <View style={styles.locationButtonsContainer}>
+  <View style={[styles.locationButtonsContainer, coordsError && { borderColor: "#c00", borderWidth: 2, borderRadius: 10, padding: 8 }]}>
     <TouchableOpacity
-      style={styles.locationButton}
+      style={[styles.locationButton, coordsError && { borderColor: "#c00", borderWidth: 1 }]}
       onPress={async () => {
         try {
           setGettingLoc(true);
@@ -513,6 +529,7 @@ if (errorFlag) {
     
           const { latitude, longitude } = pos.coords;
           setCoords({ latitude, longitude });
+          setCoordsError(false); // Clear error when coordinates are set
     
           // Reverse geocode to fill the address
           const placemarks = await Location.reverseGeocodeAsync({ latitude, longitude });
@@ -539,7 +556,7 @@ if (errorFlag) {
     </TouchableOpacity>
     
     <TouchableOpacity
-      style={styles.locationButton}
+      style={[styles.locationButton, coordsError && { borderColor: "#c00", borderWidth: 1 }]}
       onPress={openMapPicker}
     >
       <Text style={styles.locationButtonText}>{t("clientPostTask.selectOnMap")}</Text>
@@ -1152,11 +1169,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 8,
   },
-  
-  
-  
-  
-  
-  
+
+  errorText: {
+    color: "#c00",
+    fontSize: 14,
+    fontFamily: "Inter",
+    marginTop: 4,
+    marginBottom: 8,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
   
 });
