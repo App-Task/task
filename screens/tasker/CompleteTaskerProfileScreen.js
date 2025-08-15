@@ -113,26 +113,20 @@ export default function CompleteTaskerProfileScreen() {
 
       const data = await res.json();
       if (res.ok) {
-        Alert.alert(t("taskerCompleteProfile.completedTitle"), t("taskerCompleteProfile.completedMessage"), [
+        navigation.reset({
+          index: 0,
+          routes: [
             {
-              text: t("common.continue"),
-              onPress: () =>
-                navigation.reset({
-                  index: 0,
-                  routes: [
-                    {
-                      name: "Documents",
-                      params: { fromRegister: true }, // 👈 Pass this to identify newly registered taskers
-                    },
-                  ],
-                }),
+              name: "Documents",
+              params: { fromRegister: true },
             },
-          ]);
-          
+          ],
+        });
       } else {
         console.error("❌ Update failed:", data);
         Alert.alert(t("common.errorTitle"), data.msg || t("common.errorGeneric"));
       }
+      
     } catch (err) {
       console.error("❌ Error saving profile:", err.message);
       Alert.alert(t("common.errorTitle"), t("common.errorGeneric"));
@@ -224,21 +218,22 @@ export default function CompleteTaskerProfileScreen() {
   </TouchableOpacity>
 
   {showLocationDropdown && (
-    <View style={styles.dropdown}>
-      {[t("taskerCompleteProfile.locationBahrain"), t("taskerCompleteProfile.locationSaudiArabia")].map((option) => (
-        <TouchableOpacity
-          key={option}
-          style={styles.dropdownItem}
-          onPress={() => {
-            setLocation(option);
-            setShowLocationDropdown(false);
-          }}
-        >
-          <Text style={styles.dropdownText}>{option}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-  )}
+  <View style={styles.dropdown}>
+    {[t("taskerCompleteProfile.locationBahrain")].map((option) => (
+      <TouchableOpacity
+        key={option}
+        style={styles.dropdownItem}
+        onPress={() => {
+          setLocation(option);
+          setShowLocationDropdown(false);
+        }}
+      >
+        <Text style={styles.dropdownText}>{option}</Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+)}
+
 </View>
 
 
