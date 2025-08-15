@@ -308,49 +308,44 @@ const [locLoading, setLocLoading] = useState(false);
     <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
       {/* Header */}
       <View style={styles.cardHeader}>
-        <Text style={styles.cardHeaderText}>
-          {t("taskerExplore.posted")}:
-          {" " +
-            new Date(item.createdAt).toLocaleDateString(
-              I18nManager.isRTL ? "ar-SA" : "en-GB",
-              {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              }
-            )}
-          {" • " +
-            new Date(item.createdAt).toLocaleTimeString(
-              I18nManager.isRTL ? "ar-SA" : "en-GB",
-              {
-                hour: "2-digit",
-                minute: "2-digit",
-              }
-            )}
-        </Text>
-      </View>
+  <Text style={styles.cardHeaderText}>
+    {t("taskerExplore.posted") + ": "}
+    <Text style={{ fontFamily: "Inter" }}> {/* normal weight */}
+      {new Date(item.createdAt).toLocaleDateString(
+        I18nManager.isRTL ? "ar-SA" : "en-GB",
+        { day: "2-digit", month: "short", year: "numeric" }
+      )}
+    </Text>
+    <Text style={{ fontFamily: "InterBold" }}> • </Text> {/* bold dot */}
+    <Text style={{ fontFamily: "Inter" }}> {/* normal weight */}
+      {new Date(item.createdAt).toLocaleTimeString(
+        I18nManager.isRTL ? "ar-SA" : "en-GB",
+        { hour: "2-digit", minute: "2-digit" }
+      )}
+    </Text>
+  </Text>
+</View>
 
-      {/* Body */}
-      <View style={styles.cardBody}>
-        <Text style={styles.title}>{item.title}</Text>
+<View style={styles.cardBody}>
+  <Text style={styles.title}>{item.title}</Text>
 
-        {/* ✅ NEW (distance pill if available) */}
-        {typeof item.__distanceKm === "number" && (
-          <View style={styles.distancePill}>
-            <Ionicons name="location-outline" size={14} color="#213729" />
-            <Text style={styles.distanceText}>
-              {item.__distanceKm.toFixed(1)} km
-            </Text>
-          </View>
-        )}
+  {typeof item.__distanceKm === "number" && (
+    <View style={styles.distancePill}>
+      <Ionicons name="location-outline" size={14} color="#213729" />
+      <Text style={styles.distanceText}>
+        {item.__distanceKm.toFixed(1)} km
+      </Text>
+    </View>
+  )}
 
-        <Text
-          style={styles.viewDetails}
-          onPress={() => navigation.navigate("TaskerTaskDetails", { task: item })}
-        >
-          {t("taskerExplore.viewDetails")}
-        </Text>
-      </View>
+  <Text
+    style={styles.viewDetails}
+    onPress={() => navigation.navigate("TaskerTaskDetails", { task: item })}
+  >
+    {t("taskerExplore.viewDetails")}
+  </Text>
+</View>
+
     </Animated.View>
   );
 
@@ -571,19 +566,19 @@ const styles = StyleSheet.create({
   },
   cardHeaderText: {
     color: "#ffffff",
-    fontFamily: "InterBold",
+    fontFamily: "Inter", // default to normal
     fontSize: 12,
   },
   title: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#213729",
+    color: "#666", // changed from #213729 to grey
     marginBottom: 6,
     textAlign: "left",
     marginTop: 4,
   },
   viewDetails: {
-    color: "#213729",
+    color: "#666", // changed from #213729 to grey
     fontFamily: "InterBold",
     fontSize: 13,
     textDecorationLine: "underline",
