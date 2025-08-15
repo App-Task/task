@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -15,7 +15,6 @@ import {
   Image,
   I18nManager,
   Linking,
-  Keybaord,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"; // ✅ add this
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -91,24 +90,6 @@ export default function PostTaskScreen() {
   const [gettingLoc, setGettingLoc] = useState(false);
 
 const [mapVisible, setMapVisible] = useState(false);
-
-// ⬇️ keep track of keyboard height so the green background extends under it
-const [kbHeight, setKbHeight] = useState(0);
-useEffect(() => {
-  const showSub = Keyboard.addListener(
-    Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-    (e) => setKbHeight(e.endCoordinates?.height ?? 0)
-  );
-  const hideSub = Keyboard.addListener(
-    Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-    () => setKbHeight(0)
-  );
-  return () => {
-    showSub.remove();
-    hideSub.remove();
-  };
-}, []);
-
 const [tempCoords, setTempCoords] = useState(null);   // used inside the modal
 const [tempRegion, setTempRegion] = useState(null);   // MapView region while editing
   
@@ -436,34 +417,15 @@ if (errorFlag) {
   );
 
   return (
-<SafeAreaView style={{ flex: 1, backgroundColor: "#215432" }} edges={['top','bottom']}>
-<KeyboardAvoidingView
-  behavior={Platform.OS === "ios" ? "height" : undefined}
-  style={{ flex: 1, backgroundColor: "#215432" }}
-  keyboardVerticalOffset={0}
->
-
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1 }}
+    >
 
 <ScrollView
-  style={{ flex: 1, backgroundColor: "#215432" }}
-  contentContainerStyle={[
-    styles.container,
-    {
-      // ensure content always taller than the viewport + keyboard + bottom inset
-      minHeight: height + (kbHeight || 0) + insets.bottom,
-      paddingBottom: (kbHeight || insets.bottom) + 40,
-    },
-  ]}
-  keyboardShouldPersistTaps="handled"
-  keyboardDismissMode="interactive"
-  // prevent white overscroll glow/peek
-  contentInsetAdjustmentBehavior="never"   // iOS
-  bounces={false}                           // iOS
-  alwaysBounceVertical={false}              // iOS
-  overScrollMode="never"                    // Android
+  style={{ flex: 1, backgroundColor: "#215432" }}  // ✅ green background for the whole scroll area
+  contentContainerStyle={styles.container}
 >
-
-
 
         <Text style={styles.heading}>{t("clientPostTask.title")}</Text>
 
@@ -729,6 +691,7 @@ if (errorFlag) {
 
 
 
+        <View style={{ height: 40 }} />
       </ScrollView>
 
 
@@ -825,11 +788,9 @@ if (errorFlag) {
 
 
 
-</KeyboardAvoidingView>
-  </SafeAreaView>
-);
+    </KeyboardAvoidingView>
+  );
 }
-
 
 const styles = StyleSheet.create({
   container: {
