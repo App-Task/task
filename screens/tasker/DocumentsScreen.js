@@ -17,72 +17,70 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 
-
-
 export default function DocumentsScreen({ navigation, route }) {
   const fromRegister = route?.params?.fromRegister || false; // 👈 Detect if came from registration
   const { t } = useTranslation();
+
   const getMimeType = (filename) => {
-    const ext = filename.split('.').pop().toLowerCase();
+    const ext = filename.split(".").pop().toLowerCase();
     switch (ext) {
-      case 'jpg':
-      case 'jpeg': return 'image/jpeg';
-      case 'png': return 'image/png';
-      case 'pdf': return 'application/pdf';
-      default: return 'application/octet-stream';
+      case "jpg":
+      case "jpeg":
+        return "image/jpeg";
+      case "png":
+        return "image/png";
+      case "pdf":
+        return "application/pdf";
+      default:
+        return "application/octet-stream";
     }
   };
-  
+
+  // 👉 keep both url (full path) and name for deletion + display
   const [documents, setDocuments] = useState([]);
   const [uploading, setUploading] = useState(false);
-
-  
 
   const uploadDocument = async () => {
     try {
       const user = await fetchCurrentUser();
       const token = await getToken();
-  
+
       const result = await DocumentPicker.getDocumentAsync({
         type: "*/*",
         copyToCacheDirectory: true,
       });
-  
+
       if (result.canceled || !result.assets?.length) return;
-  
+
       const file = result.assets[0];
-  
-      // 👇 Confirmation alert
+
       Alert.alert(
         t("taskerDocuments.confirmTitle"),
         t("taskerDocuments.confirmMessage"),
         [
-          {
-            text: t("taskerDocuments.no"),
-            style: "cancel",
-          },
+          { text: t("taskerDocuments.no"), style: "cancel" },
           {
             text: t("taskerDocuments.yes"),
             onPress: async () => {
-              setUploading(true); // show loading popup
-  
+              setUploading(true);
               try {
                 const formData = new FormData();
                 formData.append("userId", user._id);
+
                 const fileUri = file.uri;
                 const fileInfo = await FileSystem.getInfoAsync(fileUri);
                 if (!fileInfo.exists) throw new Error("File not found");
-  
+
                 const fileBlob = {
                   uri: fileUri,
                   name: file.name || `upload-${Date.now()}`,
-                  type: file.mimeType || getMimeType(file.name),
+                  type: file.mimeType || getMimeType(file.name || ""),
                 };
-  
-                formData.append("file", fileBlob); // ✅ must match uploadCloud.single("file")
+
+                formData.append("file", fileBlob); // must match uploadCloud.single("file")
 
                 const response = await axios.post(
-                  "https://task-kq94.onrender.com/api/documents/upload-file", // ✅ correct route
+                  "https://task-kq94.onrender.com/api/documents/upload-file",
                   formData,
                   {
                     headers: {
@@ -91,41 +89,42 @@ export default function DocumentsScreen({ navigation, route }) {
                     },
                   }
                 );
-                
-                const uploadedPath = response?.data?.path;
 
+                const uploadedPath = response?.data?.path;
                 if (!uploadedPath) {
-                  console.error("❌ Upload succeeded but response is missing 'path':", response.data);
+                  console.error("❌ Missing 'path' in response:", response.data);
                   throw new Error("Upload succeeded but no document URL was returned.");
                 }
-                
-                // ✅ Save to MongoDB via PATCH
+
+                // save to MongoDB
                 await axios.patch(
                   `https://task-kq94.onrender.com/api/documents/update/${user._id}`,
                   { documentUrl: uploadedPath },
-                  {
-                    headers: { Authorization: `Bearer ${token}` },
-                  }
+                  { headers: { Authorization: `Bearer ${token}` } }
                 );
 
-                
-                // ✅ Show in UI
+                // show in UI (keep both url and filename)
                 setDocuments((prev) => [
                   ...prev,
-                  { id: Date.now().toString(), name: uploadedPath.split("/").pop() },
+                  {
+                    id: Date.now().toString(),
+                    url: uploadedPath,
+                    name: uploadedPath.split("/").pop(),
+                  },
                 ]);
-                
 
-  
                 Alert.alert(
                   t("taskerDocuments.uploadedTitle"),
                   t("taskerDocuments.uploadedMessage")
                 );
               } catch (err) {
                 console.error("❌ Upload error:", err.response?.data || err.message);
-                Alert.alert(t("taskerDocuments.uploadFailedTitle"), t("taskerDocuments.uploadFailedMessage"));
+                Alert.alert(
+                  t("taskerDocuments.uploadFailedTitle"),
+                  t("taskerDocuments.uploadFailedMessage")
+                );
               } finally {
-                setUploading(false); // hide loading popup
+                setUploading(false);
               }
             },
           },
@@ -135,14 +134,15 @@ export default function DocumentsScreen({ navigation, route }) {
       console.error("❌ Picker error:", err.message);
     }
   };
-  
 
   const fetchDocuments = async () => {
     try {
       const user = await fetchCurrentUser();
+      // user.documents is assumed to be an array of full URLs/paths
       setDocuments(
         (user.documents || []).map((doc, index) => ({
           id: index.toString(),
+          url: doc,
           name: doc ? doc.split("/").pop() : "unknown",
         }))
       );
@@ -150,69 +150,79 @@ export default function DocumentsScreen({ navigation, route }) {
       console.error("❌ Error fetching documents:", err.message);
     }
   };
-  
+
   useEffect(() => {
     fetchDocuments();
   }, []);
-  
-  
 
-  const deleteDocument = async (id, name) => {
+  const deleteDocument = async (doc) => {
     try {
       const user = await fetchCurrentUser();
       const token = await getToken();
-  
-      await axios.delete(
-        `https://task-kq94.onrender.com/api/documents/delete/${user._id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          data: { fileName: name }, // ✅ send fileName here
-        }
+
+      // Confirm before deleting
+      Alert.alert(
+        t("taskerDocuments.deleteConfirmTitle") || "Delete document?",
+        t("taskerDocuments.deleteConfirmMessage") ||
+          "Are you sure you want to delete this document?",
+        [
+          { text: t("taskerDocuments.no") || "No", style: "cancel" },
+          {
+            text: t("taskerDocuments.yes") || "Yes",
+            style: "destructive",
+            onPress: async () => {
+              await axios.delete(
+                `https://task-kq94.onrender.com/api/documents/delete/${user._id}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                  // Send BOTH the fileName and documentUrl to be safe
+                  data: { fileName: doc.name, documentUrl: doc.url },
+                }
+              );
+
+              setDocuments((prev) => prev.filter((d) => d.id !== doc.id));
+            },
+          },
+        ]
       );
-  
-      setDocuments((prev) => prev.filter((doc) => doc.id !== id));
     } catch (err) {
       console.error("❌ Error deleting document:", err.response?.data || err.message);
-      Alert.alert(t("taskerDocuments.deleteFailedTitle"), t("taskerDocuments.deleteFailedMessage"));
+      Alert.alert(
+        t("taskerDocuments.deleteFailedTitle") || "Delete Failed",
+        t("taskerDocuments.deleteFailedMessage") ||
+          "Could not delete the document. Please try again."
+      );
     }
   };
-  
-  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Header */}
-    {/* Back Button Only */}
-<View style={styles.headerRow}>
-<TouchableOpacity
-  onPress={() => {
-    if (fromRegister) {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "CompleteTaskerProfile" }],
-      });
-    } else {
-      navigation.goBack();
-    }
-  }}
-  style={styles.backBtn}
->
+      {/* Back only */}
+      <View style={styles.headerRow}>
+        <TouchableOpacity
+          onPress={() => {
+            if (fromRegister) {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "CompleteTaskerProfile" }],
+              });
+            } else {
+              navigation.goBack();
+            }
+          }}
+          style={styles.backBtn}
+        >
+          <Ionicons
+            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+            size={30}
+            color="#213729"
+          />
+        </TouchableOpacity>
+      </View>
 
-    <Ionicons
-      name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-      size={30}
-      color="#213729"
-    />
-  </TouchableOpacity>
-</View>
-
-{/* Title + Description BELOW the arrow */}
-<Text style={styles.finalTitle}>{t("taskerDocuments.finalTitle")}</Text>
-<Text style={styles.finalDesc}>
-  {t("taskerDocuments.finalDesc")}
-</Text>
-
-
+      {/* Title + description */}
+      <Text style={styles.finalTitle}>{t("taskerDocuments.finalTitle")}</Text>
+      <Text style={styles.finalDesc}>{t("taskerDocuments.finalDesc")}</Text>
 
       {/* Document List */}
       {documents.length > 0 ? (
@@ -220,9 +230,11 @@ export default function DocumentsScreen({ navigation, route }) {
           <View key={doc.id} style={styles.card}>
             <MaterialCommunityIcons
               name={
-                doc.name.endsWith(".pdf")
+                doc.name?.toLowerCase()?.endsWith(".pdf")
                   ? "file-pdf-box"
-                  : doc.name.endsWith(".jpg") || doc.name.endsWith(".png")
+                  : doc.name?.toLowerCase()?.endsWith(".jpg") ||
+                    doc.name?.toLowerCase()?.endsWith(".jpeg") ||
+                    doc.name?.toLowerCase()?.endsWith(".png")
                   ? "file-image"
                   : "file-document-outline"
               }
@@ -230,19 +242,20 @@ export default function DocumentsScreen({ navigation, route }) {
               color="#215432"
             />
             <Text style={styles.docName}>{doc.name}</Text>
-            {/* <TouchableOpacity onPress={() => deleteDocument(doc.id, doc.name)}>
-  <Ionicons name="trash-outline" size={20} color="#999" />
-</TouchableOpacity> */}
 
-
+            {/* DELETE BUTTON */}
+            <TouchableOpacity onPress={() => deleteDocument(doc)} style={{ padding: 4 }}>
+              <Ionicons name="trash-outline" size={20} color="#999" />
+            </TouchableOpacity>
           </View>
         ))
       ) : (
         <TouchableOpacity style={styles.uploadBox} onPress={uploadDocument}>
-  <Ionicons name="cloud-upload-outline" size={40} color="#999" />
-  <Text style={styles.uploadBoxText}>{t("taskerDocuments.uploadDocument")}</Text>
-</TouchableOpacity>
-
+          <Ionicons name="cloud-upload-outline" size={40} color="#999" />
+          <Text style={styles.uploadBoxText}>
+            {t("taskerDocuments.uploadDocument")}
+          </Text>
+        </TouchableOpacity>
       )}
 
       {/* Upload */}
@@ -251,53 +264,52 @@ export default function DocumentsScreen({ navigation, route }) {
       </TouchableOpacity>
 
       {fromRegister && documents.length > 0 && (
-  <TouchableOpacity
-    style={[styles.button, { marginTop: 20 }]}
-    onPress={() =>
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "TaskerHome" }],
-      })
-    }
-  >
-    <Text style={styles.buttonText}>{t("taskerDocuments.continueToHome")}</Text>
-  </TouchableOpacity>
-)}
-
+        <TouchableOpacity
+          style={[styles.button, { marginTop: 20 }]}
+          onPress={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "TaskerHome" }],
+            })
+          }
+        >
+          <Text style={styles.buttonText}>
+            {t("taskerDocuments.continueToHome")}
+          </Text>
+        </TouchableOpacity>
+      )}
 
       <View style={{ height: 60 }} />
 
-
       {uploading && (
-  <View
-    style={{
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: "rgba(0,0,0,0.4)",
-      justifyContent: "center",
-      alignItems: "center",
-      zIndex: 999,
-    }}
-  >
-    <View
-      style={{
-        backgroundColor: "#fff",
-        paddingVertical: 20,
-        paddingHorizontal: 30,
-        borderRadius: 20,
-        alignItems: "center",
-      }}
-    >
-      <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
-        {t("taskerDocuments.uploading")}
-      </Text>
-    </View>
-  </View>
-)}
-
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.4)",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 999,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#fff",
+              paddingVertical: 20,
+              paddingHorizontal: 30,
+              borderRadius: 20,
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+              {t("taskerDocuments.uploading")}
+            </Text>
+          </View>
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -344,6 +356,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#213729",
     textAlign: I18nManager.isRTL ? "right" : "left",
+    marginHorizontal: 8,
   },
   empty: {
     textAlign: "center",
@@ -357,9 +370,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 30,
     alignItems: "center",
-    marginTop: 0, // no extra top margin, spacing handled by uploadBox
+    marginTop: 0,
   },
-  
   buttonText: {
     fontFamily: "InterBold",
     fontSize: 16,
@@ -378,20 +390,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     lineHeight: 20,
-    marginBottom: 10, // adds consistent space before the upload box
+    marginBottom: 10,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
-  
   uploadBox: {
     backgroundColor: "#f1f1f1",
     borderRadius: 12,
     paddingVertical: 50,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 30, // increased spacing from title
-    marginBottom: 40, // added space before submit button
+    marginTop: 30,
+    marginBottom: 40,
   },
-  
   uploadBoxText: {
     fontFamily: "Inter",
     fontSize: 14,
@@ -399,5 +409,4 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: "center",
   },
-  
 });
