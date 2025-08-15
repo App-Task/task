@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from "react-native";
 
 import { useTranslation } from "react-i18next";
@@ -17,7 +18,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { getToken } from "../../services/authStorage";
 import CountryPicker from "react-native-country-picker-modal";
 import { useNavigation } from "@react-navigation/native";
-import { useEffect } from "react";
 import { fetchCurrentUser } from "../../services/auth";
 
 export default function CompleteTaskerProfileScreen() {
@@ -37,6 +37,25 @@ export default function CompleteTaskerProfileScreen() {
   const [showGenderDropdown, setShowGenderDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Refs
+  const scrollRef = useRef(null);
+  const kbHeightRef = useRef(0);
+  const positionsRef = useRef({
+    name: 0,
+    phone: 0,
+    experience: 0,
+    skills: 0,
+    about: 0,
+  });
+
+  // Smooth scroll to a stored Y (no measureLayout)
+  const scrollToKey = (key) => {
+    const y = positionsRef.current[key] ?? 0;
+    // Offset so the field sits above the keyboard
+    const extraOffset = 100;
+    scrollRef.current?.scrollTo({ y: Math.max(0, y - extraOffset), animated: true });
+  };
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -70,15 +89,45 @@ export default function CompleteTaskerProfileScreen() {
     loadUserData();
   }, []);
 
+  // Manage keyboard height to avoid white bar
+  const [kbHeight, setKbHeight] = useState(0);
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      (e) => {
+        const h = e.endCoordinates?.height ?? 0;
+        kbHeightRef.current = h;
+        setKbHeight(h);
+      }
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => {
+        kbHeightRef.current = 0;
+        setKbHeight(0);
+      }
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
   const handleSave = async () => {
     if (!name || !gender || !location || !experience || !skills || !about || !rawPhone) {
-      Alert.alert(t("taskerCompleteProfile.incompleteTitle"), t("taskerCompleteProfile.incompleteMessage"));
+      Alert.alert(
+        t("taskerCompleteProfile.incompleteTitle"),
+        t("taskerCompleteProfile.incompleteMessage")
+      );
       return;
     }
 
     const phoneRegex = /^[0-9]{8,15}$/;
     if (!phoneRegex.test(rawPhone.trim())) {
-      Alert.alert(t("taskerCompleteProfile.invalidPhoneTitle"), t("taskerCompleteProfile.invalidPhoneMessage"));
+      Alert.alert(
+        t("taskerCompleteProfile.invalidPhoneTitle"),
+        t("taskerCompleteProfile.invalidPhoneMessage")
+      );
       return;
     }
 
@@ -110,12 +159,7 @@ export default function CompleteTaskerProfileScreen() {
       if (res.ok) {
         navigation.reset({
           index: 0,
-          routes: [
-            {
-              name: "Documents",
-              params: { fromRegister: true },
-            },
-          ],
+          routes: [{ name: "Documents", params: { fromRegister: true } }],
         });
       } else {
         console.error("❌ Update failed:", data);
@@ -132,32 +176,42 @@ export default function CompleteTaskerProfileScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#ffffff" }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+      // Using 'height' avoids the iOS white padding bar
+      behavior={Platform.OS === "ios" ? "height" : undefined}
+      keyboardVerticalOffset={0}
     >
       <ScrollView
-        style={{ backgroundColor: "#ffffff" }}
-        contentContainerStyle={styles.container}
+        ref={scrollRef}
+        style={{ flex: 1, backgroundColor: "#ffffff" }}
+        contentContainerStyle={[styles.container, { paddingBottom: 20 }]}
         keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        contentInset={{ bottom: 24 }}
-        scrollIndicatorInsets={{ bottom: 24 }}
+        keyboardDismissMode="interactive"
+        // No contentInset / scrollIndicatorInsets (prevents white band)
       >
-        <View style={styles.headerRow}>
+        <View style={styles.headerRow} onLayout={(e) => {}}>
           <Ionicons name="person-circle-outline" size={60} color="#213729" />
           <Text style={styles.header}>{t("taskerCompleteProfile.title")}</Text>
         </View>
 
         <Text style={styles.subText}>{t("taskerCompleteProfile.subText")}</Text>
 
-        <TextInput
-          style={styles.input}
-          value={name}
-          onChangeText={setName}
-          placeholder={t("taskerCompleteProfile.namePlaceholder")}
-          textAlign={I18nManager.isRTL ? "right" : "left"}
-          placeholderTextColor="#999"
-        />
+        {/* Each field wrapped with onLayout to store its Y */}
+        <View
+          onLayout={(e) => {
+            positionsRef.current.name = e.nativeEvent.layout.y;
+          }}
+        >
+          <TextInput
+            style={styles.input}
+            value={name}
+            onChangeText={setName}
+            onFocus={() => scrollToKey("name")}
+            placeholder={t("taskerCompleteProfile.namePlaceholder")}
+            textAlign={I18nManager.isRTL ? "right" : "left"}
+            placeholderTextColor="#999"
+            returnKeyType="next"
+          />
+        </View>
 
         <View style={styles.phoneContainer}>
           <View style={styles.countryPickerWrapper}>
@@ -174,14 +228,23 @@ export default function CompleteTaskerProfileScreen() {
               }}
             />
           </View>
-          <TextInput
-            style={styles.phoneInput}
-            value={rawPhone}
-            onChangeText={setRawPhone}
-            keyboardType="phone-pad"
-            placeholder={t("taskerCompleteProfile.phonePlaceholder")}
-            placeholderTextColor="#999"
-          />
+          <View
+            style={{ flex: 1 }}
+            onLayout={(e) => {
+              positionsRef.current.phone = e.nativeEvent.layout.y;
+            }}
+          >
+            <TextInput
+              style={styles.phoneInput}
+              value={rawPhone}
+              onChangeText={setRawPhone}
+              onFocus={() => scrollToKey("phone")}
+              keyboardType="phone-pad"
+              placeholder={t("taskerCompleteProfile.phonePlaceholder")}
+              placeholderTextColor="#999"
+              returnKeyType="next"
+            />
+          </View>
         </View>
 
         <View style={{ marginBottom: 20 }}>
@@ -196,18 +259,20 @@ export default function CompleteTaskerProfileScreen() {
 
           {showGenderDropdown && (
             <View style={styles.dropdown}>
-              {[t("taskerCompleteProfile.genderMale"), t("taskerCompleteProfile.genderFemale")].map((option) => (
-                <TouchableOpacity
-                  key={option}
-                  style={styles.dropdownItem}
-                  onPress={() => {
-                    setGender(option);
-                    setShowGenderDropdown(false);
-                  }}
-                >
-                  <Text style={styles.dropdownText}>{option}</Text>
-                </TouchableOpacity>
-              ))}
+              {[t("taskerCompleteProfile.genderMale"), t("taskerCompleteProfile.genderFemale")].map(
+                (option) => (
+                  <TouchableOpacity
+                    key={option}
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setGender(option);
+                      setShowGenderDropdown(false);
+                    }}
+                  >
+                    <Text style={styles.dropdownText}>{option}</Text>
+                  </TouchableOpacity>
+                )
+              )}
             </View>
           )}
         </View>
@@ -240,70 +305,99 @@ export default function CompleteTaskerProfileScreen() {
           )}
         </View>
 
-        <TextInput
-          style={styles.input}
-          value={experience}
-          onChangeText={setExperience}
-          placeholder={t("taskerCompleteProfile.experiencePlaceholder")}
-          textAlign={I18nManager.isRTL ? "right" : "left"}
-          placeholderTextColor="#999"
-        />
-        <TextInput
-          style={styles.input}
-          value={skills}
-          onChangeText={setSkills}
-          placeholder={t("taskerCompleteProfile.skillsPlaceholder")}
-          textAlign={I18nManager.isRTL ? "right" : "left"}
-          placeholderTextColor="#999"
-        />
-        <TextInput
-          style={[styles.input, styles.textarea]}
-          value={about}
-          onChangeText={setAbout}
-          placeholder={t("taskerCompleteProfile.aboutPlaceholder")}
-          textAlign={I18nManager.isRTL ? "right" : "left"}
-          textAlignVertical="top"
-          placeholderTextColor="#999"
-          multiline
-          maxLength={150}
-          returnKeyType="done"
-          blurOnSubmit={true}
-        />
+        <View
+          onLayout={(e) => {
+            positionsRef.current.experience = e.nativeEvent.layout.y;
+          }}
+        >
+          <TextInput
+            style={styles.input}
+            value={experience}
+            onChangeText={setExperience}
+            onFocus={() => scrollToKey("experience")}
+            placeholder={t("taskerCompleteProfile.experiencePlaceholder")}
+            textAlign={I18nManager.isRTL ? "right" : "left"}
+            placeholderTextColor="#999"
+            returnKeyType="next"
+          />
+        </View>
+
+        <View
+          onLayout={(e) => {
+            positionsRef.current.skills = e.nativeEvent.layout.y;
+          }}
+        >
+          <TextInput
+            style={styles.input}
+            value={skills}
+            onChangeText={setSkills}
+            onFocus={() => scrollToKey("skills")}
+            placeholder={t("taskerCompleteProfile.skillsPlaceholder")}
+            textAlign={I18nManager.isRTL ? "right" : "left"}
+            placeholderTextColor="#999"
+            returnKeyType="next"
+          />
+        </View>
+
+        <View
+          onLayout={(e) => {
+            positionsRef.current.about = e.nativeEvent.layout.y;
+          }}
+        >
+          <TextInput
+            style={[styles.input, styles.textarea]}
+            value={about}
+            onChangeText={setAbout}
+            onFocus={() => scrollToKey("about")}
+            placeholder={t("taskerCompleteProfile.aboutPlaceholder")}
+            textAlign={I18nManager.isRTL ? "right" : "left"}
+            textAlignVertical="top"
+            placeholderTextColor="#999"
+            multiline
+            maxLength={150}
+            returnKeyType="done"
+            blurOnSubmit={true}
+          />
+        </View>
 
         <TouchableOpacity style={styles.button} onPress={handleSave}>
           <Text style={styles.buttonText}>{t("taskerCompleteProfile.saveAndContinue")}</Text>
         </TouchableOpacity>
 
-        {loading && (
+        {/* Spacer equals keyboard height (prevents white bar & lets you see the focused field) */}
+        <View style={{ height: kbHeight }} />
+      </ScrollView>
+
+      {loading && (
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.4)",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 999,
+          }}
+        >
           <View
             style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0,0,0,0.4)",
-              justifyContent: "center",
+              backgroundColor: "#fff",
+              paddingVertical: 20,
+              paddingHorizontal: 30,
+              borderRadius: 20,
               alignItems: "center",
-              zIndex: 999,
             }}
           >
-            <View
-              style={{
-                backgroundColor: "#fff",
-                paddingVertical: 20,
-                paddingHorizontal: 30,
-                borderRadius: 20,
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
-                {t("taskerCompleteProfile.savingProfile")}
-              </Text>
-            </View>
+            <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+              {t("taskerCompleteProfile.savingProfile")}
+            </Text>
           </View>
-        )}
-      </ScrollView>
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -312,7 +406,6 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#ffffff",
     paddingTop: 100,
-    paddingBottom: 40,
     paddingHorizontal: 24,
     flexGrow: 1,
   },
@@ -346,7 +439,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   textarea: {
-    height: 100,
+    minHeight: 100,
   },
   button: {
     backgroundColor: "#213729",
