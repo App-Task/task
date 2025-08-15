@@ -277,14 +277,28 @@ export default function TaskDetailsScreen({ route }) {
         behavior={Platform.OS === "ios" ? "height" : undefined}
         keyboardVerticalOffset={0}
       >
-        <ScrollView
-          ref={scrollRef}
-          contentContainerStyle={[styles.container, { flexGrow: 1 }]}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="interactive"
-        >
+<ScrollView
+  ref={scrollRef}
+  style={{ flex: 1, backgroundColor: "#215432" }}   // ⬅️ paint the scroller
+  contentContainerStyle={[
+    styles.container,
+    {
+      flexGrow: 1,
+      minHeight: height + (kbHeight || 0),           // ⬅️ always taller than viewport + keyboard
+      paddingBottom: (kbHeight || 0),                // ⬅️ so green covers under the keyboard
+    },
+  ]}
+  keyboardShouldPersistTaps="handled"
+  keyboardDismissMode="interactive"
+  contentInsetAdjustmentBehavior="never"             // ⬅️ iOS: no auto inset (prevents white peek)
+  bounces={false}                                     // ⬅️ iOS: no bounce to reveal white
+  alwaysBounceVertical={false}                        // ⬅️ iOS: extra safety
+  overScrollMode="never"                              // ⬅️ Android: no overscroll glow/peek
+>
+
           {/* Top header content */}
-          <View style={styles.topContent}>
+{/* Top header content */}
+<View style={[styles.topContent, { backgroundColor: "#ffffff" }]}>
             <View style={styles.topRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.heading}>{task.title}</Text>
@@ -480,14 +494,16 @@ export default function TaskDetailsScreen({ route }) {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#ffffff" },
+
   backButton: { paddingHorizontal: 16, paddingTop: 10 },
   container: {
     backgroundColor: "#ffffff",
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 0, // let green sheet own the bottom
-    minHeight: height, // ensures we have at least full viewport height
   },
+  
+  
 
   topContent: { marginTop: 10, marginBottom: 16 },
   topRow: {
