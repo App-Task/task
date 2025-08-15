@@ -25,7 +25,7 @@ import * as SecureStore from "expo-secure-store";
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import useUnreadNotifications from "../../hooks/useUnreadNotifications";
+
 
 
 import * as Location from "expo-location";
@@ -65,7 +65,7 @@ const openInGoogleMaps = async (lat, lng, labelRaw = "Task Location") => {
 export default function PostTaskScreen() {
   const navigation = useNavigation();
   const { t } = useTranslation();
-  const unreadCount = useUnreadNotifications();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
@@ -412,19 +412,6 @@ if (errorFlag) {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1 }}
     >
-          {/* 🔔 Notifications button */}
-          <View style={styles.notificationsIcon}>
-  <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-  <Ionicons name="notifications-outline" size={24} color="#ffffff" />
-    {unreadCount > 0 && (
-      <View style={styles.notificationDot}>
-        <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
-      </View>
-    )}
-  </TouchableOpacity>
-</View>
-
-
 
 <ScrollView
   style={{ flex: 1, backgroundColor: "#215432" }}  // ✅ green background for the whole scroll area
@@ -980,34 +967,7 @@ const styles = StyleSheet.create({
     gap: 16, // equal spacing between all form elements
     marginBottom: 40,
   },
-  notificationsIcon: {
-    position: "absolute",
-    top: 65,
-    right: 24,
-    zIndex: 10,
-  },
 
-  notificationDot: {
-    position: "absolute",
-    top: -4,
-    right: -4,
-    backgroundColor: "#c00",
-    borderRadius: 10,
-    minWidth: 16,
-    height: 16,
-    paddingHorizontal: 4,
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 20,
-  },
-  
-  badgeText: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "bold",
-    textAlign: "center",
-    includeFontPadding: false,
-  },
   
 
   postingOverlay: {

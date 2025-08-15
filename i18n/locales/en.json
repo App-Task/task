@@ -10,7 +10,7 @@
 },
 "clientDescription": "Find trusted taskers to get your chores done.",
 "taskerDescription": "Get hired by clients looking for your services.",
-"tagline": "Reliable Help Just a Task Away",
+"tagline": "Reliable Help, Just a Task Away",
 "language": {
   "changedEn": "Language changed to English",
   "changedAr": "تم تغيير اللغة إلى العربية",
@@ -634,7 +634,7 @@
   "ok": "OK",
   "bidSubmitError": "Something went wrong while submitting the bid.",
   "noBidFoundTitle": "No Bid Found",
-  "noBidFoundMessage": "You haven't submitted a bid for this task yet.",
+  "noBidFoundMessage": "You haven't submitted a bid for this task yet",
   "cannotEditTitle": "Cannot Edit",
   "cannotEditMessage": "This task is no longer accepting bids.",
   "bidUpdateError": "Something went wrong while updating the bid.",

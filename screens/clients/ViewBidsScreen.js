@@ -221,7 +221,7 @@ export default function ViewBidsScreen({ route, navigation }) {
         >
           <Ionicons name="arrow-back" size={30} color="#215432" />
         </TouchableOpacity>
-        <Text style={styles.title}>{t("clientViewBids.title")}</Text>
+        <Text style={styles.title}>Bids Received</Text>
           <View style={styles.backBtn} />
         </View>
 
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
 
   taskerName: {
     fontFamily: "InterBold",
-    fontSize: 20,
+    fontSize: 18,
     color: "#ffffff",
   },
   taskerRating: {

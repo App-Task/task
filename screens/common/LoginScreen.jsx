@@ -219,6 +219,7 @@ const styles = StyleSheet.create({
   backBtn: {
     padding: 5,        // smaller padding so it looks like the image
     borderRadius: 50,  // rounded feel (optional)
+    marginLeft: -10,    // move left to align with title
   },
   title: {
     fontSize: 22,

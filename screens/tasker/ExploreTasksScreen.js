@@ -375,7 +375,7 @@ const [locLoading, setLocLoading] = useState(false);
             {t("taskerExplore.verifyPending")}{" "}
             <Text
               style={styles.contactLink}
-              onPress={() => Linking.openURL("mailto:Task.team.bh@gmail.com")}
+              onPress={() => Linking.openURL("mailto:support@taskbh.com")}
             >
               {t("taskerExplore.contactUs")}
             </Text>

@@ -199,16 +199,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
     fontFamily: "Inter",
-    marginTop: 6,
+    marginTop: 4,
     marginBottom: 20,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   button: {
     backgroundColor: "#2E4A3A",
-    paddingVertical: 14,
-    borderRadius: 50, // full pill
+    paddingVertical: 14,      // increased from 14 to 16
+    paddingHorizontal: 4,     // add horizontal padding to increase button size
+    borderRadius: 50,         // full pill
     alignItems: "center",
     marginBottom: 30,
+    marginHorizontal: 2,     // negative margin to align edges with text
   },
   
   buttonText: {

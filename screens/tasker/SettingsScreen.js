@@ -60,7 +60,7 @@ export default function SettingsScreen({ navigation }) {
         <TouchableOpacity 
           style={styles.item}
           onPress={() => {
-            const mailto = "mailto:Task.team.bh@gmail.com";
+            const mailto = "mailto:support@taskbh.com";
             Linking.openURL(mailto).catch((err) => {
               console.error("❌ Failed to open email:", err.message);
               Alert.alert(t("common.errorTitle"), t("common.emailOpenError"));

@@ -44,6 +44,9 @@ export default function MyTasksScreen({ navigation, route }) {
   const [reportedTaskIds, setReportedTaskIds] = useState([]);
   const [reportingTaskId, setReportingTaskId] = useState(null);
   const [isReporting, setIsReporting] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportTask, setReportTask] = useState(null);
 
 
 
@@ -176,6 +179,45 @@ allTasks.forEach((task) => {
       Alert.alert(t("clientMyTasks.errorTitle"), t("clientMyTasks.reviewFailedMessage"));
     }
   };
+
+  const submitReport = async () => {
+    if (!reportReason.trim() || !reportTask) return;
+    try {
+      setIsReporting(true);
+      const token = await SecureStore.getItemAsync("token");
+      await fetch("https://task-kq94.onrender.com/api/reports", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          reporterId: userId,
+          reportedUserId: reportTask.taskerId,
+          reason: reportReason,
+          taskId: reportTask._id,
+        }),
+      });
+      
+      setReportedTaskIds((prev) => [...prev, reportTask._id]);
+      setIsReporting(false);
+      setShowReportModal(false);
+      setReportReason("");
+      setReportTask(null);
+      
+      Alert.alert(
+        t("clientMyTasks.reportedTitle"),
+        t("clientMyTasks.reportedMessage")
+      );
+    } catch (err) {
+      setIsReporting(false);
+      console.error("❌ Report error:", err.message);
+      Alert.alert(
+        t("clientMyTasks.errorTitle"),
+        t("clientMyTasks.reportFailedMessage")
+      );
+    }
+  };
   
   const renderTask = ({ item }) => (
     <TouchableOpacity
@@ -199,9 +241,8 @@ allTasks.forEach((task) => {
         {/* ✅ Divider Line Above Title */}
         <View style={{ height: 1, backgroundColor: "#e0e0e0", marginVertical: 6 }} />
   
-        {/* ✅ Task Title & Price */}
+        {/* ✅ Task Title */}
         <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardPrice}>{item.budget} BHD</Text>
   
        {/* ✅ Completed / Cancelled Label for Previous Tab */}
 {activeTab === "Previous" && (
@@ -248,17 +289,10 @@ allTasks.forEach((task) => {
         {/* ✅ View Profile & Report Buttons */}
         {["Pending", "Started", "Cancelled"].includes(activeTab) &&
           item.taskerId && (
-            <View
-              style={{ marginTop: 10, flexDirection: "row", gap: 12 }}
-            >
+            <View style={styles.buttonsRow}>
               {/* View Profile */}
               <TouchableOpacity
-                style={{
-                  backgroundColor: "#213729",
-                  paddingVertical: 8,
-                  paddingHorizontal: 16,
-                  borderRadius: 30,
-                }}
+                style={styles.viewProfileBtn}
                 onPress={() =>
                   navigation.navigate("TaskerProfile", {
                     taskerId:
@@ -268,90 +302,21 @@ allTasks.forEach((task) => {
                   })
                 }
               >
-                <Text
-                  style={{
-                    color: "#fff",
-                    fontFamily: "InterBold",
-                    fontSize: 13,
-                  }}
-                >
+                <Text style={styles.viewProfileText}>
                   {t("clientMyTasks.viewProfile")}
                 </Text>
               </TouchableOpacity>
   
               {/* Report Tasker */}
               <TouchableOpacity
-                style={{
-                  backgroundColor: "#fff",
-                  borderColor: "#213729",
-                  borderWidth: 1,
-                  paddingVertical: 8,
-                  paddingHorizontal: 16,
-                  borderRadius: 30,
-                }}
+                style={styles.reportBtn}
                 disabled={reportingTaskId === item._id}
                 onPress={() => {
-                  Alert.prompt(
-                    t("clientMyTasks.reportPromptTitle"),
-                    t("clientMyTasks.reportPromptMessage"),
-                    [
-                      { text: t("clientMyTasks.cancel"), style: "cancel" },
-                      {
-                        text: t("clientMyTasks.submit"),
-                        onPress: async (reason) => {
-                          try {
-                            setReportingTaskId(item._id);
-                            setIsReporting(true);
-                            const token =
-                              await SecureStore.getItemAsync("token");
-                            await fetch(
-                              "https://task-kq94.onrender.com/api/reports",
-                              {
-                                method: "POST",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  Authorization: `Bearer ${token}`,
-                                },
-                                body: JSON.stringify({
-                                  reporterId: userId,
-                                  reportedUserId: item.taskerId,
-                                  reason,
-                                  taskId: item._id,
-                                }),
-                              }
-                            );
-                            setReportedTaskIds((prev) => [
-                              ...prev,
-                              item._id,
-                            ]);
-                            Alert.alert(
-                              t("clientMyTasks.reportedTitle"),
-                              t("clientMyTasks.reportedMessage")
-                            );
-                          } catch (err) {
-                            console.error("❌ Report error:", err.message);
-                            Alert.alert(
-                              t("clientMyTasks.errorTitle"),
-                              t("clientMyTasks.reportFailedMessage")
-                            );
-                          } finally {
-                            setIsReporting(false);
-                            setReportingTaskId(null);
-                          }
-                        },
-                      },
-                    ],
-                    "plain-text"
-                  );
+                  setReportTask(item);
+                  setShowReportModal(true);
                 }}
               >
-                <Text
-                  style={{
-                    color: "#213729",
-                    fontFamily: "InterBold",
-                    fontSize: 13,
-                  }}
-                >
+                <Text style={styles.reportText}>
                   {t("clientMyTasks.reportTasker")}
                 </Text>
               </TouchableOpacity>
@@ -428,6 +393,93 @@ allTasks.forEach((task) => {
   </View>
 </Modal>
 
+      {/* Report Modal */}
+      <Modal isVisible={showReportModal}>
+        <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20 }}>
+          {isReporting ? (
+            <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40 }}>
+              <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 12 }} />
+              <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+                {t("clientMyTasks.submittingReport", "Submitting report...")}
+              </Text>
+            </View>
+          ) : (
+            <>
+              <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#213729", marginBottom: 12 }}>
+                {t("clientMyTasks.reportPromptTitle", "Report Tasker")}
+              </Text>
+
+              <Text style={{ fontFamily: "Inter", fontSize: 14, color: "#666", marginBottom: 16 }}>
+                {t("clientMyTasks.reportPromptMessage", "Please describe the issue with this tasker:")}
+              </Text>
+
+              <TextInput
+                placeholder={t("clientMyTasks.reportPlaceholder", "Describe the issue...")}
+                placeholderTextColor="#999"
+                value={reportReason}
+                onChangeText={(text) => {
+                  if (text.length <= 300) setReportReason(text);
+                }}
+                style={{
+                  borderWidth: 1,
+                  borderColor: "#ccc",
+                  borderRadius: 12,
+                  padding: 12,
+                  marginBottom: 8,
+                  fontFamily: "Inter",
+                  fontSize: 14,
+                  color: "#333",
+                  textAlignVertical: "top",
+                  height: 80,
+                }}
+                multiline
+                maxLength={300}
+              />
+
+              <Text style={{ fontFamily: "Inter", fontSize: 12, color: "#999", marginBottom: 20 }}>
+                {reportReason.length}/300 characters
+              </Text>
+
+              <View style={{ flexDirection: "row", gap: 12 }}>
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#f5f5f5",
+                    paddingVertical: 12,
+                    borderRadius: 30,
+                    alignItems: "center",
+                  }}
+                  onPress={() => {
+                    setShowReportModal(false);
+                    setReportReason("");
+                    setReportTask(null);
+                  }}
+                >
+                  <Text style={{ color: "#666", fontFamily: "InterBold", fontSize: 16 }}>
+                    {t("clientMyTasks.cancel", "Cancel")}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    backgroundColor: reportReason.trim() ? "#213729" : "#ccc",
+                    paddingVertical: 12,
+                    borderRadius: 30,
+                    alignItems: "center",
+                  }}
+                  onPress={submitReport}
+                  disabled={!reportReason.trim()}
+                >
+                  <Text style={{ color: "#fff", fontFamily: "InterBold", fontSize: 16 }}>
+                    {t("clientMyTasks.submit", "Submit")}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+        </View>
+      </Modal>
 
       {/* Tabs */}
       <View style={styles.tabs}>
@@ -583,7 +635,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   activeTab: {
-    backgroundColor: "#213729", // dark green like screenshot
+    backgroundColor: "#213729", // dark green
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
@@ -625,12 +677,7 @@ const styles = StyleSheet.create({
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   
-  cardPrice: {
-    fontFamily: "InterBold", // ✅ bold like screenshot
-    fontSize: 15,
-    color: "#215432",
-    marginBottom: 6,
-  },
+
   
   emptyText: {
     textAlign: "center",
@@ -700,9 +747,44 @@ const styles = StyleSheet.create({
     marginTop: 8,           // ✅ proper spacing from previous content
     textDecorationLine: "underline", // ✅ underlined
   },
-  
-  
-  
-  
+
+  buttonsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+    paddingBottom: 4,
+  },
+
+  viewProfileBtn: {
+    flex: 1,
+    backgroundColor: "#213729",
+    paddingVertical: 10,
+    borderRadius: 30,
+    alignItems: "center",
+    marginRight: 8,
+  },
+
+  viewProfileText: {
+    color: "#ffffff",
+    fontFamily: "InterBold",
+    fontSize: 13,
+  },
+
+  reportBtn: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#213729",
+    paddingVertical: 10,
+    borderRadius: 30,
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+  },
+
+  reportText: {
+    color: "#213729",
+    fontFamily: "InterBold",
+    fontSize: 13,
+  },
   
 });
