@@ -230,7 +230,6 @@ navigation.reset({
         <View style={{ alignSelf: "flex-start", marginBottom: 15 }}>
   <Text style={styles.requirement}>• Password should have at least one number</Text>
   <Text style={styles.requirement}>• Password should have at least one capital letter</Text>
-  <Text style={styles.requirement}>• Password should have at least one special character</Text>
 </View>
 
 <Text style={styles.termsText}>

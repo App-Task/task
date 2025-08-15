@@ -9,6 +9,9 @@ import {
   Alert,
   ActivityIndicator,
   TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ScrollView,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import * as SecureStore from "expo-secure-store";
@@ -331,67 +334,74 @@ allTasks.forEach((task) => {
   return (
     <View style={styles.container}>
       {/* Review Modal */}
-      <Modal isVisible={showReview}>
-  <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20 }}>
-    {submittingReview ? (
-      <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40 }}>
-        <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 12 }} />
-        <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
-          {t("clientReview.submitting", "Submitting review...")}
-        </Text>
-      </View>
-    ) : (
-      <>
-        <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#213729", marginBottom: 12 }}>
-          {t("clientReview.title", "Rate Your Tasker")}
-        </Text>
+      <Modal isVisible={showReview} avoidKeyboard={true}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20, maxHeight: "80%" }}>
+              {submittingReview ? (
+                <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40 }}>
+                  <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 12 }} />
+                  <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+                    {t("clientReview.submitting", "Submitting review...")}
+                  </Text>
+                </View>
+              ) : (
+                <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+                  <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#213729", marginBottom: 12 }}>
+                    {t("clientReview.title", "Rate Your Tasker")}
+                  </Text>
 
-        <StarRating rating={rating} onChange={setRating} starSize={28} color="#215432" />
+                  <StarRating rating={rating} onChange={setRating} starSize={28} color="#215432" />
 
-        <TextInput
-          placeholder={t("clientReview.commentPlaceholder", "Leave a comment...")}
-          placeholderTextColor="#999"
-          value={comment}
-          onChangeText={(text) => {
-            if (text.length <= 300) setComment(text);
-          }}
-          style={{
-            borderWidth: 1,
-            borderColor: "#ccc",
-            borderRadius: 12,
-            padding: 12,
-            marginTop: 16,
-            fontFamily: "Inter",
-            fontSize: 14,
-            color: "#333",
-            textAlignVertical: "top",
-          }}
-          multiline
-          maxLength={300}
-        />
+                  <TextInput
+                    placeholder={t("clientReview.commentPlaceholder", "Leave a comment...")}
+                    placeholderTextColor="#999"
+                    value={comment}
+                    onChangeText={(text) => {
+                      if (text.length <= 300) setComment(text);
+                    }}
+                    style={{
+                      borderWidth: 1,
+                      borderColor: "#ccc",
+                      borderRadius: 12,
+                      padding: 12,
+                      marginTop: 16,
+                      fontFamily: "Inter",
+                      fontSize: 14,
+                      color: "#333",
+                      textAlignVertical: "top",
+                      minHeight: 80,
+                      maxHeight: 120,
+                    }}
+                    multiline
+                    maxLength={300}
+                    blurOnSubmit={true}
+                  />
 
-        <Text style={{ fontFamily: "Inter", fontSize: 12, color: "#999", marginTop: 4 }}>
-          {t("clientMyTasks.charactersCount", { count: comment.length })}
-        </Text>
+                  <Text style={{ fontFamily: "Inter", fontSize: 12, color: "#999", marginTop: 4 }}>
+                    {t("clientMyTasks.charactersCount", { count: comment.length })}
+                  </Text>
 
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#213729",
-            paddingVertical: 12,
-            borderRadius: 30,
-            marginTop: 20,
-            alignItems: "center",
-          }}
-          onPress={submitReview}
-        >
-          <Text style={{ color: "#fff", fontFamily: "InterBold", fontSize: 16 }}>
-            {t("clientReview.submit", "Submit Review")}
-          </Text>
-        </TouchableOpacity>
-      </>
-    )}
-  </View>
-</Modal>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: "#213729",
+                      paddingVertical: 12,
+                      borderRadius: 30,
+                      marginTop: 20,
+                      alignItems: "center",
+                    }}
+                    onPress={submitReview}
+                  >
+                    <Text style={{ color: "#fff", fontFamily: "InterBold", fontSize: 16 }}>
+                      {t("clientReview.submit", "Submit Review")}
+                    </Text>
+                  </TouchableOpacity>
+                </ScrollView>
+              )}
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
 
       {/* Report Modal */}
       <Modal isVisible={showReportModal}>
