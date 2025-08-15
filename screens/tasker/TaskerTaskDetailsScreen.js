@@ -470,14 +470,13 @@ const getStatusStyle = (status) => {
 </View>
 
 
-
 {selectedImage && (
   <View style={styles.fullScreenOverlay}>
     <TouchableOpacity
-      style={styles.closeButton}
+      style={styles.closeBtnWhite}
       onPress={() => setSelectedImage(null)}
     >
-      <Ionicons name="close" size={32} color="#fff" />
+      <Ionicons name="close" size={26} color="#000" />
     </TouchableOpacity>
 
     <Image
@@ -619,16 +618,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
 
-  closeButton: {
-    position: "absolute",
-    top: 40,
-    left: I18nManager.isRTL ? undefined : 20,
-    right: I18nManager.isRTL ? 20 : undefined,
-    zIndex: 10000,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    borderRadius: 20,
-    padding: 6,
-  },
+
 
   submittingOverlay: {
     position: "absolute",
@@ -735,6 +725,23 @@ const styles = StyleSheet.create({
     opacity: 0.85,
     marginTop: 6,
     textAlign: I18nManager.isRTL ? "right" : "left",
+  },
+  backBtn: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 10,
+  },
+  closeBtnWhite: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 10,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 6,
+    justifyContent: "center",
+    alignItems: "center",
   },
   
   
