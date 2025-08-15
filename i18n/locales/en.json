@@ -716,5 +716,15 @@
       "price": "Price ({{currency}})"
     }
   },
-  "common": { "errorTitle": "Error" }
+  "common": { "errorTitle": "Error" },
+  "register": {
+  "errorTitle": "Registration Error",
+  "missingFields": "Missing Information",
+  "fillAllFields": "Please fill in all required fields.",
+  "mismatchTitle": "Password Mismatch",
+  "passwordMismatch": "The passwords you entered do not match.",
+  "emailExists": "Email Already Registered",
+  "emailExistsMessage": "An account with this email already exists. Please log in or use a different email."
+}
+
 }
