@@ -331,7 +331,7 @@ const [locLoading, setLocLoading] = useState(false);
 
   {typeof item.__distanceKm === "number" && (
     <View style={styles.distancePill}>
-      <Ionicons name="location-outline" size={14} color="#213729" />
+      <Ionicons name="location-outline" size={14} color="#215433" />
       <Text style={styles.distanceText}>
         {item.__distanceKm.toFixed(1)} km
       </Text>
@@ -360,7 +360,7 @@ const [locLoading, setLocLoading] = useState(false);
         </View>
 
         <TouchableOpacity onPress={() => setShowModal(true)}>
-          <Ionicons name="filter-outline" size={26} color="#213729" />
+          <Ionicons name="filter-outline" size={26} color="#215433" />
         </TouchableOpacity>
       </View>
 
@@ -387,7 +387,7 @@ const [locLoading, setLocLoading] = useState(false);
             onPress={() => navigation.navigate("EditTaskerProfile")}
             style={{
               marginTop: 10,
-              backgroundColor: "#213729",
+              backgroundColor: "#215433",
               paddingVertical: 10,
               borderRadius: 20,
               paddingHorizontal: 18,
@@ -423,7 +423,7 @@ const [locLoading, setLocLoading] = useState(false);
         )}
         {sortMode === "nearest" && (
           <View style={[styles.chip, { backgroundColor: "#e8f4ec", borderColor: "#c9e5d3" }]}>
-            <Ionicons name="navigate-outline" size={14} color="#213729" />
+            <Ionicons name="navigate-outline" size={14} color="#215433" />
             <Text style={[styles.chipText, { marginLeft: 4 }]}>
               {locLoading ? (t("common.loading") || "Loading…") : (t("taskerExplore.nearest") || "Nearest")}
             </Text>
@@ -474,7 +474,7 @@ const [locLoading, setLocLoading] = useState(false);
               <Ionicons
                 name={sortMode === "nearest" ? "radio-button-on" : "radio-button-off"}
                 size={20}
-                color="#213729"
+                color="#215433"
               />
             </TouchableOpacity>
 
@@ -496,7 +496,7 @@ const [locLoading, setLocLoading] = useState(false);
       </Modal>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#213729" />
+        <ActivityIndicator size="large" color="#215433" />
       ) : filteredTasks.length === 0 ? (
         <Text style={styles.empty}>{t("taskerExplore.noTasks")}</Text>
       ) : (
@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     height: 48,
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     borderRadius: 30,
     paddingHorizontal: 18,
     fontSize: 15,
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   cardHeader: {
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
@@ -572,13 +572,13 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#666", // changed from #213729 to grey
+    color: "#666", // changed from #215433 to grey
     marginBottom: 6,
     textAlign: "left",
     marginTop: 4,
   },
   viewDetails: {
-    color: "#666", // changed from #213729 to grey
+    color: "#666", // changed from #215433 to grey
     fontFamily: "InterBold",
     fontSize: 13,
     textDecorationLine: "underline",
@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
   greeting: {
     fontFamily: "InterBold",
     fontSize: 26,
-    color: "#213729",
+    color: "#215433",
     marginTop: 30,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
   optionText: {
     fontFamily: "Inter",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
   },
   verifyBanner: {
     backgroundColor: "#fff4e6",
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   distanceText: {
-    color: "#213729",
+    color: "#215433",
     fontFamily: "Inter",
     fontSize: 12,
   },
@@ -674,6 +674,6 @@ const styles = StyleSheet.create({
   chipText: {
     fontFamily: "Inter",
     fontSize: 12,
-    color: "#213729",
+    color: "#215433",
   },
 });
