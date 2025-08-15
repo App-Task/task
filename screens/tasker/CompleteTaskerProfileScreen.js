@@ -131,17 +131,18 @@ export default function CompleteTaskerProfileScreen() {
 
   return (
     <KeyboardAvoidingView
-    style={{ flex: 1, backgroundColor: "#ffffff" }} // ✅ White background under keyboard
-    behavior={Platform.OS === "ios" ? "padding" : "height"}
-    keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
-  >
-    <ScrollView
-      style={{ backgroundColor: "#ffffff" }} // ✅ White background when scrolling
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="always"
-      keyboardDismissMode="on-drag"
-      automaticallyAdjustKeyboardInsets={true}
+      style={{ flex: 1, backgroundColor: "#ffffff" }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
     >
+      <ScrollView
+        style={{ backgroundColor: "#ffffff" }}
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        contentInset={{ bottom: 24 }}
+        scrollIndicatorInsets={{ bottom: 24 }}
+      >
         <View style={styles.headerRow}>
           <Ionicons name="person-circle-outline" size={60} color="#213729" />
           <Text style={styles.header}>{t("taskerCompleteProfile.title")}</Text>
@@ -311,7 +312,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#ffffff",
     paddingTop: 100,
-    paddingBottom: 160,
+    paddingBottom: 40,
     paddingHorizontal: 24,
     flexGrow: 1,
   },
