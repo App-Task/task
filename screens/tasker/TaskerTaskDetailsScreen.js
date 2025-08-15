@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
   },
 
   existingBidBox: {
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#ffffff",
     padding: 16,
     borderRadius: 12,
     marginTop: 16,
