@@ -179,7 +179,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <ActivityIndicator size="large" color="#213729" style={{ marginTop: 100 }} />
+        <ActivityIndicator size="large" color="#215433" style={{ marginTop: 100 }} />
       </SafeAreaView>
     );
   }
@@ -203,7 +203,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
             size={30}
-            color="#213729"
+            color="#215433"
           />
         </TouchableOpacity>
 
@@ -396,7 +396,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
       {completing && (
         <View style={styles.overlay}>
           <View style={styles.overlayBox}>
-            <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
+            <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 10 }} />
             <Text style={styles.overlayText}>{t("clientTaskDetails.completingTask")}</Text>
           </View>
         </View>
@@ -405,7 +405,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
       {canceling && (
         <View style={styles.overlay}>
           <View style={styles.overlayBox}>
-            <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
+            <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 10 }} />
             <Text style={styles.overlayText}>{t("clientTaskDetails.cancelingTask")}</Text>
           </View>
         </View>
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
   heading: {
     fontFamily: "InterBold",
     fontSize: 30,
-    color: "#213729",
+    color: "#215433",
     marginBottom: 4,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
@@ -560,5 +560,5 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
   },
-  overlayText: { fontFamily: "InterBold", fontSize: 16, color: "#213729" },
+  overlayText: { fontFamily: "InterBold", fontSize: 16, color: "#215433" },
 });

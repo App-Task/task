@@ -24,7 +24,7 @@ export default function PrivacyPolicyScreen({ navigation }) {
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
             size={24}
-            color="#213729"
+            color="#215433"
           />
         </TouchableOpacity>
         <Text style={styles.title}>{t("privacyPolicy.title")}</Text>
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "InterBold",
     fontSize: 24,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
     flex: 1,
   },

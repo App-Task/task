@@ -39,7 +39,7 @@ export default function PaymentMethodsScreen({ navigation }) {
         <Ionicons
           name="card-outline"
           size={22}
-          color="#213729"
+          color="#215433"
         />
         <Text style={styles.cardText}>
           {item.type} **** {item.last4}
@@ -60,7 +60,7 @@ export default function PaymentMethodsScreen({ navigation }) {
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
             size={24}
-            color="#213729"
+            color="#215433"
           />
         </TouchableOpacity>
         <Text style={styles.title}>{t("clientPaymentMethods.title")}</Text>
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "InterBold",
     fontSize: 22,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
     flex: 1,
   },
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   cardText: {
     fontFamily: "Inter",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
     marginLeft: 10,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   button: {
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     paddingVertical: 14,
     borderRadius: 30,
     alignItems: "center",

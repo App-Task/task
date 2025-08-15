@@ -46,7 +46,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color="#215433" style={{ marginTop: 40 }} />
       </SafeAreaView>
     );
   }
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "InterBold",
     fontSize: 20,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
     flex: 1,
   },
@@ -237,13 +237,13 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 18,
     fontFamily: "InterBold",
-    color: "#213729",
+    color: "#215433",
   },
   
   reviewRating: {
     fontSize: 16,
     fontFamily: "InterBold",
-    color: "#213729",
+    color: "#215433",
   },
   
   reviewComment: {

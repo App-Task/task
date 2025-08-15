@@ -85,7 +85,7 @@ if (!strongPasswordRegex.test(newPass)) {
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
             size={24}
-            color="#213729"
+            color="#215433"
           />
         </TouchableOpacity>
         <Text style={styles.title}>{t("clientChangePassword.title")}</Text>
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "InterBold",
     fontSize: 24,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
     flex: 1,
   },
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   button: {
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     paddingVertical: 16,
     borderRadius: 30,
     alignItems: "center",

@@ -742,7 +742,7 @@ if (errorFlag) {
         <Ionicons
           name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
           size={24}
-          color="#213729"
+          color="#215433"
         />
       </TouchableOpacity>
       <Text style={styles.modalHeader}>{t("clientPostTask.selectTaskLocation")}</Text>
@@ -903,7 +903,7 @@ const styles = StyleSheet.create({
   categoryText: {
     fontFamily: "Inter",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
   },
   modalCancel: {
     marginTop: 10,
@@ -932,7 +932,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "InterBold",
     marginBottom: 12,
-    color: "#213729",
+    color: "#215433",
   },
   
   modalCancel: {
@@ -1008,7 +1008,7 @@ const styles = StyleSheet.create({
   postingText: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
   },
 
   previewModalContainer: {
@@ -1073,7 +1073,7 @@ const styles = StyleSheet.create({
   mapBtnText: {
     fontSize: 16,
     fontFamily: "InterBold",
-    color: "#213729",
+    color: "#215433",
   },
   mapHeader: {
     paddingHorizontal: 20,
@@ -1086,7 +1086,7 @@ const styles = StyleSheet.create({
   mapHeaderTitle: {
     fontSize: 20,
     fontFamily: "InterBold",
-    color: "#213729",
+    color: "#215433",
     marginBottom: 4,
   },
   mapHeaderSubtitle: {
@@ -1159,7 +1159,7 @@ const styles = StyleSheet.create({
   modalHeader: {
     fontFamily: "InterBold",
     fontSize: 20,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
     flex: 1,
   },

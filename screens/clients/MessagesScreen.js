@@ -117,7 +117,7 @@ export default function MessagesScreen({ navigation }) {
 
 
       {loading && conversations.length === 0 ? (
-        <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color="#215433" style={{ marginTop: 40 }} />
       ) : conversations.length === 0 ? (
         <Text style={styles.empty}>{t("clientMessages.placeholder")}</Text>
       ) : (
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
     marginBottom: 4,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   unreadBadge: {
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 2,

@@ -160,7 +160,7 @@ const [rawPhone, setRawPhone] = useState("");
 <Ionicons
   name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
   size={24}
-  color="#213729"
+  color="#215433"
 />
 
 
@@ -170,7 +170,7 @@ const [rawPhone, setRawPhone] = useState("");
 </View>
 
 
-<Text style={{ fontSize: 16, fontWeight: "bold", color: "#213729", marginBottom: 20, textAlign: I18nManager.isRTL ? "right" : "left" }}>
+<Text style={{ fontSize: 16, fontWeight: "bold", color: "#215433", marginBottom: 20, textAlign: I18nManager.isRTL ? "right" : "left" }}>
   {t("taskerEditProfile.instruction")}
 </Text>
 
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   header: {
     fontFamily: "InterBold",
     fontSize: 22,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
   },
 
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     paddingVertical: 16,
     borderRadius: 30,
     alignItems: "center",

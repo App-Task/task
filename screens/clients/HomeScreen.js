@@ -134,7 +134,7 @@ export default function ClientHomeScreen() {
       {/* 🔔 Notifications button */}
       <View style={styles.notificationsIcon}>
   <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-    <Ionicons name="notifications-outline" size={24} color="#213729" />
+    <Ionicons name="notifications-outline" size={24} color="#215433" />
     {unreadCount > 0 && (
       <View style={styles.notificationDot}>
 
@@ -161,7 +161,7 @@ export default function ClientHomeScreen() {
       <Text style={styles.sectionTitle}>{t("clientHome.yourTasks")}</Text>
 
       {loading ? (
-        <ActivityIndicator color="#213729" size="large" />
+        <ActivityIndicator color="#215433" size="large" />
       ) : (
         <FlatList
           data={tasks}
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: "InterBold",
     fontSize: 18,
-    color: "#213729",
+    color: "#215433",
     marginBottom: 10,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   viewDetails: {
-    color: "#213729", // ✅ same as title color
+    color: "#215433", // ✅ same as title color
     fontSize: 13,
     fontFamily: "Inter",
     marginTop: 4,
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   taskTitle: {
     fontFamily: "Inter",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
   },
   badge: {
     borderRadius: 20,

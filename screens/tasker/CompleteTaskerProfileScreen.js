@@ -511,7 +511,7 @@ export default function CompleteTaskerProfileScreen() {
               alignItems: "center",
             }}
           >
-            <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+            <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#215433" }}>
               {t("taskerCompleteProfile.savingProfile")}
             </Text>
           </View>
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
   avatarInitials: {
     fontFamily: "InterBold",
     fontSize: 28,
-    color: "#213729",
+    color: "#215433",
   },
   container: {
     backgroundColor: "#ffffff",
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
   header: {
     fontFamily: "InterBold",
     fontSize: 22,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
     marginTop: 4,
   },
@@ -593,7 +593,7 @@ const styles = StyleSheet.create({
     minHeight: 100,
   },
   button: {
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     paddingVertical: 16,
     borderRadius: 30,
     alignItems: "center",

@@ -151,7 +151,7 @@ export default function ProfileScreen({ navigation }) {
 
 <View style={styles.headerWrapper}>
   <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-    <Ionicons name="notifications-outline" size={24} color="#213729" />
+    <Ionicons name="notifications-outline" size={24} color="#215433" />
     {unreadCount > 0 && (
       <View style={styles.badge}>
         <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
@@ -246,7 +246,7 @@ export default function ProfileScreen({ navigation }) {
 
         <TouchableOpacity style={[styles.rowItem, styles.logoutRow]} onPress={handleLogout}>
           <Text style={[styles.rowText, styles.logoutText]}>{t("clientProfile.logout")}</Text>
-          <Ionicons name="log-out-outline" size={20} color="#213729" />
+          <Ionicons name="log-out-outline" size={20} color="#215433" />
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   avatarInitials: {
     fontFamily: "InterBold",
     fontSize: 32,
-    color: "#213729",
+    color: "#215433",
   },
   info: {
     alignItems: "center",
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: "InterBold",
     fontSize: 24,
-    color: "#213729",
+    color: "#215433",
     marginBottom: 6,
   },
   email: {
@@ -326,14 +326,14 @@ const styles = StyleSheet.create({
   rowText: {
     fontFamily: "Inter",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
   },
   logoutRow: {
     backgroundColor: "#c1ff72",
   },
   logoutText: {
     fontFamily: "InterBold",
-    color: "#213729",
+    color: "#215433",
   },
   headerWrapper: {
     width: "100%",

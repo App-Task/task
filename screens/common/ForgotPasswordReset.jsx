@@ -51,7 +51,7 @@ export default function ForgotPasswordReset({ navigation, route }) {
   return (
     <View style={styles.wrapper}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-        <Ionicons name="arrow-back" size={28} color="#213729" />
+        <Ionicons name="arrow-back" size={28} color="#215433" />
       </TouchableOpacity>
 
       <Text style={styles.title}>Reset your password</Text>

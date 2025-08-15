@@ -24,7 +24,7 @@ export default function SettingsScreen({ navigation }) {
             <Ionicons
               name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
               size={24}
-              color="#213729"
+              color="#215433"
             />
           </TouchableOpacity>
           <Text style={styles.header}>{t("taskerSettings.title")}</Text>
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   header: {
     fontFamily: "InterBold",
     fontSize: 22,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
     flex: 1,
   },
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: "Inter",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
     flex: 1,
   },
   logout: {
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     fontFamily: "InterBold",
-    color: "#213729",
+    color: "#215433",
   },
   loadingOverlay: {
     position: "absolute",
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontFamily: "Inter",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
     marginTop: 15,
     textAlign: "center",
   },

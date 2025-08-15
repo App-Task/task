@@ -155,7 +155,7 @@ export default function ChatScreen({ route, navigation }) {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#213729" />
+          <Ionicons name="arrow-back" size={24} color="#215433" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {t("clientChat.chatWith", { name })}
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: "InterBold",
     fontSize: 18,
-    color: "#213729",
+    color: "#215433",
   },
   chatBox: {
     paddingHorizontal: 20,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   messageText: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#213729",
+    color: "#215433",
     lineHeight: 20,
   },
   timestamp: {
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     marginLeft: 10,
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     padding: 10,
     borderRadius: 30,
     minWidth: 42,

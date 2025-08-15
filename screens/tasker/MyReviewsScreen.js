@@ -98,7 +98,7 @@ export default function MyReviewsScreen({ navigation }) {
 
 
       {loading ? (
-        <ActivityIndicator color="#213729" size="large" style={{ marginTop: 40 }} />
+        <ActivityIndicator color="#215433" size="large" style={{ marginTop: 40 }} />
       ) : reviews.length === 0 ? (
         <Text style={styles.empty}>{t("taskerReviews.empty")}</Text>
       ) : (
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   reviewer: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   stars: {

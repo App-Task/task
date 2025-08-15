@@ -340,14 +340,14 @@ allTasks.forEach((task) => {
             <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20, maxHeight: "80%" }}>
               {submittingReview ? (
                 <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40 }}>
-                  <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 12 }} />
-                  <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+                  <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 12 }} />
+                  <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#215433" }}>
                     {t("clientReview.submitting", "Submitting review...")}
                   </Text>
                 </View>
               ) : (
                 <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-                  <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#213729", marginBottom: 12 }}>
+                  <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#215433", marginBottom: 12 }}>
                     {t("clientReview.title", "Rate Your Tasker")}
                   </Text>
 
@@ -384,7 +384,7 @@ allTasks.forEach((task) => {
 
                   <TouchableOpacity
                     style={{
-                      backgroundColor: "#213729",
+                      backgroundColor: "#215433",
                       paddingVertical: 12,
                       borderRadius: 30,
                       marginTop: 20,
@@ -408,14 +408,14 @@ allTasks.forEach((task) => {
         <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20 }}>
           {isReporting ? (
             <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40 }}>
-              <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 12 }} />
-              <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+              <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 12 }} />
+              <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#215433" }}>
                 {t("clientMyTasks.submittingReport", "Submitting report...")}
               </Text>
             </View>
           ) : (
             <>
-              <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#213729", marginBottom: 12 }}>
+              <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#215433", marginBottom: 12 }}>
                 {t("clientMyTasks.reportPromptTitle", "Report Tasker")}
               </Text>
 
@@ -473,7 +473,7 @@ allTasks.forEach((task) => {
                 <TouchableOpacity
                   style={{
                     flex: 1,
-                    backgroundColor: reportReason.trim() ? "#213729" : "#ccc",
+                    backgroundColor: reportReason.trim() ? "#215433" : "#ccc",
                     paddingVertical: 12,
                     borderRadius: 30,
                     alignItems: "center",
@@ -513,7 +513,7 @@ allTasks.forEach((task) => {
 
       {/* Task List */}
       {loading ? (
-  <ActivityIndicator size="large" color="#213729" style={{ marginTop: 40 }} />
+  <ActivityIndicator size="large" color="#215433" style={{ marginTop: 40 }} />
 ) : (
   <>
     {activeTab === "Previous" ? (
@@ -587,8 +587,8 @@ allTasks.forEach((task) => {
       borderRadius: 20,
       alignItems: "center",
     }}>
-      <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
-      <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+      <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 10 }} />
+      <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#215433" }}>
         {t("clientReview.submitting", "Submitting review...")}
       </Text>
     </View>
@@ -612,8 +612,8 @@ allTasks.forEach((task) => {
       borderRadius: 16,
       alignItems: "center",
     }}>
-      <ActivityIndicator size="large" color="#213729" />
-      <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#213729" }}>
+      <ActivityIndicator size="large" color="#215433" />
+      <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#215433" }}>
         {t("clientMyTasks.submittingReport")}
       </Text>
     </View>
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   activeTab: {
-    backgroundColor: "#213729", // dark green
+    backgroundColor: "#215433", // dark green
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
@@ -682,7 +682,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontFamily: "InterBold",
     fontSize: 17, // ✅ slightly larger
-    color: "#213729",
+    color: "#215433",
     marginBottom: 6,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
@@ -712,7 +712,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: "InterBold",
     fontSize: 18,
-    color: "#213729",
+    color: "#215433",
     marginVertical: 12,
     textAlign: I18nManager.isRTL ? "right" : "left", // ✅
   },
@@ -731,11 +731,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   activeSubTab: {
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
   },
   subTabText: {
     fontFamily: "Inter",
-    color: "#213729",
+    color: "#215433",
     fontSize: 14,
   },
   activeSubTabText: {
@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
   },
 
   viewDetails: {
-    color: "#213729",       // ✅ green like screenshot
+    color: "#215433",       // ✅ green like screenshot
     fontFamily: "InterBold",
     fontSize: 13,
     marginTop: 8,           // ✅ proper spacing from previous content
@@ -768,7 +768,7 @@ const styles = StyleSheet.create({
 
   viewProfileBtn: {
     flex: 1,
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     paddingVertical: 10,
     borderRadius: 30,
     alignItems: "center",
@@ -784,7 +784,7 @@ const styles = StyleSheet.create({
   reportBtn: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#213729",
+    borderColor: "#215433",
     paddingVertical: 10,
     borderRadius: 30,
     alignItems: "center",
@@ -792,7 +792,7 @@ const styles = StyleSheet.create({
   },
 
   reportText: {
-    color: "#213729",
+    color: "#215433",
     fontFamily: "InterBold",
     fontSize: 13,
   },

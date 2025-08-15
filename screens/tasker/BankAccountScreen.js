@@ -31,7 +31,7 @@ export default function BankAccountScreen({ navigation }) {
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
             size={24}
-            color="#213729"
+            color="#215433"
           />
         </TouchableOpacity>
         <Text style={styles.headerText}>{t("taskerBankAccount.title")}</Text>
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontFamily: "InterBold",
     fontSize: 22,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
     flex: 1,
   },
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     paddingVertical: 16,
     borderRadius: 30,
     alignItems: "center",

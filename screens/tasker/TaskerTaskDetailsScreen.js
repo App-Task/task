@@ -268,7 +268,7 @@ export default function TaskDetailsScreen({ route }) {
         <Ionicons
           name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
           size={30}
-          color="#213729"
+          color="#215433"
         />
       </TouchableOpacity>
 
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   heading: {
     fontFamily: "InterBold",
     fontSize: 26,
-    color: "#213729",
+    color: "#215433",
     marginBottom: 4,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
@@ -638,5 +638,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     borderRadius: 20,
   },
-  submittingText: { fontFamily: "InterBold", fontSize: 16, color: "#213729" },
+  submittingText: { fontFamily: "InterBold", fontSize: 16, color: "#215433" },
 });

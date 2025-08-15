@@ -274,7 +274,7 @@ export default function TaskerProfileScreen({ navigation }) {
     <Text style={[styles.rowText, styles.logoutText]}>
       {t("taskerProfile.logout")}
     </Text>
-    <Ionicons name="log-out-outline" size={20} color="#213729" />
+    <Ionicons name="log-out-outline" size={20} color="#215433" />
   </TouchableOpacity>
 </View>
 
@@ -320,12 +320,12 @@ const styles = StyleSheet.create({
   initials: {
     fontSize: 28,
     fontFamily: "InterBold",
-    color: "#213729",
+    color: "#215433",
   },
   name: {
     fontFamily: "InterBold",
     fontSize: 22,
-    color: "#213729",
+    color: "#215433",
     marginBottom: 6,
   },
   email: {
@@ -351,14 +351,14 @@ const styles = StyleSheet.create({
   rowText: {
     fontFamily: "Inter",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
   },
   logoutRow: {
     backgroundColor: "#c1ff72",
   },
   logoutText: {
     fontFamily: "InterBold",
-    color: "#213729",
+    color: "#215433",
   },
 
   verifiedBadge: {

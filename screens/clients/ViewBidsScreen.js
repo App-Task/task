@@ -228,7 +228,7 @@ export default function ViewBidsScreen({ route, navigation }) {
         {loading ? (
   <ActivityIndicator
     size="large"
-    color="#213729"
+    color="#215433"
     style={{ marginTop: 50 }}
   />
 ) : (
@@ -249,7 +249,7 @@ export default function ViewBidsScreen({ route, navigation }) {
       {accepting && (
   <View style={styles.acceptingOverlay}>
     <View style={styles.acceptingBox}>
-      <ActivityIndicator size="large" color="#213729" style={{ marginBottom: 10 }} />
+      <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 10 }} />
       <Text style={styles.acceptingText}>{t("clientViewBids.acceptingBid")}</Text>
     </View>
   </View>
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "InterBold",
     fontSize: 26,
-    color: "#213729",
+    color: "#215433",
     marginBottom: -30, // reduced spacing
   },
   
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
   acceptingText: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
   },
 
   

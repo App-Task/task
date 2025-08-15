@@ -154,7 +154,7 @@ export default function NotificationsScreen() {
     <Ionicons
       name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
       size={24}
-      color="#213729"
+      color="#215433"
     />
   </TouchableOpacity>
   <Text style={styles.title}>{t("clientNotifications.title")}</Text>
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   screenTitle: {
     fontFamily: "InterBold",
     fontSize: 24,
-    color: "#213729",
+    color: "#215433",
     marginBottom: 30,
     textAlign: "center",
   },
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
     marginBottom: 6,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "InterBold",
     fontSize: 24,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
     flex: 1,
   },

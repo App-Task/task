@@ -286,7 +286,7 @@ export default function DocumentsScreen({ navigation, route }) {
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
             size={30}
-            color="#213729"
+            color="#215433"
           />
         </TouchableOpacity>
       </View>
@@ -376,7 +376,7 @@ export default function DocumentsScreen({ navigation, route }) {
               alignItems: "center",
             }}
           >
-            <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#213729" }}>
+            <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#215433" }}>
               {t("taskerDocuments.uploading")}
             </Text>
           </View>
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontFamily: "InterBold",
     fontSize: 22,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
     flex: 1,
   },
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: "Inter",
     fontSize: 15,
-    color: "#213729",
+    color: "#215433",
     textAlign: I18nManager.isRTL ? "right" : "left",
     marginHorizontal: 8,
   },
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   button: {
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     paddingVertical: 16,
     borderRadius: 30,
     alignItems: "center",
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   finalTitle: {
     fontFamily: "InterBold",
     fontSize: 22,
-    color: "#213729",
+    color: "#215433",
     marginBottom: 6,
     marginTop: 10,
     textAlign: I18nManager.isRTL ? "right" : "left",

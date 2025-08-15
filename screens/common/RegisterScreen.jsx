@@ -136,7 +136,7 @@ navigation.reset({
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.topBar}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Ionicons name="arrow-back" size={30} color="#213729" />
+            <Ionicons name="arrow-back" size={30} color="#215433" />
           </TouchableOpacity>
         </View>
 
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
   },
 
   countryPickerWrapper: {

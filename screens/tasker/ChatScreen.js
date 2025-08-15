@@ -45,15 +45,15 @@ export default function TaskerChatScreen({ navigation, route }) {
       headerTitleStyle: {
         fontFamily: "InterBold",
         fontSize: 18,
-        color: "#213729",
+        color: "#215433",
       },
-      headerTintColor: "#213729",
+      headerTintColor: "#215433",
       headerRight: () => (
         <TouchableOpacity
           onPress={() => alert(t("clientChat.reported"))}
           style={{ marginRight: 16 }}
         >
-          <Ionicons name="alert-circle-outline" size={24} color="#213729" />
+          <Ionicons name="alert-circle-outline" size={24} color="#215433" />
         </TouchableOpacity>
       ),
     });
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   messageText: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#213729",
+    color: "#215433",
     lineHeight: 20,
   },
   timestamp: {
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     marginLeft: 10,
-    backgroundColor: "#213729",
+    backgroundColor: "#215433",
     padding: 10,
     borderRadius: 30,
     minWidth: 42,

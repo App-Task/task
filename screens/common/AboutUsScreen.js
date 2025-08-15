@@ -21,7 +21,7 @@ export default function AboutUsScreen({ navigation }) {
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
             size={24}
-            color="#213729"
+            color="#215433"
           />
         </TouchableOpacity>
         <Text style={styles.header}>{t("aboutUs.title")}</Text>
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   header: {
     fontFamily: "InterBold",
     fontSize: 24,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
     flex: 1,
   },

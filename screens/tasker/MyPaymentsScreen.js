@@ -70,7 +70,7 @@ export default function MyPaymentsScreen() {
       </View>
 
       {loading ? (
-        <ActivityIndicator color="#213729" size="large" style={{ marginTop: 40 }} />
+        <ActivityIndicator color="#215433" size="large" style={{ marginTop: 40 }} />
       ) : payments.length === 0 ? (
         <Text style={styles.empty}>{t("taskerPayments.empty")}</Text>
       ) : (
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   header: {
     fontFamily: "InterBold",
     fontSize: 22,
-    color: "#213729",
+    color: "#215433",
     marginBottom: 20,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#c1ff72",
   },
   activeFilterText: {
-    color: "#213729",
+    color: "#215433",
     fontFamily: "InterBold",
   },
   card: {
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   task: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#213729",
+    color: "#215433",
     marginBottom: 4,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },

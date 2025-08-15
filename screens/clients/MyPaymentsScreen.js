@@ -44,7 +44,7 @@ export default function MyPaymentsScreen({ navigation }) {
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
             size={24}
-            color="#213729"
+            color="#215433"
           />
         </TouchableOpacity>
         <Text style={styles.title}>{t("clientPayments.title")}</Text>
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "InterBold",
     fontSize: 24,
-    color: "#213729",
+    color: "#215433",
     textAlign: "center",
     flex: 1,
   },
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   total: {
     fontFamily: "InterBold",
     fontSize: 20,
-    color: "#213729",
+    color: "#215433",
   },
   card: {
     backgroundColor: "#f9f9f9",
