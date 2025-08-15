@@ -18,17 +18,19 @@ import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 
 export default function DocumentsScreen({ navigation, route }) {
-  const fromRegister = route?.params?.fromRegister || false; // 👈 Detect if came from registration
+  const fromRegister = route?.params?.fromRegister || false;
   const { t } = useTranslation();
 
-  const getMimeType = (filename) => {
-    const ext = filename.split(".").pop().toLowerCase();
+  const getMimeType = (filename = "") => {
+    const ext = filename.split(".").pop()?.toLowerCase();
     switch (ext) {
       case "jpg":
       case "jpeg":
         return "image/jpeg";
       case "png":
         return "image/png";
+      case "heic":
+        return "image/heic";
       case "pdf":
         return "application/pdf";
       default:
@@ -36,109 +38,181 @@ export default function DocumentsScreen({ navigation, route }) {
     }
   };
 
-  // 👉 keep both url (full path) and name for deletion + display
+  // keep both url (full path) and name for deletion + display
   const [documents, setDocuments] = useState([]);
   const [uploading, setUploading] = useState(false);
 
-  const uploadDocument = async () => {
-    try {
-      const user = await fetchCurrentUser();
-      const token = await getToken();
+  // ---------- NEW: unified uploader ----------
+  const doUpload = async ({ uri, name, type }) => {
+    const user = await fetchCurrentUser();
+    const token = await getToken();
 
-      const result = await DocumentPicker.getDocumentAsync({
-        type: "*/*",
-        copyToCacheDirectory: true,
+    setUploading(true);
+    try {
+      const info = await FileSystem.getInfoAsync(uri);
+      if (!info.exists) throw new Error("File not found");
+
+      const formData = new FormData();
+      formData.append("userId", user._id);
+      formData.append("file", {
+        uri,
+        name: name || `upload-${Date.now()}`,
+        type: type || getMimeType(name || ""),
       });
 
-      if (result.canceled || !result.assets?.length) return;
+      const response = await axios.post(
+        "https://task-kq94.onrender.com/api/documents/upload-file",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-      const file = result.assets[0];
+      const uploadedPath = response?.data?.path;
+      if (!uploadedPath) {
+        throw new Error("Upload succeeded but no document URL was returned.");
+      }
+
+      // save to MongoDB
+      await axios.patch(
+        `https://task-kq94.onrender.com/api/documents/update/${user._id}`,
+        { documentUrl: uploadedPath },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // show in UI
+      setDocuments((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          url: uploadedPath,
+          name: uploadedPath.split("/").pop(),
+        },
+      ]);
 
       Alert.alert(
-        t("taskerDocuments.confirmTitle"),
-        t("taskerDocuments.confirmMessage"),
-        [
-          { text: t("taskerDocuments.no"), style: "cancel" },
-          {
-            text: t("taskerDocuments.yes"),
-            onPress: async () => {
-              setUploading(true);
-              try {
-                const formData = new FormData();
-                formData.append("userId", user._id);
-
-                const fileUri = file.uri;
-                const fileInfo = await FileSystem.getInfoAsync(fileUri);
-                if (!fileInfo.exists) throw new Error("File not found");
-
-                const fileBlob = {
-                  uri: fileUri,
-                  name: file.name || `upload-${Date.now()}`,
-                  type: file.mimeType || getMimeType(file.name || ""),
-                };
-
-                formData.append("file", fileBlob); // must match uploadCloud.single("file")
-
-                const response = await axios.post(
-                  "https://task-kq94.onrender.com/api/documents/upload-file",
-                  formData,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                      "Content-Type": "multipart/form-data",
-                    },
-                  }
-                );
-
-                const uploadedPath = response?.data?.path;
-                if (!uploadedPath) {
-                  console.error("❌ Missing 'path' in response:", response.data);
-                  throw new Error("Upload succeeded but no document URL was returned.");
-                }
-
-                // save to MongoDB
-                await axios.patch(
-                  `https://task-kq94.onrender.com/api/documents/update/${user._id}`,
-                  { documentUrl: uploadedPath },
-                  { headers: { Authorization: `Bearer ${token}` } }
-                );
-
-                // show in UI (keep both url and filename)
-                setDocuments((prev) => [
-                  ...prev,
-                  {
-                    id: Date.now().toString(),
-                    url: uploadedPath,
-                    name: uploadedPath.split("/").pop(),
-                  },
-                ]);
-
-                Alert.alert(
-                  t("taskerDocuments.uploadedTitle"),
-                  t("taskerDocuments.uploadedMessage")
-                );
-              } catch (err) {
-                console.error("❌ Upload error:", err.response?.data || err.message);
-                Alert.alert(
-                  t("taskerDocuments.uploadFailedTitle"),
-                  t("taskerDocuments.uploadFailedMessage")
-                );
-              } finally {
-                setUploading(false);
-              }
-            },
-          },
-        ]
+        t("taskerDocuments.uploadedTitle"),
+        t("taskerDocuments.uploadedMessage")
       );
     } catch (err) {
-      console.error("❌ Picker error:", err.message);
+      console.error("❌ Upload error:", err.response?.data || err.message);
+      Alert.alert(
+        t("taskerDocuments.uploadFailedTitle"),
+        t("taskerDocuments.uploadFailedMessage")
+      );
+    } finally {
+      setUploading(false);
     }
+  };
+
+  // ---------- UPDATED: show source options ----------
+  const uploadDocument = async () => {
+    Alert.alert(
+      t("taskerDocuments.chooseSourceTitle") || "Upload Document",
+      t("taskerDocuments.chooseSourceMessage") ||
+        "Choose how you want to upload your document.",
+      [
+        {
+          text: t("taskerDocuments.takePhoto") || "Take Photo",
+          onPress: async () => {
+            const { status } = await ImagePicker.requestCameraPermissionsAsync();
+            if (status !== "granted") {
+              Alert.alert(
+                t("taskerDocuments.permissionDenied") || "Permission denied",
+                t("taskerDocuments.cameraDeniedMsg") ||
+                  "Camera permission is required to take a photo."
+              );
+              return;
+            }
+            const res = await ImagePicker.launchCameraAsync({
+              allowsEditing: false,
+              quality: 0.9,
+            });
+            if (res.canceled || !res.assets?.length) return;
+
+            const asset = res.assets[0];
+            // Fallbacks: some platforms may not return name/mimeType
+            await confirmThenUpload({
+              uri: asset.uri,
+              name: asset.fileName || `photo-${Date.now()}.jpg`,
+              type: asset.mimeType || "image/jpeg",
+            });
+          },
+        },
+        {
+          text: t("taskerDocuments.chooseFromLibrary") || "Choose from Photos",
+          onPress: async () => {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== "granted") {
+              Alert.alert(
+                t("taskerDocuments.permissionDenied") || "Permission denied",
+                t("taskerDocuments.libraryDeniedMsg") ||
+                  "Photo library permission is required to pick a photo."
+              );
+              return;
+            }
+            const res = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              allowsEditing: false,
+              quality: 0.9,
+            });
+            if (res.canceled || !res.assets?.length) return;
+
+            const asset = res.assets[0];
+            await confirmThenUpload({
+              uri: asset.uri,
+              name: asset.fileName || `image-${Date.now()}.jpg`,
+              type: asset.mimeType || "image/jpeg",
+            });
+          },
+        },
+        {
+          text: t("taskerDocuments.uploadAFile") || "Upload File (PDF/doc)",
+          onPress: async () => {
+            try {
+              const res = await DocumentPicker.getDocumentAsync({
+                type: "*/*",
+                copyToCacheDirectory: true,
+              });
+              if (res.canceled || !res.assets?.length) return;
+
+              const file = res.assets[0];
+              await confirmThenUpload({
+                uri: file.uri,
+                name: file.name || `upload-${Date.now()}`,
+                type: file.mimeType || getMimeType(file.name || ""),
+              });
+            } catch (e) {
+              console.error("❌ Picker error:", e.message);
+            }
+          },
+        },
+        { text: t("taskerDocuments.no") || "Cancel", style: "cancel" },
+      ]
+    );
+  };
+
+  // ---------- NEW: confirmation wrapper ----------
+  const confirmThenUpload = async ({ uri, name, type }) => {
+    Alert.alert(
+      t("taskerDocuments.confirmTitle"),
+      t("taskerDocuments.confirmMessage"),
+      [
+        { text: t("taskerDocuments.no"), style: "cancel" },
+        {
+          text: t("taskerDocuments.yes"),
+          onPress: () => doUpload({ uri, name, type }),
+        },
+      ]
+    );
   };
 
   const fetchDocuments = async () => {
     try {
       const user = await fetchCurrentUser();
-      // user.documents is assumed to be an array of full URLs/paths
       setDocuments(
         (user.documents || []).map((doc, index) => ({
           id: index.toString(),
@@ -160,7 +234,6 @@ export default function DocumentsScreen({ navigation, route }) {
       const user = await fetchCurrentUser();
       const token = await getToken();
 
-      // Confirm before deleting
       Alert.alert(
         t("taskerDocuments.deleteConfirmTitle") || "Delete document?",
         t("taskerDocuments.deleteConfirmMessage") ||
@@ -175,11 +248,9 @@ export default function DocumentsScreen({ navigation, route }) {
                 `https://task-kq94.onrender.com/api/documents/delete/${user._id}`,
                 {
                   headers: { Authorization: `Bearer ${token}` },
-                  // Send BOTH the fileName and documentUrl to be safe
                   data: { fileName: doc.name, documentUrl: doc.url },
                 }
               );
-
               setDocuments((prev) => prev.filter((d) => d.id !== doc.id));
             },
           },
@@ -234,7 +305,8 @@ export default function DocumentsScreen({ navigation, route }) {
                   ? "file-pdf-box"
                   : doc.name?.toLowerCase()?.endsWith(".jpg") ||
                     doc.name?.toLowerCase()?.endsWith(".jpeg") ||
-                    doc.name?.toLowerCase()?.endsWith(".png")
+                    doc.name?.toLowerCase()?.endsWith(".png") ||
+                    doc.name?.toLowerCase()?.endsWith(".heic")
                   ? "file-image"
                   : "file-document-outline"
               }
