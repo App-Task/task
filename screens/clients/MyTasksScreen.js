@@ -12,14 +12,37 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
+  Image,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import Modal from "react-native-modal";
-import StarRating from "react-native-star-rating-widget";
 import { I18nManager } from "react-native";
 
+// Custom star rating component using image
+const CustomStarRating = ({ rating, onChange, starSize = 28, color = "#215432" }) => {
+  return (
+    <View style={{ flexDirection: "row" }}>
+      {Array.from({ length: 5 }, (_, i) => (
+        <TouchableOpacity
+          key={i}
+          onPress={() => onChange(i + 1)}
+          style={{ marginRight: 4 }}
+        >
+          <Image
+            source={require("../../assets/images/Starno background.png")}
+            style={{
+              width: starSize,
+              height: starSize,
+              opacity: i < rating ? 1 : 0.3,
+            }}
+          />
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+};
 
 const { width } = Dimensions.get("window");
 
@@ -351,7 +374,7 @@ allTasks.forEach((task) => {
                     {t("clientReview.title", "Rate Your Tasker")}
                   </Text>
 
-                  <StarRating rating={rating} onChange={setRating} starSize={28} color="#215432" />
+                  <CustomStarRating rating={rating} onChange={setRating} starSize={28} color="#215432" />
 
                   <TextInput
                     placeholder={t("clientReview.commentPlaceholder", "Leave a comment...")}

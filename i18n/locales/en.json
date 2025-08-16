@@ -437,7 +437,7 @@
     "title": "My Reviews",
     "average": "Average Rating",
     "empty": "You have not received any reviews yet.",
-    "averageText": "Your average rating: {{rating}} ⭐",
+    "averageText": "Your average rating: {{rating}}",
     "clientName": "Client Name:"
   },
   "taskerMyTasks": {

@@ -8,6 +8,7 @@ import {
   Alert,
   StyleSheet,
   SafeAreaView,
+  Image,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
@@ -145,7 +146,17 @@ export default function ViewBidsScreen({ route, navigation }) {
               {item.taskerId?.name || "Tasker"}
             </Text>
             {average && (
-              <Text style={styles.taskerRating}>⭐ {average.toFixed(1)}</Text>
+              <View style={styles.taskerRatingContainer}>
+                <Text style={styles.taskerRating}>{average.toFixed(1)}</Text>
+                <Image
+                  source={require("../../assets/images/Starno background.png")}
+                  style={{
+                    width: 16,
+                    height: 16,
+                    marginLeft: 4,
+                  }}
+                />
+              </View>
             )}
           </View>
   
@@ -318,10 +329,14 @@ const styles = StyleSheet.create({
     color: "#ffffff",
   },
   taskerRating: {
-    fontFamily: "Inter",
+    fontFamily: "InterBold",
     fontSize: 13,
-    color: "#c1ff72", // Lime green stars
+    color: "#ffffff",
     marginTop: 2,
+  },
+  taskerRatingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 
   taskerPrice: {

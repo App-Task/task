@@ -135,7 +135,18 @@ export default function TaskerProfileScreen({ route, navigation }) {
         {/* ✅ New Divider Line */}
         <View style={styles.reviewDivider} />
     
-        <Text style={styles.reviewRating}>⭐ {rev.rating}/5</Text>
+        <View style={styles.reviewRatingContainer}>
+          <Text style={styles.reviewRating}>{rev.rating}/5</Text>
+          <Image
+            source={require("../../assets/images/Starno background.png")}
+            style={{
+              width: 16,
+              height: 16,
+              marginLeft: 4,
+              marginTop: -2,
+            }}
+          />
+        </View>
         {rev.comment ? (
           <Text style={styles.reviewComment}>{rev.comment}</Text>
         ) : null}
@@ -304,7 +315,12 @@ const styles = StyleSheet.create({
   reviewRating: {
     fontFamily: "InterBold",
     fontSize: 14,
-    color: "#215432",
+    color: "#000000",
+    marginBottom: 4,
+  },
+  reviewRatingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 4,
   },
   reviewComment: {

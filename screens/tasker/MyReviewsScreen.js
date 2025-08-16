@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   StyleSheet,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
@@ -53,27 +54,43 @@ export default function MyReviewsScreen({ navigation }) {
 
   const renderStars = (count) =>
     Array.from({ length: 5 }, (_, i) => (
-      <Ionicons
+      <Image
         key={i}
-        name={i < count ? "star" : "star-outline"}
-        size={18}
-        color="#c1ff72"
+        source={require("../../assets/images/Starno background.png")}
+        style={{
+          width: 18,
+          height: 18,
+          opacity: i < count ? 1 : 0.3,
+        }}
       />
     ));
 
     const renderItem = ({ item }) => (
       <View style={styles.card}>
-  <View style={styles.ratingHeader}>
-    <Text style={styles.ratingText}>{item.rating} ⭐</Text>
-  </View>
-  <View style={{ padding: 16 }}>
-    <Text style={styles.reviewer}>
-      {t("taskerReviews.clientName")} {item.clientId?.name || "Client"}
-    </Text>
-    {item.comment ? <Text style={styles.comment}>{item.comment}</Text> : null}
-  </View>
-</View>
-
+        <View style={styles.ratingHeader}>
+          <View style={styles.ratingContainer}>
+            <Text style={styles.ratingText}>{item.rating}</Text>
+            <Image
+              source={require("../../assets/images/Starno background.png")}
+              style={{
+                width: 16,
+                height: 16,
+                marginLeft: 4,
+              }}
+            />
+          </View>
+        </View>
+        <View style={{ padding: 16 }}>
+          <Text style={styles.reviewer}>
+            {t("taskerReviews.clientName")} {item.clientId?.name || "Client"}
+          </Text>
+          {/* Display the star rating */}
+          <View style={styles.starsContainer}>
+            {renderStars(item.rating)}
+          </View>
+          {item.comment ? <Text style={styles.comment}>{item.comment}</Text> : null}
+        </View>
+      </View>
     );
     
 
@@ -201,6 +218,15 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 14,
     color: "#ffffff",
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  starsContainer: {
+    flexDirection: "row",
+    marginTop: 8,
+    marginBottom: 8,
   },
   
   

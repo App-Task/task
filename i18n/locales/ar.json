@@ -434,7 +434,7 @@
     "title": "تقييماتي",
     "average": "متوسط التقييم",
     "empty": "لم تستلم أي تقييمات بعد.",
-    "averageText": "تقييمك المتوسط: {{rating}} ⭐",
+    "averageText": "تقييمك المتوسط: {{rating}}",
     "clientName": "اسم العميل:"
   },
  "taskerMyTasks": {
