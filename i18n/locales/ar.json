@@ -1,715 +1,751 @@
 {
- "tagline": {
-    "main": "مساعدة موثوقة",
-    "sub": "مهمة واحدة فقط بعيدًا"
+  "tagline": {
+     "main": "مساعدة موثوقة",
+     "sub": "أقرب إليك بخطوة واحدة"
+   },
+  "chooseRole": "اختر دورك:",
+  "role": {
+   "client": "عميل",
+   "tasker": "مقدم خدمة"
   },
-"chooseRole": "اختر دورك:",
-"role": {
-  "client": "عميل",
-  "tasker": "مقدم خدمة"
-},
-"clientDescription": "ابحث عن مقدمي خدمات موثوقين لإنجاز مهامك.",
-"taskerDescription": "احصل على عملاء يبحثون عن خدماتك.",
-"tagline": "مساعدة موثوقة على بُعد مهمة واحدة",
-"language": {
-  "changedEn": "Language changed to English",
-  "changedAr": "تم تغيير اللغة إلى العربية",
-  "switching": "جاري تغيير اللغة..."
-},
-  "login": {
-    "welcomeBack": "مرحبًا بعودتك ",
-    "email": "البريد الإلكتروني",
-    "password": "كلمة المرور",
-    "forgotPassword": "هل نسيت كلمة المرور؟",
-    "loginBtn": "تسجيل الدخول",
-    "noAccount": "ليس لديك حساب؟",
-    "registerLink": "سجّل الآن",
-    "failedTitle": "فشل تسجيل الدخول",
-  "blockedAccount": "تم حظر حسابك من قبل الإدارة.",
-  "failedGeneric": "حدث خطأ ما. حاول مرة أخرى.",
-  "missingTitle": "معلومات ناقصة",
-  "missingFields": "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
-  "loggingIn": "جاري تسجيل الدخول...",
-  "roleConflictMessage": "هذا الحساب مسجل كـ {{userRole}}، وليس كـ {{selectedRole}}.",
-  "invalidCredentials": "بيانات الدخول غير صحيحة"
+  "clientDescription": "ابحث عن أشخاص موثوقين لإنجاز مهامك.",
+  "taskerDescription": "احصل على عملاء يبحثون عن خدماتك.",
+  "tagline": "مساعدة موثوقة أقرب إليك بخطوة واحدة",
+  "language": {
+   "changedEn": "Language changed to English",
+   "changedAr": "تم تغيير اللغة إلى العربية",
+   "switching": "جاري تغيير اللغة..."
   },
-  "register": {
-    "title": "إنشاء حساب ",
-    "fullName": "الاسم الكامل",
-    "email": "البريد الإلكتروني",
-    "password": "كلمة المرور",
-    "confirmPassword": "تأكيد كلمة المرور",
-    "registerBtn": "إنشاء حساب",
-    "alreadyHave": "هل لديك حساب؟",
-    "loginLink": "تسجيل الدخول",
-    "phone": "رقم الجوال",
-    "missingFields": "معلومات ناقصة",
-  "fillAllFields": "يرجى ملء جميع الحقول.",
- "termsText": "من خلال التسجيل، أنت توافق على",
-  "terms": "الشروط والأحكام",
-  "privacy": "سياسة الخصوصية",
-  "and": "و",
-  "termsRequiredTitle": "الموافقة مطلوبة",
-  "termsRequiredMessage": "يجب الموافقة على الشروط وسياسة الخصوصية للمتابعة."
-
+   "login": {
+     "welcomeBack": "يا هلا وسهلا ",
+     "email": "البريد الإلكتروني",
+     "password": "كلمة المرور",
+     "forgotPassword": "هل نسيت كلمة المرور؟",
+     "loginBtn": "تسجيل الدخول",
+     "noAccount": "ليس لديك حساب؟",
+     "registerLink": "سجّل الآن",
+     "failedTitle": "فشل تسجيل الدخول",
+   "blockedAccount": "تم حظر حسابك من قبل الإدارة.",
+   "failedGeneric": "حدث خطأ ما. حاول مرة أخرى.",
+   "missingTitle": "معلومات ناقصة",
+   "missingFields": "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
+   "loggingIn": "جاري تسجيل الدخول...",
+   "roleConflictMessage": "هذا الحساب مسجل كـ {{userRole}}، وليس كـ {{selectedRole}}.",
+   "invalidCredentials": "بيانات الدخول غير صحيحة"
+   },
+   "register": {
+     "title": "إنشاء حساب ",
+     "fullName": "الاسم الكامل",
+     "email": "البريد الإلكتروني",
+     "password": "كلمة المرور",
+     "confirmPassword": "تأكيد كلمة المرور",
+     "registerBtn": "إنشاء حساب",
+     "alreadyHave": "هل لديك حساب؟",
+     "loginLink": "تسجيل الدخول",
+     "phone": "رقم الجوال",
+     "missingFields": "معلومات ناقصة",
+   "fillAllFields": "يرجى ملء جميع الحقول.",
+  "termsText": "من خلال التسجيل، أنت توافق على",
+   "terms": "الشروط والأحكام",
+   "privacy": "سياسة الخصوصية",
+   "and": "و",
+   "termsRequiredTitle": "الموافقة مطلوبة",
+   "termsRequiredMessage": "يجب الموافقة على الشروط وسياسة الخصوصية للمتابعة."
+  
+  
+   },
+   "TaskBottomNav": {
+   "explore": "ابحث",
+   "myTasks": "مهامي",
+   "messages": "الرسائل",
+   "notifications": "الإشعارات",
+   "profile": "الملف الشخصي"
   },
-  "TaskBottomNav": {
-  "explore": "استكشاف",
-  "myTasks": "مهامي",
-  "messages": "الرسائل",
-  "notifications": "الإشعارات",
-  "profile": "الملف الشخصي"
-},
-
-
-
-
-
-
-
-
-
-
-
-    "clientChangePassword": {
-      "title": "تغيير كلمة المرور",
-      "old": "كلمة المرور القديمة",
-      "new": "كلمة المرور الجديدة",
-      "confirm": "تأكيد كلمة المرور الجديدة",
-      "submit": "تحديث كلمة المرور",
-      "updated": "تم تحديث كلمة المرور بنجاح"
-    },
-
-    "clientChat": {
-      "chatWith": "الدردشة مع {{name}}",
-      "placeholder": "اكتب رسالة...",
-      "typing": "{{name}} يكتب...",
-      "mock1": "مرحبًا، رأيت مهمتك وأنا مهتم.",
-      "mock2": "رائع! متى تكون متاحًا؟"
-    },
-    "clientEditProfile": {
-      "title": "تعديل الملف الشخصي",
-      "name": "الاسم الكامل",
-      "gender": "الجنس",
-      "location": "الموقع",
-      "experience": "الخبرة",
-      "skills": "المهارات",
-      "about": "نبذة (150 حرفًا كحد أقصى)",
-      "save": "حفظ التغييرات",
-      "updated": "تم تحديث الملف الشخصي بنجاح"
-    },
-    "clientEditTask": {
-    "heading": "تعديل المهمة",
-    "titlePlaceholder": "أدخل عنوان المهمة (15 حرفًا كحد أقصى)",
-    "descriptionPlaceholder": "وصف المهمة (150 حرفًا كحد أقصى)",
-    "pricePlaceholder": "أدخل ميزانيتك",
-    "save": "حفظ التغييرات",
-    "missingTitle": "غير مكتمل",
-    "missingFields": "يرجى ملء جميع الحقول للمتابعة.",
-    "updatedTitle": "تم تحديث المهمة",
-    "updatedMessage": "تم تحديث المهمة بنجاح."
-  },
-  "clientHome": {
-    "greeting": "مرحبًا {{name}}،",
-    "defaultName": "عزيزي",
-    "subtitle": "بما تحتاج إلى مساعدة اليوم؟",
-    "postTaskBtn": "أنشئ مهمة",
-    "yourTasks": "مهامك",
-    "noTasks": "لم تقم بإنشاء أي مهام بعد.",
-    "viewDetails": "عرض التفاصيل",
-    "errorTitle": "خطأ",
-    "loadTasksError": "تعذر تحميل المهام.",
-    "status": {
-      "pending": "قيد الانتظار",
-      "started": "قيد التنفيذ",
-      "completed": "مكتملة",
-      "cancelled": "ملغاة"
-    }
-  },
-  "clientMessages": {
-    "title": "الرسائل",
-    "placeholder": "لا توجد رسائل بعد",
-    "search": "البحث"
-  },
-  "clientPayments": {
-    "title": "مدفوعاتي",
-    "total": "إجمالي المبلغ المستلم",
-    "date": "التاريخ",
-    "status": "الحالة",
-    "completed": "مكتمل",
-    "pending": "قيد الانتظار"
-  },
-"clientMyTasks": {
-  "pending": "قيد الانتظار",
-  "started": "قيد التنفيذ",
-  "completed": "مكتمل",
-  "cancelled": "ملغي",
-  "previous": "المهام السابقة",
-  "noTasks": "لا توجد مهام في حالة {{status}} حالياً",
-  "fetchError": "حدث خطأ أثناء تحميل المهام.",
-  "viewTaskDetails": "عرض تفاصيل المهمة",
-  "completed": "مكتملة",
-  "cancelledByYou": "ألغيت بواسطتك",
-  "cancelledByTasker": "ألغيت بواسطة مقدم الخدمة",
-  "viewProfile": "عرض الملف الشخصي",
-  "reportTasker": "الإبلاغ عن مقدم الخدمة",
-  "reportPromptTitle": "الإبلاغ عن مقدم الخدمة",
-  "reportPromptMessage": "أدخل سبب الإبلاغ عن مقدم الخدمة:",
-  "cancel": "إلغاء",
-  "submit": "إرسال",
-  "reportedTitle": "تم الإبلاغ",
-  "reportedMessage": "تم الإبلاغ عن مقدم الخدمة بنجاح.",
-  "errorTitle": "خطأ",
-  "reportFailedMessage": "فشل في إرسال البلاغ.",
-  "thankYouTitle": "شكراً لك!",
-  "reviewSubmittedMessage": "تم إرسال تقييمك.",
-  "reviewFailedMessage": "فشل في إرسال التقييم.",
-  "submittingReport": "جاري إرسال البلاغ...",
-  "charactersCount": "{{count}}/300 حرف"
-}
-,
-  "clientNotifications": {
-    "title": "الإشعارات",
-    "none": "ليس لديك إشعارات.",
-    "taskHired": "تم توظيفك!",
-    "taskHiredDesc": "قام العميل بتوظيفك لمهمة.",
-    "newMessage": "تم استلام رسالة جديدة",
-    "newMessageDesc": "لديك رسالة جديدة في الدردشة.",
-    "paymentSent": "تم إرسال الدفعة",
-    "paymentSentDesc": "تمت معالجة دفعتك بنجاح."
-  },
-  "clientPaymentMethods": {
-    "title": "طرق الدفع",
-    "add": "إضافة بطاقة جديدة",
-    "default": "البطاقة الافتراضية"
-  },
-  "clientPostTask": {
-    "title": "نشر مهمة",
-        "openInGoogleMaps": "افتح في خرائط جوجل",
-    "taskTitlePlaceholder": "أدخل عنوان المهمة (15 حرفًا كحد أقصى)",
-    "taskDescPlaceholder": "صف مهمتك (150 حرفًا كحد أقصى)",
-    "selectCategory": "اختر الفئة",
-    "enterAddress": "أدخل العنوان أو الموقع",
-    "budget": "أدخل ميزانيتك",
-    "uploadImage": "رفع صورة",
-    "postBtn": "نشر المهمة +",
-    "cancel": "إلغاء",
-    "limitTitle": "تم الوصول للحد الأقصى",
-    "limitMsg": "يمكنك تحميل 3 صور كحد أقصى.",
-    "missingTitle": "معلومات ناقصة",
-    "fillAllFields": "يرجى ملء جميع الحقول للمتابعة.",
-    "successTitle": "تم النشر",
-    "successMessage": "تم نشر المهمة بنجاح.",
-   "categories": {
-    "handyman": "أعمال الصيانة",
-    "moving": "النقل",
-    "ikea assembly": "تركيب أثاث إيكيا",
-    "cleaning": "التنظيف",
-    "shopping & delivery": "التسوق والتوصيل",
-    "yardwork services": "أعمال الحديقة",
-    "dog walking": "تمشية الكلاب",
-    "other": "أخرى"
-  },
-    "postingNow": "جاري النشر...",
-    "uploadingImage": "جارٍ تحميل الصورة...",
-    "useCurrentLocation": "استخدام الموقع الحالي",
-    "selectOnMap": "اختيار على الخريطة",
-    "editLocation": "تعديل الموقع",
-    "locating": "جاري تحديد الموقع...",
-    "permissionNeeded": "مطلوب إذن",
-    "locationPermissionMessage": "مطلوب الوصول للموقع لتحديد مهمتك.",
-    "mapPermissionMessage": "مطلوب الوصول للموقع لتعيين دبوسك.",
-    "errorTitle": "خطأ",
-    "locationError": "تعذر الحصول على موقعك. حاول مرة أخرى.",
-    "mapError": "تعذر فتح الخريطة.",
-    "userNotLoggedIn": "المستخدم غير مسجل الدخول. يرجى تسجيل الدخول مرة أخرى.",
-    "uploadFailed": "فشل التحميل",
-    "uploadFailedMessage": "تعذر تحميل الصورة. حاول مرة أخرى.",
-    "postError": "تعذر نشر المهمة. حاول مرة أخرى.",
-    "permissionDenied": "تم رفض الإذن",
-    "cameraPermissionMessage": "مطلوب الوصول للكاميرا لالتقاط صورة.",
-    "libraryPermissionMessage": "مطلوب الوصول لمكتبة الصور.",
-    "ok": "موافق",
-    "selectTaskLocation": "اختيار موقع المهمة",
-    "mapInstructions": "اضغط على الخريطة لوضع دبوسك، أو اسحب الدبوس الموجود",
-    "cancel": "إلغاء",
-    "confirmLocation": "تأكيد الموقع"
-
-
-  },
-  "clientProfile": {
-  "editProfile": "تعديل الملف الشخصي",
-  "changePassword": "تغيير كلمة المرور",
-  "myPayments": "مدفوعاتي",
-  "paymentMethods": "طرق الدفع",
-  "aboutUs": "معلومات عنا",
-  "privacyPolicy": "سياسة الخصوصية",
-  "terms": "الشروط والأحكام",
-  "faqs": "الأسئلة الشائعة",
-  "contactAdmin": "الاتصال بالإدارة",
-  "language": "اللغة",
-  "logout": "تسجيل الخروج",
-  "logoutAlertTitle": "تم تسجيل الخروج",
-  "logoutAlertMessage": "لقد تم تسجيل خروجك بنجاح.",
-  "managePhotoTitle": "إدارة صورة الملف الشخصي",
-  "chooseNewPhoto": "اختر صورة جديدة",
-  "removePhoto": "إزالة الصورة",
-  "cancel": "إلغاء",
-  "logoutConfirmTitle": "هل أنت متأكد أنك تريد تسجيل الخروج؟"
-
-},
-
-  "clientTaskDetails": {
-  "description": "الوصف",
-  "address": "العنوان",
-  "offeredPrice": "السعر المعروض",
-  "editTask": "تعديل المهمة",
-  "viewBids": "عرض العروض",
-  "cancelTask": "إلغاء المهمة",
-  "category": "الفئة",
-  "status": "الحالة",
-  "createdAt": "تاريخ الإنشاء",
-  "bidCount": "عدد العروض",
-  "notProvided": "لم يتم التقديم",
-   "completingTask": "جارٍ إنهاء المهمة...",
-  "cancelingTask": "جارٍ إلغاء المهمة...",
-  "offeredPrice": "السعر المعروض",
-  "description": "الوصف",
-  "location": "الموقع",
-  "images": "الصور",
-  "noImages": "لا توجد صور",
-  "category": "الفئة",
-  "bidCount": "عدد العروض",
-  "createdAt": "تاريخ الإنشاء",
-  "markCompleted": "تحديد كمكتملة",
-  "markCompletedConfirmTitle": "تحديد كمكتملة",
-  "markCompletedConfirmMessage": "هل أنت متأكد أنك تريد تحديد هذه المهمة كمكتملة؟",
-  "cancelTaskConfirmTitle": "إلغاء المهمة",
-  "cancelTaskConfirmMessage": "هل أنت متأكد أنك تريد إلغاء هذه المهمة؟",
-  "no": "لا",
-  "yes": "نعم",
-  "taskCancelled": "تم إلغاء المهمة",
-  "errorTitle": "خطأ",
-  "loadTaskError": "فشل في تحميل المهمة.",
-  "userIdNotFound": "لم يتم العثور على معرف المستخدم.",
-  "cancelTaskError": "فشل في إلغاء المهمة.",
-  "markCompletedError": "تعذر تحديد المهمة كمكتملة.",
-  "editNotAllowed": "لا يمكنك تعديل هذه المهمة لأن مقدم خدمة قد قدم عرضاً بالفعل."
-},
-  "clientViewBids": {
-    "title": "العروض المستلمة",
-    "chat": "محادثة",
-    "accept": "قبول",
-    "noBids": "لم يتم استلام أي عروض بعد.",
-    "acceptedTitle": "تم قبول العرض",
-    "acceptedMessage": "لقد قبلت عرض {{name}}.",
-    "acceptingBid": "جاري القبول..."
-
-  },
-"clientReview": {
-  "title": "قيّم المزود",
-  "commentPlaceholder": "اكتب تعليقاً...",
-  "submit": "إرسال التقييم",
-  "submitting": "جارٍ إرسال التقييم..."
-},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  "taskerBankAccount": {
-    "title": "الحساب البنكي",
-    "bankName": "اسم البنك",
-    "accountNumber": "رقم الحساب",
-    "iban": "رقم الآيبان",
-    "save": "حفظ التغييرات",
-    "savedTitle": "تم الحفظ",
-    "savedMessage": "تم حفظ تفاصيل الحساب البنكي بنجاح."
-  },
-  "taskerChat": {
-    "title": "المحادثة",
-    "placeholder": "اكتب رسالة...",
-    "reported": "تم الإبلاغ عن هذا المستخدم."
-  },
-  "taskerDocuments": {
-    "title": "المستندات",
-    "uploadBtn": "رفع مستند",
-    "empty": "لم يتم رفع أي مستند بعد.",
-    "uploadedTitle": "تم الرفع",
-    "uploadedMessage": "تم رفع المستند بنجاح.",
-    "confirmTitle": "هل أنت متأكد؟",
-    "confirmMessage": "لا يمكنك حذف الملفات التي تم تحميلها. هل تريد المتابعة؟",
-    "yes": "نعم",
-    "no": "لا",
-    "uploading": "جارٍ تحميل المستند...",
-    "finalTitle": "فحص أخير!",
-    "finalDesc": "للتحقق، يرجى رفع بطاقة الهوية الخاصة بك. هذا يحافظ على أمان حسابك ومنصتنا.",
-    "uploadDocument": "رفع مستند",
-    "continueToHome": "متابعة إلى الصفحة الرئيسية",
-    "uploadFailedTitle": "فشل في الرفع",
-    "uploadFailedMessage": "لم يتم رفع المستند. يرجى المحاولة مرة أخرى.",
-    "deleteFailedTitle": "فشل في الحذف",
-    "deleteFailedMessage": "لم يتم حذف المستند."
-  },
-  "taskerEditProfile": {
-    "title": "تعديل الملف الشخصي",
-    "name": "الاسم الكامل",
-    "email": "البريد الإلكتروني",
-    "gender": "الجنس",
-    "location": "الموقع",
-    "experience": "الخبرة",
-    "skills": "المهارات",
-    "about": "نبذة (150 حرفًا كحد أقصى)",
-    "save": "حفظ التغييرات",
-    "savedTitle": "تم التحديث",
-    "savedMessage": "تم تحديث الملف الشخصي بنجاح.",
-    "instruction": "لإيجاد الوظائف يجب عليك إكمال ملفك الشخصي. املأ جميع الحقول أدناه.",
-    "incompleteTitle": "ملف شخصي غير مكتمل",
-    "incompleteMessage": "يرجى ملء جميع الحقول قبل حفظ ملفك الشخصي.",
-    "invalidEmailTitle": "بريد إلكتروني غير صحيح",
-    "invalidEmailMessage": "يرجى إدخال عنوان بريد إلكتروني صحيح.",
-    "invalidPhoneTitle": "رقم هاتف غير صحيح",
-    "invalidPhoneMessage": "يجب أن يكون رقم الهاتف من 8 إلى 15 رقمًا ويحتوي على أرقام فقط.",
-    "updateSuccessTitle": "تم تحديث الملف الشخصي",
-    "updateSuccessMessage": "تم حفظ ملفك الشخصي بنجاح.",
-    "ok": "موافق",
-    "errorTitle": "خطأ",
-    "updateFailedMessage": "فشل في تحديث الملف الشخصي.",
-    "generalErrorMessage": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
-  },
-  "taskerExplore": {
-    "header": "استكشاف المهام",
-    "sortNearest": "الترتيب حسب الأقرب"
-,  "nearest": "الأقرب"
-,
-    "location": "الموقع",
-    "price": "السعر",
-    "bids": "العروض",
-    "viewDetails": "عرض التفاصيل",
-    "noTasks": "لا توجد مهام متاحة حاليًا.",
-    "greeting": "مرحباً {{name}}،",
-    "subGreeting": "ابحث عن مهمتك القادمة وابدأ في الكسب!",
-    "searchPlaceholder": "البحث بعنوان المهمة...",
-    "posted": "نُشرت",
-    "viewDetails": "عرض التفاصيل",
-    "clearFilter": "إزالة الفلتر",
-    "verifyPending": "مستنداتك ما زالت تحتاج للمراجعة (قد يستغرق الأمر حتى 48 ساعة)،",
-    "contactUs": "تواصل معنا",
-      "incompleteProfile": "لإيجاد الوظائف يجب إكمال ملفك الشخصي.",
-  "finishProfile": "اضغط هنا لإنهاء ملفك الشخصي",
-  "jobTypes": {
-    "handyman": "أعمال الصيانة",
-    "moving": "النقل",
-    "ikea assembly": "تركيب أثاث إيكيا",
-    "cleaning": "التنظيف",
-    "shopping & delivery": "التسوق والتوصيل",
-    "yardwork services": "أعمال الحديقة",
-    "dog walking": "تمشية الكلاب",
-    "other": "أخرى"
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+     "clientChangePassword": {
+       "title": "تغيير كلمة المرور",
+       "old": "كلمة المرور القديمة",
+       "new": "كلمة المرور الجديدة",
+       "confirm": "تأكيد كلمة المرور الجديدة",
+       "submit": "تحديث كلمة المرور",
+       "updated": "تم تحديث كلمة المرور بنجاح"
+     },
+  
+  
+     "clientChat": {
+       "chatWith": "المحادثة مع {{name}}",
+       "placeholder": "اكتب رسالة...",
+       "typing": "{{name}} يكتب...",
+       "mock1": "مرحبًا، رأيت مهمتك وأنا مهتم.",
+       "mock2": "رائع! متى تكون متاحًا؟"
+     },
+     "clientEditProfile": {
+       "title": "تعديل الملف الشخصي",
+       "name": "الاسم الكامل",
+       "gender": "الجنس",
+       "location": "الموقع",
+       "experience": "الخبرة",
+       "skills": "المهارات",
+       "about": "نبذة (150 حرفًا كحد أقصى)",
+       "save": "حفظ التغييرات",
+       "updated": "تم تحديث الملف الشخصي بنجاح"
+     },
+     "clientEditTask": {
+     "heading": "تعديل المهمة",
+     "titlePlaceholder": "أدخل عنوان المهمة (15 حرفًا كحد أقصى)",
+     "descriptionPlaceholder": "وصف المهمة (150 حرفًا كحد أقصى)",
+     "pricePlaceholder": "حدد ميزانيتك",
+     "save": "حفظ التغييرات",
+     "missingTitle": "غير مكتمل",
+     "missingFields": "يرجى ملء جميع الحقول للمتابعة.",
+     "updatedTitle": "تم تحديث المهمة",
+     "updatedMessage": "تم تحديث المهمة بنجاح."
+   },
+   "clientHome": {
+     "greeting": "مرحبًا {{name}}،",
+     "defaultName": "عزيزي",
+     "subtitle": "في ماذا تحتاج إلى مساعدة اليوم؟",
+     "postTaskBtn": "أنشئ مهمة",
+     "yourTasks": "مهامك",
+     "noTasks": "لم تقم بإنشاء أي مهام بعد.",
+     "viewDetails": "عرض التفاصيل",
+     "errorTitle": "خطأ",
+     "loadTasksError": "تعذر تحميل المهام.",
+     "status": {
+       "pending": "قيد الانتظار",
+       "started": "قيد التنفيذ",
+       "completed": "مكتملة",
+       "cancelled": "ملغاة"
+     }
+   },
+   "clientMessages": {
+     "title": "الرسائل",
+     "placeholder": "لا توجد رسائل بعد",
+     "search": "البحث"
+   },
+   "clientPayments": {
+     "title": "مدفوعاتي",
+     "total": "إجمالي المبلغ المستلم",
+     "date": "التاريخ",
+     "status": "الحالة",
+     "completed": "مكتمل",
+     "pending": "قيد الانتظار"
+   },
+  "clientMyTasks": {
+   "pending": "قيد الانتظار",
+   "started": "قيد التنفيذ",
+   "completed": "مكتمل",
+   "cancelled": "ملغي",
+   "previous": "المهام السابقة",
+   "noTasks": "لا توجد مهام في حالة {{status}} حالياً",
+   "fetchError": "حدث خطأ أثناء تحميل المهام.",
+   "viewTaskDetails": "عرض تفاصيل المهمة",
+   "completed": "مكتملة",
+   "cancelledByYou": "ألغيت بواسطتك",
+   "cancelledByTasker": "ألغيت بواسطة مقدم الخدمة",
+   "viewProfile": "عرض الملف الشخصي",
+   "reportTasker": "الإبلاغ عن مقدم الخدمة",
+   "reportPromptTitle": "الإبلاغ عن مقدم الخدمة",
+   "reportPromptMessage": "أدخل سبب الإبلاغ عن مقدم الخدمة:",
+   "cancel": "إلغاء",
+   "submit": "إرسال",
+   "reportedTitle": "تم الإبلاغ",
+   "reportedMessage": "تم الإبلاغ عن مقدم الخدمة بنجاح.",
+   "errorTitle": "خطأ",
+   "reportFailedMessage": "فشل في إرسال البلاغ.",
+   "thankYouTitle": "شكراً لك!",
+   "reviewSubmittedMessage": "تم إرسال تقييمك.",
+   "reviewFailedMessage": "فشل في إرسال التقييم.",
+   "submittingReport": "جاري إرسال البلاغ...",
+   "charactersCount": "{{count}}/300 حرف"
   }
-  },
-  "taskerMessages": {
-    "title": "الرسائل",
-    "empty": "لا توجد رسائل بعد",
-    "searchPlaceholder": "البحث"
-  },
-  "taskerPayments": {
-    "title": "مدفوعاتي",
-    "all": "الكل",
-    "recent": "الأحدث",
-    "empty": "لا توجد مدفوعات."
-  },
-  "taskerReviews": {
-    "title": "تقييماتي",
-    "average": "متوسط التقييم",
-    "empty": "لم تستلم أي تقييمات بعد.",
-    "averageText": "تقييمك المتوسط: {{rating}}",
-    "clientName": "اسم العميل:"
-  },
- "taskerMyTasks": {
-  "status": "الحالة",
-  "statusTypes": {
-    "pending": "قيد الانتظار",
-    "started": "بدأت",
-    "completed": "مكتملة",
-    "cancelled": "ألغيت"
-  },
-  "active": "نشطة",
-  "previous": "السابقة",
-  "bidSent": "العطاءات المرسلة",
-  "noTasks": "لا توجد مهام",
-  "chat": "دردشة",
-  "report": "إبلاغ",
-  "cancel": "إلغاء",
-  "previous": "السابقة",
-  "viewDetails": "عرض التفاصيل",
-  "completed": "مكتملة",
-  "cancelledByYou": "ألغيت بواسطتك",
-  "cancelledByClient": "ألغيت بواسطة العميل",
-  "reportClient": "الإبلاغ عن العميل",
-  "reportPrompt": "أدخل سبب الإبلاغ عن هذا العميل:",
-  "reportCancel": "إلغاء",
-  "reportSubmit": "إرسال",
-  "reportedTitle": "تم الإبلاغ",
-  "reportedMessage": "تم الإبلاغ عن العميل بنجاح.",
-  "errorTitle": "خطأ",
-  "reportError": "فشل في إرسال البلاغ.",
-  "loadError": "فشل في تحميل المهام.",
-  "cancelConfirm": "هل أنت متأكد أنك تريد الإلغاء؟",
-  "no": "لا",
-  "yes": "نعم",
-  "cancelSuccess": "تم الإلغاء بنجاح",
-  "cancelError": "حدث خطأ ما.",
-  "verifyPending": "مستنداتك ما زالت تحتاج للمراجعة (قد يستغرق الأمر حتى 48 ساعة)،",
-  "contactUs": "تواصل معنا",
-  "submittingReport": "جاري إرسال البلاغ...",
-  "cancelling": "جاري الإلغاء..."
-},
-  "taskerNotifications": {
-    "title": "الإشعارات",
-    "empty": "لا توجد إشعارات حالياً.",
-    "types": {
-      "hired": "تم توظيفك",
-      "message": "رسالة جديدة"
-    }
-  },
-  "notification": {
-    "newMessage": "رسالة جديدة",
-    "newMessageFrom": "رسالة جديدة من {{name}}",
-    "someone": "شخص ما",
-    "newBid": "عرض جديد على مهمتك",
-    "newBidMessage": "تم تقديم عرض جديد على مهمتك \"{{title}}\"",
-    "hired": "تم توظيفك!",
-    "hiredMessage": "تم توظيفك للمهمة \"{{title}}\"",
-    "newReview": "تقييم جديد",
-    "newReviewMessage": "تلقيت تقييماً من العميل للمهمة \"{{title}}\"",
-    "taskCancelled": "تم إلغاء المهمة",
-    "taskCancelledByClient": "تم إلغاء المهمة \"{{title}}\" من قبل العميل",
-    "taskCancelledByTasker": "تم إلغاء المهمة \"{{title}}\" من قبل مقدم الخدمة",
-    "taskCancelledByYou": "تم إلغاء المهمة \"{{title}}\" من قبلك",
-    "taskCompleted": "تم إنجاز المهمة",
-    "taskCompletedMessage": "تم تحديد المهمة \"{{title}}\" كمكتملة",
-    "verificationStatus": "حالة التحقق",
-    "verificationApproved": "تم الموافقة على مستنداتك. أنت الآن معتمد!",
-    "verificationDeclined": "تم رفض مستنداتك. يرجى إعادة التحميل للحصول على الاعتماد."
-  },
-  "taskerProfile": {
-  "edit": "تعديل الملف الشخصي",
-  "documents": "المستندات المرفوعة",
-  "loadError": "فشل في تحميل ملف المنفذ الشخصي.",
-  "location": "الموقع:",
-  "experience": "الخبرة:",
-  "skills": "المهارات:",
-  "notProvided": "غير مقدم",
-  "about": "حول:",
-  "reviews": "التقييمات",
-  "avgRating": "متوسط التقييم:",
-  "noReviews": "لا توجد تقييمات بعد",
-  "bank": "الحساب البنكي",
-  "payments": "مدفوعاتي",
-  "reviews": "تقييماتي",
-  "settings": "الإعدادات",
-  "logout": "تسجيل الخروج",
-  "changePassword": "تغيير كلمة المرور",
-  "verifiedTasker": "منفذ معتمد",
-  "verificationDeclined": "تم رفض التحقق",
-  "verificationPending": "التحقق معلق",
-  "logoutConfirmTitle": "تسجيل الخروج",
-  "logoutConfirmMessage": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
-  "cancel": "إلغاء",
-  "managePhotoTitle": "إدارة الصورة",
-  "chooseNewPhoto": "اختيار صورة جديدة",
-  "removePhoto": "إزالة الصورة",
-  "uploadFailed": "فشل في الرفع",
-  "uploadFailedMessage": "لم يتم رفع الصورة. حاول مرة أخرى.",
-  "removePhotoError": "خطأ",
-  "removePhotoErrorMessage": "لم يتم إزالة صورة الملف الشخصي."
-},
-"taskerSettings": {
-  "title": "الإعدادات",
-  "open": "جاري فتح",
-  "about": "حول",
-  "privacy": "سياسة الخصوصية",
-  "terms": "الشروط والأحكام",
-  "faq": "الأسئلة الشائعة",
-  "contact": "تواصل معنا",
-  "language": "اللغة",
-  "logout": "تسجيل الخروج",
-  "logoutMsg": "تم تسجيل خروجك بنجاح."
-},
-"termsAndConditions": {
-  "title": "الشروط والأحكام",
-  "effectiveDate": "تاريخ السريان:",
-  "heading1": "١. التفسير والتعريفات",
-  "section1": "تاسك، نحن، نا، أو الخاص بنا يشير إلى الفريق الذي يشغل تطبيق تاسك. العميل يعني المستخدم الذي يسعى للحصول على الخدمات؛ المنفذ يعني المستخدم الذي يقدم الخدمات. المحتوى يشير إلى أي معلومات أو مواد مقدمة عبر التطبيق.",
-  "heading2": "٢. الإقرار",
-  "section2": "تشكل هذه الشروط اتفاقية ملزمة قانونياً بينك وبين تاسك. باستخدام التطبيق، فإنك تقبل وتوافق صراحة على الالتزام بهذه الشروط وسياسة الخصوصية الخاصة بنا. لا تستخدم التطبيق إذا كنت لا توافق.",
-  "heading3": "٣. الوضع القانوني",
-  "section3": "يتم تشغيل تاسك من قبل مجموعة من الأفراد وهو غير مؤسس أو مسجل كشركة في البحرين. يعمل تاسك فقط كمنصة وسيطة محايدة - وليس كصاحب عمل أو ممثل أو ضامن لأي مستخدم.",
-  "heading4": "٤. وصف الخدمة",
-  "section4": "تاسك يمكّن التواصل والتنسيق بين العملاء والمنفذين. تاسك لا يقوم بـ: • فحص هويات المستخدمين أو مهاراتهم أو مؤهلاتهم • إدارة التسعير أو التنفيذ أو جودة الخدمات • الإشراف على أو توجيه أي مهمة\n\nجميع التفاعلات والاتفاقيات والخدمات هي بين المستخدمين. تاسك لا يضمن أي نتيجة.",
-  "heading5": "٥. المحتوى والتزامات المستخدم",
-  "section5": "تحتفظ بملكية المحتوى الخاص بك، لكنك تمنح تاسك ترخيصاً لاستخدامه. العملاء والمنفذون مسؤولون عن ضمان أن المحتوى قانوني ودقيق ولا ينتهك حقوق الآخرين.\n\nالمحتوى المحظور يشمل على سبيل المثال لا الحصر: • المحتوى غير القانوني أو التشهيري أو التمييزي • البيانات الشخصية غير المصرح بها • البرامج الضارة أو الرسائل غير المرغوب فيها",
-  "heading6": "٦. تحديد المسؤولية",
-  "section6": "إلى أقصى حد قانوني في إطار القانون البحريني، تاسك غير مسؤول عن أي خسارة أو إصابة أو أضرار ناشئة عن التفاعلات بين المستخدمين. هذا يشمل فيما يتعلق بـ: • أداء المهام أو التأخير أو الإلغاءات • سوء السلوك أو الإهمال • نزاعات الدفع أو عدم الرضا عن الخدمة • سوء الاستخدام أو الوصول غير المصرح به للمحتوى أو الوثائق\n\nتستخدم التطبيق على مسؤوليتك الخاصة بالكامل.",
-  "heading7": "٧. المدفوعات",
-  "section7": "قد يسهل تاسك الاتصالات مع معالجات الدفع، لكن تاسك لا يعالج أو يحتفظ بالأموال. تاسك غير مسؤول عن فشل المعاملات أو النزاعات - يجب حلها مباشرة بين المستخدمين أو عبر مقدم خدمة الدفع.",
-  "heading8": "٨. الملكية الفكرية",
-  "section8": "جميع العلامات التجارية والأكواد والمواد الخاصة بالتطبيق مملوكة لتاسك أو المرخصين. لا يجوز لك نسخها أو استخدامها دون إذن مكتوب مسبق.",
-  "heading9": "٩. تعليق الحساب والإنهاء",
-  "section9": "قد يعلق تاسك أو ينهي وصول المستخدم في أي وقت، مع أو بدون إشعار، لأي سبب - خاصة في حالات الاشتباه في الاحتيال أو الإساءة أو انتهاك الشروط.",
-  "heading10": "١٠. القانون الحاكم والاختصاص القضائي",
-  "section10": "تخضع هذه الشروط حصرياً لقوانين مملكة البحرين. يجب رفع أي نزاع فقط في محاكم البحرين. تتنازل عن أي اعتراضات قضائية.",
-  "heading11": "١١. تغييرات على الشروط",
-  "section11": "قد نحدث هذه الشروط بشكل دوري. ستظهر كل نسخة تاريخ سريان محدث. الاستمرار في استخدام التطبيق بعد التحديث يشكل قبولاً للشروط الجديدة."
-},
-"privacyPolicy": {
-  "title": "سياسة الخصوصية",
-  "effectiveDate": "تاريخ السريان:",
-  "heading1": "١. هوية المتحكم",
-  "section1": "يتم تشغيل تاسك من قبل فريق من الأفراد وليس شركة مسجلة. تحدد هذه السياسة جمع واستخدام ومعالجة البيانات الشخصية في إطار القانون البحريني.",
-  "heading2": "٢. المعلومات التي نجمعها",
-  "section2": "نجمع:\n١. البيانات المقدمة من المستخدم: الاسم، البريد الإلكتروني، رقم الهاتف، تفاصيل الملف الشخصي، الرسائل، التقييمات.\n٢. بيانات الاستخدام: عنوان IP، نوع الجهاز، نظام التشغيل، سجلات الاستخدام.\n٣. بيانات الموقع: إذا سُمح، لتمكين المطابقة المحلية.\n٤. وثائق الهوية الشخصية: بطاقات الهوية، جوازات السفر، رخص القيادة، الشهادات، المقدمة طوعياً للتحقق من هوية المستخدم أو المؤهلات.",
-  "heading3": "٣. استخدام المعلومات",
-  "section3": "تستخدم بياناتك لـ:\n• تشغيل وتحسين التطبيق\n• تسهيل المطابقة والمراسلة والتنسيق\n• التحقق من أوراق اعتماد المستخدم عند الضرورة\n• منع الاحتيال أو الإساءة\n• الامتثال للطلبات القانونية من السلطات البحرينية",
-  "heading4": "٤. مشاركة البيانات",
-  "section4": "قد نشارك معلوماتك مع:\n• مقدمي الخدمات (مثل الاستضافة، التحليلات، الاتصالات، معالجات الدفع) في إطار اتفاقيات السرية\n• المستخدمين الآخرين، حسب الضرورة لتقديم الخدمات\n• السلطات القانونية، عندما يتطلب القانون البحريني ذلك\n\nنحن لا نبيع أو نؤجر بياناتك الشخصية.",
-  "heading5": "٥. الاحتفاظ بالبيانات",
-  "section5": "نحتفظ بالبيانات فقط حسب الضرورة لتقديم الخدمات، والامتثال للالتزامات القانونية، وحل النزاعات، أو إنفاذ شروطنا. قد يتم الاحتفاظ بمعلومات الحساب المحذوف إذا كان مطلوباً بموجب القانون.",
-  "heading6": "٦. حقوقك",
-  "section6": "يمكنك:\n• الوصول إلى بياناتك الشخصية وتحديثها\n• طلب حذف حسابك وبياناتك\n• سحب الموافقة على معالجة بيانات معينة (مما قد يحد من الوصول للميزات)\n\nقدم الطلبات باستخدام قنوات الدعم داخل التطبيق.",
-  "heading7": "٧. الأمان",
-  "section7": "نستخدم تدابير تقنية وتنظيمية معقولة لحماية بياناتك. ومع ذلك، لا يوجد نظام منيع. بتقديم المستندات الشخصية، فإنك تقبل أن تاسك غير مسؤول عن الوصول غير المصرح به أو الإساءة خارج سيطرتنا.",
-  "heading8": "٨. خصوصية الأطفال",
-  "section8": "التطبيق مخصص للمستخدمين من عمر ١٨ سنة فما فوق. إذا علمنا أن البيانات الشخصية تم جمعها من شخص دون سن ١٨ بدون موافقة الوالدين، سنحذفها فوراً.",
-  "heading9": "٩. نقل البيانات",
-  "section9": "قد تتم معالجة أو تخزين بياناتك في البحرين أو في الخارج من قبل مقدمي خدمات طرف ثالث موثوقين. باستخدام التطبيق، فإنك توافق على هذه النقلات الدولية.",
-  "heading10": "١٠. تحديثات السياسة",
-  "section10": "قد يتم تحديث هذه السياسة أحياناً. سيعكس تاريخ السريان آخر مراجعة. الاستمرار في الاستخدام يشكل قبولاً للتحديثات."
-},
-"taskerTaskDetails": {
-  "location": "الموقع",
-  "price": "السعر المعروض",
-      "openInMaps": "افتح في خرائط جوجل",
-    "mapPreview": "معاينة موقع المهمة على الخريطة",
-  "description": "وصف المهمة",
-  "category": "الفئة",
-  "enterBid": "أدخل عرضك",
-  "bidAmount": "عرضك (بالريال)",
-  "bidMessage": "رسالة إلى العميل",
-  "submitBid": "إرسال العرض",
-  "fillFields": "يرجى ملء جميع الحقول المطلوبة",
-  "successTitle": "تم بنجاح",
-  "bidSent": "تم إرسال عرضك بنجاح.",
-  "errorTitle": "خطأ",
-  "editYourBid": "تعديل عرضك",
-"updateBid": "تحديث العرض",
-"submitting": "جارٍ الإرسال...",
-"status": "حالة العرض",
- "loadingBid": "جاري تحميل عرض السعر الخاص بك...",
-  "loadingBidMessage": "يرجى الانتظار أثناء تحميل تفاصيل عرضك.",
-  "submittingBid": "جاري تقديم العرض...",
-  "invalidBidTitle": "عرض غير صالح",
-  "invalidBidMessage": "الحد الأدنى للمزايدة هو 0.1 دينار بحريني.",
-  "alreadyBidTitle": "تم تقديم عرض بالفعل",
-  "alreadyBidMessage": "لقد قدمت عرضاً لهذه المهمة بالفعل.",
-  "accessDeniedTitle": "الوصول مرفوض",
-  "accessDeniedMessage": "يجب أن تكون معتمداً لتقديم عرض.",
-  "ok": "موافق",
-  "bidSubmitError": "حدث خطأ أثناء إرسال العرض.",
-  "noBidFoundTitle": "لم يتم العثور على عرض",
-  "noBidFoundMessage": "لم تقدم عرضاً لهذه المهمة بعد.",
-  "cannotEditTitle": "لا يمكن التعديل",
-  "cannotEditMessage": "هذه المهمة لم تعد تقبل العروض.",
-  "bidUpdateError": "حدث خطأ أثناء تحديث العرض.",
-  "images": "الصور",
-  "noImages": "لا توجد صور",
-  "biddingClosed": "تم إغلاق المزايدة"
-},
-"aboutUs": {
-  "title": "معلومات عنا",
-  "description": "هدفنا هو ربط الأشخاص المشغولين الذين يحتاجون إلى يد المساعدة في حياتهم بالأشخاص القريبين القادرين والراغبين في المساعدة. مساعدة كلاهما على عيش حياة أفضل!"
-}
   ,
-  "common": {
-    "errorTitle": "خطأ",
-    "errorGeneric": "حدث خطأ ما. حاول مرة أخرى.",
-    "ok": "حسناً",
-    "continue": "متابعة",
-    "emailOpenError": "تعذر فتح تطبيق البريد.",
-    "locationAccessTitle": "الوصول إلى الموقع",
-    "locationAccessDenied": "تم رفض إذن الموقع.",
-    "notificationsTitle": "الإشعارات",
-    "notificationsDenied": "تم رفض إذن الإشعارات."
+   "clientNotifications": {
+     "title": "الإشعارات",
+     "none": "ليس لديك إشعارات.",
+     "taskHired": "تم اختيارك!",
+     "taskHiredDesc": "قام العميل بإختيارك للمهمة.",
+     "newMessage": "لديك رسالة جديدة",
+     "newMessageDesc": "لديك رسالة جديدة في المحادثة.",
+     "paymentSent": "تم إرسال المبلغ",
+     "paymentSentDesc": "تم معالجة السداد بنجاح."
+   },
+   "clientPaymentMethods": {
+     "title": "طرق الدفع",
+     "add": "إضافة بطاقة جديدة",
+     "default": "البطاقة الافتراضية"
+   },
+   "clientPostTask": {
+     "title": "نشر مهمة",
+         "openInGoogleMaps": "افتح في خرائط جوجل",
+     "taskTitlePlaceholder": "أدخل عنوان المهمة (15 حرفًا كحد أقصى)",
+     "taskDescPlaceholder": "صف مهمتك (150 حرفًا كحد أقصى)",
+     "selectCategory": "اختر الفئة",
+     "enterAddress": "أدخل العنوان أو الموقع",
+     "budget": "أدخل ميزانيتك",
+     "uploadImage": "رفع صورة",
+     "postBtn": "نشر المهمة +",
+     "cancel": "إلغاء",
+     "limitTitle": "تم الوصول للحد الأقصى",
+     "limitMsg": "يمكنك تحميل 3 صور كحد أقصى.",
+     "missingTitle": "معلومات ناقصة",
+     "fillAllFields": "يرجى ملء جميع الحقول للمتابعة.",
+     "successTitle": "تم النشر",
+     "successMessage": "تم نشر المهمة بنجاح.",
+    "categories": {
+     "handyman": "أعمال الصيانة",
+     "moving": "النقل",
+     "ikea assembly": "تركيب أثاث إيكيا",
+     "cleaning": "التنظيف",
+     "shopping & delivery": "التسوق والتوصيل",
+     "yardwork services": "أعمال الحديقة",
+     "dog walking": "تمشية الكلاب",
+     "other": "أخرى"
+   },
+     "postingNow": "جاري النشر...",
+     "uploadingImage": "جارٍ تحميل الصورة...",
+     "useCurrentLocation": "استخدام الموقع الحالي",
+     "selectOnMap": "اختيار على الخريطة",
+     "editLocation": "تعديل الموقع",
+     "locating": "جاري تحديد الموقع...",
+     "permissionNeeded": "مطلوب موافقة",
+     "locationPermissionMessage": "السماح للوصول للموقع لتحديد مهمتك.",
+     "mapPermissionMessage": "السماح باستخدام الخريطة لتحديد موقعك.",
+     "errorTitle": "خطأ",
+     "locationError": "تعذر الحصول على موقعك. حاول مرة أخرى.",
+     "mapError": "تعذر فتح الخريطة.",
+     "userNotLoggedIn": "المستخدم غير مسجل. يرجى تسجيل الدخول مرة أخرى.",
+     "uploadFailed": "فشل التحميل",
+     "uploadFailedMessage": "تعذر تحميل الصورة. حاول مرة أخرى.",
+     "postError": "تعذر نشر المهمة. حاول مرة أخرى.",
+     "permissionDenied": "تم رفض الإذن",
+     "cameraPermissionMessage": "السماح للوصول للكاميرا لالتقاط صورة.",
+     "libraryPermissionMessage": "السماح للوصول لمكتبة الصور.",
+     "ok": "موافق",
+     "selectTaskLocation": "اختيار موقع المهمة",
+     "mapInstructions": "اضغط على الخريطة لتحديدالموقع",
+     "cancel": "إلغاء",
+     "confirmLocation": "تأكيد الموقع"
+  
+  
+  
+  
+   },
+   "clientProfile": {
+   "editProfile": "تعديل الملف الشخصي",
+   "changePassword": "تغيير كلمة المرور",
+   "myPayments": "مدفوعاتي",
+   "paymentMethods": "طرق الدفع",
+   "aboutUs": "معلومات عنا",
+   "privacyPolicy": "سياسة الخصوصية",
+   "terms": "الشروط والأحكام",
+   "faqs": "الأسئلة الشائعة",
+   "contactAdmin": "الاتصال بالإدارة",
+   "language": "اللغة",
+   "logout": "تسجيل الخروج",
+   "logoutAlertTitle": "تم تسجيل الخروج",
+   "logoutAlertMessage": "لقد تم تسجيل خروجك بنجاح.",
+   "managePhotoTitle": "إدارة صورة الملف الشخصي",
+   "chooseNewPhoto": "اختر صورة جديدة",
+   "removePhoto": "إزالة الصورة",
+   "cancel": "إلغاء",
+   "logoutConfirmTitle": "هل أنت متأكد أنك تريد تسجيل الخروج؟"
+  
+  
   },
-  "taskerCompleteProfile": {
-    "title": "أكمل ملفك الشخصي",
-    "subText": "لأمان أفضل وتطابق أدق مع العملاء، يجب عليك إكمال ملفك الشخصي قبل المتابعة.",
-    "namePlaceholder": "الاسم الكامل",
-    "phonePlaceholder": "رقم الجوال",
-    "selectGender": "اختر الجنس",
-    "selectLocation": "اختر الموقع",
-    "genderMale": "ذكر",
-    "genderFemale": "أنثى",
-    "locationBahrain": "البحرين",
-    "locationSaudiArabia": "السعودية",
-    "experiencePlaceholder": "الخبرة",
-    "skillsPlaceholder": "المهارات (مفصولة بفواصل)",
-    "aboutPlaceholder": "نبذة عنك",
-    "saveAndContinue": "حفظ ومتابعة",
-    "savingProfile": "جاري حفظ ملفك...",
-    "incompleteTitle": "ملف غير مكتمل",
-    "incompleteMessage": "يرجى ملء جميع الحقول قبل المتابعة.",
-    "invalidPhoneTitle": "رقم هاتف غير صالح",
-    "invalidPhoneMessage": "يجب أن يكون رقم الهاتف بين 8 و15 رقماً ويحتوي على أرقام فقط.",
-    "completedTitle": "تم اكتمال الملف",
-    "completedMessage": "تم إعداد ملفك الشخصي بنجاح."
+  
+  
+   "clientTaskDetails": {
+   "description": "الوصف",
+   "address": "العنوان",
+   "offeredPrice": "السعر المعروض",
+   "editTask": "تعديل المهمة",
+   "viewBids": "عرض العروض",
+   "cancelTask": "إلغاء المهمة",
+   "category": "الفئة",
+   "status": "الحالة",
+   "createdAt": "تاريخ الإنشاء",
+   "bidCount": "عدد العروض",
+   "notProvided": "لم يتم التقديم",
+    "completingTask": "جارٍ إنهاء المهمة...",
+   "cancelingTask": "جارٍ إلغاء المهمة...",
+   "offeredPrice": "السعر المعروض",
+   "description": "الوصف",
+   "location": "الموقع",
+   "images": "الصور",
+   "noImages": "لا توجد صور",
+   "category": "الفئة",
+   "bidCount": "عدد العروض",
+   "createdAt": "تاريخ الإنشاء",
+   "markCompleted": "تم الإنجاز",
+   "markCompletedConfirmTitle": "تم الإنجاز",
+   "markCompletedConfirmMessage": "هل أنت متأكد أنك تريد تحديد هذه المهمة كمنجزة؟",
+   "cancelTaskConfirmTitle": "إلغاء المهمة",
+   "cancelTaskConfirmMessage": "هل أنت متأكد أنك تريد إلغاء هذه المهمة؟",
+   "no": "لا",
+   "yes": "نعم",
+   "taskCancelled": "تم إلغاء المهمة",
+   "errorTitle": "خطأ",
+   "loadTaskError": "فشل في تحميل المهمة.",
+   "userIdNotFound": "لم يتم العثور على المستخدم.",
+   "cancelTaskError": "فشل في إلغاء المهمة.",
+   "markCompletedError": "تعذر تحديد المهمة كمنجزة.",
+   "editNotAllowed": "لا يمكنك تعديل هذه المهمة لوجود عرض."
   },
-  "clientViewBids": {
-    "title": "عروض المهمة",
-    "chat": "محادثة",
-    "accept": "قبول",
-    "acceptedLabel": "تم القبول",
-    "alreadySelectedLabel": "تم اختيار عامل بالفعل",
-    "viewProfile": "عرض الملف الشخصي",
-    "priceOffered": "السعر المقترح",
-    "currency": "BHD",
-    "noBids": "لا توجد عروض حتى الآن.",
-    "acceptingBid": "جارٍ قبول العرض...",
-    "acceptedTitle": "تم قبول العرض",
-    "acceptedMessage": "تم اختيار {{name}} لهذه المهمة.",
-    "acceptError": "تعذّر قبول العرض. حاول مرة أخرى.",
-    "loadError": "فشل تحميل العروض. حاول مرة أخرى.",
-    "taskerFallbackName": "عامل"
+   "clientViewBids": {
+     "title": "العروض المستلمة",
+     "chat": "محادثة",
+     "accept": "قبول",
+     "noBids": "لم يتم استلام أي عروض بعد.",
+     "acceptedTitle": "تم قبول العرض",
+     "acceptedMessage": "لقد قبلت عرض {{name}}.",
+     "acceptingBid": "جاري القبول..."
+  
+  
+   },
+  "clientReview": {
+   "title": "قيّم مقدم الخدمة",
+   "commentPlaceholder": "اكتب تعليقاً...",
+   "submit": "إرسال التقييم",
+   "submitting": "جارٍ إرسال التقييم..."
   },
-  "common": {
-    "errorTitle": "خطأ",
-    "ok": "حسناً"
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+   "taskerBankAccount": {
+     "title": "الحساب البنكي",
+     "bankName": "اسم البنك",
+     "accountNumber": "رقم الحساب",
+     "iban": "رقم الآيبان",
+     "save": "حفظ التغييرات",
+     "savedTitle": "تم الحفظ",
+     "savedMessage": "تم حفظ تفاصيل الحساب البنكي بنجاح."
+   },
+   "taskerChat": {
+     "title": "المحادثة",
+     "placeholder": "اكتب رسالة...",
+     "reported": "تم الإبلاغ عن هذا المستخدم."
+   },
+   "taskerDocuments": {
+     "title": "المستندات",
+     "uploadBtn": "رفع مستند",
+     "empty": "لم يتم رفع أي مستند بعد.",
+     "uploadedTitle": "تم الرفع",
+     "uploadedMessage": "تم رفع المستند بنجاح.",
+     "confirmTitle": "هل أنت متأكد؟",
+     "confirmMessage": "لا يمكنك حذف الملفات التي تم تحميلها. هل تريد المتابعة؟",
+     "yes": "نعم",
+     "no": "لا",
+     "uploading": "جارٍ تحميل المستند...",
+     "finalTitle": "فحص أخير!",
+     "finalDesc": "للتحقق، يرجى رفع بطاقة الهوية الخاصة بك. هذا يحافظ على أمان حسابك ومنصتنا.",
+     "uploadDocument": "رفع مستند",
+     "continueToHome": "متابعة إلى الصفحة الرئيسية",
+     "uploadFailedTitle": "فشل في الرفع",
+     "uploadFailedMessage": "لم يتم رفع المستند. يرجى المحاولة مرة أخرى.",
+     "deleteFailedTitle": "فشل في الحذف",
+     "deleteFailedMessage": "لم يتم حذف المستند."
+   },
+   "taskerEditProfile": {
+     "title": "تعديل الملف الشخصي",
+     "name": "الاسم الكامل",
+     "email": "البريد الإلكتروني",
+     "gender": "الجنس",
+     "location": "الموقع",
+     "experience": "الخبرة",
+     "skills": "المهارات",
+     "about": "نبذة (150 حرفًا كحد أقصى)",
+     "save": "حفظ التغييرات",
+     "savedTitle": "تم التحديث",
+     "savedMessage": "تم تحديث الملف الشخصي بنجاح.",
+     "instruction": "لإيجاد الوظائف يجب عليك إكمال ملفك الشخصي. املأ جميع الحقول أدناه.",
+     "incompleteTitle": "ملف شخصي غير مكتمل",
+     "incompleteMessage": "يرجى ملء جميع الحقول قبل حفظ ملفك الشخصي.",
+     "invalidEmailTitle": "البريد الالكتروني غير صحيح",
+     "invalidEmailMessage": "يرجى إدخال عنوان بريد إلكتروني صحيح.",
+     "invalidPhoneTitle": "رقم هاتف غير صحيح",
+     "invalidPhoneMessage": "يجب أن يكون رقم الهاتف من 8 إلى 15 رقمًا ويحتوى على أرقام فقط.",
+     "updateSuccessTitle": "تم تحديث الملف الشخصي",
+     "updateSuccessMessage": "تم حفظ ملفك الشخصي بنجاح.",
+     "ok": "موافق",
+     "errorTitle": "خطأ",
+     "updateFailedMessage": "فشل في تحديث الملف الشخصي.",
+     "generalErrorMessage": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+   },
+   "taskerExplore": {
+     "header": "البحث عن المهام",
+     "sortNearest": "الترتيب حسب الأقرب"
+  ,  "nearest": "الأقرب"
+  ,
+     "location": "الموقع",
+     "price": "السعر",
+     "bids": "العروض",
+     "viewDetails": "عرض التفاصيل",
+     "noTasks": "لا توجد مهام متاحة حاليًا.",
+     "greeting": "مرحباً {{name}}،",
+     "subGreeting": "ابحث عن مهمتك القادمة وابدأ في الكسب!",
+     "searchPlaceholder": "البحث بعنوان المهمة...",
+     "posted": "نُشرت",
+     "viewDetails": "عرض التفاصيل",
+     "clearFilter": "إزالة الفلتر",
+     "verifyPending": "مستنداتك ما زالت تحتاج للمراجعة (قد يستغرق الأمر حتى 48 ساعة)،",
+     "contactUs": "تواصل معنا",
+       "incompleteProfile": "لإيجاد الوظائف يجب إكمال ملفك الشخصي.",
+   "finishProfile": "اضغط هنا لإنهاء ملفك الشخصي",
+   "jobTypes": {
+     "handyman": "أعمال الصيانة",
+     "moving": "النقل",
+     "ikea assembly": "تركيب أثاث إيكيا",
+     "cleaning": "التنظيف",
+     "shopping & delivery": "التسوق والتوصيل",
+     "yardwork services": "أعمال الحديقة",
+     "dog walking": "تمشية الكلاب",
+     "other": "أخرى"
+   }
+   },
+   "taskerMessages": {
+     "title": "الرسائل",
+     "empty": "لا توجد رسائل بعد",
+     "searchPlaceholder": "البحث"
+   },
+   "taskerPayments": {
+     "title": "مدفوعاتي",
+     "all": "الكل",
+     "recent": "الأحدث",
+     "empty": "لا توجد مدفوعات."
+   },
+   "taskerReviews": {
+     "title": "تقييماتي",
+     "average": "متوسط التقييم",
+     "empty": "لا يوجد تقيم.",
+     "averageText": "متوسط التقيم: {{rating}} ⭐",
+     "clientName": "اسم العميل:"
+   },
+  "taskerMyTasks": {
+   "status": "الحالة",
+   "statusTypes": {
+     "pending": "قيد الإنتظار",
+     "started": "بدأت",
+     "completed": "مكتملة",
+     "cancelled": "ألغيت"
+   },
+   "active": "نشطة",
+   "previous": "السابقة",
+   "bidSent": "العروض المرسلة",
+   "noTasks": "لا توجد مهام",
+   "chat": "محادثة",
+   "report": "إبلاغ",
+   "cancel": "إلغاء",
+   "previous": "السابقة",
+   "viewDetails": "عرض التفاصيل",
+   "completed": "مكتملة",
+   "cancelledByYou": "ألغيت بواسطتك",
+   "cancelledByClient": "ألغيت بواسطة العميل",
+   "reportClient": "الإبلاغ عن العميل",
+   "reportPrompt": "أدخل سبب الإبلاغ عن هذا العميل:",
+   "reportCancel": "إلغاء",
+   "reportSubmit": "إرسال",
+   "reportedTitle": "تم الإبلاغ",
+   "reportedMessage": "تم الإبلاغ عن العميل بنجاح.",
+   "errorTitle": "خطأ",
+   "reportError": "فشل في إرسال البلاغ.",
+   "loadError": "فشل في تحميل المهام.",
+   "cancelConfirm": "هل أنت متأكد أنك تريد الإلغاء؟",
+   "no": "لا",
+   "yes": "نعم",
+   "cancelSuccess": "تم الإلغاء بنجاح",
+   "cancelError": "حدث خطأ ما.",
+   "verifyPending": "مستنداتك ما زالت تحتاج للمراجعة (قد يستغرق الأمر حتى 48 ساعة)،",
+   "contactUs": "تواصل معنا",
+   "submittingReport": "جاري إرسال البلاغ...",
+   "cancelling": "جاري الإلغاء..."
   },
-  "clientEditTask": {
-    "heading": "تعديل المهمة",
-    "loadError": "فشل في تحميل تفاصيل المهمة. يرجى المحاولة مرة أخرى.",
-    "missingTitle": "معلومات ناقصة",
-    "missingFields": "يرجى ملء جميع الحقول المطلوبة قبل الحفظ.",
-    "updateError": "فشل في تحديث المهمة. يرجى المحاولة مرة أخرى.",
-    "save": "حفظ التغييرات",
-    "placeholders": {
-      "title": "اسم المهمة",
-      "description": "الوصف",
-      "location": "العنوان",
-      "price": "السعر ({{currency}})"
-    }
+   "taskerNotifications": {
+     "title": "الإشعارات",
+     "empty": "لا توجد اشعارات حالياً.",
+     "types": {
+       "hired": "تم توظيفك",
+       "message": "رسالة جديدة"
+     }
+   },
+   "notification": {
+     "newMessage": "رسالة جديدة",
+     "newMessageFrom": "رسالة جديدة من {{name}}",
+     "someone": "شخص ما",
+     "newBid": "عرض جديد على مهمتك",
+     "newBidMessage": "تم تقديم عرض جديد على مهمتك \"{{title}}\"",
+     "hired": "تم اختيارك!",
+     "hiredMessage": "تم اختيارك للمهمة \"{{title}}\"",
+     "newReview": "تقييم جديد",
+     "newReviewMessage": "تلقيت تقييماً من العميل للمهمة \"{{title}}\"",
+     "taskCancelled": "تم إلغاء المهمة",
+     "taskCancelledByClient": "تم إلغاء المهمة \"{{title}}\" من قبل العميل",
+     "taskCancelledByTasker": "تم إلغاء المهمة \"{{title}}\" من قبل مقدم الخدمة",
+     "taskCancelledByYou": "تم إلغاء المهمة \"{{title}}\" من قبلك",
+     "taskCompleted": "تم إنجاز المهمة",
+     "taskCompletedMessage": "تم تحديد المهمة \"{{title}}\" كمكتملة",
+     "verificationStatus": "حالة التحقق",
+     "verificationApproved": "تم الموافقة على مستنداتك. أنت الآن معتمد!",
+     "verificationDeclined": "تم رفض مستنداتك. يرجى إعادة التحميل للحصول على الاعتماد."
+   },
+   "taskerProfile": {
+   "edit": "تعديل الملف الشخصي",
+   "documents": "المستندات المرفوعة",
+   "loadError": "فشل في تحميل ملف المنفذ الشخصي.",
+   "location": "الموقع:",
+   "experience": "الخبرة:",
+   "skills": "المهارات:",
+   "notProvided": "غير مقدم",
+   "about": "حول:",
+   "reviews": "التقييمات",
+   "avgRating": "متوسط التقييم:",
+   "noReviews": "لا توجد تقييمات بعد",
+   "bank": "الحساب البنكي",
+   "payments": "مدفوعاتي",
+   "reviews": "تقييماتي",
+   "settings": "الإعدادات",
+   "logout": "تسجيل الخروج",
+   "changePassword": "تغيير كلمة المرور",
+   "verifiedTasker": "منفذ معتمد",
+   "verificationDeclined": "تم رفض التحقق",
+   "verificationPending": "التحقق معلق",
+   "logoutConfirmTitle": "تسجيل الخروج",
+   "logoutConfirmMessage": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+   "cancel": "إلغاء",
+   "managePhotoTitle": "إدارة الصورة",
+   "chooseNewPhoto": "اختيار صورة جديدة",
+   "removePhoto": "إزالة الصورة",
+   "uploadFailed": "فشل في الرفع",
+   "uploadFailedMessage": "لم يتم رفع الصورة. حاول مرة أخرى.",
+   "removePhotoError": "خطأ",
+   "removePhotoErrorMessage": "لم يتم إزالة صورة الملف الشخصي."
   },
-  "common": { "errorTitle": "خطأ" }
-}
+  "taskerSettings": {
+   "title": "الإعدادات",
+   "open": "جاري فتح",
+   "about": "عن",
+   "privacy": "سياسة الخصوصية",
+   "terms": "الشروط والأحكام",
+   "faq": "الأسئلة الشائعة",
+   "contact": "تواصل معنا",
+   "language": "اللغة",
+   "logout": "تسجيل الخروج",
+   "logoutMsg": "تم تسجيل خروجك بنجاح."
+  },
+  "termsAndConditions": {
+   "title": "الشروط والأحكام",
+   "effectiveDate": "تاريخ السريان:",
+   "heading1": "١. التفسير والتعريفات",
+   "section1": "تشير 'تاسك'، 'نحن'، أو 'الخاص بنا' إلى الفريق المسؤول عن تشغيل تطبيق تاسك. بينما يعني 'العميل' المستخدم الذي يبحث عن الخدمات، و'المنفذ'  يعني المستخدم الذي يقدم هذه الخدمات. أما 'المحتوى' فيشير إلى أي معلومات أو مواد يتم توفيرها عبر التطبيق.",
+   "heading2": "٢. الإقرار",
+   "section2": "تشكل هذه الشروط اتفاقية ملزمة قانونياً بينك وبين تاسك. باستخدام التطبيق، فإنك تقبل وتوافق صراحة على الالتزام بهذه الشروط وسياسة الخصوصية الخاصة بنا. لا تستخدم التطبيق إذا كنت لا توافق.",
+   "heading3": "٣. الوضع القانوني",
+   "section3": "يتم تشغيل تاسك من قبل مجموعة من الأفراد وهو غير مؤسس أو مسجل كشركة في البحرين. يعمل تاسك فقط كمنصة وسيطة محايدة - وليس كصاحب عمل أو ممثل أو ضامن لأي مستخدم.",
+   "heading4": "٤. وصف الخدمة",
+   "section4": "تاسك يمكّن التواصل والتنسيق بين العملاء والمنفذين. تاسك لا يقوم بـ: • فحص هويات المستخدمين أو مهاراتهم أو مؤهلاتهم • إدارة التسعير أو التنفيذ أو جودة  مستخدمي الخدمات • الإشراف على أو توجيه أي مهمة على جميع التفاعلات والاتفاقيات والخدمات هي بين  المستخدمين. تاسك لا يضمن أي نتيجة.",
+   "heading5": "٥. المحتوى والتزامات المستخدم",
+   "section5": "تحتفظ بملكية المحتوى الخاص بك، لكنك تمنح تاسك ترخيصاً لاستخدامه. العملاء والمنفذون مسؤولون عن ضمان أن المحتوى قانوني ودقيق ولا ينتهك حقوق الآخرين.المحتوى المحظور يشمل على سبيل المثال لا الحصر: • المحتوى غير القانوني أو التشهيري أو التمييزي • البيانات الشخصية غير المصرح بها • البرامج الضارة أو الرسائل غير المرغوب فيها",
+   "heading6": "٦. تحديد المسؤولية",
+   "section6": "إلى أقصى حد قانوني في إطار القانون البحريني، تاسك غير مسؤول عن أي خسارة أو إصابة أو أضرار ناشئة عن التفاعلات بين المستخدمين. هذا يشمل فيما يتعلق بـ: • أداء المهام أو التأخير أو الإلغاءات • سوء السلوك أو الإهمال • نزاعات الدفع أو عدم الرضا عن الخدمة • سوء الاستخدام أو الوصول غير المصرح به للمحتوى أو الوثائق تستخدم التطبيق على مسؤوليتك الخاصة بالكامل.",
+   "heading7": "٧. المدفوعات",
+   "section7": "قد يسهل تاسك الاتصالات مع معالجات الدفع، لكن تاسك لا يعالج أو يحتفظ بالأموال. تاسك غير مسؤول عن فشل المعاملات أو النزاعات - يجب حلها مباشرة بين المستخدمين أو عبر مقدم خدمة الدفع.",
+   "heading8": "٨. الملكية الفكرية",
+   "section8": "جميع العلامات التجارية والأكواد والمواد الخاصة بالتطبيق مملوكة لتاسك أو المرخصين. لا يجوز لك نسخها أو استخدامها دون إذن مكتوب مسبق.",
+   "heading9": "٩. تعليق الحساب والإنهاء",
+   "section9": "قد يعلق تاسك أو ينهي وصول المستخدم في أي وقت، مع أو بدون إشعار، لأي سبب - خاصة في حالات الاشتباه في الاحتيال أو الإساءة أو انتهاك الشروط.",
+   "heading10": "١٠. القانون الحاكم والاختصاص القضائي",
+   "section10": "تخضع هذه الشروط حصرياً لقوانين مملكة البحرين. يجب رفع أي نزاع فقط في محاكم البحرين. تتنازل عن أي اعتراضات قضائية.",
+   "heading11": "١١. تغييرات على الشروط",
+   "section11": "قد نحدث هذه الشروط بشكل دوري. ستظهر كل نسخة تاريخ سريان محدث. الاستمرار في استخدام التطبيق بعد التحديث يشكل قبولاً للشروط الجديدة."
+  },
+  "privacyPolicy": {
+   "title": "سياسة الخصوصية",
+   "effectiveDate": "تاريخ السريان:",
+   "heading1": "١. هوية المتحكم",
+   "section1": "يتم تشغيل تاسك من قبل فريق من الأفراد وليس شركة مسجلة. تحدد هذه السياسة جمع واستخدام ومعالجة البيانات الشخصية في إطار القانون البحريني.",
+   "heading2": "٢. المعلومات التي نجمعها",
+   "section2": "نجمع:\n١. البيانات المقدمة من المستخدم: الاسم، البريد الإلكتروني، رقم الهاتف، تفاصيل الملف الشخصي، الرسائل، التقييمات.\n٢. بيانات الاستخدام: عنوان IP، نوع الجهاز، نظام التشغيل، سجلات الاستخدام.\n٣. بيانات الموقع: إذا سُمح، لتمكين المطابقة المحلية.\n٤. وثائق الهوية الشخصية: بطاقات الهوية، جوازات السفر، رخص القيادة، الشهادات، المقدمة طوعياً للتحقق من هوية المستخدم أو المؤهلات.",
+   "heading3": "٣. استخدام المعلومات",
+   "section3": "تستخدم بياناتك لـ:• تشغيل وتحسين التطبيق• تسهيل المطابقة والمراسلة والتنسيق• التحقق من أوراق اعتماد المستخدم عند الضرورة• منع الاحتيال أو الإساءة• الامتثال للطلبات القانونية من السلطات البحرينية",
+   "heading4": "٤. مشاركة البيانات",
+   "section4": "قد نشارك معلوماتك مع:• مقدمي الخدمات (مثل الاستضافة، التحليلات، الاتصالات، معالجات الدفع) في إطار اتفاقيات السرية• المستخدمين الآخرين، حسب الضرورة لتقديم الخدمات• السلطات القانونية، عندما يتطلب القانون البحريني ذلك نحن لا نبيع أو نؤجر بياناتك الشخصية.",
+   "heading5": "٥. الاحتفاظ بالبيانات",
+   "section5": "نحتفظ بالبيانات فقط حسب الضرورة لتقديم الخدمات، والامتثال للالتزامات القانونية، وحل النزاعات، أو إنفاذ شروطنا. قد يتم الاحتفاظ بمعلومات الحساب المحذوف إذا كان مطلوباً بموجب القانون.",
+   "heading6": "٦. حقوقك",
+   "section6": "يمكنك:• الوصول إلى بياناتك الشخصية وتحديثها• طلب حذف حسابك وبياناتك• سحب الموافقة على معالجة بيانات معينة (مما قد يحد من الوصول للميزات)قدم الطلبات باستخدام قنوات الدعم داخل التطبيق.",
+   "heading7": "٧. الأمان",
+   "section7": "نستخدم تدابير تقنية وتنظيمية موثوقة لحماية بياناتك. ومع ذلك، لا يوجد نظام منيع. بتقديم المستندات الشخصية، فإنك تقبل أن تاسك غير مسؤول عن الوصول غير المصرح به أو الإساءة خارج سيطرتنا.",
+   "heading8": "٨. خصوصية الأطفال",
+   "section8": "التطبيق مخصص للمستخدمين من عمر ١٨ سنة فما فوق. إذا علمنا أن البيانات الشخصية تم جمعها من شخص دون سن ١٨ بدون موافقة الوالدين، سنحذفها فوراً.",
+   "heading9": "٩. نقل البيانات",
+   "section9": "قد تتم معالجة أو تخزين بياناتك في البحرين أو في الخارج من قبل مقدمي خدمات طرف ثالث موثوقين. باستخدام التطبيق، فإنك توافق على هذه السياسة.",
+   "heading10": "١٠. تحديثات السياسة",
+   "section10": "قد يتم تحديث هذه السياسة أحياناً. سيعكس تاريخ السريان آخر مراجعة. الاستمرار في الاستخدام يشكل قبولاً للتحديثات."
+  },
+  "taskerTaskDetails": {
+   "location": "الموقع",
+   "price": "السعر المعروض",
+       "openInMaps": "افتح في خرائط جوجل",
+     "mapPreview": "معاينة موقع المهمة على الخريطة",
+   "description": "وصف المهمة",
+   "category": "الفئة",
+   "enterBid": "أدخل عرضك",
+   "bidAmount": "عرضك (بالريال)",
+   "bidMessage": "رسالة إلى العميل",
+   "submitBid": "إرسال العرض",
+   "fillFields": "يرجى ملء جميع الحقول المطلوبة",
+   "successTitle": "تم بنجاح",
+   "bidSent": "تم إرسال عرضك بنجاح.",
+   "errorTitle": "خطأ",
+   "editYourBid": "تعديل عرضك",
+  "updateBid": "تحديث العرض",
+  "submitting": "جارٍ الإرسال...",
+  "status": "حالة العرض",
+  "loadingBid": "جاري تحميل عرض السعر الخاص بك...",
+   "loadingBidMessage": "يرجى الانتظار أثناء تحميل تفاصيل عرضك.",
+   "submittingBid": "جاري تقديم العرض...",
+   "invalidBidTitle": "عرض غير صالح",
+   "invalidBidMessage": "الحد الأدنى للمزايدة هو 0.1 دينار بحريني.",
+   "alreadyBidTitle": "تم تقديم عرض بالفعل",
+   "alreadyBidMessage": "لقد قدمت عرضاً لهذه المهمة بالفعل.",
+   "accessDeniedTitle": "الوصول مرفوض",
+   "accessDeniedMessage": "يجب أن تكون معتمداً لتقديم عرض.",
+   "ok": "موافق",
+   "bidSubmitError": "حدث خطأ أثناء إرسال العرض.",
+   "noBidFoundTitle": "لم يتم العثور على عرض",
+   "noBidFoundMessage": "لم تقدم عرضاً لهذه المهمة بعد.",
+   "cannotEditTitle": "لا يمكن التعديل",
+   "cannotEditMessage": "هذه المهمة لم تعد تقبل العروض.",
+   "bidUpdateError": "حدث خطأ أثناء تحديث العرض.",
+   "images": "الصور",
+   "noImages": "لا توجد صور",
+   "biddingClosed": "تم إغلاق المزايدة"
+  },
+  "aboutUs": {
+   "title": "معلومات عنا",
+   "description": "هدفنا هو ربط الأشخاص المشغولين الذين يحتاجون إلى يد المساعدة في حياتهم بالأشخاص القريبين القادرين والراغبين في المساعدة. مساعدة كلاهما على حياة أفضل!"
+  }
+   ,
+   "common": {
+     "errorTitle": "خطأ",
+     "errorGeneric": "حدث خطأ ما. حاول مرة أخرى.",
+     "ok": "حسناً",
+     "continue": "متابعة",
+     "emailOpenError": "تعذر فتح تطبيق البريد.",
+     "locationAccessTitle": "الوصول إلى الموقع",
+     "locationAccessDenied": "تم رفض إذن الموقع.",
+     "notificationsTitle": "الإشعارات",
+     "notificationsDenied": "تم رفض إذن الإشعارات."
+   },
+   "taskerCompleteProfile": {
+     "title": "أكمل ملفك الشخصي",
+     "subText": "لأمان أفضل وتطابق أدق مع العملاء، يجب عليك إكمال ملفك الشخصي قبل المتابعة.",
+     "namePlaceholder": "الاسم الكامل",
+     "phonePlaceholder": "رقم الجوال",
+     "selectGender": "اختر الجنس",
+     "selectLocation": "اختر الموقع",
+     "genderMale": "ذكر",
+     "genderFemale": "أنثى",
+     "locationBahrain": "البحرين",
+     "locationSaudiArabia": "السعودية",
+     "experiencePlaceholder": "الخبرة",
+     "skillsPlaceholder": "المهارات (مفصولة بفواصل)",
+     "aboutPlaceholder": "نبذة عنك",
+     "saveAndContinue": "حفظ ومتابعة",
+     "savingProfile": "جاري حفظ ملفك...",
+     "incompleteTitle": "ملف غير مكتمل",
+     "incompleteMessage": "يرجى ملء جميع الحقول قبل المتابعة.",
+     "invalidPhoneTitle": "رقم هاتف غير صالح",
+     "invalidPhoneMessage": "يجب أن يكون رقم الهاتف بين 8 و15 رقماً ويحتوي على أرقام فقط.",
+     "completedTitle": "تم اكتمال الملف",
+     "completedMessage": "تم إعداد ملفك الشخصي بنجاح."
+   },
+   "clientViewBids": {
+     "title": "عروض المهمة",
+     "chat": "محادثة",
+     "accept": "قبول",
+     "acceptedLabel": "تم القبول",
+     "alreadySelectedLabel": "تم اختيار مقدم خدمة",
+     "viewProfile": "عرض الملف الشخصي",
+     "priceOffered": "السعر المقترح",
+     "currency": "BHD",
+     "noBids": "لا توجد عروض حتى الآن.",
+     "acceptingBid": "جارٍ قبول العرض...",
+     "acceptedTitle": "تم قبول العرض",
+     "acceptedMessage": "تم اختيار {{name}} لهذه المهمة.",
+     "acceptError": "تعذّر قبول العرض. حاول مرة أخرى.",
+     "loadError": "فشل تحميل العروض. حاول مرة أخرى.",
+     "taskerFallbackName": "مقدم خذمة"
+   },
+   "common": {
+     "errorTitle": "خطأ",
+     "ok": "حسناً"
+   },
+   "clientEditTask": {
+     "heading": "تعديل المهمة",
+     "loadError": "فشل في تحميل تفاصيل المهمة. يرجى المحاولة مرة أخرى.",
+     "missingTitle": "معلومات ناقصة",
+     "missingFields": "يرجى ملء جميع الحقول المطلوبة قبل الحفظ.",
+     "updateError": "فشل في تحديث المهمة. يرجى المحاولة مرة أخرى.",
+     "save": "حفظ التغييرات",
+     "placeholders": {
+       "title": "اسم المهمة",
+       "description": "الوصف",
+       "location": "العنوان",
+       "price": "السعر ({{currency}})"
+     }
+   },
+   "common": { "errorTitle": "خطأ" }
+  }
+  
+  
