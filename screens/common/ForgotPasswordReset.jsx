@@ -12,6 +12,7 @@ import { resetPassword } from "../../services/auth";
 
 export default function ForgotPasswordReset({ navigation, route }) {
   const emailFromRoute = route?.params?.email || "";
+  const roleFromRoute = route?.params?.role || "client";
   const [email, setEmail] = useState(emailFromRoute);
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -39,7 +40,7 @@ export default function ForgotPasswordReset({ navigation, route }) {
     try {
       await resetPassword({ email: email.trim(), code: code.trim(), newPassword });
       Alert.alert("Success", "Your password has been reset. Please log in.");
-      navigation.replace("Login");
+      navigation.replace("Login", { role: roleFromRoute });
     } catch (err) {
       console.error("❌ Reset Password Error:", err.message);
       Alert.alert("Error", err.response?.data?.msg || "Something went wrong.");

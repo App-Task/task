@@ -57,9 +57,9 @@ export const updateUserProfile = async (data) => {
   return response.data;
 };
 
-export const forgotPassword = async (email) => {
+export const forgotPassword = async (email, role) => {
   try {
-    const response = await axios.post(`${API_URL}/forgot-password`, { email });
+    const response = await axios.post(`${API_URL}/forgot-password`, { email, role });
     return response.data; // always returns a generic success message
   } catch (error) {
     const msg = error?.response?.data?.msg || "Something went wrong.";

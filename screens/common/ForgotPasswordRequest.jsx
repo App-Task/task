@@ -10,18 +10,19 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { forgotPassword } from "../../services/auth";
 
-export default function ForgotPasswordRequest({ navigation }) {
+export default function ForgotPasswordRequest({ navigation, route }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const role = route?.params?.role || "client";
 
   const handleSendCode = async () => {
     if (!email.trim()) return Alert.alert("Missing", "Please enter your email.");
 
     setLoading(true);
     try {
-      await forgotPassword(email.trim().toLowerCase());
+      await forgotPassword(email.trim().toLowerCase(), role);
       Alert.alert("Request Received", "A password reset code has been sent to your email.");
-      navigation.navigate("ForgotPasswordReset", { email: email.trim().toLowerCase() });
+      navigation.navigate("ForgotPasswordReset", { email: email.trim().toLowerCase(), role });
     } catch (err) {
       console.error("❌ Forgot Password Error:", err.message);
       Alert.alert("Error", "Something went wrong. Please try again.");

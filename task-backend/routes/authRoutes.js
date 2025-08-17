@@ -155,12 +155,14 @@ if ("profileImage" in req.body) user.profileImage = profileImage;
 
 // ✅ Forgot Password - Send 6-digit code
 router.post("/forgot-password", async (req, res) => {
-  const { email } = req.body;
+  const { email, role } = req.body;
   const genericMsg = { msg: "If this email exists, we sent a reset code." };
 
   if (!email) return res.status(200).json(genericMsg);
 
-  const user = await User.findOne({ email: email.toLowerCase() });
+  // If role is provided, find user by email + role, otherwise find by email only
+  const query = role ? { email: email.toLowerCase(), role: role.toLowerCase() } : { email: email.toLowerCase() };
+  const user = await User.findOne(query);
   if (!user) return res.status(200).json(genericMsg);
 
   const now = Date.now();
