@@ -47,6 +47,30 @@ export default function TaskDetailsScreen({ route, navigation }) {
     }
   }, [isFocused]);
 
+  // Get current location automatically when component mounts
+  useEffect(() => {
+    const getCurrentLocation = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          console.log("Location permission denied");
+          return;
+        }
+        
+        const pos = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
+        
+        const { latitude, longitude } = pos.coords;
+        setCoords({ latitude, longitude });
+      } catch (e) {
+        console.log("get location error", e);
+      }
+    };
+    
+    getCurrentLocation();
+  }, []);
+
   const fetchTask = async () => {
     try {
       const freshTask = await getTaskById(initialTask._id);
@@ -258,50 +282,45 @@ export default function TaskDetailsScreen({ route, navigation }) {
           </View>
 
           {/* Location label */}
-    <Text style={[styles.detailsText, { marginTop: 12 }]}>
-           <Text style={{ fontFamily: "InterBold" }}>
-             {t("clientTaskDetails.location") || "Location"}:
-           </Text>
-         </Text>
+          <Text style={[styles.detailsText, { marginTop: 12 }]}>
+            <Text style={{ fontFamily: "InterBold" }}>
+              {t("clientTaskDetails.location") || "Location"}:
+            </Text>
+          </Text>
 
-          {/* 🔻 REPLACED plain location/category with a tappable map preview */}
-          {coords ? (
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={() =>
-                openInGoogleMaps(
-                  coords.latitude,
-                  coords.longitude,
-                  task?.title || "Task Location"
-                )
-              }
-              style={{ marginTop: 12, borderRadius: 12, overflow: "hidden" }}
-            >
-              <MapView
-                style={styles.map}
-                initialRegion={{
-                  latitude: coords.latitude,
-                  longitude: coords.longitude,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                }}
-                pointerEvents="none"
+          {/* Location text */}
+          <Text style={styles.detailsText}>
+            {task.location || "Location not specified"}
+          </Text>
+
+          {/* Map below location text */}
+          {coords && (
+            <View style={styles.mapContainer}>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() =>
+                  openInGoogleMaps(
+                    coords.latitude,
+                    coords.longitude,
+                    task?.title || "Task Location"
+                  )
+                }
               >
-                <Marker coordinate={coords} />
-              </MapView>
-            </TouchableOpacity>
-          ) : geoError ? null : (
-            <View style={[styles.map, { justifyContent: "center", alignItems: "center" }]}>
-              <Text style={{ color: "#fff", opacity: 0.8, fontFamily: "Inter" }}>
-                {t("taskerTaskDetails.locating") || "Locating on map…"}
-              </Text>
+                <MapView
+                  style={styles.map}
+                  initialRegion={{
+                    latitude: coords.latitude,
+                    longitude: coords.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                  pointerEvents="none"
+                >
+                  <Marker coordinate={coords} />
+                </MapView>
+              </TouchableOpacity>
             </View>
           )}
-
-          {/* 🔻 REMOVED:
-              - location text row
-              - category row
-          */}
 
           {/* Actions (inside the green box) */}
           <View style={styles.actionsInside}>
@@ -496,10 +515,18 @@ const styles = StyleSheet.create({
     marginLeft: I18nManager.isRTL ? 8 : 0,
   },
 
+  // Map container below location text
+  mapContainer: {
+    marginTop: 12,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
   map: {
     width: "100%",
     height: 180,
-    backgroundColor: "#e6e6e6",
   },
 
   actionsInside: { marginTop: 20 },

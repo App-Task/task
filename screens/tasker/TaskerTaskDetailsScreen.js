@@ -68,6 +68,33 @@ export default function TaskDetailsScreen({ route }) {
   };
   // ----
 
+  // Remove the current location fallback - we only want task coordinates
+  // useEffect(() => {
+  //   const getCurrentLocation = async () => {
+  //     try {
+  //       const { status } = await Location.requestForegroundPermissionsAsync();
+  //       if (status !== "granted") {
+  //         console.log("Location permission denied");
+  //         return;
+  //       }
+  //       
+  //       const pos = await Location.getCurrentPositionAsync({
+  //         accuracy: Location.Accuracy.Balanced,
+  //       });
+  //       
+  //       const { latitude, longitude } = pos.coords;
+  //       // Only set current location as fallback if no task coordinates exist
+  //       if (!coords) {
+  //         setCoords({ latitude, longitude });
+  //       }
+  //     } catch (e) {
+  //       console.log("get current location error", e);
+  //     }
+  //   };
+  //   
+  //   getCurrentLocation();
+  // }, []);
+
   const openInGoogleMaps = async (lat, lng, labelRaw = "Task Location") => {
     try {
       const label = encodeURIComponent(labelRaw || "Task Location");
@@ -125,32 +152,55 @@ export default function TaskDetailsScreen({ route }) {
     fetchFullTask();
   }, []);
 
+  // Only use task coordinates - no fallback to user location
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
+        // First priority: Use task's exact coordinates if available
         if (typeof task?.latitude === "number" && typeof task?.longitude === "number") {
-          if (!cancelled) setCoords({ latitude: task.latitude, longitude: task.longitude });
+          if (!cancelled) {
+            setCoords({ latitude: task.latitude, longitude: task.longitude });
+          }
           return;
         }
+        
+        // Second priority: Try to parse coordinates from location string
         if (typeof task?.location === "string") {
           const match = task.location.match(/-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?/);
           if (match) {
             const [lat, lng] = match[0].split(",").map((v) => parseFloat(v.trim()));
             if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
-              if (!cancelled) setCoords({ latitude: lat, longitude: lng });
+              if (!cancelled) {
+                setCoords({ latitude: lat, longitude: lng });
+              }
               return;
             }
           }
         }
-        if (task?.location) {
-          const results = await Location.geocodeAsync(task.location);
-          if (results && results[0] && !cancelled) {
-            setCoords({ latitude: results[0].latitude, longitude: results[0].longitude });
+        
+        // Third priority: Geocode the location string
+        if (task?.location && task.location.trim()) {
+          try {
+            const results = await Location.geocodeAsync(task.location);
+            if (results && results[0] && !cancelled) {
+              setCoords({ latitude: results[0].latitude, longitude: results[0].longitude });
+              return;
+            }
+          } catch (e) {
+            // Geocoding failed, continue to next option
           }
         }
+        
+        // No task coordinates found - don't set any coordinates
+        if (!cancelled) {
+          setCoords(null);
+        }
+        
       } catch (e) {
-        if (!cancelled) setGeoError(e.message || "Geocoding failed");
+        if (!cancelled) {
+          setGeoError(e.message || "Failed to get task location");
+        }
       }
     })();
     return () => {
@@ -349,36 +399,45 @@ export default function TaskDetailsScreen({ route }) {
               )}
             </View>
 
-            {/* Map (tappable) */}
+            {/* Location text */}
+            <Text style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}>
+              {t("taskerTaskDetails.location") || "Location"}:
+            </Text>
+            <Text style={styles.detailsText}>
+              {task.location || "Location not specified"}
+            </Text>
+
+            {/* Map below location text */}
             {coords ? (
-              <TouchableOpacity
-                activeOpacity={0.9}
-                onPress={() =>
-                  openInGoogleMaps(
-                    coords.latitude,
-                    coords.longitude,
-                    task?.title || "Task Location"
-                  )
-                }
-                style={{ marginTop: 12, borderRadius: 12, overflow: "hidden" }}
-              >
-                <MapView
-                  style={styles.map}
-                  initialRegion={{
-                    latitude: coords.latitude,
-                    longitude: coords.longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                  }}
-                  pointerEvents="none"
+              <View style={styles.mapContainer}>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() =>
+                    openInGoogleMaps(
+                      coords.latitude,
+                      coords.longitude,
+                      task?.title || "Task Location"
+                    )
+                  }
                 >
-                  <Marker coordinate={coords} />
-                </MapView>
-              </TouchableOpacity>
-            ) : geoError ? null : (
-              <View style={[styles.map, { justifyContent: "center", alignItems: "center" }]}>
-                <Text style={{ color: "#fff", opacity: 0.8, fontFamily: "Inter" }}>
-                  {t("taskerTaskDetails.locating") || "Locating on map…"}
+                  <MapView
+                    style={styles.map}
+                    initialRegion={{
+                      latitude: coords.latitude,
+                      longitude: coords.longitude,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
+                    }}
+                    pointerEvents="none"
+                  >
+                    <Marker coordinate={coords} />
+                  </MapView>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={[styles.mapContainer, styles.mapLoading]}>
+                <Text style={styles.mapLoadingText}>
+                  {geoError ? "Location unavailable" : "No location data available for this task"}
                 </Text>
               </View>
             )}
@@ -503,8 +562,6 @@ const styles = StyleSheet.create({
     paddingBottom: 0, // let green sheet own the bottom
   },
   
-  
-
   topContent: { marginTop: 10, marginBottom: 16 },
   topRow: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
@@ -569,10 +626,31 @@ const styles = StyleSheet.create({
     marginLeft: I18nManager.isRTL ? 8 : 0,
   },
 
+  // Map container below location text
+  mapContainer: {
+    marginTop: 12,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
   map: {
     width: "100%",
     height: 180,
-    backgroundColor: "#e6e6e6",
+  },
+  mapLoading: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  mapLoadingText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
   },
 
   input: {

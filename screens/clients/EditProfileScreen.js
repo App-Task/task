@@ -8,13 +8,14 @@ import {
   TouchableOpacity,
   I18nManager,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { fetchCurrentUser, updateUserProfile } from "../../services/auth";
 import CountryPicker from "react-native-country-picker-modal";
-
-
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import * as SecureStore from "expo-secure-store";
 
@@ -98,32 +99,36 @@ export default function EditProfileScreen({ navigation }) {
   
   
   return (
-    <View style={styles.wrapper}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
       >
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-            <Ionicons
-              name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-              size={24}
-              color="#215433"
-            />
-          </TouchableOpacity>
-          <Text style={styles.title}>{t("clientEditProfile.title")}</Text>
-          <View style={{ width: 24 }} />
-        </View>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.header}>
+            <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+              <Ionicons
+                name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+                size={24}
+                color="#215433"
+              />
+            </TouchableOpacity>
+            <Text style={styles.title}>{t("clientEditProfile.title")}</Text>
+            <View style={{ width: 24 }} />
+          </View>
   
-        <TextInput
-          style={styles.input}
-          placeholder="Name"
-          placeholderTextColor="#999"
-          value={name}
-          onChangeText={setName}
-          textAlign={I18nManager.isRTL ? "right" : "left"}
-          maxLength={50}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            placeholderTextColor="#999"
+            value={name}
+            onChangeText={setName}
+            textAlign={I18nManager.isRTL ? "right" : "left"}
+            maxLength={50}
+          />
 <TextInput
   style={[styles.input, { color: "#999" }]} // Optional: gray text to show it's disabled
   placeholder="Email"
@@ -168,7 +173,8 @@ export default function EditProfileScreen({ navigation }) {
           <Text style={styles.buttonText}>{t("clientEditProfile.save")}</Text>
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }  
 const styles = StyleSheet.create({
@@ -184,7 +190,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 60,
+    paddingTop: 20,
     marginBottom: 30,
   },
   backBtn: {
@@ -217,10 +223,6 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontFamily: "InterBold",
     fontSize: 16,
-  },
-  wrapper: {
-    flex: 1,
-    backgroundColor: "#ffffff", // 🔥 fixes full screen background
   },
   phoneContainer: {
     flexDirection: "row",

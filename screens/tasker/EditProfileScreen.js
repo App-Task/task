@@ -8,6 +8,8 @@ import {
   I18nManager,
   Alert,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,7 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { getToken } from "../../services/authStorage";
 import CountryPicker from "react-native-country-picker-modal";
 import i18n from "i18next";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function EditProfileScreen() {
@@ -147,90 +149,97 @@ const [rawPhone, setRawPhone] = useState("");
   
   
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* ✅ Top Back Button */}
-      <View style={styles.headerRow}>
-  <TouchableOpacity
-    style={[
-      styles.backButton,
-      isRTL ? { right: 0, left: undefined } : { left: 0, right: undefined }
-    ]}
-    onPress={() => navigation.goBack()}
-  >
-<Ionicons
-  name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-  size={24}
-  color="#215433"
-/>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={styles.container}>
+          {/* ✅ Top Back Button */}
+          <View style={styles.headerRow}>
+      <TouchableOpacity
+        style={[
+          styles.backButton,
+          isRTL ? { right: 0, left: undefined } : { left: 0, right: undefined }
+        ]}
+        onPress={() => navigation.goBack()}
+      >
+    <Ionicons
+      name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+      size={24}
+      color="#215433"
+    />
 
 
-  </TouchableOpacity>
+      </TouchableOpacity>
 
-  <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>
-</View>
-
-
-<Text style={{ fontSize: 16, fontWeight: "bold", color: "#215433", marginBottom: 20, textAlign: I18nManager.isRTL ? "right" : "left" }}>
-  {t("taskerEditProfile.instruction")}
-</Text>
+      <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>
+    </View>
 
 
+    <Text style={{ fontSize: 16, fontWeight: "bold", color: "#215433", marginBottom: 20, textAlign: I18nManager.isRTL ? "right" : "left" }}>
+      {t("taskerEditProfile.instruction")}
+    </Text>
 
 
-      {/* Inputs */}
-      <TextInput
-  style={styles.input}
-  value={name}
-  onChangeText={setName}
-  placeholder={t("taskerEditProfile.name") || "Name"}
-  textAlign={I18nManager.isRTL ? "right" : "left"}
-  placeholderTextColor="#999"
-  maxLength={50} // ✅ add this line
-/>
 
-      <TextInput style={styles.input} value={email} editable={false} placeholder={t("taskerEditProfile.email") || "Email"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
-      <View style={styles.phoneContainer}>
-  <View style={styles.countryPickerWrapper}>
-    <CountryPicker
-      countryCode={countryCode}
-      withFilter
-      withFlag
-      withCallingCodeButton
-      withCountryNameButton={false} // ✅ hides country name
-      withEmoji
-      onSelect={(country) => {
-        setCountryCode(country.cca2);
-        setCallingCode("+" + country.callingCode[0]);
-      }}
+
+          {/* Inputs */}
+          <TextInput
+    style={styles.input}
+    value={name}
+    onChangeText={setName}
+    placeholder={t("taskerEditProfile.name") || "Name"}
+    textAlign={I18nManager.isRTL ? "right" : "left"}
+    placeholderTextColor="#999"
+    maxLength={50} // ✅ add this line
+  />
+
+          <TextInput style={styles.input} value={email} editable={false} placeholder={t("taskerEditProfile.email") || "Email"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+          <View style={styles.phoneContainer}>
+    <View style={styles.countryPickerWrapper}>
+      <CountryPicker
+        countryCode={countryCode}
+        withFilter
+        withFlag
+        withCallingCodeButton
+        withCountryNameButton={false} // ✅ hides country name
+        withEmoji
+        onSelect={(country) => {
+          setCountryCode(country.cca2);
+          setCallingCode("+" + country.callingCode[0]);
+        }}
+      />
+    </View>
+    <TextInput
+      style={styles.phoneInput}
+      value={rawPhone}
+      onChangeText={setRawPhone}
+      keyboardType="phone-pad"
+      placeholder={t("register.phone") || "Phone Number"}
+      placeholderTextColor="#999"
     />
   </View>
-  <TextInput
-    style={styles.phoneInput}
-    value={rawPhone}
-    onChangeText={setRawPhone}
-    keyboardType="phone-pad"
-    placeholder={t("register.phone") || "Phone Number"}
-    placeholderTextColor="#999"
-  />
-</View>
 
 
-      <TextInput style={styles.input} value={gender} onChangeText={setGender} placeholder={t("taskerEditProfile.gender") || "Gender"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
-      <TextInput style={styles.input} value={location} onChangeText={setLocation} placeholder={t("taskerEditProfile.location") || "Location"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
-      <TextInput style={styles.input} value={experience} onChangeText={setExperience} placeholder={t("taskerEditProfile.experience") || "Experience"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
-      <TextInput style={styles.input} value={skills} onChangeText={setSkills} placeholder={t("taskerEditProfile.skills") || "Skills"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
-      <TextInput style={[styles.input, styles.textarea]} value={about} onChangeText={setAbout} placeholder={t("taskerEditProfile.about") || "About"} textAlign={I18nManager.isRTL ? "right" : "left"} textAlignVertical="top" placeholderTextColor="#999" multiline maxLength={150} />
+          <TextInput style={styles.input} value={gender} onChangeText={setGender} placeholder={t("taskerEditProfile.gender") || "Gender"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+          <TextInput style={styles.input} value={location} onChangeText={setLocation} placeholder={t("taskerEditProfile.location") || "Location"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+          <TextInput style={styles.input} value={experience} onChangeText={setExperience} placeholder={t("taskerEditProfile.experience") || "Experience"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+          <TextInput style={styles.input} value={skills} onChangeText={setSkills} placeholder={t("taskerEditProfile.skills") || "Skills"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
+          <TextInput style={[styles.input, styles.textarea]} value={about} onChangeText={setAbout} placeholder={t("taskerEditProfile.about") || "About"} textAlign={I18nManager.isRTL ? "right" : "left"} textAlignVertical="top" placeholderTextColor="#999" multiline maxLength={150} />
 
-      <TouchableOpacity style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>{t("taskerEditProfile.save")}</Text>
-      </TouchableOpacity>
-    </ScrollView>
+          <TouchableOpacity style={styles.button} onPress={handleSave}>
+            <Text style={styles.buttonText}>{t("taskerEditProfile.save")}</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#ffffff",
-    paddingTop: 60,
+    paddingTop: 20,
     paddingBottom: 40,
     paddingHorizontal: 24,
     flex: 1,

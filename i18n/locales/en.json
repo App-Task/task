@@ -106,7 +106,12 @@
     "missingTitle": "Incomplete",
     "missingFields": "Please fill all the fields to continue.",
     "updatedTitle": "Task Updated",
-    "updatedMessage": "Your task has been successfully updated."
+    "updatedMessage": "Your task has been successfully updated.",
+    "placeholders": {
+      "title": "Enter task title (max 15 chars)",
+      "description": "Describe the task (max 150 chars)",
+      "price": "Enter your budget ({{currency}})"
+    }
   },
   "clientHome": {
     "greeting": "Hi {{name}},",
@@ -196,7 +201,16 @@
     "limitTitle": "Image Limit Reached",
     "limitMsg": "You can upload a maximum of 3 images.",
     "missingTitle": "Missing Information",
-    "fillAllFields": "Please fill all fields to continue.",
+    "fillAllFields": "Please fill out all required fields.",
+    "addressFields": {
+      "houseNumber": "House/Building Number",
+      "streetName": "Street Name",
+      "city": "City",
+      "state": "State/Province (Optional)",
+      "zipCode": "ZIP/Postal Code (Optional)"
+    },
+    "addressSectionTitle": "Address Details",
+    "budgetSectionTitle": "Budget",
     "successTitle": "Task Posted",
     "successMessage": "Your task has been successfully posted.",
    "categories": {

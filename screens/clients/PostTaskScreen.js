@@ -68,7 +68,11 @@ export default function PostTaskScreen() {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
+  const [houseNumber, setHouseNumber] = useState("");
+  const [streetName, setStreetName] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zipCode, setZipCode] = useState("");
   const [budget, setBudget] = useState("");
   const [images, setImages] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -80,14 +84,14 @@ export default function PostTaskScreen() {
   const [categoryError, setCategoryError] = useState(false);
   const [titleError, setTitleError] = useState(false);
   const [descError, setDescError] = useState(false);
-  const [locationError, setLocationError] = useState(false);
+  const [houseNumberError, setHouseNumberError] = useState(false);
+  const [streetNameError, setStreetNameError] = useState(false);
+  const [cityError, setCityError] = useState(false);
   const [budgetError, setBudgetError] = useState(false);
-  const [coordsError, setCoordsError] = useState(false);
   const insets = useSafeAreaInsets();
 
 
   const [coords, setCoords] = useState(null); // { latitude, longitude }
-  const [gettingLoc, setGettingLoc] = useState(false);
 
 const [mapVisible, setMapVisible] = useState(false);
 const [tempCoords, setTempCoords] = useState(null);   // used inside the modal
@@ -97,49 +101,42 @@ const [tempRegion, setTempRegion] = useState(null);   // MapView region while ed
 
 
 
-// Helper: reverse geocode and set the address field
-const applyReverseGeocode = async (lat, lng) => {
-  try {
-    const placemarks = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
-    if (placemarks?.length) {
-      const p = placemarks[0];
-      const nice = [p.name, p.street, p.subregion, p.city, p.region, p.country]
-        .filter(Boolean)
-        .join(", ");
-      setLocation(nice || `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
-    } else {
-      setLocation(`${lat.toFixed(5)}, ${lng.toFixed(5)}`);
-    }
-  } catch {
-    setLocation(`${lat.toFixed(5)}, ${lng.toFixed(5)}`);
-  }
-};
-
-// Open the map picker; if no coords yet, get current location first
-const openMapPicker = async () => {
-  try {
-    // ✅ show UI immediately so safe-area applies on first open
-    setMapVisible(true);
-
-    if (!coords) {
+// Get current location automatically when component mounts
+React.useEffect(() => {
+  const getCurrentLocation = async () => {
+    try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert(t("clientPostTask.permissionNeeded"), t("clientPostTask.mapPermissionMessage"));
+        Alert.alert("Permission Needed", "Location permission is required to show your current location.");
         return;
       }
+      
       const pos = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
+      
       const { latitude, longitude } = pos.coords;
       setCoords({ latitude, longitude });
-      setTempCoords({ latitude, longitude });
       setTempRegion({
         latitude,
         longitude,
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       });
-    } else {
+    } catch (e) {
+      console.log("get location error", e);
+      Alert.alert("Error", "Could not get your current location.");
+    }
+  };
+  
+  getCurrentLocation();
+}, []);
+
+// Open the map picker
+const openMapPicker = async () => {
+  try {
+    setMapVisible(true);
+    if (coords) {
       setTempCoords(coords);
       setTempRegion({
         latitude: coords.latitude,
@@ -158,8 +155,6 @@ const openMapPicker = async () => {
 const confirmMapLocation = async () => {
   if (!tempCoords) return;
   setCoords(tempCoords);
-  setCoordsError(false); // Clear error when coordinates are set
-  await applyReverseGeocode(tempCoords.latitude, tempCoords.longitude);
   setMapVisible(false);
 };
 
@@ -196,11 +191,25 @@ if (!description) {
   setDescError(false);
 }
 
-if (!location) {
-  setLocationError(true);
+if (!houseNumber) {
+  setHouseNumberError(true);
   errorFlag = true;
 } else {
-  setLocationError(false);
+  setHouseNumberError(false);
+}
+
+if (!streetName) {
+  setStreetNameError(true);
+  errorFlag = true;
+} else {
+  setStreetNameError(false);
+}
+
+if (!city) {
+  setCityError(true);
+  errorFlag = true;
+} else {
+  setCityError(false);
 }
 
 if (!budget) {
@@ -218,10 +227,8 @@ if (!selectedCategory) {
 }
 
 if (!coords || !coords.latitude || !coords.longitude) {
-  setCoordsError(true);
-  errorFlag = true;
-} else {
-  setCoordsError(false);
+  Alert.alert("Location Required", "Please select a location using the map.");
+  return;
 }
 
 if (errorFlag) {
@@ -243,11 +250,16 @@ if (errorFlag) {
         Alert.alert(t("clientPostTask.errorTitle"), t("clientPostTask.userNotLoggedIn"));
         return;
       }
+
+      // Combine address fields into a single location string
+      const fullLocation = [houseNumber, streetName, city, state, zipCode]
+        .filter(Boolean)
+        .join(", ");
   
       const taskData = {
         title,
         description,
-        location, // human-readable string shown in input
+        location: fullLocation, // human-readable string shown in input
         budget: parseFloat(budget),
         category: selectedCategory,
         images,
@@ -294,7 +306,11 @@ if (errorFlag) {
   
       setTitle("");
       setDescription("");
-      setLocation("");
+      setHouseNumber("");
+      setStreetName("");
+      setCity("");
+      setState("");
+      setZipCode("");
       setBudget("");
       setImages([]);
       setSelectedCategory(null);
@@ -429,6 +445,27 @@ if (errorFlag) {
 
         <Text style={styles.heading}>{t("clientPostTask.title")}</Text>
 
+        {/* Map at the top */}
+        {coords && (
+          <View style={styles.mapContainer}>
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+              pointerEvents="none"
+            >
+              <Marker coordinate={coords} />
+            </MapView>
+            <TouchableOpacity style={styles.editLocationButton} onPress={openMapPicker}>
+              <Text style={styles.editLocationText}>Edit Location on Map</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         <View style={styles.formContainer}>
   <TextInput
       style={[styles.input, titleError && { borderColor: "#c00", borderWidth: 2 }]}
@@ -472,141 +509,59 @@ if (errorFlag) {
         : t("clientPostTask.selectCategory")}
     </Text>
   </TouchableOpacity>
+
+  {/* Address fields */}
+  <Text style={styles.sectionTitle}>{t("clientPostTask.addressSectionTitle")}</Text>
+  
   <TextInput
-  style={[styles.input, locationError && { borderColor: "#c00", borderWidth: 2 }]}
-  placeholder={t("clientPostTask.enterAddress")}
-  placeholderTextColor="#999"
-  value={location}
-  onChangeText={setLocation}
-  onBlur={async () => {
-    // When the user types an address manually, geocode it to set coords
-    try {
-      if (!location) return;
-      // If user pasted "lat,lng" set coords directly
-      const match = location.match(/-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?/);
-      if (match) {
-        const [lat, lng] = match[0].split(",").map(v => parseFloat(v.trim()));
-        if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
-          setCoords({ latitude: lat, longitude: lng });
-          setCoordsError(false); // Clear error when coordinates are set
-          return;
-        }
-      }
-      const res = await Location.geocodeAsync(location);
-      if (res && res[0]) {
-        setCoords({ latitude: res[0].latitude, longitude: res[0].longitude });
-        setCoordsError(false); // Clear error when coordinates are set
-      }
-    } catch (e) {
-      // ignore; user can still pick on map
-    }
-  }}
-  textAlign={I18nManager.isRTL ? "right" : "left"}
-/>
+    style={[styles.input, houseNumberError && { borderColor: "#c00", borderWidth: 2 }]}
+    placeholder={t("clientPostTask.addressFields.houseNumber")}
+    placeholderTextColor="#999"
+    value={houseNumber}
+    onChangeText={setHouseNumber}
+    maxLength={20}
+    textAlign={I18nManager.isRTL ? "right" : "left"}
+  />
 
-  {coordsError && (
-    <Text style={styles.errorText}>
-      {t("clientPostTask.locationRequired", "Please select a location on Google Maps")}
-    </Text>
-  )}
-  
-  {/* Location buttons with equal spacing */}
-  <View style={[styles.locationButtonsContainer, coordsError && { borderColor: "#c00", borderWidth: 2, borderRadius: 10, padding: 8 }]}>
-    <TouchableOpacity
-      style={[styles.locationButton, coordsError && { borderColor: "#c00", borderWidth: 1 }]}
-      onPress={async () => {
-        try {
-          setGettingLoc(true);
-          const { status } = await Location.requestForegroundPermissionsAsync();
-          if (status !== "granted") {
-            Alert.alert(t("clientPostTask.permissionNeeded"), t("clientPostTask.locationPermissionMessage"));
-            return;
-          }
-    
-          const pos = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced
-          });
-    
-          const { latitude, longitude } = pos.coords;
-          setCoords({ latitude, longitude });
-          setCoordsError(false); // Clear error when coordinates are set
-    
-          // Reverse geocode to fill the address
-          const placemarks = await Location.reverseGeocodeAsync({ latitude, longitude });
-          if (placemarks?.length) {
-            const p = placemarks[0];
-            const nice = [p.name, p.street, p.subregion, p.city, p.region, p.country]
-              .filter(Boolean)
-              .join(", ");
-            setLocation(nice || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-          } else {
-            setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-          }
-        } catch (e) {
-          console.log("get location error", e);
-          Alert.alert(t("clientPostTask.errorTitle"), t("clientPostTask.locationError"));
-        } finally {
-          setGettingLoc(false);
-        }
-      }}
-    >
-      <Text style={styles.locationButtonText}>
-        {gettingLoc ? t("clientPostTask.locating") : t("clientPostTask.useCurrentLocation")}
-      </Text>
-    </TouchableOpacity>
-    
-    <TouchableOpacity
-      style={[styles.locationButton, coordsError && { borderColor: "#c00", borderWidth: 1 }]}
-      onPress={openMapPicker}
-    >
-      <Text style={styles.locationButtonText}>{t("clientPostTask.selectOnMap")}</Text>
-    </TouchableOpacity>
-  </View>
-  
-  {/* Map preview if coordinates are set */}
-  {coords && (
-  <View style={styles.mapPreviewContainer}>
-    <View style={styles.mapPreview}>
-      <MapView
-        style={{ flex: 1 }}
-        pointerEvents="none"
-        region={{
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-      >
-        <Marker coordinate={coords} />
-      </MapView>
-    </View>
+  <TextInput
+    style={[styles.input, streetNameError && { borderColor: "#c00", borderWidth: 2 }]}
+    placeholder={t("clientPostTask.addressFields.streetName")}
+    placeholderTextColor="#999"
+    value={streetName}
+    onChangeText={setStreetName}
+    maxLength={100}
+    textAlign={I18nManager.isRTL ? "right" : "left"}
+  />
 
-    <TouchableOpacity
-      style={styles.editLocationButton}
-      onPress={openMapPicker}
-    >
-      <Text style={styles.editLocationText}>{t("clientPostTask.editLocation")}</Text>
-    </TouchableOpacity>
+  <TextInput
+    style={[styles.input, cityError && { borderColor: "#c00", borderWidth: 2 }]}
+    placeholder={t("clientPostTask.addressFields.city")}
+    placeholderTextColor="#999"
+    value={city}
+    onChangeText={setCity}
+    maxLength={50}
+    textAlign={I18nManager.isRTL ? "right" : "left"}
+  />
 
-    <TouchableOpacity
-      style={[styles.editLocationButton, { marginTop: 6, backgroundColor: "#e7f0e9" }]}
-      onPress={() =>
-        openInGoogleMaps(
-          coords.latitude,
-          coords.longitude,
-          title || "Task Location"
-        )
-      }
-    >
-<Text style={styles.editLocationText}>
-  {t("clientPostTask.openInGoogleMaps")}
-</Text>
+  <TextInput
+    style={styles.input}
+    placeholder={t("clientPostTask.addressFields.state")}
+    placeholderTextColor="#999"
+    value={state}
+    onChangeText={setState}
+    maxLength={50}
+    textAlign={I18nManager.isRTL ? "right" : "left"}
+  />
 
-    </TouchableOpacity>
-  </View>
-)}
-
-
+  <TextInput
+    style={styles.input}
+    placeholder={t("clientPostTask.addressFields.zipCode")}
+    placeholderTextColor="#999"
+    value={zipCode}
+    onChangeText={setZipCode}
+    maxLength={20}
+    textAlign={I18nManager.isRTL ? "right" : "left"}
+  />
 
   <TextInput
       style={[styles.input, budgetError && { borderColor: "#c00", borderWidth: 2 }]}
@@ -985,6 +940,39 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
 
+  // Map container at the top
+  mapContainer: {
+    marginBottom: 20,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  map: {
+    width: "100%",
+    height: 200,
+  },
+  editLocationButton: {
+    paddingVertical: 12,
+    alignItems: "center",
+    backgroundColor: "#f2f2f2",
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+  },
+  editLocationText: {
+    fontSize: 14,
+    color: "#215432",
+    fontFamily: "InterBold",
+  },
+  sectionTitle: {
+    fontFamily: "InterBold",
+    fontSize: 18,
+    color: "#ffffff",
+    marginBottom: 16,
+    marginTop: 8,
+  },
+
   
 
   postingOverlay: {
@@ -1094,55 +1082,6 @@ const styles = StyleSheet.create({
     color: "#666",
     marginTop: 2,
   },
-  mapPreviewContainer: {
-    marginTop: 10,
-    borderRadius: 10,
-    overflow: "hidden",
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  mapPreview: {
-    width: "100%",
-    height: 180,
-  },
-  editLocationButton: {
-    paddingVertical: 10,
-    alignItems: "center",
-    backgroundColor: "#f2f2f2",
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-  },
-  editLocationText: {
-    fontSize: 14,
-    color: "#215432",
-    fontFamily: "InterBold",
-  },
-  locationButtonsContainer: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  locationButton: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    paddingVertical: 14,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  locationButtonText: {
-    fontFamily: "Inter",
-    fontSize: 14,
-    color: "#333",
-  },
-  imagePreviewContainer: {
-    marginTop: 8,
-    marginBottom: 8,
-  },
-
-  
   modalHeaderRow: {
     flexDirection: "row",
     alignItems: "center",

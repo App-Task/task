@@ -49,67 +49,65 @@ export default function EditTaskScreen({ route, navigation }) {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
+  const [houseNumber, setHouseNumber] = useState("");
+  const [streetName, setStreetName] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zipCode, setZipCode] = useState("");
   const [price, setPrice] = useState("");
   const [loading, setLoading] = useState(true);
 
   // Location-related state
   const [coords, setCoords] = useState(null);
-  const [gettingLoc, setGettingLoc] = useState(false);
   const [mapVisible, setMapVisible] = useState(false);
   const [tempCoords, setTempCoords] = useState(null);
   const [tempRegion, setTempRegion] = useState(null);
-  const [coordsError, setCoordsError] = useState(false);
 
   const [errors, setErrors] = useState({
     title: false,
     description: false,
-    location: false,
+    houseNumber: false,
+    streetName: false,
+    city: false,
     price: false,
   });
 
-  // Helper: reverse geocode and set the address field
-  const applyReverseGeocode = async (lat, lng) => {
-    try {
-      const placemarks = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
-      if (placemarks?.length) {
-        const p = placemarks[0];
-        const nice = [p.name, p.street, p.subregion, p.city, p.region, p.country]
-          .filter(Boolean)
-          .join(", ");
-        setLocation(nice || `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
-      } else {
-        setLocation(`${lat.toFixed(5)}, ${lng.toFixed(5)}`);
-      }
-    } catch {
-      setLocation(`${lat.toFixed(5)}, ${lng.toFixed(5)}`);
-    }
-  };
-
-  // Open the map picker; if no coords yet, get current location first
-  const openMapPicker = async () => {
-    try {
-      setMapVisible(true);
-
-      if (!coords) {
+  // Get current location automatically when component mounts
+  useEffect(() => {
+    const getCurrentLocation = async () => {
+      try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
-          Alert.alert("Permission Needed", "Location permission is required to select a location on the map.");
+          Alert.alert("Permission Needed", "Location permission is required to show your current location.");
           return;
         }
+        
         const pos = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
         });
+        
         const { latitude, longitude } = pos.coords;
         setCoords({ latitude, longitude });
-        setTempCoords({ latitude, longitude });
         setTempRegion({
           latitude,
           longitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         });
-      } else {
+      } catch (e) {
+        console.log("get location error", e);
+        Alert.alert("Error", "Could not get your current location.");
+      }
+    };
+    
+    getCurrentLocation();
+  }, []);
+
+  // Open the map picker
+  const openMapPicker = async () => {
+    try {
+      setMapVisible(true);
+      if (coords) {
         setTempCoords(coords);
         setTempRegion({
           latitude: coords.latitude,
@@ -128,8 +126,6 @@ export default function EditTaskScreen({ route, navigation }) {
   const confirmMapLocation = async () => {
     if (!tempCoords) return;
     setCoords(tempCoords);
-    setCoordsError(false);
-    await applyReverseGeocode(tempCoords.latitude, tempCoords.longitude);
     setMapVisible(false);
   };
 
@@ -139,16 +135,43 @@ export default function EditTaskScreen({ route, navigation }) {
         const task = await getTaskById(taskId);
         setTitle(task.title || "");
         setDescription(task.description || "");
-        setLocation(task.location || "");
+        
+        // Parse existing location into separate fields if available
+        if (task.location) {
+          // Try to parse existing location string into components
+          const locationParts = task.location.split(',').map(part => part.trim());
+          if (locationParts.length >= 3) {
+            setHouseNumber(locationParts[0] || "");
+            setStreetName(locationParts[1] || "");
+            setCity(locationParts[2] || "");
+            if (locationParts.length >= 4) setState(locationParts[3] || "");
+            if (locationParts.length >= 5) setZipCode(locationParts[4] || "");
+          } else {
+            // Fallback: put everything in street name
+            setStreetName(task.location);
+          }
+        }
+        
         setPrice(task.budget?.toString() || "");
         
         // Load coordinates from existing task
         if (task.latitude && task.longitude) {
           setCoords({ latitude: task.latitude, longitude: task.longitude });
+          setTempRegion({
+            latitude: task.latitude,
+            longitude: task.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
         } else if (task.locationGeo?.coordinates) {
-          setCoords({ 
-            latitude: task.locationGeo.coordinates[1], 
-            longitude: task.locationGeo.coordinates[0] 
+          const lat = task.locationGeo.coordinates[1];
+          const lng = task.locationGeo.coordinates[0];
+          setCoords({ latitude: lat, longitude: lng });
+          setTempRegion({
+            latitude: lat,
+            longitude: lng,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
           });
         }
       } catch (err) {
@@ -164,8 +187,11 @@ export default function EditTaskScreen({ route, navigation }) {
     const newErrors = {
       title: !title.trim(),
       description: !description.trim(),
-      location: !location.trim(),
+      houseNumber: !houseNumber.trim(),
+      streetName: !streetName.trim(),
+      city: !city.trim(),
       price: !price.trim(),
+      // Note: state and zipCode remain optional
     };
 
     setErrors(newErrors);
@@ -177,16 +203,20 @@ export default function EditTaskScreen({ route, navigation }) {
 
     // Check if coordinates are set
     if (!coords || !coords.latitude || !coords.longitude) {
-      setCoordsError(true);
-      Alert.alert("Location Required", "Please select a location using the map or current location.");
+      Alert.alert("Location Required", "Please select a location using the map.");
       return;
     }
+
+    // Combine address fields into a single location string
+    const fullLocation = [houseNumber, streetName, city, state, zipCode]
+      .filter(Boolean)
+      .join(", ");
 
     try {
       await updateTaskById(taskId, {
         title,
         description,
-        location,
+        location: fullLocation,
         budget: price,
         latitude: coords.latitude,
         longitude: coords.longitude,
@@ -209,8 +239,8 @@ export default function EditTaskScreen({ route, navigation }) {
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={80}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
         {/* Header */}
         <View style={styles.headerRow}>
@@ -221,170 +251,157 @@ export default function EditTaskScreen({ route, navigation }) {
 
         <Text style={styles.heading}>{t("clientEditTask.heading")}</Text>
 
-        {/* Key the ScrollView to language so placeholders refresh on switch */}
-        <ScrollView key={i18n.language} contentContainerStyle={styles.container}>
-          <TextInput
-            style={[styles.input, dirStyle, errors.title && styles.errorInput]}
-            placeholder={t("clientEditTask.placeholders.title")}
-            value={title}
-            onChangeText={(text) => {
-              setTitle(text);
-              if (errors.title && text.trim()) {
-                setErrors((prev) => ({ ...prev, title: false }));
-              }
-            }}
-            maxLength={30}
-            placeholderTextColor="#999"
-          />
-
-          <TextInput
-            style={[styles.input, styles.textarea, dirStyle, errors.description && styles.errorInput]}
-            placeholder={t("clientEditTask.placeholders.description")}
-            value={description}
-            onChangeText={(text) => {
-              setDescription(text);
-              if (errors.description && text.trim()) {
-                setErrors((prev) => ({ ...prev, description: false }));
-              }
-            }}
-            multiline
-            maxLength={150}
-            placeholderTextColor="#999"
-          />
-
-          <TextInput
-            style={[styles.input, dirStyle, errors.location && styles.errorInput]}
-            placeholder={t("clientEditTask.placeholders.location")}
-            value={location}
-            onChangeText={(text) => {
-              setLocation(text);
-              if (errors.location && text.trim()) {
-                setErrors((prev) => ({ ...prev, location: false }));
-              }
-            }}
-            maxLength={100}
-            placeholderTextColor="#999"
-            onBlur={async () => {
-              // When the user types an address manually, geocode it to set coords
-              try {
-                if (!location) return;
-                // If user pasted "lat,lng" set coords directly
-                const match = location.match(/-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?/);
-                if (match) {
-                  const [lat, lng] = match[0].split(",").map(v => parseFloat(v.trim()));
-                  if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
-                    setCoords({ latitude: lat, longitude: lng });
-                    setCoordsError(false);
-                    return;
-                  }
-                }
-                const res = await Location.geocodeAsync(location);
-                if (res && res[0]) {
-                  setCoords({ latitude: res[0].latitude, longitude: res[0].longitude });
-                  setCoordsError(false);
-                }
-              } catch (e) {
-                // ignore; user can still pick on map
-              }
-            }}
-          />
-
-          {coordsError && (
-            <Text style={styles.errorText}>
-              Please select a location on Google Maps
-            </Text>
-          )}
-
-          {/* Location buttons with equal spacing */}
-          <View style={styles.locationButtonsContainer}>
-            <TouchableOpacity
-              style={styles.locationButton}
-              onPress={async () => {
-                try {
-                  setGettingLoc(true);
-                  const { status } = await Location.requestForegroundPermissionsAsync();
-                  if (status !== "granted") {
-                    Alert.alert("Permission Needed", "Location permission is required to use your current location.");
-                    return;
-                  }
-            
-                  const pos = await Location.getCurrentPositionAsync({
-                    accuracy: Location.Accuracy.Balanced
-                  });
-            
-                  const { latitude, longitude } = pos.coords;
-                  setCoords({ latitude, longitude });
-                  setCoordsError(false);
-            
-                  // Reverse geocode to fill the address
-                  const placemarks = await Location.reverseGeocodeAsync({ latitude, longitude });
-                  if (placemarks?.length) {
-                    const p = placemarks[0];
-                    const nice = [p.name, p.street, p.subregion, p.city, p.region, p.country]
-                      .filter(Boolean)
-                      .join(", ");
-                    setLocation(nice || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-                  } else {
-                    setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-                  }
-                } catch (e) {
-                  console.log("get location error", e);
-                  Alert.alert("Error", "Could not get your current location.");
-                } finally {
-                  setGettingLoc(false);
-                }
-              }}
-            >
-              <Text style={styles.locationButtonText}>
-                {gettingLoc ? "Locating..." : "Use Current Location"}
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={styles.locationButton}
-              onPress={openMapPicker}
-            >
-              <Text style={styles.locationButtonText}>Edit Location</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Map preview if coordinates are set */}
+        {/* ScrollView with all content including map */}
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Map inside the scroll view */}
           {coords && (
-            <View style={styles.mapPreviewContainer}>
-              <View style={styles.mapPreview}>
-                <MapView
-                  style={{ flex: 1 }}
-                  pointerEvents="none"
-                  region={{
-                    latitude: coords.latitude,
-                    longitude: coords.longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                  }}
-                >
-                  <Marker coordinate={coords} />
-                </MapView>
-              </View>
+            <View style={styles.mapContainer}>
+              <MapView
+                style={styles.map}
+                initialRegion={{
+                  latitude: coords.latitude,
+                  longitude: coords.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
+                pointerEvents="none"
+              >
+                <Marker coordinate={coords} />
+              </MapView>
+              <TouchableOpacity style={styles.editLocationButton} onPress={openMapPicker}>
+                <Text style={styles.editLocationText}>Edit Location on Map</Text>
+              </TouchableOpacity>
             </View>
           )}
 
-          <TextInput
-            style={[styles.input, dirStyle, errors.price && styles.errorInput]}
-            placeholder={t("clientEditTask.placeholders.price", { currency: "BHD" })}
-            value={price}
-            onChangeText={(text) => {
-              setPrice(text);
-              if (errors.price && text.trim()) {
-                setErrors((prev) => ({ ...prev, price: false }));
-              }
-            }}
-            keyboardType="numeric"
-            placeholderTextColor="#999"
-          />
+          {/* Form fields */}
+          <View style={styles.formContainer}>
+            <TextInput
+              style={[styles.input, dirStyle, errors.title && styles.errorInput]}
+              placeholder={t("clientEditTask.placeholders.title")}
+              value={title}
+              onChangeText={(text) => {
+                setTitle(text);
+                if (errors.title && text.trim()) {
+                  setErrors((prev) => ({ ...prev, title: false }));
+                }
+              }}
+              maxLength={30}
+              placeholderTextColor="#999"
+              returnKeyType="next"
+            />
 
-          <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-            <Text style={styles.buttonText}>{t("clientEditTask.save")}</Text>
-          </TouchableOpacity>
+            <TextInput
+              style={[styles.input, styles.textarea, dirStyle, errors.description && styles.errorInput]}
+              placeholder={t("clientEditTask.placeholders.description")}
+              value={description}
+              onChangeText={(text) => {
+                setDescription(text);
+                if (errors.description && text.trim()) {
+                  setErrors((prev) => ({ ...prev, description: false }));
+                }
+              }}
+              multiline
+              maxLength={150}
+              placeholderTextColor="#999"
+              returnKeyType="next"
+            />
+
+            {/* Address fields */}
+            <Text style={styles.sectionTitle}>{t("clientPostTask.addressSectionTitle")}</Text>
+            
+            <TextInput
+              style={[styles.input, dirStyle, errors.houseNumber && styles.errorInput]}
+              placeholder={t("clientPostTask.addressFields.houseNumber")}
+              value={houseNumber}
+              onChangeText={(text) => {
+                setHouseNumber(text);
+                if (errors.houseNumber && text.trim()) {
+                  setErrors((prev) => ({ ...prev, houseNumber: false }));
+                }
+              }}
+              maxLength={20}
+              placeholderTextColor="#999"
+              returnKeyType="next"
+            />
+
+            <TextInput
+              style={[styles.input, dirStyle, errors.streetName && styles.errorInput]}
+              placeholder={t("clientPostTask.addressFields.streetName")}
+              value={streetName}
+              onChangeText={(text) => {
+                setStreetName(text);
+                if (errors.streetName && text.trim()) {
+                  setErrors((prev) => ({ ...prev, streetName: false }));
+                }
+              }}
+              maxLength={100}
+              placeholderTextColor="#999"
+              returnKeyType="next"
+            />
+
+            <TextInput
+              style={[styles.input, dirStyle, errors.city && styles.errorInput]}
+              placeholder={t("clientPostTask.addressFields.city")}
+              value={city}
+              onChangeText={(text) => {
+                setCity(text);
+                if (errors.city && text.trim()) {
+                  setErrors((prev) => ({ ...prev, city: false }));
+                }
+              }}
+              maxLength={50}
+              placeholderTextColor="#999"
+              returnKeyType="next"
+            />
+
+            <TextInput
+              style={[styles.input, dirStyle]}
+              placeholder={t("clientPostTask.addressFields.state")}
+              value={state}
+              onChangeText={setState}
+              maxLength={50}
+              placeholderTextColor="#999"
+              returnKeyType="next"
+            />
+
+            <TextInput
+              style={[styles.input, dirStyle]}
+              placeholder={t("clientPostTask.addressFields.zipCode")}
+              value={zipCode}
+              onChangeText={setZipCode}
+              maxLength={20}
+              placeholderTextColor="#999"
+              returnKeyType="next"
+            />
+
+            {/* Budget section - separated from address */}
+            <Text style={styles.sectionTitle}>{t("clientPostTask.budgetSectionTitle")}</Text>
+            
+            <TextInput
+              style={[styles.input, dirStyle, errors.price && styles.errorInput]}
+              placeholder={t("clientEditTask.placeholders.price", { currency: "BHD" })}
+              value={price}
+              onChangeText={(text) => {
+                setPrice(text);
+                if (errors.price && text.trim()) {
+                  setErrors((prev) => ({ ...prev, price: false }));
+                }
+              }}
+              keyboardType="numeric"
+              placeholderTextColor="#999"
+              returnKeyType="done"
+            />
+
+            <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+              <Text style={styles.buttonText}>{t("clientEditTask.save")}</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
 
         {/* Map Picker Modal */}
@@ -451,20 +468,19 @@ export default function EditTaskScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   keyboardView: { flex: 1 },
-  safeArea: { flex: 1, backgroundColor: "#215432" }, // same green background
-  container: {
-    paddingTop: 20,  // slightly less because header is now separate
+  safeArea: { flex: 1, backgroundColor: "#215432" },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
     paddingBottom: 40,
-    paddingHorizontal: 24,
-    backgroundColor: "#215432",
-    minHeight: Dimensions.get("window").height,
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 24,
     marginTop: 20,
-    marginBottom: 10, // space below arrow
+    marginBottom: 10,
   },
   backBtn: {
     width: 24,
@@ -477,9 +493,43 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: "#ffffff",
     marginBottom: 30,
-    marginTop: 60, // space above heading
+    marginTop: 60,
     textAlign: "left",
-    paddingHorizontal: 24, // aligns with arrow
+    paddingHorizontal: 24,
+  },
+  // Map container inside scroll view
+  mapContainer: {
+    marginHorizontal: 24,
+    marginBottom: 20,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#ffffff",
+  },
+  map: {
+    width: "100%",
+    height: 200,
+  },
+  editLocationButton: {
+    paddingVertical: 12,
+    alignItems: "center",
+    backgroundColor: "#f2f2f2",
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+  },
+  editLocationText: {
+    fontSize: 14,
+    color: "#215432",
+    fontFamily: "InterBold",
+  },
+  formContainer: {
+    paddingHorizontal: 24,
+  },
+  sectionTitle: {
+    fontFamily: "InterBold",
+    fontSize: 18,
+    color: "#ffffff",
+    marginBottom: 16,
+    marginTop: 8,
   },
   input: {
     backgroundColor: "#ffffff",
@@ -493,7 +543,11 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 20,
   },
-  textarea: { textAlignVertical: "top", height: 120 },
+  textarea: { 
+    textAlignVertical: "top", 
+    height: 120,
+    paddingTop: 14,
+  },
   button: {
     backgroundColor: "#ffffff",
     paddingVertical: 14,
@@ -517,37 +571,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 10,
     textAlign: "center",
-  },
-  locationButtonsContainer: {
-    flexDirection: "row",
-    gap: 16,
-    marginBottom: 20,
-  },
-  locationButton: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  locationButtonText: {
-    fontFamily: "Inter",
-    fontSize: 14,
-    color: "#333",
-  },
-  mapPreviewContainer: {
-    height: 200,
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    overflow: "hidden",
-    marginBottom: 20,
-  },
-  mapPreview: {
-    flex: 1,
   },
   modalHeaderRow: {
     flexDirection: "row",

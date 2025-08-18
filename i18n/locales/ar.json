@@ -120,7 +120,12 @@
      "missingTitle": "غير مكتمل",
      "missingFields": "يرجى ملء جميع الحقول للمتابعة.",
      "updatedTitle": "تم تحديث المهمة",
-     "updatedMessage": "تم تحديث المهمة بنجاح."
+     "updatedMessage": "تم تحديث المهمة بنجاح.",
+     "placeholders": {
+       "title": "أدخل عنوان المهمة (15 حرفًا كحد أقصى)",
+       "description": "وصف المهمة (150 حرفًا كحد أقصى)",
+       "price": "أدخل ميزانيتك ({{currency}})"
+     }
    },
    "clientHome": {
      "greeting": "مرحبًا {{name}}،",
@@ -210,7 +215,16 @@
      "limitTitle": "تم الوصول للحد الأقصى",
      "limitMsg": "يمكنك تحميل 3 صور كحد أقصى.",
      "missingTitle": "معلومات ناقصة",
-     "fillAllFields": "يرجى ملء جميع الحقول للمتابعة.",
+     "fillAllFields": "يرجى ملء جميع الحقول المطلوبة.",
+     "addressFields": {
+       "houseNumber": "رقم المنزل/المبنى",
+       "streetName": "اسم الشارع",
+       "city": "المدينة",
+       "state": "الولاية/المحافظة (اختياري)",
+       "zipCode": "الرمز البريدي (اختياري)"
+     },
+     "addressSectionTitle": "تفاصيل العنوان",
+     "budgetSectionTitle": "الميزانية",
      "successTitle": "تم النشر",
      "successMessage": "تم نشر المهمة بنجاح.",
     "categories": {
