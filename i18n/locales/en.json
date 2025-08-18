@@ -383,7 +383,7 @@
     "uploadedTitle": "Uploaded",
     "uploadedMessage": "Your document has been uploaded successfully.",
     "confirmTitle": "Are you sure?",
-    "confirmMessage": "You cannot delete uploaded files. Do you want to continue?",
+    "confirmMessage": "Do you want to continue?",
     "yes": "Yes",
     "no": "No",
     "uploading": "Uploading document...",

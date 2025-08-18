@@ -405,7 +405,7 @@
      "uploadedTitle": "تم الرفع",
      "uploadedMessage": "تم رفع المستند بنجاح.",
      "confirmTitle": "هل أنت متأكد؟",
-     "confirmMessage": "لا يمكنك حذف الملفات التي تم تحميلها. هل تريد المتابعة؟",
+     "confirmMessage": "هل تريد المتابعة؟",
      "yes": "نعم",
      "no": "لا",
      "uploading": "جارٍ تحميل المستند...",
