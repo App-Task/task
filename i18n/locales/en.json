@@ -780,10 +780,6 @@
     "taskerFallbackName": "Tasker",
     "ok": "OK"
   },
-  "common": {
-    "errorTitle": "Error",
-    "ok": "OK"
-  },
 "clientEditTask": {
     "heading": "Edit Task",
     "loadError": "Failed to load task details. Please try again.",
@@ -797,6 +793,5 @@
       "location": "Address",
       "price": "Price ({{currency}})"
     }
-  },
-  "common": { "errorTitle": "Error" }
+  }
 }

@@ -801,10 +801,7 @@
      "taskerFallbackName": "مقدم الخدمة",
      "ok": "حسناً"
    },
-   "common": {
-     "errorTitle": "خطأ",
-     "ok": "حسناً"
-   },
+
    "clientEditTask": {
      "heading": "تعديل المهمة",
      "loadError": "فشل في تحميل تفاصيل المهمة. يرجى المحاولة مرة أخرى.",
@@ -818,8 +815,7 @@
        "location": "العنوان",
        "price": "السعر ({{currency}})"
      }
-   },
-   "common": { "errorTitle": "خطأ" }
-  }
+        }
+   }
   
   
