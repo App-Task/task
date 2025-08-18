@@ -18,7 +18,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { getToken } from "../../services/authStorage";
-import CountryPicker from "react-native-country-picker-modal";
 import { useNavigation } from "@react-navigation/native";
 import { fetchCurrentUser, updateUserProfile } from "../../services/auth";
 import * as ImagePicker from "expo-image-picker";
@@ -38,9 +37,6 @@ export default function CompleteTaskerProfileScreen() {
 
   const [profileImage, setProfileImage] = useState(null); // ✅ NEW
 
-  const [countryCode, setCountryCode] = useState("SA");
-  const [callingCode, setCallingCode] = useState("+966");
-  const [rawPhone, setRawPhone] = useState("");
   const [showGenderDropdown, setShowGenderDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,7 +46,6 @@ export default function CompleteTaskerProfileScreen() {
   const kbHeightRef = useRef(0);
   const positionsRef = useRef({
     name: 0,
-    phone: 0,
     experience: 0,
     skills: 0,
     about: 0,
@@ -76,17 +71,6 @@ export default function CompleteTaskerProfileScreen() {
           setAbout(user.about || "");
           if (user.profileImage) setProfileImage(user.profileImage); // ✅ load existing pfp
 
-          if (user.callingCode && user.rawPhone) {
-            setCallingCode(user.callingCode);
-            setRawPhone(user.rawPhone);
-            setCountryCode(user.countryCode || "SA");
-          } else if (user.phone) {
-            const match = user.phone.match(/^\+(\d{1,4})(.*)$/);
-            if (match) {
-              setCallingCode("+" + match[1]);
-              setRawPhone(match[2].trim());
-            }
-          }
         }
       } catch (err) {
         console.error("❌ Error fetching user data:", err.message);
@@ -210,19 +194,10 @@ export default function CompleteTaskerProfileScreen() {
   // ===========================================================================
 
   const handleSave = async () => {
-    if (!name || !gender || !location || !experience || !skills || !about || !rawPhone) {
+    if (!name || !gender || !location || !experience || !skills || !about) {
       Alert.alert(
         t("taskerCompleteProfile.incompleteTitle"),
         t("taskerCompleteProfile.incompleteMessage")
-      );
-      return;
-    }
-
-    const phoneRegex = /^[0-9]{8,15}$/;
-    if (!phoneRegex.test(rawPhone.trim())) {
-      Alert.alert(
-        t("taskerCompleteProfile.invalidPhoneTitle"),
-        t("taskerCompleteProfile.invalidPhoneMessage")
       );
       return;
     }
@@ -245,10 +220,6 @@ export default function CompleteTaskerProfileScreen() {
           skills,
           about,
           profileImage, // ✅ include current image too
-          phone: `${callingCode}${rawPhone.trim()}`,
-          callingCode,
-          rawPhone: rawPhone.trim(),
-          countryCode,
         }),
       });
 
@@ -330,40 +301,6 @@ export default function CompleteTaskerProfileScreen() {
             placeholderTextColor="#999"
             returnKeyType="next"
           />
-        </View>
-
-        <View style={styles.phoneContainer}>
-          <View style={styles.countryPickerWrapper}>
-            <CountryPicker
-              countryCode={countryCode}
-              withFilter
-              withFlag
-              withCallingCodeButton
-              withCountryNameButton={false}
-              withEmoji
-              onSelect={(country) => {
-                setCountryCode(country.cca2);
-                setCallingCode("+" + country.callingCode[0]);
-              }}
-            />
-          </View>
-          <View
-            style={{ flex: 1 }}
-            onLayout={(e) => {
-              positionsRef.current.phone = e.nativeEvent.layout.y;
-            }}
-          >
-            <TextInput
-              style={styles.phoneInput}
-              value={rawPhone}
-              onChangeText={setRawPhone}
-              onFocus={() => scrollToKey("phone")}
-              keyboardType="phone-pad"
-              placeholder={t("taskerCompleteProfile.phonePlaceholder")}
-              placeholderTextColor="#999"
-              returnKeyType="next"
-            />
-          </View>
         </View>
 
         <View style={{ marginBottom: 20 }}>
@@ -603,29 +540,6 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 16,
     color: "#ffffff",
-  },
-  phoneContainer: {
-    flexDirection: "row",
-    width: "100%",
-    backgroundColor: "#f2f2f2",
-    borderRadius: 12,
-    marginBottom: 20,
-    overflow: "hidden",
-  },
-  countryPickerWrapper: {
-    justifyContent: "center",
-    paddingHorizontal: 10,
-    backgroundColor: "#e0e0e0",
-    borderRightWidth: 1,
-    borderRightColor: "#ccc",
-  },
-  phoneInput: {
-    flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 18,
-    fontSize: 16,
-    fontFamily: "Inter",
-    color: "#333",
   },
   dropdown: {
     backgroundColor: "#f2f2f2",
