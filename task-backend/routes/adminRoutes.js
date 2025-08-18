@@ -399,7 +399,7 @@ router.get("/taskers/:id", async (req, res) => {
         phone: tasker.phone,
         profileImage: tasker.profileImage || null,
         location: tasker.location || "N/A",
-        experience: tasker.experience || "N/A",
+        skills: tasker.skills || "N/A",
         about: tasker.about || "",
         isBlocked: !!tasker.isBlocked,
         verificationStatus: tasker.verificationStatus || "pending",
