@@ -59,23 +59,30 @@ export const updateUserProfile = async (data) => {
 
 export const forgotPassword = async (email, role) => {
   try {
+    console.log(`🔍 Sending forgot password request:`, { email, role });
+    
     const response = await axios.post(`${API_URL}/forgot-password`, { email, role });
     return response.data; // always returns a generic success message
   } catch (error) {
+    console.error(`❌ Forgot password error:`, error.response?.data || error.message);
     const msg = error?.response?.data?.msg || "Something went wrong.";
     throw new Error(msg);
   }
 };
 
-export const resetPassword = async ({ email, code, newPassword }) => {
+export const resetPassword = async ({ email, code, newPassword, role }) => {
   try {
+    console.log(`🔍 Sending reset password request:`, { email, code: code ? '***' : 'missing', newPassword: newPassword ? '***' : 'missing', role });
+    
     const response = await axios.post(`${API_URL}/reset-password`, {
       email,
       code,
       newPassword,
+      role,
     });
     return response.data; // { msg: "Password updated..." }
   } catch (error) {
+    console.error(`❌ Reset password error:`, error.response?.data || error.message);
     const msg = error?.response?.data?.msg || "Reset failed.";
     throw new Error(msg);
   }

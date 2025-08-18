@@ -40,12 +40,22 @@ export default function ForgotPasswordReset({ navigation, route }) {
 
     setLoading(true);
     try {
-      await resetPassword({ email: email.trim(), code: code.trim(), newPassword });
+      console.log(`🔍 Attempting password reset for email: ${email}, role: ${roleFromRoute}`);
+      await resetPassword({ email: email.trim(), code: code.trim(), newPassword, role: roleFromRoute });
       Alert.alert(t("common.success"), t("common.passwordResetSuccess"));
       navigation.replace("Login", { role: roleFromRoute });
     } catch (err) {
       console.error("❌ Reset Password Error:", err.message);
-      Alert.alert(t("common.errorTitle"), err.response?.data?.msg || t("common.resetFailed"));
+      console.error("❌ Error details:", err.response?.data);
+      
+      let errorMessage = t("common.resetFailed");
+      if (err.response?.data?.msg) {
+        errorMessage = err.response.data.msg;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      Alert.alert(t("common.errorTitle"), errorMessage);
     } finally {
       setLoading(false);
     }

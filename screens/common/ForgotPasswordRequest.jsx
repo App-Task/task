@@ -17,11 +17,16 @@ export default function ForgotPasswordRequest({ navigation, route }) {
   const role = route?.params?.role || "client";
   const { t } = useTranslation();
 
+  // Debug logging
+  console.log(`🔍 ForgotPasswordRequest mounted with role: ${role}`);
+  console.log(`🔍 Route params:`, route?.params);
+
   const handleSendCode = async () => {
     if (!email.trim()) return Alert.alert(t("common.missingInfo"), t("common.missingFields"));
 
     setLoading(true);
     try {
+      console.log(`🔍 Sending forgot password request for email: ${email.trim().toLowerCase()}, role: ${role}`);
       await forgotPassword(email.trim().toLowerCase(), role);
       Alert.alert(t("forgotPassword.requestReceived"), t("forgotPassword.resetCodeSent"));
       navigation.navigate("ForgotPasswordReset", { email: email.trim().toLowerCase(), role });

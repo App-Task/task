@@ -190,11 +190,16 @@ router.post("/forgot-password", async (req, res) => {
 
 // ✅ Reset Password - Confirm code and set new password
 router.post("/reset-password", async (req, res) => {
-  const { email, code, newPassword } = req.body;
+  const { email, code, newPassword, role } = req.body;
   const genericError = { msg: "Invalid code or it has expired." };
 
   if (!email || !code || !newPassword) {
     return res.status(400).json({ msg: "Missing fields." });
+  }
+
+  // Validate role if provided
+  if (role && !['client', 'tasker'].includes(role.toLowerCase())) {
+    return res.status(400).json({ msg: "Invalid role specified." });
   }
 
   const strongPw = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -202,9 +207,19 @@ router.post("/reset-password", async (req, res) => {
     return res.status(400).json({ msg: "Weak password." });
   }
 
-  const user = await User.findOne({ email: email.toLowerCase() });
-  if (!user || !user.passwordResetCodeHash || !user.passwordResetExpires) {
-    return res.status(400).json(genericError);
+  // If role is provided, validate that the user has the correct role
+  const query = role ? { email: email.toLowerCase(), role: role.toLowerCase() } : { email: email.toLowerCase() };
+  console.log(`🔍 Reset password query:`, query);
+  
+  const user = await User.findOne(query);
+  console.log(`🔍 User found:`, user ? { id: user._id, email: user.email, role: user.role } : 'Not found');
+  
+  if (!user) {
+    return res.status(400).json({ msg: "User not found with the specified email and role." });
+  }
+  
+  if (!user.passwordResetCodeHash || !user.passwordResetExpires) {
+    return res.status(400).json({ msg: "No active password reset request found. Please request a new reset code." });
   }
 
   if (user.passwordResetExpires.getTime() < Date.now()) {
