@@ -36,6 +36,17 @@ const [selectedSkills, setSelectedSkills] = useState([]);
 const [about, setAbout] = useState("");
 const [descriptionY, setDescriptionY] = useState(0);
 
+// ✅ Temporary debugging to track skills changes
+useEffect(() => {
+  console.log('🔍 Skills state changed to:', selectedSkills);
+}, [selectedSkills]);
+
+// ✅ Robust skills update function
+const updateSkills = (newSkills) => {
+  console.log('🔄 Updating skills from:', selectedSkills, 'to:', newSkills);
+  setSelectedSkills([...newSkills]); // Create new array reference
+};
+
 // ✅ New phone-related state
 const [countryCode, setCountryCode] = useState("SA");
 const [callingCode, setCallingCode] = useState("+966");
@@ -55,14 +66,6 @@ const availableSkills = [
   "Shopping & Delivery",
   "Yardwork Services",
   "Dog Walking",
-  "Plumbing",
-  "Electrical",
-  "Painting",
-  "Gardening",
-  "Pet Care",
-  "Housekeeping",
-  "Cooking",
-  "Tutoring",
   "Other"
 ];
 
@@ -82,7 +85,13 @@ const availableSkills = [
           setEmail(data.email || "");
           setGender(data.gender || "");
           setLocation(data.location || "");
-          setSelectedSkills(data.skills ? (Array.isArray(data.skills) ? data.skills : data.skills.split(",").map(s => s.trim())) : []);
+          
+          // Load skills exactly like CompleteTaskerProfileScreen
+          console.log('🔄 Loading skills from backend:', data.skills);
+          const skillsArray = data.skills ? data.skills.split(",").map(s => s.trim()).filter(s => s !== "") : [];
+          console.log('🔄 Parsed skills array:', skillsArray);
+          setSelectedSkills(skillsArray);
+          
           setAbout(data.about || "");
 
 
@@ -135,7 +144,8 @@ const availableSkills = [
       keyboardDidShowListener?.remove();
       keyboardDidHideListener?.remove();
     };
-  }, [descriptionY]);
+  }, []); // ✅ Remove descriptionY dependency - only run once on mount
+
   const handleSave = async () => {
     if (!name || !gender || !location || !selectedSkills.length || !about) {
       Alert.alert(
@@ -361,7 +371,9 @@ const availableSkills = [
                     <TouchableOpacity
                       style={styles.removeSkillButton}
                       onPress={() => {
-                        setSelectedSkills(prev => prev.filter((_, i) => i !== index));
+                        const newSkills = selectedSkills.filter((_, i) => i !== index);
+                        console.log('🗑️ Removing skill at index:', index, 'Skill:', skill);
+                        updateSkills(newSkills);
                       }}
                     >
                       <Text style={styles.removeSkillText}>×</Text>
@@ -386,16 +398,16 @@ const availableSkills = [
                         selectedSkills.includes(skill) && styles.dropdownItemSelected
                       ]}
                       onPress={() => {
-                        setSelectedSkills(prev => {
-                          const newSelected = [...prev];
-                          const index = newSelected.indexOf(skill);
-                          if (index > -1) {
-                            newSelected.splice(index, 1);
-                          } else {
-                            newSelected.push(skill);
-                          }
-                          return newSelected;
-                        });
+                        const newSelected = [...selectedSkills];
+                        const index = newSelected.indexOf(skill);
+                        if (index > -1) {
+                          newSelected.splice(index, 1);
+                          console.log('➖ Removing skill:', skill);
+                        } else {
+                          newSelected.push(skill);
+                          console.log('➕ Adding skill:', skill);
+                        }
+                        updateSkills(newSelected);
                         setShowSkillsDropdown(false);
                       }}
                     >
@@ -666,6 +678,22 @@ const styles = StyleSheet.create({
     textAlign: "right",
     marginTop: 8,
     paddingRight: 16,
+  },
+
+  closeDropdownButton: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
+  },
+
+  closeDropdownText: {
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#215433",
+    fontWeight: "bold",
   },
 });
 

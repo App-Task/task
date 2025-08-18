@@ -50,14 +50,6 @@ export default function CompleteTaskerProfileScreen() {
     "Shopping & Delivery",
     "Yardwork Services",
     "Dog Walking",
-    "Plumbing",
-    "Electrical",
-    "Painting",
-    "Gardening",
-    "Pet Care",
-    "Housekeeping",
-    "Cooking",
-    "Tutoring",
     "Other"
   ];
 
