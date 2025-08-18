@@ -128,7 +128,7 @@
         <p id="email"></p>
         <p id="phone"></p>
         <p id="location"></p>
-        <p id="experience"></p>
+        <p id="skills"></p>
       </div>
     </div>
     <p><strong>Bio -</strong> <span id="bio"></span></p>
@@ -171,7 +171,7 @@ if (taskerData.verificationStatus === "accepted") {
       document.getElementById("email").textContent = "Email: " + taskerData.email;
       document.getElementById("phone").textContent = "Number: " + taskerData.phone;
       document.getElementById("location").textContent = "Location: " + taskerData.location;
-      document.getElementById("experience").textContent = "Experience: " + taskerData.experience;
+      document.getElementById("skills").textContent = "Skills: " + taskerData.skills;
       document.getElementById("bio").textContent = taskerData.about;
       document.getElementById("avatar").src =
   taskerData.profileImage || "https://via.placeholder.com/100";
