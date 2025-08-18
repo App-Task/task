@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
@@ -24,20 +25,46 @@ export default function EditProfileScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const isRTL = I18nManager.isRTL || i18n.language?.startsWith("ar");
+  const scrollRef = useRef(null);
 
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [gender, setGender] = useState("");
 const [location, setLocation] = useState("");
-const [experience, setExperience] = useState("");
-const [skills, setSkills] = useState("");
+const [selectedSkills, setSelectedSkills] = useState([]);
 const [about, setAbout] = useState("");
+const [descriptionY, setDescriptionY] = useState(0);
 
 // ✅ New phone-related state
 const [countryCode, setCountryCode] = useState("SA");
 const [callingCode, setCallingCode] = useState("+966");
 const [rawPhone, setRawPhone] = useState("");
+
+// Dropdown states
+const [showGenderDropdown, setShowGenderDropdown] = useState(false);
+const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+const [showSkillsDropdown, setShowSkillsDropdown] = useState(false);
+
+// Predefined skills list (same as CompleteTaskerProfileScreen)
+const availableSkills = [
+  "Handyman",
+  "Moving",
+  "IKEA Assembly",
+  "Cleaning",
+  "Shopping & Delivery",
+  "Yardwork Services",
+  "Dog Walking",
+  "Plumbing",
+  "Electrical",
+  "Painting",
+  "Gardening",
+  "Pet Care",
+  "Housekeeping",
+  "Cooking",
+  "Tutoring",
+  "Other"
+];
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -55,8 +82,7 @@ const [rawPhone, setRawPhone] = useState("");
           setEmail(data.email || "");
           setGender(data.gender || "");
           setLocation(data.location || "");
-          setExperience(data.experience || "");
-          setSkills(data.skills || "");
+          setSelectedSkills(data.skills ? (Array.isArray(data.skills) ? data.skills : data.skills.split(",").map(s => s.trim())) : []);
           setAbout(data.about || "");
 
 
@@ -83,9 +109,35 @@ const [rawPhone, setRawPhone] = useState("");
     };
 
     fetchProfile();
-  }, []);
+
+    // Add keyboard listeners for better handling
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => {
+        // When keyboard shows, ensure we can scroll to the description field
+        setTimeout(() => {
+          if (descriptionY > 0) {
+            scrollRef.current?.scrollTo({ y: Math.max(0, descriptionY - 150), animated: true });
+          }
+        }, 100);
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        // When keyboard hides, scroll back to top
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
+  }, [descriptionY]);
   const handleSave = async () => {
-    if (!name || !gender || !location || !experience || !skills || !about) {
+    if (!name || !gender || !location || !selectedSkills.length || !about) {
       Alert.alert(
         t("taskerEditProfile.incompleteTitle"),
         t("taskerEditProfile.incompleteMessage")
@@ -119,13 +171,12 @@ const [rawPhone, setRawPhone] = useState("");
           name,
           gender,
           location,
-          experience,
-          skills,
+          skills: selectedSkills.join(","), // ✅ convert array to comma-separated string
           about,
           phone: `${callingCode}${rawPhone.trim()}`,
+          countryCode,
           callingCode,
           rawPhone: rawPhone.trim(),
-          countryCode,
         }),
       });
   
@@ -153,8 +204,19 @@ const [rawPhone, setRawPhone] = useState("");
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        enabled={true}
       >
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView 
+          ref={scrollRef}
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
+          contentInsetAdjustmentBehavior="automatic"
+          contentInset={{ bottom: 50 }}
+          style={{ flex: 1 }}
+        >
           {/* ✅ Top Back Button */}
           <View style={styles.headerRow}>
       <TouchableOpacity
@@ -197,40 +259,199 @@ const [rawPhone, setRawPhone] = useState("");
 
           <TextInput style={styles.input} value={email} editable={false} placeholder={t("taskerEditProfile.email") || "Email"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
           <View style={styles.phoneContainer}>
-    <View style={styles.countryPickerWrapper}>
-      <CountryPicker
-        countryCode={countryCode}
-        withFilter
-        withFlag
-        withCallingCodeButton
-        withCountryNameButton={false} // ✅ hides country name
-        withEmoji
-        onSelect={(country) => {
-          setCountryCode(country.cca2);
-          setCallingCode("+" + country.callingCode[0]);
-        }}
-      />
-    </View>
-    <TextInput
-      style={styles.phoneInput}
-      value={rawPhone}
-      onChangeText={setRawPhone}
-      keyboardType="phone-pad"
-      placeholder={t("register.phone") || "Phone Number"}
-      placeholderTextColor="#999"
-    />
-  </View>
+            <View style={styles.countryPickerWrapper}>
+              <CountryPicker
+                countryCode={countryCode}
+                withFilter
+                withFlag
+                withCallingCodeButton
+                withCountryNameButton={false} // ✅ hides country name
+                withEmoji
+                onSelect={(country) => {
+                  setCountryCode(country.cca2);
+                  setCallingCode("+" + country.callingCode[0]);
+                }}
+              />
+            </View>
+            <TextInput
+              style={styles.phoneInput}
+              value={rawPhone}
+              onChangeText={setRawPhone}
+              keyboardType="phone-pad"
+              placeholder={t("register.phone") || "Phone Number"}
+              placeholderTextColor="#999"
+            />
+          </View>
 
+          {/* Gender Dropdown */}
+          <View style={{ marginBottom: 20 }}>
+            <TouchableOpacity
+              style={styles.input}
+              onPress={() => setShowGenderDropdown(!showGenderDropdown)}
+            >
+              <Text style={{ color: gender ? "#333" : "#999" }}>
+                {gender || "Select Gender"}
+              </Text>
+            </TouchableOpacity>
 
-          <TextInput style={styles.input} value={gender} onChangeText={setGender} placeholder={t("taskerEditProfile.gender") || "Gender"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
-          <TextInput style={styles.input} value={location} onChangeText={setLocation} placeholder={t("taskerEditProfile.location") || "Location"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
-          <TextInput style={styles.input} value={experience} onChangeText={setExperience} placeholder={t("taskerEditProfile.experience") || "Experience"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
-          <TextInput style={styles.input} value={skills} onChangeText={setSkills} placeholder={t("taskerEditProfile.skills") || "Skills"} textAlign={I18nManager.isRTL ? "right" : "left"} placeholderTextColor="#999" />
-          <TextInput style={[styles.input, styles.textarea]} value={about} onChangeText={setAbout} placeholder={t("taskerEditProfile.about") || "About"} textAlign={I18nManager.isRTL ? "right" : "left"} textAlignVertical="top" placeholderTextColor="#999" multiline maxLength={150} />
+            {showGenderDropdown && (
+              <View style={styles.dropdown}>
+                {["Male", "Female"].map((option) => (
+                  <TouchableOpacity
+                    key={option}
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setGender(option);
+                      setShowGenderDropdown(false);
+                    }}
+                  >
+                    <Text style={styles.dropdownText}>{option}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </View>
+
+          {/* Location Dropdown */}
+          <View style={{ marginBottom: 20 }}>
+            <TouchableOpacity
+              style={styles.input}
+              onPress={() => setShowLocationDropdown(!showLocationDropdown)}
+            >
+              <Text style={{ color: location ? "#333" : "#999" }}>
+                {location || "Select Location"}
+              </Text>
+            </TouchableOpacity>
+
+            {showLocationDropdown && (
+              <View style={styles.dropdown}>
+                {["Bahrain"].map((option) => (
+                  <TouchableOpacity
+                    key={option}
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setLocation(option);
+                      setShowLocationDropdown(false);
+                    }}
+                  >
+                    <Text style={styles.dropdownText}>{option}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </View>
+
+          {/* Skills Multi-Select Dropdown */}
+          <View style={{ marginBottom: 20 }}>
+            <TouchableOpacity
+              style={styles.input}
+              onPress={() => setShowSkillsDropdown(!showSkillsDropdown)}
+            >
+              <Text style={{ color: selectedSkills.length > 0 ? "#333" : "#999" }}>
+                {selectedSkills.length > 0 ? selectedSkills.join(", ") : "Select Skills"}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Display selected skills with remove buttons */}
+            {selectedSkills.length > 0 && (
+              <View style={styles.selectedSkillsContainer}>
+                {selectedSkills.map((skill, index) => (
+                  <View key={index} style={styles.selectedSkillItem}>
+                    <Text style={styles.selectedSkillText}>{skill}</Text>
+                    <TouchableOpacity
+                      style={styles.removeSkillButton}
+                      onPress={() => {
+                        setSelectedSkills(prev => prev.filter((_, i) => i !== index));
+                      }}
+                    >
+                      <Text style={styles.removeSkillText}>×</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {showSkillsDropdown && (
+              <View style={styles.dropdown}>
+                <ScrollView 
+                  style={styles.dropdownScrollView}
+                  showsVerticalScrollIndicator={false}
+                  nestedScrollEnabled={true}
+                >
+                  {availableSkills.map((skill) => (
+                    <TouchableOpacity
+                      key={skill}
+                      style={[
+                        styles.dropdownItem,
+                        selectedSkills.includes(skill) && styles.dropdownItemSelected
+                      ]}
+                      onPress={() => {
+                        setSelectedSkills(prev => {
+                          const newSelected = [...prev];
+                          const index = newSelected.indexOf(skill);
+                          if (index > -1) {
+                            newSelected.splice(index, 1);
+                          } else {
+                            newSelected.push(skill);
+                          }
+                          return newSelected;
+                        });
+                        setShowSkillsDropdown(false);
+                      }}
+                    >
+                      <Text style={[
+                        styles.dropdownText,
+                        selectedSkills.includes(skill) && styles.dropdownTextSelected
+                      ]}>
+                        {skill}
+                      </Text>
+                      {selectedSkills.includes(skill) && (
+                        <View style={styles.selectedIndicator}>
+                          <Ionicons name="checkmark" size={16} color="#215433" />
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+
+          {/* About/Description field with proper keyboard handling */}
+          <View 
+            style={{ marginBottom: 20 }}
+            onLayout={(e) => {
+              // Store the Y position of the description field
+              setDescriptionY(e.nativeEvent.layout.y);
+            }}
+          >
+            <TextInput 
+              style={[styles.input, styles.textarea]} 
+              value={about} 
+              onChangeText={setAbout} 
+              placeholder={t("taskerEditProfile.about") || "About"} 
+              textAlign={I18nManager.isRTL ? "right" : "left"} 
+              textAlignVertical="top" 
+              placeholderTextColor="#999" 
+              multiline 
+              maxLength={150}
+              returnKeyType="done"
+              blurOnSubmit={true}
+              onFocus={() => {
+                // The keyboard listener will handle scrolling automatically
+              }}
+            />
+            <Text style={styles.characterCount}>
+              {about.length}/150 characters
+            </Text>
+          </View>
 
           <TouchableOpacity style={styles.button} onPress={handleSave}>
             <Text style={styles.buttonText}>{t("taskerEditProfile.save")}</Text>
           </TouchableOpacity>
+
+          {/* Spacer for keyboard */}
+          <View style={{ height: 50 }} />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -240,9 +461,9 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#ffffff",
     paddingTop: 20,
-    paddingBottom: 40,
+    paddingBottom: 100, // Reduced to ensure save button is visible
     paddingHorizontal: 24,
-    flex: 1,
+    flexGrow: 1, // Changed from flex: 1 to flexGrow: 1 for proper scrolling
   },
 
   headerRow: {
@@ -271,40 +492,51 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#f8f9fa",
     borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 18,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
+    borderWidth: 1,
+    borderColor: "#e9ecef",
     marginBottom: 20,
   },
 
   textarea: {
-    height: 100,
+    height: 120,
+    textAlignVertical: "top",
   },
 
   button: {
     backgroundColor: "#215433",
-    paddingVertical: 16,
+    paddingVertical: 18,
     borderRadius: 30,
     alignItems: "center",
+    marginTop: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
 
   buttonText: {
     fontFamily: "InterBold",
-    fontSize: 16,
+    fontSize: 18,
     color: "#ffffff",
   },
 
   phoneContainer: {
     flexDirection: "row",
     width: "100%",
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#f8f9fa",
     borderRadius: 12,
     marginBottom: 20,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#e9ecef",
   },
   
   countryPickerWrapper: {
@@ -317,13 +549,124 @@ const styles = StyleSheet.create({
   
   phoneInput: {
     flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 18,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
   },
   
+  dropdown: {
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    maxHeight: 200,
+  },
+
+  dropdownItem: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f1f3f4",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  dropdownText: {
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#333",
+    flex: 1,
+  },
+
+  dropdownItemSelected: {
+    backgroundColor: "#f0f9eb", // Light green background for selected items
+    borderColor: "#a5d6a7", // Green border for selected items
+    borderWidth: 1,
+  },
+
+  dropdownTextSelected: {
+    color: "#215433", // Dark green for selected text
+    fontWeight: "bold",
+  },
+
+  selectedSkillsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+  },
+
+  selectedSkillItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#215433",
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginRight: 8,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+
+  selectedSkillText: {
+    color: "#ffffff",
+    fontFamily: "InterMedium",
+    fontSize: 14,
+    marginRight: 6,
+  },
+
+  removeSkillButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  removeSkillText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "bold",
+    lineHeight: 18,
+  },
+
+  dropdownScrollView: {
+    maxHeight: 200,
+  },
+
+  selectedIndicator: {
+    position: "absolute",
+    right: 10,
+    top: "50%",
+    transform: [{ translateY: -8 }],
+  },
+
+  characterCount: {
+    fontSize: 14,
+    color: "#999",
+    textAlign: "right",
+    marginTop: 8,
+    paddingRight: 16,
+  },
 });
 
   

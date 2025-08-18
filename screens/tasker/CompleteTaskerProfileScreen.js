@@ -31,22 +31,41 @@ export default function CompleteTaskerProfileScreen() {
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
   const [location, setLocation] = useState("");
-  const [experience, setExperience] = useState("");
-  const [skills, setSkills] = useState("");
+  const [selectedSkills, setSelectedSkills] = useState([]);
   const [about, setAbout] = useState("");
 
   const [profileImage, setProfileImage] = useState(null); // ✅ NEW
 
   const [showGenderDropdown, setShowGenderDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [showSkillsDropdown, setShowSkillsDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Predefined skills list
+  const availableSkills = [
+    "Handyman",
+    "Moving",
+    "IKEA Assembly",
+    "Cleaning",
+    "Shopping & Delivery",
+    "Yardwork Services",
+    "Dog Walking",
+    "Plumbing",
+    "Electrical",
+    "Painting",
+    "Gardening",
+    "Pet Care",
+    "Housekeeping",
+    "Cooking",
+    "Tutoring",
+    "Other"
+  ];
 
   // Refs
   const scrollRef = useRef(null);
   const kbHeightRef = useRef(0);
   const positionsRef = useRef({
     name: 0,
-    experience: 0,
     skills: 0,
     about: 0,
   });
@@ -66,8 +85,7 @@ export default function CompleteTaskerProfileScreen() {
           setName(user.name || "");
           setGender(user.gender || "");
           setLocation(user.location || "");
-          setExperience(user.experience || "");
-          setSkills(user.skills || "");
+          setSelectedSkills(user.skills ? user.skills.split(",").map(s => s.trim()) : []); // ✅ load existing skills
           setAbout(user.about || "");
           if (user.profileImage) setProfileImage(user.profileImage); // ✅ load existing pfp
 
@@ -194,7 +212,7 @@ export default function CompleteTaskerProfileScreen() {
   // ===========================================================================
 
   const handleSave = async () => {
-    if (!name || !gender || !location || !experience || !skills || !about) {
+    if (!name || !gender || !location || !selectedSkills.length || !about) {
       Alert.alert(
         t("taskerCompleteProfile.incompleteTitle"),
         t("taskerCompleteProfile.incompleteMessage")
@@ -216,8 +234,7 @@ export default function CompleteTaskerProfileScreen() {
           name,
           gender,
           location,
-          experience,
-          skills,
+          skills: selectedSkills.join(","), // ✅ include current skills
           about,
           profileImage, // ✅ include current image too
         }),
@@ -285,11 +302,17 @@ export default function CompleteTaskerProfileScreen() {
         </View>
         <Text style={styles.subText}>{t("taskerCompleteProfile.subText")}</Text>
 
+        {/* Personal Information Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Personal Information</Text>
+        </View>
+
         {/* Each field wrapped with onLayout to store its Y */}
         <View
           onLayout={(e) => {
             positionsRef.current.name = e.nativeEvent.layout.y;
           }}
+          style={{ marginBottom: 20 }}
         >
           <TextInput
             style={styles.input}
@@ -303,6 +326,7 @@ export default function CompleteTaskerProfileScreen() {
           />
         </View>
 
+        {/* Gender Dropdown */}
         <View style={{ marginBottom: 20 }}>
           <TouchableOpacity
             style={styles.input}
@@ -333,6 +357,7 @@ export default function CompleteTaskerProfileScreen() {
           )}
         </View>
 
+        {/* Location Dropdown */}
         <View style={{ marginBottom: 20 }}>
           <TouchableOpacity
             style={styles.input}
@@ -361,44 +386,101 @@ export default function CompleteTaskerProfileScreen() {
           )}
         </View>
 
-        <View
-          onLayout={(e) => {
-            positionsRef.current.experience = e.nativeEvent.layout.y;
-          }}
-        >
-          <TextInput
-            style={styles.input}
-            value={experience}
-            onChangeText={setExperience}
-            onFocus={() => scrollToKey("experience")}
-            placeholder={t("taskerCompleteProfile.experiencePlaceholder")}
-            textAlign={I18nManager.isRTL ? "right" : "left"}
-            placeholderTextColor="#999"
-            returnKeyType="next"
-          />
+        {/* Skills Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Skills & Expertise</Text>
         </View>
 
         <View
           onLayout={(e) => {
             positionsRef.current.skills = e.nativeEvent.layout.y;
           }}
+          style={{ marginBottom: 20 }}
         >
-          <TextInput
+          <TouchableOpacity
             style={styles.input}
-            value={skills}
-            onChangeText={setSkills}
-            onFocus={() => scrollToKey("skills")}
-            placeholder={t("taskerCompleteProfile.skillsPlaceholder")}
-            textAlign={I18nManager.isRTL ? "right" : "left"}
-            placeholderTextColor="#999"
-            returnKeyType="next"
-          />
+            onPress={() => setShowSkillsDropdown(!showSkillsDropdown)}
+          >
+            <Text style={{ color: selectedSkills.length > 0 ? "#333" : "#999" }}>
+              {selectedSkills.length > 0 ? selectedSkills.join(", ") : "Select Skills"}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Display selected skills with remove buttons */}
+          {selectedSkills.length > 0 && (
+            <View style={styles.selectedSkillsContainer}>
+              {selectedSkills.map((skill, index) => (
+                <View key={index} style={styles.selectedSkillItem}>
+                  <Text style={styles.selectedSkillText}>{skill}</Text>
+                  <TouchableOpacity
+                    style={styles.removeSkillButton}
+                    onPress={() => {
+                      setSelectedSkills(prev => prev.filter((_, i) => i !== index));
+                    }}
+                  >
+                    <Text style={styles.removeSkillText}>×</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {showSkillsDropdown && (
+            <View style={styles.dropdown}>
+              <ScrollView 
+                style={styles.dropdownScrollView}
+                showsVerticalScrollIndicator={false}
+                nestedScrollEnabled={true}
+              >
+                {availableSkills.map((skill) => (
+                  <TouchableOpacity
+                    key={skill}
+                    style={[
+                      styles.dropdownItem,
+                      selectedSkills.includes(skill) && styles.dropdownItemSelected
+                    ]}
+                    onPress={() => {
+                      setSelectedSkills(prev => {
+                        const newSelected = [...prev];
+                        const index = newSelected.indexOf(skill);
+                        if (index > -1) {
+                          newSelected.splice(index, 1);
+                        } else {
+                          newSelected.push(skill);
+                        }
+                        return newSelected;
+                      });
+                      setShowSkillsDropdown(false);
+                    }}
+                  >
+                    <Text style={[
+                      styles.dropdownText,
+                      selectedSkills.includes(skill) && styles.dropdownTextSelected
+                    ]}>
+                      {skill}
+                    </Text>
+                    {selectedSkills.includes(skill) && (
+                      <View style={styles.selectedIndicator}>
+                        <Ionicons name="checkmark" size={16} color="#215433" />
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+        </View>
+
+        {/* About Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>About You</Text>
         </View>
 
         <View
           onLayout={(e) => {
             positionsRef.current.about = e.nativeEvent.layout.y;
           }}
+          style={{ marginBottom: 20 }}
         >
           <TextInput
             style={[styles.input, styles.textarea]}
@@ -414,6 +496,9 @@ export default function CompleteTaskerProfileScreen() {
             returnKeyType="done"
             blurOnSubmit={true}
           />
+          <Text style={styles.characterCount}>
+            {about.length}/150 characters
+          </Text>
         </View>
 
         <TouchableOpacity style={styles.button} onPress={handleSave}>
@@ -462,7 +547,7 @@ const styles = StyleSheet.create({
   avatarWrapper: {
     position: "relative",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 24,
   },
   editIconWrapper: {
     position: "absolute",
@@ -495,66 +580,170 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     paddingTop: 60,
     paddingHorizontal: 24,
+    paddingBottom: 40,
     flexGrow: 1,
   },
   headerRow: {
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
+    marginBottom: 16,
   },
   header: {
     fontFamily: "InterBold",
-    fontSize: 22,
+    fontSize: 24,
     color: "#215433",
     textAlign: "center",
     marginTop: 4,
   },
   subText: {
-    fontSize: 14,
-    color: "#555",
+    fontSize: 16,
+    color: "#666",
     textAlign: "center",
-    marginBottom: 24,
+    marginBottom: 32,
     fontFamily: "Inter",
+    lineHeight: 22,
   },
   input: {
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#f8f9fa",
     borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 18,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
-    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
   },
   textarea: {
-    minHeight: 100,
+    minHeight: 120,
+    textAlignVertical: "top",
   },
   button: {
     backgroundColor: "#215433",
-    paddingVertical: 16,
+    paddingVertical: 18,
     borderRadius: 30,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   buttonText: {
     fontFamily: "InterBold",
-    fontSize: 16,
+    fontSize: 18,
     color: "#ffffff",
   },
   dropdown: {
-    backgroundColor: "#f2f2f2",
-    borderRadius: 8,
-    marginTop: 4,
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    maxHeight: 200,
+  },
+  dropdownScrollView: {
+    maxHeight: 200,
   },
   dropdownItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: "#f1f3f4",
+  },
+  dropdownItemSelected: {
+    backgroundColor: "#f0f9eb", // Light green background for selected items
+    borderColor: "#a5d6a7", // Green border for selected items
+    borderWidth: 1,
   },
   dropdownText: {
     fontFamily: "Inter",
     fontSize: 16,
     color: "#333",
+  },
+  dropdownTextSelected: {
+    color: "#215433", // Dark green for selected text
+    fontWeight: "bold",
+  },
+  selectedSkillsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+  },
+  selectedSkillItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#215433",
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginRight: 8,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  selectedSkillText: {
+    color: "#ffffff",
+    fontFamily: "InterMedium",
+    fontSize: 14,
+    marginRight: 6,
+  },
+  removeSkillButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  removeSkillText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "bold",
+    lineHeight: 18,
+  },
+  selectedIndicator: {
+    position: "absolute",
+    right: 10,
+    top: "50%",
+    transform: [{ translateY: -8 }],
+  },
+  sectionHeader: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+  },
+  sectionTitle: {
+    fontFamily: "InterBold",
+    fontSize: 18,
+    color: "#215433",
+    textAlign: "center",
+  },
+  characterCount: {
+    fontSize: 14,
+    color: "#999",
+    textAlign: "right",
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    fontFamily: "Inter",
   },
 });

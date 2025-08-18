@@ -153,7 +153,6 @@ const [locLoading, setLocLoading] = useState(false);
         !user.name ||
         !user.gender ||
         !user.location ||
-        !user.experience ||
         !user.skills ||
         !user.about
       ) {
