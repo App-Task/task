@@ -207,7 +207,7 @@ const res = await axios.get(url, {
                 style={styles.btn}
                 onPress={() =>
                   navigation.navigate("Chat", {
-                    name: item.user?.name || "Client",
+                    name: item.user?.name || t("common.client"),
                     otherUserId: item.user?._id || item.userId,
                   })
                 }

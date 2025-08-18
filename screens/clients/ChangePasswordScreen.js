@@ -29,8 +29,8 @@ export default function ChangePasswordScreen({ navigation }) {
   const [secure3, setSecure3] = useState(true);
 
   const handleSubmit = async () => {
-    if (!oldPass || !newPass || !confirmPass) {
-      Alert.alert("Missing fields", "Please fill in all fields.");
+    if (!oldPass.trim() || !newPass.trim() || !confirmPass.trim()) {
+      Alert.alert(t("common.missingInfo"), t("common.missingFields"));
       return;
     }
   
@@ -44,7 +44,7 @@ if (!strongPasswordRegex.test(newPass)) {
 }
 
     if (newPass !== confirmPass) {
-      Alert.alert("Mismatch", "New passwords do not match.");
+      Alert.alert(t("common.mismatch"), t("common.passwordsDoNotMatch"));
       return;
     }
   
@@ -64,12 +64,12 @@ if (!strongPasswordRegex.test(newPass)) {
         }
       );
   
-      Alert.alert("Success", res.data.msg || "Password changed successfully.");
+      Alert.alert(t("common.success"), res.data.msg || t("common.passwordChangedSuccessfully"));
       navigation.goBack();
     } catch (err) {
       const msg =
         err?.response?.data?.msg || "Something went wrong. Try again later.";
-      Alert.alert("Error", msg);
+      Alert.alert(t("common.errorTitle"), msg);
     }
   };
   

@@ -236,9 +236,8 @@ const [locLoading, setLocLoading] = useState(false);
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
-          t("common.permissionRequired") || "Permission required",
-          t("common.locationExplain") ||
-            "We need your location to sort tasks by nearest."
+          t("common.permissionRequired"),
+          t("common.locationExplain")
         );
         setSortMode("none");
         return;
@@ -253,9 +252,8 @@ const [locLoading, setLocLoading] = useState(false);
     } catch (e) {
       console.log("Location error:", e);
       Alert.alert(
-        t("common.locationError") || "Location error",
-        t("common.locationTryAgain") ||
-          "Could not get your location. Try again later."
+        t("common.locationError"),
+        t("common.locationTryAgain")
       );
       setSortMode("none");
     } finally {

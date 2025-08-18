@@ -64,14 +64,14 @@ if (!strongPasswordRegex.test(password)) {
 // ✅ Validate email format
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 if (!emailRegex.test(email.trim())) {
-  Alert.alert("Invalid Email", "Please enter a valid email address.");
+  Alert.alert(t("common.invalidEmail"), t("common.pleaseEnterValidEmail"));
   return;
 }
 
 // ✅ Validate phone number format (8–15 digits, no letters/spaces)
 const phoneRegex = /^[0-9]{8,15}$/;
 if (!phoneRegex.test(phone.trim())) {
-  Alert.alert("Invalid Phone Number", "Phone number must be 8 to 15 digits and contain only numbers.");
+  Alert.alert(t("common.invalidPhoneNumber"), t("common.phoneNumberRequirements"));
   return;
 }
 
@@ -122,7 +122,7 @@ navigation.reset({
   ],
 });
   } catch (err) {
-    Alert.alert(t("register.errorTitle"), err.message || "Something went wrong");
+    Alert.alert(t("common.errorTitle"), err.message || t("common.somethingWentWrong"));
   } finally {
     setIsRegistering(false); // ✅ hide popup
   }

@@ -33,6 +33,14 @@
     "roleConflictMessage": "This account is registered as a {{userRole}}, not a {{selectedRole}}.",
     "invalidCredentials": "Invalid credentials"
   },
+  "forgotPassword": {
+    "resetPassword": "Reset your password",
+    "enterEmail": "Enter your email",
+    "sendResetCode": "Send Reset Code",
+    "sending": "Sending...",
+    "requestReceived": "Request Received",
+    "resetCodeSent": "A password reset code has been sent to your email."
+  },
   "register": {
     "title": "Create Your Account ",
     "fullName": "Full Name",
@@ -314,14 +322,22 @@
   "editNotAllowed": "You can't edit this task because a tasker has already placed a bid."
 },
   "clientViewBids": {
-    "title": "Bids Received",
+    "title": "Task Bids",
     "chat": "Chat",
     "accept": "Accept",
-    "noBids": "No bids received yet.",
+    "acceptedLabel": "Accepted",
+    "alreadySelectedLabel": "Tasker already selected",
+    "viewProfile": "View Profile",
+    "priceOffered": "Price offered",
+    "currency": "BHD",
+    "noBids": "No bids yet.",
+    "acceptingBid": "Accepting bid...",
     "acceptedTitle": "Bid Accepted",
-    "acceptedMessage": "You have accepted {{name}}'s bid.",
-    "acceptingBid": "Accepting..."
-
+    "acceptedMessage": "{{name}} has been selected for this task.",
+    "acceptError": "Couldn't accept the bid. Please try again.",
+    "loadError": "Failed to load bids. Please try again.",
+    "taskerFallbackName": "Tasker",
+    "ok": "OK"
   },
 "clientReview": {
   "title": "Rate Your Tasker",
@@ -378,7 +394,17 @@
     "uploadFailedTitle": "Upload Failed",
     "uploadFailedMessage": "Could not upload document. Please try again.",
     "deleteFailedTitle": "Delete Failed",
-    "deleteFailedMessage": "Could not delete document."
+    "deleteFailedMessage": "Could not delete document.",
+    "chooseSourceTitle": "Upload Document",
+    "chooseSourceMessage": "Choose how you want to upload your document.",
+    "takePhoto": "Take Photo",
+    "chooseFromLibrary": "Choose from Photos",
+    "uploadAFile": "Upload File (PDF/doc)",
+    "permissionDenied": "Permission denied",
+    "cameraDeniedMsg": "Camera permission is required to take a photo.",
+    "libraryDeniedMsg": "Photo library permission is required to pick a photo.",
+    "deleteConfirmTitle": "Delete document?",
+    "deleteConfirmMessage": "Are you sure you want to delete this document?"
   },
   "taskerEditProfile": {
     "title": "Edit Profile",
@@ -669,7 +695,50 @@
     "locationAccessTitle": "Location Access",
     "locationAccessDenied": "Location permission denied.",
     "notificationsTitle": "Notifications",
-    "notificationsDenied": "Notifications permission denied."
+    "notificationsDenied": "Notifications permission denied.",
+    "permissionRequired": "Permission required",
+    "locationExplain": "We need your location to sort tasks by nearest.",
+    "locationError": "Location error",
+    "locationTryAgain": "Could not get your location. Try again later.",
+    "missingInfo": "Missing Info",
+    "missingFields": "Please fill all fields.",
+    "mismatch": "Mismatch",
+    "passwordsDoNotMatch": "Passwords do not match.",
+    "success": "Success",
+    "somethingWentWrong": "Something went wrong.",
+    "permissionNeeded": "Permission Needed",
+    "locationPermissionRequired": "Location permission is required to show your current location.",
+    "locationRequired": "Location Required",
+    "pleaseSelectLocation": "Please select a location using the map.",
+    "couldNotOpenMaps": "Could not open Google Maps on this device.",
+    "couldNotGetLocation": "Could not get your current location.",
+    "couldNotOpenMapPicker": "Could not open map picker.",
+    "invalidEmail": "Invalid Email",
+    "pleaseEnterValidEmail": "Please enter a valid email address.",
+    "invalidPhoneNumber": "Invalid Phone Number",
+    "phoneNumberRequirements": "Phone number must be 8 to 15 digits and contain only numbers.",
+    "passwordChangedSuccessfully": "Password changed successfully.",
+    "requestReceived": "Request Received",
+    "passwordResetCodeSent": "A password reset code has been sent to your email.",
+    "passwordResetSuccess": "Your password has been reset. Please log in.",
+    "resetFailed": "Reset failed.",
+    "serverError": "Server error",
+    "registrationError": "Something went wrong during registration.",
+    "loginError": "Something went wrong.",
+    "uploadFailed": "Upload failed",
+    "cameraPermissionRequired": "Camera permission is required to take a photo.",
+    "libraryPermissionRequired": "Library access is required.",
+    "takePhoto": "Take Photo",
+    "chooseFromLibrary": "Choose from Library",
+    "selectImageSource": "Choose Image Source",
+    "howToUploadImage": "How would you like to upload the image?",
+    "managePhoto": "Manage Profile Picture",
+    "chooseNewPhoto": "Choose New Photo",
+    "removePhoto": "Remove Photo",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No",
+    "client": "Client"
   },
   "taskerCompleteProfile": {
     "title": "Complete Your Profile",
@@ -708,7 +777,8 @@
     "acceptedMessage": "{{name}} has been selected for this task.",
     "acceptError": "Couldn't accept the bid. Please try again.",
     "loadError": "Failed to load bids. Please try again.",
-    "taskerFallbackName": "Tasker"
+    "taskerFallbackName": "Tasker",
+    "ok": "OK"
   },
   "common": {
     "errorTitle": "Error",

@@ -37,7 +37,7 @@ const openInGoogleMaps = async (lat, lng, labelRaw = "Task Location") => {
     const webUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
     await Linking.openURL(webUrl);
   } catch (e) {
-    Alert.alert("Error", "Could not open Google Maps on this device.");
+    Alert.alert(t("common.errorTitle"), t("common.couldNotOpenMaps"));
   }
 };
 
@@ -78,7 +78,7 @@ export default function EditTaskScreen({ route, navigation }) {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
-          Alert.alert("Permission Needed", "Location permission is required to show your current location.");
+          Alert.alert(t("common.permissionNeeded"), t("common.locationPermissionRequired"));
           return;
         }
         
@@ -96,7 +96,7 @@ export default function EditTaskScreen({ route, navigation }) {
         });
       } catch (e) {
         console.log("get location error", e);
-        Alert.alert("Error", "Could not get your current location.");
+        Alert.alert(t("common.errorTitle"), t("common.couldNotGetLocation"));
       }
     };
     
@@ -118,7 +118,7 @@ export default function EditTaskScreen({ route, navigation }) {
       }
     } catch (e) {
       console.log("openMapPicker error", e);
-      Alert.alert("Error", "Could not open map picker.");
+      Alert.alert(t("common.errorTitle"), t("common.couldNotOpenMapPicker"));
     }
   };
 
@@ -203,7 +203,7 @@ export default function EditTaskScreen({ route, navigation }) {
 
     // Check if coordinates are set
     if (!coords || !coords.latitude || !coords.longitude) {
-      Alert.alert("Location Required", "Please select a location using the map.");
+      Alert.alert(t("common.locationRequired"), t("common.pleaseSelectLocation"));
       return;
     }
 

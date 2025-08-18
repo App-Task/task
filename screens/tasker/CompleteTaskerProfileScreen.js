@@ -138,7 +138,7 @@ export default function CompleteTaskerProfileScreen() {
       }
     } catch (err) {
       console.error("❌ Upload failed:", err.message);
-      Alert.alert(t("common.errorTitle"), t("common.errorGeneric"));
+      Alert.alert(t("common.errorTitle"), t("common.uploadFailed"));
     }
   };
 
@@ -162,14 +162,13 @@ export default function CompleteTaskerProfileScreen() {
           },
         },
         {
-          text: t("taskerDocuments.takePhoto") || "Take Photo",
+          text: t("common.takePhoto"),
           onPress: async () => {
             const { status } = await ImagePicker.requestCameraPermissionsAsync();
             if (status !== "granted") {
               Alert.alert(
-                t("taskerDocuments.permissionDenied") || "Permission denied",
-                t("taskerDocuments.cameraDeniedMsg") ||
-                  "Camera permission is required to take a photo."
+                t("common.permissionNeeded"),
+                t("common.cameraPermissionRequired")
               );
               return;
             }
@@ -185,7 +184,7 @@ export default function CompleteTaskerProfileScreen() {
           },
         },
         {
-          text: t("clientProfile.removePhoto"),
+          text: t("common.removePhoto"),
           style: "destructive",
           onPress: async () => {
             setProfileImage(null);
@@ -196,7 +195,7 @@ export default function CompleteTaskerProfileScreen() {
             }
           },
         },
-        { text: t("clientProfile.cancel"), style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
       ],
       { cancelable: true }
     );

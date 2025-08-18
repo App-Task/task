@@ -111,19 +111,17 @@ export default function DocumentsScreen({ navigation, route }) {
   // ---------- UPDATED: show source options ----------
   const uploadDocument = async () => {
     Alert.alert(
-      t("taskerDocuments.chooseSourceTitle") || "Upload Document",
-      t("taskerDocuments.chooseSourceMessage") ||
-        "Choose how you want to upload your document.",
+      t("taskerDocuments.chooseSourceTitle"),
+      t("taskerDocuments.chooseSourceMessage"),
       [
         {
-          text: t("taskerDocuments.takePhoto") || "Take Photo",
+          text: t("taskerDocuments.takePhoto"),
           onPress: async () => {
             const { status } = await ImagePicker.requestCameraPermissionsAsync();
             if (status !== "granted") {
               Alert.alert(
-                t("taskerDocuments.permissionDenied") || "Permission denied",
-                t("taskerDocuments.cameraDeniedMsg") ||
-                  "Camera permission is required to take a photo."
+                t("taskerDocuments.permissionDenied"),
+                t("taskerDocuments.cameraDeniedMsg")
               );
               return;
             }
@@ -143,14 +141,13 @@ export default function DocumentsScreen({ navigation, route }) {
           },
         },
         {
-          text: t("taskerDocuments.chooseFromLibrary") || "Choose from Photos",
+          text: t("taskerDocuments.chooseFromLibrary"),
           onPress: async () => {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== "granted") {
               Alert.alert(
-                t("taskerDocuments.permissionDenied") || "Permission denied",
-                t("taskerDocuments.libraryDeniedMsg") ||
-                  "Photo library permission is required to pick a photo."
+                t("taskerDocuments.permissionDenied"),
+                t("taskerDocuments.libraryDeniedMsg")
               );
               return;
             }
@@ -170,7 +167,7 @@ export default function DocumentsScreen({ navigation, route }) {
           },
         },
         {
-          text: t("taskerDocuments.uploadAFile") || "Upload File (PDF/doc)",
+          text: t("taskerDocuments.uploadAFile"),
           onPress: async () => {
             try {
               const res = await DocumentPicker.getDocumentAsync({
@@ -190,7 +187,7 @@ export default function DocumentsScreen({ navigation, route }) {
             }
           },
         },
-        { text: t("taskerDocuments.no") || "Cancel", style: "cancel" },
+        { text: t("taskerDocuments.no"), style: "cancel" },
       ]
     );
   };
@@ -235,13 +232,12 @@ export default function DocumentsScreen({ navigation, route }) {
       const token = await getToken();
 
       Alert.alert(
-        t("taskerDocuments.deleteConfirmTitle") || "Delete document?",
-        t("taskerDocuments.deleteConfirmMessage") ||
-          "Are you sure you want to delete this document?",
+        t("taskerDocuments.deleteConfirmTitle"),
+        t("taskerDocuments.deleteConfirmMessage"),
         [
-          { text: t("taskerDocuments.no") || "No", style: "cancel" },
+          { text: t("taskerDocuments.no"), style: "cancel" },
           {
-            text: t("taskerDocuments.yes") || "Yes",
+            text: t("taskerDocuments.yes"),
             style: "destructive",
             onPress: async () => {
               await axios.delete(
@@ -259,9 +255,8 @@ export default function DocumentsScreen({ navigation, route }) {
     } catch (err) {
       console.error("❌ Error deleting document:", err.response?.data || err.message);
       Alert.alert(
-        t("taskerDocuments.deleteFailedTitle") || "Delete Failed",
-        t("taskerDocuments.deleteFailedMessage") ||
-          "Could not delete the document. Please try again."
+        t("taskerDocuments.deleteFailedTitle"),
+        t("taskerDocuments.deleteFailedMessage")
       );
     }
   };

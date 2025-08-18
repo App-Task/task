@@ -104,7 +104,7 @@ export default function ViewBidsScreen({ route, navigation }) {
         }),
         [
           {
-            text: "OK",
+            text: t("clientViewBids.ok"),
             onPress: () => {
               navigation.navigate("ClientHome", {
                 screen: "Tasks",
@@ -143,7 +143,7 @@ export default function ViewBidsScreen({ route, navigation }) {
         <View style={styles.taskerHeader}>
           <View>
             <Text style={styles.taskerName}>
-              {item.taskerId?.name || "Tasker"}
+              {item.taskerId?.name || t("clientViewBids.taskerFallbackName")}
             </Text>
             {average && (
               <View style={styles.taskerRatingContainer}>
@@ -167,15 +167,15 @@ export default function ViewBidsScreen({ route, navigation }) {
               })
             }
           >
-            <Text style={styles.viewProfileText}>View Profile</Text>
+            <Text style={styles.viewProfileText}>{t("clientViewBids.viewProfile")}</Text>
           </TouchableOpacity>
         </View>
   
         {/* ✅ Price and Message */}
         <View style={{ padding: 16 }}>
           <Text style={styles.priceOffered}>
-            Price offered:{" "}
-            <Text style={{ fontWeight: "bold" }}>{item.amount} BHD</Text>
+            {t("clientViewBids.priceOffered")}:{" "}
+            <Text style={{ fontWeight: "bold" }}>{item.amount} {t("clientViewBids.currency")}</Text>
           </Text>
           {item.message ? (
             <Text style={styles.message}>{item.message}</Text>

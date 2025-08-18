@@ -104,7 +104,7 @@ export default function TaskDetailsScreen({ route }) {
       const webUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
       await Linking.openURL(webUrl);
     } catch (e) {
-      Alert.alert("Error", "Could not open Google Maps on this device.");
+      Alert.alert(t("common.errorTitle"), t("common.couldNotOpenMaps"));
     }
   };
 

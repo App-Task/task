@@ -9,23 +9,25 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { forgotPassword } from "../../services/auth";
+import { useTranslation } from "react-i18next";
 
 export default function ForgotPasswordRequest({ navigation, route }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const role = route?.params?.role || "client";
+  const { t } = useTranslation();
 
   const handleSendCode = async () => {
-    if (!email.trim()) return Alert.alert("Missing", "Please enter your email.");
+    if (!email.trim()) return Alert.alert(t("common.missingInfo"), t("common.missingFields"));
 
     setLoading(true);
     try {
       await forgotPassword(email.trim().toLowerCase(), role);
-      Alert.alert("Request Received", "A password reset code has been sent to your email.");
+      Alert.alert(t("forgotPassword.requestReceived"), t("forgotPassword.resetCodeSent"));
       navigation.navigate("ForgotPasswordReset", { email: email.trim().toLowerCase(), role });
     } catch (err) {
       console.error("❌ Forgot Password Error:", err.message);
-      Alert.alert("Error", "Something went wrong. Please try again.");
+      Alert.alert(t("common.errorTitle"), t("common.somethingWentWrong"));
     } finally {
       setLoading(false);
     }
@@ -37,11 +39,11 @@ export default function ForgotPasswordRequest({ navigation, route }) {
         <Ionicons name="arrow-back" size={28} color="#215433" />
       </TouchableOpacity>
 
-      <Text style={styles.title}>Reset your password</Text>
+      <Text style={styles.title}>{t("forgotPassword.resetPassword")}</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Enter your email"
+        placeholder={t("forgotPassword.enterEmail")}
         placeholderTextColor="#999"
         value={email}
         onChangeText={setEmail}
@@ -51,7 +53,7 @@ export default function ForgotPasswordRequest({ navigation, route }) {
 
       <TouchableOpacity style={styles.button} onPress={handleSendCode} disabled={loading}>
         <Text style={styles.buttonText}>
-          {loading ? "Sending..." : "Send Reset Code"}
+          {loading ? t("forgotPassword.sending") : t("forgotPassword.sendResetCode")}
         </Text>
       </TouchableOpacity>
     </View>

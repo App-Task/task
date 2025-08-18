@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { resetPassword } from "../../services/auth";
+import { useTranslation } from "react-i18next";
 
 export default function ForgotPasswordReset({ navigation, route }) {
   const emailFromRoute = route?.params?.email || "";
@@ -18,14 +19,15 @@ export default function ForgotPasswordReset({ navigation, route }) {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const handleReset = async () => {
-    if (!email || !code || !newPassword || !confirmPassword) {
-      return Alert.alert("Missing Info", "Please fill all fields.");
+    if (!code.trim() || !newPassword.trim() || !confirmPassword.trim()) {
+      return Alert.alert(t("common.missingInfo"), t("common.missingFields"));
     }
 
     if (newPassword !== confirmPassword) {
-      return Alert.alert("Mismatch", "Passwords do not match.");
+      return Alert.alert(t("common.mismatch"), t("common.passwordsDoNotMatch"));
     }
 
     const strongPw = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -39,11 +41,11 @@ export default function ForgotPasswordReset({ navigation, route }) {
     setLoading(true);
     try {
       await resetPassword({ email: email.trim(), code: code.trim(), newPassword });
-      Alert.alert("Success", "Your password has been reset. Please log in.");
+      Alert.alert(t("common.success"), t("common.passwordResetSuccess"));
       navigation.replace("Login", { role: roleFromRoute });
     } catch (err) {
       console.error("❌ Reset Password Error:", err.message);
-      Alert.alert("Error", err.response?.data?.msg || "Something went wrong.");
+      Alert.alert(t("common.errorTitle"), err.response?.data?.msg || t("common.resetFailed"));
     } finally {
       setLoading(false);
     }

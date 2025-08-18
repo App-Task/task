@@ -90,7 +90,7 @@ export default function TaskerProfileScreen({ navigation }) {
       "",
       [
         {
-          text: t("taskerProfile.chooseNewPhoto"),
+          text: t("common.chooseNewPhoto"),
           onPress: async () => {
             const result = await ImagePicker.launchImageLibraryAsync({
               allowsEditing: true,
