@@ -171,7 +171,7 @@ if (taskerData.verificationStatus === "accepted") {
       document.getElementById("email").textContent = "Email: " + taskerData.email;
       document.getElementById("phone").textContent = "Number: " + taskerData.phone;
       document.getElementById("location").textContent = "Location: " + taskerData.location;
-      document.getElementById("skills").textContent = "Skills: " + taskerData.skills;
+      document.getElementById("skills").textContent = "Skills: " + (taskerData.skills ? (Array.isArray(taskerData.skills) ? taskerData.skills.join(", ") : taskerData.skills) : "No skills specified");
       document.getElementById("bio").textContent = taskerData.about;
       document.getElementById("avatar").src =
   taskerData.profileImage || "https://via.placeholder.com/100";
