@@ -31,7 +31,6 @@ passwordResetLastSentAt: { type: Date },
     // ✅ Tasker-only optional fields
     gender: { type: String, default: "" },
     location: { type: String, default: "" },
-    experience: { type: String, default: "" },
     skills: { type: String, default: "" },
     about: { type: String, default: "" },
 

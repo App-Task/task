@@ -75,7 +75,6 @@ export default function LoginScreen({ navigation, route }) {
             const profileIncomplete =
               !currentUser.gender ||
               !currentUser.location ||
-              !currentUser.experience ||
               !currentUser.skills ||
               !currentUser.about;
         

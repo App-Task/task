@@ -28,7 +28,7 @@ router.get("/me", async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id).select(
-      "name email phone callingCode rawPhone countryCode profileImage gender location experience skills about isVerified verificationStatus documents"
+      "name email phone callingCode rawPhone countryCode profileImage gender location skills about isVerified verificationStatus documents"
     );
     
     
@@ -90,7 +90,6 @@ router.put("/me", async (req, res) => {
       profileImage,
       gender,
       location,
-      experience,
       skills,
       about,
       callingCode,
@@ -120,7 +119,6 @@ if ("profileImage" in req.body) user.profileImage = profileImage;
     // ✅ Optional tasker-only fields (won't affect clients)
     if (gender !== undefined) user.gender = gender;
     if (location !== undefined) user.location = location;
-    if (experience !== undefined) user.experience = experience;
     if (skills !== undefined) user.skills = skills;
     if (about !== undefined) user.about = about;
     
@@ -138,7 +136,6 @@ if ("profileImage" in req.body) user.profileImage = profileImage;
         profileImage: user.profileImage || null,
         gender: user.gender || "",
         location: user.location || "",
-        experience: user.experience || "",
         skills: user.skills || "",
         about: user.about || "",
       },
