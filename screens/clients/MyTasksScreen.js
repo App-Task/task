@@ -19,36 +19,95 @@ import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { I18nManager } from "react-native";
-
-// Custom star rating component using image
-const CustomStarRating = ({ rating, onChange, starSize = 28, color = "#215432" }) => {
-  return (
-    <View style={{ flexDirection: "row" }}>
-      {Array.from({ length: 5 }, (_, i) => (
-        <TouchableOpacity
-          key={i}
-          onPress={() => onChange(i + 1)}
-          style={{ marginRight: 4 }}
-        >
-          <Image
-            source={require("../../assets/images/Starno background.png")}
-            style={{
-              width: starSize,
-              height: starSize,
-              opacity: i < rating ? 1 : 0.3,
-            }}
-          />
-        </TouchableOpacity>
-      ))}
-    </View>
-  );
-};
+import { Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
 export default function MyTasksScreen({ navigation, route }) {
 
   const { t } = useTranslation();
+
+  // Custom star rating component using Ionicons
+  const CustomStarRating = ({ rating, onChange, starSize = 32, color = "#FFD700" }) => {
+    const handleStarPress = (starIndex, isHalfStar = false) => {
+      const newRating = starIndex + (isHalfStar ? 0.5 : 1);
+      onChange(newRating);
+    };
+
+    const renderStar = (starNumber) => {
+      const isFullStar = starNumber <= Math.floor(rating);
+      const isHalfStar = starNumber === Math.ceil(rating) && rating % 1 !== 0;
+      
+      return (
+        <View key={`star-${starNumber}`} style={{ marginRight: 8, position: 'relative' }}>
+          {/* Left half - for half star rating */}
+          <TouchableOpacity
+            onPress={() => handleStarPress(starNumber - 1, true)}
+            activeOpacity={0.7}
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              width: starSize / 2,
+              height: starSize,
+              zIndex: 2,
+            }}
+          />
+          
+          {/* Right half - for full star rating */}
+          <TouchableOpacity
+            onPress={() => handleStarPress(starNumber - 1, false)}
+            activeOpacity={0.7}
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              width: starSize / 2,
+              height: starSize,
+              zIndex: 2,
+            }}
+          />
+          
+          {/* Star icon */}
+          <Ionicons
+            name={isFullStar ? "star" : isHalfStar ? "star-half" : "star-outline"}
+            size={starSize}
+            color={isFullStar ? color : isHalfStar ? color : "#D3D3D3"}
+            style={{
+              shadowColor: isFullStar || isHalfStar ? color : "#D3D3D3",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: isFullStar || isHalfStar ? 0.3 : 0.1,
+              shadowRadius: 4,
+              elevation: isFullStar || isHalfStar ? 4 : 1,
+            }}
+          />
+        </View>
+      );
+    };
+
+    return (
+      <View>
+        <Text style={{ 
+          fontFamily: "Inter", 
+          fontSize: 16, 
+          color: "#215432", 
+          marginBottom: 16,
+          textAlign: "center",
+          fontWeight: "600"
+        }}>
+          Rate your experience: {rating}/5
+        </Text>
+        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+          {renderStar(1)}
+          {renderStar(2)}
+          {renderStar(3)}
+          {renderStar(4)}
+          {renderStar(5)}
+        </View>
+      </View>
+    );
+  };
+
   const [activeTab, setActiveTab] = useState("Pending");
   const [previousSubTab, setPreviousSubTab] = useState("Completed");
 
@@ -73,10 +132,6 @@ export default function MyTasksScreen({ navigation, route }) {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [reportTask, setReportTask] = useState(null);
-
-
-
-
 
   useFocusEffect(
     useCallback(() => {
@@ -175,7 +230,14 @@ allTasks.forEach((task) => {
   
 
   const submitReview = async () => {
-    if (!rating || !reviewTask) return;
+    if (!rating || !reviewTask) {
+      Alert.alert(
+        t("clientReview.validationTitle", "Missing Information"),
+        t("clientReview.validationMessage", "Please select a rating before submitting.")
+      );
+      return;
+    }
+    
     try {
       setSubmittingReview(true); // ✅ Show loading overlay
   
@@ -374,7 +436,7 @@ allTasks.forEach((task) => {
                     {t("clientReview.title", "Rate Your Tasker")}
                   </Text>
 
-                  <CustomStarRating rating={rating} onChange={setRating} starSize={28} color="#215432" />
+                  <CustomStarRating rating={rating} onChange={setRating} starSize={32} color="#FFD700" />
 
                   <TextInput
                     placeholder={t("clientReview.commentPlaceholder", "Leave a comment...")}

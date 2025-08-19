@@ -350,7 +350,9 @@
    "title": "قيّم مقدم الخدمة",
    "commentPlaceholder": "اكتب تعليقاً...",
    "submit": "إرسال التقييم",
-   "submitting": "جارٍ إرسال التقييم..."
+   "submitting": "جارٍ إرسال التقييم...",
+   "validationTitle": "معلومات ناقصة",
+   "validationMessage": "يرجى اختيار تقييم قبل الإرسال."
   },
   
   

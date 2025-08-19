@@ -343,7 +343,9 @@
   "title": "Rate Your Tasker",
   "commentPlaceholder": "Leave a comment...",
   "submit": "Submit Review",
-  "submitting": "Submitting review..."
+  "submitting": "Submitting review...",
+  "validationTitle": "Missing Information",
+  "validationMessage": "Please select a rating before submitting."
 },
 
 
