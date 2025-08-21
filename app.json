@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.task.app",
+      "bundleIdentifier": "com.taskbh.taskapp",
       "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -29,31 +29,18 @@
       "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
       "package": "com.task.app"
     },
-    "web": {
-      "favicon": "./assets/images/favicon.png"
-    },
+    "web": { "favicon": "./assets/images/favicon.png" },
     "plugins": [
       [
         "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
+        { "image": "./assets/images/splash-icon.png", "imageWidth": 200, "resizeMode": "contain", "backgroundColor": "#ffffff" }
       ],
       "expo-asset",
       "expo-localization",
       "expo-secure-store"
     ],
-    "extra": {
-      "eas": {
-        "projectId": "02016b9f-21ea-402a-987c-c3691146d194"
-      }
-    },
+    "extra": { "eas": { "projectId": "02016b9f-21ea-402a-987c-c3691146d194" } },
     "runtimeVersion": "1.0.0",
-    "updates": {
-      "url": "https://u.expo.dev/02016b9f-21ea-402a-987c-c3691146d194"
-    }
+    "updates": { "url": "https://u.expo.dev/02016b9f-21ea-402a-987c-c3691146d194" }
   }
 }
