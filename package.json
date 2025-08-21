@@ -83,5 +83,8 @@
     "typescript": "^5.3.3"
   },
   "private": true,
-  "packageManager": "npm@10.8.1"
+  "packageManager": "npm@10.8.1",
+  "engines": {
+    "node": ">=18 <21"
+  }
 }
