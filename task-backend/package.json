@@ -1,4 +1,20 @@
 {
+  "expo": {
+  "doctor": {
+    "reactNativeDirectoryCheck": {
+      "exclude": [
+        "react-native-star-rating-widget",
+        "i18next-browser-languagedetector",
+        "react-native-vector-icons",
+        "express-rate-limit",
+        "helmet",
+        "morgan"
+      ],
+      "listUnknownPackages": false
+    }
+  }
+}
+,
   "name": "task-backend",
   "version": "1.0.0",
   "main": "server.js",
