@@ -38,3 +38,7 @@ yarn-error.*
 app-example
 
 AuthKey_*.p8
+
+# Expo native folders
+ios/
+android/
