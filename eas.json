@@ -11,6 +11,7 @@
     },
     "preview": {
       "distribution": "internal",
+      "android": { "buildType": "apk" },
       "ios": { "simulator": true }
     },
     "production": {
@@ -18,16 +19,14 @@
       "ios": { "simulator": false }
     }
   },
-"submit": {
-  "production": {
-    "ios": {
-      "ascApiKeyPath": "./AuthKey_TZ7Z29AMA2.p8",
-      "ascApiKeyId": "TZ7Z29AMA2",
-      "ascApiKeyIssuerId": "28edad92-8cb5-41aa-9afd-2c455e8937af",
-      "ascAppId": "6751346603"
+  "submit": {
+    "production": {
+      "ios": {
+        "ascApiKeyPath": "./AuthKey_TZ7Z29AMA2.p8",
+        "ascApiKeyId": "TZ7Z29AMA2",
+        "ascApiKeyIssuerId": "28edad92-8cb5-41aa-9afd-2c455e8937af",
+        "ascAppId": "6751346603"
+      }
     }
   }
-}
-
-
 }
