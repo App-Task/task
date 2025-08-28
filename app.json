@@ -22,17 +22,16 @@
         ]
       }
     },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "permissions": [
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
-      ],
-      "package": "com.task.app"
-    },
+"android": {
+  "adaptiveIcon": {
+    "foregroundImage": "./assets/images/adaptive-icon.png",
+    "backgroundColor": "#ffffff"
+  },
+  "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
+  "package": "com.taskbh.taskapp",
+  "versionCode": 1
+}
+,
     "web": {
       "favicon": "./assets/images/favicon.png"
     },
