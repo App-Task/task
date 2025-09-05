@@ -30,6 +30,11 @@ import TaskerProfileScreen from "../screens/tasker/TaskerProfileScreen";
 import NotificationsScreen from "../screens/clients/NotificationsScreen";
 import CompleteTaskerProfileScreen from "../screens/tasker/CompleteTaskerProfileScreen";
 
+// New Post Task Pages
+import PostTaskPage1 from "../screens/clients/PostTaskPage1";
+import PostTaskPage2 from "../screens/clients/PostTaskPage2";
+import PostTaskPage3 from "../screens/clients/PostTaskPage3";
+
 
 
 
@@ -86,6 +91,11 @@ export default function MainNavigator() {
   options={{ title: "Tasker Profile" }} // You can localize this if needed
 />
 <Stack.Screen name="Notifications" component={NotificationsScreen} />
+
+      {/* New Post Task Flow */}
+      <Stack.Screen name="PostTaskPage1" component={PostTaskPage1} />
+      <Stack.Screen name="PostTaskPage2" component={PostTaskPage2} />
+      <Stack.Screen name="PostTaskPage3" component={PostTaskPage3} />
 
 
       {/* Tasker Home & Subscreens */}

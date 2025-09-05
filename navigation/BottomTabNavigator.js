@@ -8,7 +8,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 import ClientHomeScreen from "../screens/clients/HomeScreen";
 import { useTranslation } from "react-i18next";
-import PostTaskScreen from "../screens/clients/PostTaskScreen";
+import PostTaskPage1 from "../screens/clients/PostTaskPage1";
 import ProfileScreen from "../screens/clients/ProfileScreen";
 import MyTasksScreen from "../screens/clients/MyTasksScreen";
 import MessagesScreen from "../screens/clients/MessagesScreen";
@@ -84,7 +84,7 @@ export default function BottomTabNavigator() {
     >
       <Tab.Screen name="Home" component={ClientHomeScreen} options={{ title: t("TaskBottomNav.explore") }} />
       <Tab.Screen name="Tasks" component={MyTasksScreen} options={{ title: t("TaskBottomNav.myTasks") }} />
-      <Tab.Screen name="Post" component={PostTaskScreen} options={{ title: t("clientHome.postTaskBtn") }} />
+      <Tab.Screen name="Post" component={PostTaskPage1} options={{ title: t("clientHome.postTaskBtn") }} />
       <Tab.Screen
   name="Messages"
   component={MessagesScreen}
