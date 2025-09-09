@@ -199,24 +199,18 @@ export default function TaskDetailsScreen({ route, navigation }) {
         {/* Navigation Tabs */}
         <View style={styles.tabContainer}>
           <TouchableOpacity
-            style={[styles.tab, activeTab === "details" && styles.activeTab]}
+            style={[styles.tab, styles.activeTab]} // Always show as active
             onPress={() => {
-              setActiveTab("details");
-              // Navigate back to task details and pass the task data
-              navigation.navigate("TaskDetails", { 
-                task: task, // Pass the task object
-                taskId: task._id // Also pass taskId for consistency
-              });
+              // Do nothing when Task Details tab is pressed since we're already on it
             }}
           >
-            <Text style={[styles.tabText, activeTab === "details" && styles.activeTabText]}>
+            <Text style={[styles.tabText, styles.activeTabText]}>
               Task Details
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.tab, activeTab === "offers" && styles.activeTab]}
+            style={[styles.tab]} // Never show as active
             onPress={() => {
-              setActiveTab("offers");
               if (task.status === "Pending") {
                 navigation.navigate("ViewBids", { taskId: task._id });
               } else {
@@ -244,7 +238,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
               }
             }}
           >
-            <Text style={[styles.tabText, activeTab === "offers" && styles.activeTabText]}>
+            <Text style={[styles.tabText]}>
               {task.status === "Pending" ? "Offers" : "Tasker's Profile"}
             </Text>
           </TouchableOpacity>
