@@ -132,6 +132,8 @@ export default function MyTasksScreen({ navigation, route }) {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [reportTask, setReportTask] = useState(null);
+  const [completing, setCompleting] = useState(false);
+  const [canceling, setCanceling] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -373,9 +375,162 @@ allTasks.forEach((task) => {
         {/* ✅ View Details Hint */}
         <Text style={styles.viewDetails}>{t("clientMyTasks.viewTaskDetails")}</Text>
 
+        {/* ✅ Pending Tab - View Bids Button */}
+        {activeTab === "Pending" && (
+          <TouchableOpacity
+            style={styles.viewBidsBtn}
+            onPress={() => navigation.navigate("ViewBids", { taskId: item._id })}
+          >
+            <Text style={styles.viewBidsText}>
+              {t("clientMyTasks.viewBids", "View Bids")}
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {/* ✅ Started Tab - Chat, Mark as Done, Cancel Buttons */}
+        {activeTab === "Started" && item.taskerId && (
+          <View style={styles.buttonsRow}>
+            {/* Chat Button */}
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={() => navigation.navigate("Chat", { taskId: item._id, taskerId: item.taskerId })}
+            >
+              <Text style={styles.actionBtnText}>
+                {t("clientMyTasks.chat", "Chat")}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Mark as Done Button */}
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={() => {
+                Alert.alert(
+                  t("clientMyTasks.markAsDoneConfirmTitle", "Mark as Done"),
+                  t("clientMyTasks.markAsDoneConfirmMessage", "Are you sure you want to mark this task as completed?"),
+                  [
+                    { text: t("clientMyTasks.no", "No"), style: "cancel" },
+                    {
+                      text: t("clientMyTasks.yes", "Yes"),
+                      onPress: async () => {
+                        try {
+                          setCompleting(true);
+                          const res = await fetch(`https://task-kq94.onrender.com/api/tasks/${item._id}/complete`, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" }
+                          });
+                          if (!res.ok) throw new Error("Failed to complete task");
+                          
+                          // Refresh the tasks list
+                          const userId = await SecureStore.getItemAsync("userId");
+                          const res2 = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
+                          const allTasks = await res2.json();
+                          const grouped = { Pending: [], Started: [], Completed: [], Cancelled: [] };
+                          allTasks.forEach((task) => {
+                            const normalizedStatus = (task.status || "").toLowerCase();
+                            if (normalizedStatus === "pending") {
+                              grouped.Pending.push(task);
+                            } else if (normalizedStatus === "started") {
+                              grouped.Started.push(task);
+                            } else if (normalizedStatus === "completed") {
+                              grouped.Completed.push(task);
+                            } else if (normalizedStatus === "cancelled") {
+                              grouped.Cancelled.push(task);
+                            }
+                          });
+                          setGroupedTasks(grouped);
+                          setCompleting(false);
+                          
+                          Alert.alert(
+                            t("clientMyTasks.successTitle", "Success"),
+                            t("clientMyTasks.taskCompletedMessage", "Task has been marked as completed!")
+                          );
+                        } catch (err) {
+                          setCompleting(false);
+                          console.error("❌ Complete task error:", err.message);
+                          Alert.alert(
+                            t("clientMyTasks.errorTitle", "Error"),
+                            t("clientMyTasks.completeTaskError", "Failed to complete task. Please try again.")
+                          );
+                        }
+                      },
+                    },
+                  ]
+                );
+              }}
+            >
+              <Text style={styles.actionBtnText}>
+                {t("clientMyTasks.markAsDone", "Mark as Done")}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Cancel Button */}
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={() => {
+                Alert.alert(
+                  t("clientMyTasks.cancelTaskConfirmTitle", "Cancel Task"),
+                  t("clientMyTasks.cancelTaskConfirmMessage", "Are you sure you want to cancel this task?"),
+                  [
+                    { text: t("clientMyTasks.no", "No"), style: "cancel" },
+                    {
+                      text: t("clientMyTasks.yes", "Yes"),
+                      onPress: async () => {
+                        try {
+                          setCanceling(true);
+                          const userId = await SecureStore.getItemAsync("userId");
+                          const res = await fetch(`https://task-kq94.onrender.com/api/tasks/${item._id}/cancel`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ cancelledBy: userId })
+                          });
+                          if (!res.ok) throw new Error("Failed to cancel task");
+                          
+                          // Refresh the tasks list
+                          const res2 = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
+                          const allTasks = await res2.json();
+                          const grouped = { Pending: [], Started: [], Completed: [], Cancelled: [] };
+                          allTasks.forEach((task) => {
+                            const normalizedStatus = (task.status || "").toLowerCase();
+                            if (normalizedStatus === "pending") {
+                              grouped.Pending.push(task);
+                            } else if (normalizedStatus === "started") {
+                              grouped.Started.push(task);
+                            } else if (normalizedStatus === "completed") {
+                              grouped.Completed.push(task);
+                            } else if (normalizedStatus === "cancelled") {
+                              grouped.Cancelled.push(task);
+                            }
+                          });
+                          setGroupedTasks(grouped);
+                          setCanceling(false);
+                          
+                          Alert.alert(
+                            t("clientMyTasks.successTitle", "Success"),
+                            t("clientMyTasks.taskCancelledMessage", "Task has been cancelled!")
+                          );
+                        } catch (err) {
+                          setCanceling(false);
+                          console.error("❌ Cancel task error:", err.message);
+                          Alert.alert(
+                            t("clientMyTasks.errorTitle", "Error"),
+                            t("clientMyTasks.cancelTaskError", "Failed to cancel task. Please try again.")
+                          );
+                        }
+                      },
+                    },
+                  ]
+                );
+              }}
+            >
+              <Text style={styles.actionBtnText}>
+                {t("clientMyTasks.cancel", "Cancel")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
   
-        {/* ✅ View Profile & Report Buttons */}
-        {["Pending", "Started", "Cancelled"].includes(activeTab) &&
+        {/* ✅ View Profile & Report Buttons for Pending, Cancelled */}
+        {["Pending", "Cancelled"].includes(activeTab) &&
           item.taskerId && (
             <View style={styles.buttonsRow}>
               {/* View Profile */}
@@ -880,6 +1035,38 @@ const styles = StyleSheet.create({
     color: "#215433",
     fontFamily: "InterBold",
     fontSize: 13,
+  },
+  
+  viewBidsBtn: {
+    backgroundColor: "#215433",
+    paddingVertical: 10,
+    borderRadius: 30,
+    alignItems: "center",
+    marginTop: 10,
+  },
+
+  viewBidsText: {
+    color: "#ffffff",
+    fontFamily: "InterBold",
+    fontSize: 13,
+  },
+
+  actionBtn: {
+    flex: 1,
+    backgroundColor: "#215433",
+    paddingVertical: 10,
+    paddingHorizontal: 8, // Increased horizontal padding
+    borderRadius: 30,
+    alignItems: "center",
+    marginHorizontal: 4,
+    minWidth: 80, // Added minimum width
+  },
+
+  actionBtnText: {
+    color: "#ffffff",
+    fontFamily: "InterBold",
+    fontSize: 12, // Slightly smaller font size
+    textAlign: "center",
   },
   
 });
