@@ -11,15 +11,13 @@ import {
   Alert,
   ActivityIndicator,
   I18nManager,
-  Linking,                   // ✅ ADDED
+  Linking,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { getTaskById } from "../../services/taskService";
 import { useIsFocused } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
-
-// ✅ ADDED for map & geocoding
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 
@@ -36,40 +34,14 @@ export default function TaskDetailsScreen({ route, navigation }) {
   const [completing, setCompleting] = useState(false);
   const [canceling, setCanceling] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
-
-  // ✅ ADDED
   const [coords, setCoords] = useState(null);
-  const [geoError, setGeoError] = useState(null);
+  const [activeTab, setActiveTab] = useState("details");
 
   useEffect(() => {
     if (isFocused) {
       fetchTask();
     }
   }, [isFocused]);
-
-  // Get current location automatically when component mounts
-  useEffect(() => {
-    const getCurrentLocation = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          console.log("Location permission denied");
-          return;
-        }
-        
-        const pos = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        });
-        
-        const { latitude, longitude } = pos.coords;
-        setCoords({ latitude, longitude });
-      } catch (e) {
-        console.log("get location error", e);
-      }
-    };
-    
-    getCurrentLocation();
-  }, []);
 
   const fetchTask = async () => {
     try {
@@ -87,7 +59,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
     }
   };
 
-  // ✅ ADDED: derive coords from task
+  // Derive coords from task
   useEffect(() => {
     let cancelled = false;
 
@@ -114,7 +86,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
           }
         }
       } catch (e) {
-        if (!cancelled) setGeoError(e.message || "Geocoding failed");
+        console.log("Geocoding error:", e);
       }
     })();
 
@@ -123,7 +95,6 @@ export default function TaskDetailsScreen({ route, navigation }) {
     };
   }, [task?.location, task?.latitude, task?.longitude]);
 
-  // ✅ ADDED: open maps
   const openInGoogleMaps = async (lat, lng, labelRaw = "Task Location") => {
     try {
       const label = encodeURIComponent(labelRaw || "Task Location");
@@ -212,63 +183,92 @@ export default function TaskDetailsScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Make the scroller itself green so the very bottom is always green */}
-      <ScrollView
-        style={{ flex: 1, backgroundColor: "#215432" }}           // ✅ green behind the sheet
-        contentContainerStyle={styles.container}                   // ✅ white top container
-        bounces={false}
-        overScrollMode="never"
-      >
-        {/* Header (white area) */}
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
+        {/* Header with back button */}
         <TouchableOpacity
           style={[styles.backBtn, I18nManager.isRTL && { alignSelf: "flex-end" }]}
           onPress={() => navigation.goBack()}
         >
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-            size={30}
+            size={24}
             color="#215433"
           />
         </TouchableOpacity>
 
-        <View style={styles.topContent}>
-          <View style={styles.topRow}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.heading}>{title}</Text>
-              <Text style={styles.subText}>{t("clientTaskDetails.offeredPrice")}: {budget} BHD</Text>
-              <Text style={styles.subText}>
-                {new Date(task.createdAt).toLocaleDateString(
-                  I18nManager.isRTL ? "ar-SA" : "en-GB",
-                  { year: "numeric", month: "short", day: "numeric" }
-                )} •{" "}
-                {new Date(task.createdAt).toLocaleTimeString(
-                  I18nManager.isRTL ? "ar-SA" : "en-GB",
-                  { hour: "2-digit", minute: "2-digit" }
-                )}
-              </Text>
-            </View>
+        {/* Navigation Tabs */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === "details" && styles.activeTab]}
+            onPress={() => setActiveTab("details")}
+          >
+            <Text style={[styles.tabText, activeTab === "details" && styles.activeTabText]}>
+              Task details
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === "offers" && styles.activeTab]}
+            onPress={() => {
+              setActiveTab("offers");
+              navigation.navigate("ViewBids", { taskId: task._id });
+            }}
+          >
+            <Text style={[styles.tabText, activeTab === "offers" && styles.activeTabText]}>
+              Offers
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Separator line above title */}
+        <View style={styles.separator} />
+
+        {/* Task Title and Status */}
+        <View style={styles.titleSection}>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>{title}</Text>
             <View style={[styles.statusBadge, getStatusStyle(task.status)]}>
               <Text style={styles.statusText}>
-                {t(`clientHome.status.${task.status.toLowerCase()}`)}
+                {task.status}
               </Text>
             </View>
           </View>
         </View>
 
-        {/* GREEN SHEET: full-bleed, rounded top, seamless to bottom */}
-        <View style={styles.detailsBox}>
-          {/* Description */}
-          <Text style={styles.detailsText}>
-            <Text style={{ fontFamily: "InterBold" }}>
-              {t("clientTaskDetails.description")}:{" "}
-            </Text>
-            {description}
-          </Text>
+        {/* Separator line below title */}
+        <View style={styles.separator} />
 
-          {/* Images */}
-          <Text style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}>
-            {t("clientTaskDetails.images")}:
-          </Text>
+        {/* Posted on and Budget */}
+        <View style={styles.infoSection}>
+          <View style={styles.infoRow}>
+            <View>
+              <Text style={styles.infoLabel}>Posted on</Text>
+              <Text style={styles.infoValue}>
+                {new Date(task.createdAt).toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric"
+                })}
+              </Text>
+            </View>
+            <View>
+              <Text style={styles.infoLabel}>BUDGET</Text>
+              <Text style={styles.budgetValue}>{budget} BHD</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Separator line */}
+        <View style={styles.separator} />
+
+        {/* Description */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Description</Text>
+          <Text style={styles.sectionValue}>{description}</Text>
+        </View>
+
+        {/* Images */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Images</Text>
           <View style={styles.imageRow}>
             {images.length > 0 ? (
               images.map((img, index) => (
@@ -277,23 +277,17 @@ export default function TaskDetailsScreen({ route, navigation }) {
                 </TouchableOpacity>
               ))
             ) : (
-              <Text style={styles.detailsText}>{t("clientTaskDetails.noImages")}</Text>
+              <View style={styles.placeholderImage} />
             )}
           </View>
+        </View>
 
-          {/* Location label */}
-          <Text style={[styles.detailsText, { marginTop: 12 }]}>
-            <Text style={{ fontFamily: "InterBold" }}>
-              {t("clientTaskDetails.location") || "Location"}:
-            </Text>
-          </Text>
+        {/* Separator line */}
+        <View style={styles.separator} />
 
-          {/* Location text */}
-          <Text style={styles.detailsText}>
-            {task.location || "Location not specified"}
-          </Text>
-
-          {/* Map below location text */}
+        {/* Location */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Location</Text>
           {coords && (
             <View style={styles.mapContainer}>
               <TouchableOpacity
@@ -321,80 +315,68 @@ export default function TaskDetailsScreen({ route, navigation }) {
               </TouchableOpacity>
             </View>
           )}
+        </View>
 
-          {/* Actions (inside the green box) */}
-          <View style={styles.actionsInside}>
-            {task.status === "Pending" && (
-              <>
-                {bids.length > 0 ? (
-                  <Text style={styles.noticeInside}>{t("clientTaskDetails.editNotAllowed")}</Text>
-                ) : (
-                  <TouchableOpacity
-                    style={styles.whiteButton}
-                    onPress={() => navigation.navigate("EditTask", { task })}
-                  >
-                    <Text style={styles.whiteButtonText}>{t("clientTaskDetails.editTask")}</Text>
-                  </TouchableOpacity>
-                )}
-
+        {/* Action Buttons */}
+        <View style={styles.buttonSection}>
+          {task.status === "Pending" && (
+            <>
+              {bids.length === 0 && (
                 <TouchableOpacity
-                  style={styles.whiteButton}
-                  onPress={() => navigation.navigate("ViewBids", { taskId: task._id })}
+                  style={styles.editButton}
+                  onPress={() => navigation.navigate("EditTask", { task })}
                 >
-                  <Text style={styles.whiteButtonText}>{t("clientTaskDetails.viewBids")}</Text>
+                  <Text style={styles.editButtonText}>Edit Task</Text>
                 </TouchableOpacity>
-              </>
-            )}
-
-            {task.status === "Started" && (
+              )}
               <TouchableOpacity
-                style={styles.whiteButton}
-                onPress={() => {
-                  Alert.alert(
-                    t("clientTaskDetails.markCompletedConfirmTitle"),
-                    t("clientTaskDetails.markCompletedConfirmMessage"),
-                    [
-                      { text: t("clientTaskDetails.no") },
-                      {
-                        text: t("clientTaskDetails.yes"),
-                        onPress: async () => {
-                          try {
-                            setCompleting(true);
-                            await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, { method: "PATCH" });
-                            await fetchTask();
-                            setCompleting(false);
-                            navigation.navigate("ClientHome", {
-                              screen: "Tasks",
-                              params: {
-                                refreshTasks: true,
-                                targetTab: "Previous",
-                                subTab: "Completed",
-                                unique: Date.now(),
-                              },
-                            });
-                          } catch {
-                            setCompleting(false);
-                            Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.markCompletedError"));
-                          }
-                        },
-                      },
-                    ]
-                  );
-                }}
+                style={styles.cancelButton}
+                onPress={handleDelete}
               >
-                <Text style={styles.whiteButtonText}>{t("clientTaskDetails.markCompleted")}</Text>
+                <Text style={styles.cancelButtonText}>Cancel Task</Text>
               </TouchableOpacity>
-            )}
+            </>
+          )}
 
-            {(task.status === "Pending" || task.status === "Started") && (
-              <TouchableOpacity style={styles.whiteButton} onPress={handleDelete}>
-                <Text style={styles.whiteButtonText}>{t("clientTaskDetails.cancelTask")}</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          {/* Spacer so the green sheet reaches the very bottom */}
-          <View style={{ height: 24 }} />
+          {task.status === "Started" && (
+            <TouchableOpacity
+              style={styles.completeButton}
+              onPress={() => {
+                Alert.alert(
+                  t("clientTaskDetails.markCompletedConfirmTitle"),
+                  t("clientTaskDetails.markCompletedConfirmMessage"),
+                  [
+                    { text: t("clientTaskDetails.no") },
+                    {
+                      text: t("clientTaskDetails.yes"),
+                      onPress: async () => {
+                        try {
+                          setCompleting(true);
+                          await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, { method: "PATCH" });
+                          await fetchTask();
+                          setCompleting(false);
+                          navigation.navigate("ClientHome", {
+                            screen: "Tasks",
+                            params: {
+                              refreshTasks: true,
+                              targetTab: "Previous",
+                              subTab: "Completed",
+                              unique: Date.now(),
+                            },
+                          });
+                        } catch {
+                          setCompleting(false);
+                          Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.markCompletedError"));
+                        }
+                      },
+                    },
+                  ]
+                );
+              }}
+            >
+              <Text style={styles.completeButtonText}>Mark as Complete</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Image Preview */}
@@ -434,126 +416,221 @@ export default function TaskDetailsScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  // ✅ WHITE top
-  safeArea: { flex: 1, backgroundColor: "#ffffff" },  // ✅ WHITE top container (header area)
-  container: {
-    paddingHorizontal: 24,
-    paddingTop: 40,
-    paddingBottom: 0,
+  safeArea: {
+    flex: 1,
     backgroundColor: "#ffffff",
   },
-
-  heading: {
-    fontFamily: "InterBold",
-    fontSize: 30,
-    color: "#215433",
-    marginBottom: 4,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+  scrollView: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  container: {
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 40,
+    backgroundColor: "#ffffff",
   },
   backBtn: {
-    width: 24,
-    height: 24,
+    width: 32,
+    height: 32,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 26,
-    color: "#215432",
+    marginBottom: 20,
   },
-  subText: {
-    fontFamily: "Inter",
+  
+  // Navigation tabs
+  tabContainer: {
+    flexDirection: "row",
+    backgroundColor: "#E5E5E5",
+    borderRadius: 25,
+    padding: 3,
+    marginBottom: 24,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 22,
+    alignItems: "center",
+  },
+  activeTab: {
+    backgroundColor: "#215432",
+  },
+  tabText: {
     fontSize: 14,
+    fontFamily: "Inter",
     color: "#666",
-    marginBottom: 2,
-    textAlign: I18nManager.isRTL ? "right" : "left",
   },
-  statusBadge: {
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 12,
-    alignSelf: I18nManager.isRTL ? "flex-end" : "flex-start",
+  activeTabText: {
+    color: "#fff",
+    fontFamily: "InterBold",
   },
-  statusText: { color: "#fff", fontFamily: "InterBold", fontSize: 13 },
 
-  topContent: { marginTop: 10, marginBottom: 16 },
-  topRow: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+  // Title section
+  titleSection: {
+    marginBottom: 20,
+  },
+  titleRow: {
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
-
-  /** ✅ EDGE‑TO‑EDGE GREEN SHEET **/
-  detailsBox: {
-    backgroundColor: "#215432",
-    paddingTop: 16,
-    paddingBottom: 24,
-    marginTop: 16,
-    marginHorizontal: -24,       // full‑bleed horizontally
-    borderTopLeftRadius: 24,     // only top corners rounded
-    borderTopRightRadius: 24,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    paddingHorizontal: 24,       // inner gutters aligned to page
-    minHeight: height * 0.7,
+  title: {
+    fontSize: 32,
+    fontFamily: "InterBold",
+    color: "#215432",
+    flex: 1,
+    marginRight: 12,
   },
-
-  detailsText: {
-    fontFamily: "Inter",
-    fontSize: 14,
+  statusBadge: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  statusText: {
     color: "#fff",
-    lineHeight: 20,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    fontFamily: "InterBold",
+    fontSize: 12,
   },
 
+  // Info section
+  infoSection: {
+    marginBottom: 16,
+  },
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  infoLabel: {
+    fontSize: 14,
+    color: "#666",
+    fontFamily: "Inter",
+    marginBottom: 4,
+  },
+  infoValue: {
+    fontSize: 16,
+    color: "#333",
+    fontFamily: "InterBold",
+  },
+  budgetValue: {
+    fontSize: 16,
+    color: "#215432",
+    fontFamily: "InterBold",
+  },
+
+  // Separator
+  separator: {
+    height: 1,
+    backgroundColor: "#E5E5E5",
+    marginVertical: 20,
+  },
+
+  // Section styling
+  section: {
+    marginBottom: 20,
+  },
+  sectionLabel: {
+    fontSize: 16,
+    fontFamily: "InterBold",
+    color: "#333",
+    marginBottom: 8,
+  },
+  sectionValue: {
+    fontSize: 14,
+    fontFamily: "Inter",
+    color: "#666",
+    lineHeight: 20,
+  },
+
+  // Images
   imageRow: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    marginTop: 6,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 8,
   },
   image: {
-    width: 60,
-    height: 60,
+    width: 80,
+    height: 80,
     borderRadius: 8,
-    marginRight: I18nManager.isRTL ? 0 : 8,
-    marginLeft: I18nManager.isRTL ? 8 : 0,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  placeholderImage: {
+    width: 80,
+    height: 80,
+    backgroundColor: "#E5E5E5",
+    borderRadius: 8,
+    marginRight: 8,
+    marginBottom: 8,
   },
 
-  // Map container below location text
+  // Map
   mapContainer: {
-    marginTop: 12,
+    marginTop: 8,
     borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: "#ffffff",
-    borderWidth: 1,
-    borderColor: "#ddd",
+    backgroundColor: "#E5E5E5",
+    height: 180,
   },
   map: {
     width: "100%",
-    height: 180,
+    height: "100%",
   },
 
-  actionsInside: { marginTop: 20 },
-  whiteButton: {
-    backgroundColor: "#ffffff",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 10,
+  // Buttons
+  buttonSection: {
+    marginTop: 20,
   },
-  whiteButtonText: {
+  editButton: {
+    backgroundColor: "#ffffff",
+    borderWidth: 2,
+    borderColor: "#215432",
+    borderRadius: 25,  // More rounded/oval
+    paddingVertical: 16,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  editButtonText: {
     color: "#215432",
     fontFamily: "InterBold",
-    fontSize: 15,
+    fontSize: 16,
   },
-  noticeInside: {
-    marginBottom: 10,
-    fontSize: 14,
-    color: "#ffffff",
-    textAlign: "center",
-    fontFamily: "Inter",
+  cancelButton: {
+    backgroundColor: "#215432",  // Green background
+    borderWidth: 2,
+    borderColor: "#215432",
+    borderRadius: 25,  // More rounded/oval
+    paddingVertical: 16,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  cancelButtonText: {
+    color: "#fff",
+    fontFamily: "InterBold",
+    fontSize: 16,
+  },
+  completeButton: {
+    backgroundColor: "#215432",  // Green background
+    borderWidth: 2,
+    borderColor: "#215432",
+    borderRadius: 25,  // More rounded/oval
+    paddingVertical: 16,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  completeButtonText: {
+    color: "#fff",
+    fontFamily: "InterBold",
+    fontSize: 16,
   },
 
   // Preview overlay
   previewOverlay: {
     position: "absolute",
-    top: 0, left: 0, right: 0, bottom: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: "rgba(0,0,0,0.9)",
     justifyContent: "center",
     alignItems: "center",
@@ -574,7 +651,10 @@ const styles = StyleSheet.create({
   // Loading overlays
   overlay: {
     position: "absolute",
-    top: 0, bottom: 0, left: 0, right: 0,
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: "rgba(0,0,0,0.4)",
     justifyContent: "center",
     alignItems: "center",
@@ -587,5 +667,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
   },
-  overlayText: { fontFamily: "InterBold", fontSize: 16, color: "#215433" },
+  overlayText: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#215433",
+  },
 });
