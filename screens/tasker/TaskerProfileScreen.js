@@ -10,19 +10,28 @@ import {
   SafeAreaView,
   I18nManager,
   Dimensions,
+  Alert,
+  TextInput,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import Modal from "react-native-modal";
 
 const { height } = Dimensions.get("window");
 
 export default function TaskerProfileScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { taskerId } = route.params;
+  const { taskerId, taskId } = route.params;
   const [tasker, setTasker] = useState(null);
   const [reviewData, setReviewData] = useState({ reviews: [] });
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("profile");
+  
+  // Report modal states
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [isReporting, setIsReporting] = useState(false);
 
   useEffect(() => {
     const fetchTaskerAndReview = async () => {
@@ -41,6 +50,30 @@ export default function TaskerProfileScreen({ route, navigation }) {
     };
     fetchTaskerAndReview();
   }, [taskerId]);
+
+  const submitReport = async () => {
+    if (!reportReason.trim()) return;
+    
+    setIsReporting(true);
+    try {
+      const userId = await SecureStore.getItemAsync("userId");
+      await axios.post("https://task-kq94.onrender.com/api/reports", {
+        reporterId: userId,
+        reportedUserId: taskerId,
+        reason: reportReason,
+        taskId: taskId,
+      });
+      
+      setIsReporting(false);
+      setShowReportModal(false);
+      setReportReason("");
+      Alert.alert("Report Submitted", "Thank you for your report. We will review it shortly.");
+    } catch (err) {
+      setIsReporting(false);
+      console.error("❌ Report error:", err.message);
+      Alert.alert("Error", "Failed to submit report. Please try again.");
+    }
+  };
 
   if (loading) {
     return (
@@ -70,21 +103,44 @@ export default function TaskerProfileScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Make the scroller itself green so the very bottom is always green */}
       <ScrollView
-        style={{ flex: 1, backgroundColor: "#215432" }}
-        contentContainerStyle={styles.container} // white top area
+        style={{ flex: 1, backgroundColor: "#ffffff" }}
+        contentContainerStyle={styles.container}
         bounces={false}
         overScrollMode="never"
       >
-        {/* Header */}
+        {/* Header with back button */}
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-            size={30}
-            color="#215432"
+            size={24}
+            color="#215433"
           />
         </TouchableOpacity>
+
+        {/* Navigation Tabs */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === "details" && styles.activeTab]}
+            onPress={() => {
+              setActiveTab("details");
+              // Go back to the existing TaskDetails screen instead of navigating to a new one
+              navigation.goBack();
+            }}
+          >
+            <Text style={[styles.tabText, activeTab === "details" && styles.activeTabText]}>
+              Task Details
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === "profile" && styles.activeTab]}
+            onPress={() => setActiveTab("profile")}
+          >
+            <Text style={[styles.tabText, activeTab === "profile" && styles.activeTabText]}>
+              Tasker's Profile
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Big centered avatar */}
         <View style={styles.avatarWrap}>
@@ -97,7 +153,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
           )}
         </View>
 
-        {/* Name & basics (white area) */}
+        {/* Name & basics */}
         <View style={styles.infoSection}>
           <Text style={styles.name}>{tasker.name}</Text>
 
@@ -106,22 +162,23 @@ export default function TaskerProfileScreen({ route, navigation }) {
             {tasker.location || t("taskerProfile.notProvided")}
           </Text>
 
-          {/* experience REMOVED */}
-
-          <Text style={styles.profileDetails}>
-            <Text style={styles.profileLabel}>{t("taskerProfile.skills")} </Text>
-            {tasker.skills || t("taskerProfile.notProvided")}
-          </Text>
-        </View>
-
-        {/* GREEN SHEET – full-bleed and goes to the bottom */}
-        <View style={styles.greenSection}>
-          {/* About */}
+          {/* About section moved here */}
           <Text style={styles.aboutTitle}>
             <Text style={styles.aboutBold}>{t("taskerProfile.about")} </Text>
             {tasker.about || t("taskerProfile.notProvided")}
           </Text>
+        </View>
 
+        {/* Report User Button */}
+        <TouchableOpacity 
+          style={styles.reportButton}
+          onPress={() => setShowReportModal(true)}
+        >
+          <Text style={styles.reportButtonText}>Report User</Text>
+        </TouchableOpacity>
+
+        {/* Reviews Section */}
+        <View style={styles.reviewsSection}>
           {/* Reviews Header */}
           <View style={styles.reviewsHeader}>
             <Text style={styles.reviewsTitle}>{t("taskerProfile.reviews")}</Text>
@@ -161,27 +218,81 @@ export default function TaskerProfileScreen({ route, navigation }) {
               </View>
             ))
           )}
-
-          {/* Spacer so green reaches bottom even on short content */}
-          <View style={{ height: 24 }} />
         </View>
       </ScrollView>
+
+      {/* Report Modal */}
+      <Modal isVisible={showReportModal}>
+        <View style={styles.modalContainer}>
+          {isReporting ? (
+            <View style={styles.modalContent}>
+              <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 10 }} />
+              <Text style={styles.modalText}>Submitting report...</Text>
+            </View>
+          ) : (
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Report Tasker</Text>
+              <Text style={styles.modalSubtitle}>
+                Please describe the issue with this tasker:
+              </Text>
+              
+              <TextInput
+                style={styles.reportInput}
+                placeholder="Describe the issue..."
+                multiline
+                numberOfLines={4}
+                value={reportReason}
+                onChangeText={(text) => {
+                  if (text.length <= 300) setReportReason(text);
+                }}
+                maxLength={300}
+              />
+              
+              <Text style={styles.characterCount}>
+                {reportReason.length}/300 characters
+              </Text>
+
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={styles.modalCancelButton}
+                  onPress={() => {
+                    setShowReportModal(false);
+                    setReportReason("");
+                  }}
+                >
+                  <Text style={styles.modalCancelText}>Cancel</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.modalSubmitButton,
+                    { backgroundColor: reportReason.trim() ? "#F44336" : "#ccc" }
+                  ]}
+                  onPress={submitReport}
+                  disabled={!reportReason.trim()}
+                >
+                  <Text style={styles.modalSubmitText}>Submit</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  // top status area white
-  safeArea: { flex: 1, backgroundColor: "#ffffff" },
-
-  // white header area
+  safeArea: { 
+    flex: 1, 
+    backgroundColor: "#ffffff" 
+  },
   container: {
     paddingHorizontal: 20,
     paddingTop: 10,
-    paddingBottom: 0,
+    paddingBottom: 40,
     backgroundColor: "#ffffff",
   },
-
   backBtn: {
     width: 24,
     height: 24,
@@ -192,7 +303,37 @@ const styles = StyleSheet.create({
     alignSelf: I18nManager.isRTL ? "flex-end" : "flex-start",
   },
 
-  /** AVATAR **/
+  // Navigation tabs
+  tabContainer: {
+    flexDirection: "row",
+    backgroundColor: "#E5E5E5",
+    borderRadius: 25,
+    padding: 3,
+    marginBottom: 24,
+    height: 50, // Match the height from TaskDetailsScreen
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center", // Center content vertically
+  },
+  activeTab: {
+    backgroundColor: "#215432",
+  },
+  tabText: {
+    fontSize: 14,
+    fontFamily: "Inter",
+    color: "#666",
+  },
+  activeTabText: {
+    color: "#fff",
+    fontFamily: "InterBold",
+  },
+
+  // Avatar
   avatarWrap: {
     alignItems: "center",
     marginTop: 6,
@@ -223,10 +364,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  /** NAME / BASICS **/
+  // Name / Basics
   infoSection: {
     alignSelf: "stretch",
-    marginBottom: 10,
+    marginBottom: 20,
   },
   name: {
     fontSize: 24,
@@ -246,51 +387,174 @@ const styles = StyleSheet.create({
     color: "#215432",
   },
 
-  /** GREEN SHEET (full-bleed to edges, stretches to bottom) **/
-  greenSection: {
-    backgroundColor: "#215432",
-    marginTop: 16,
-    marginHorizontal: -20,     // full-bleed edges (negate container padding)
-    paddingHorizontal: 20,     // keep inside gutters aligned
-    paddingTop: 16,
-    paddingBottom: 24,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    minHeight: height * 0.7,   // helps cover to bottom on short content
-  },
-
+  // About section
   aboutTitle: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#ffffff",
+    color: "#333",
     lineHeight: 20,
-    marginBottom: 12,
+    marginTop: 12,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
-  aboutBold: { fontFamily: "InterBold", color: "#ffffff" },
+  aboutBold: { 
+    fontFamily: "InterBold", 
+    color: "#215432" 
+  },
 
+  // Report button - WIDER and OVAL/Rounded
+  reportButton: {
+    backgroundColor: "#F44336",
+    borderRadius: 50, // Very rounded/oval
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    alignItems: "center",
+    marginBottom: 20,
+    alignSelf: "stretch", // Make it cover most of the width
+    marginHorizontal: 20, // Add some margin on sides
+  },
+  reportButtonText: {
+    color: "#ffffff",
+    fontFamily: "InterBold",
+    fontSize: 16,
+  },
+
+  // Reviews section
+  reviewsSection: {
+    marginTop: 20,
+  },
   reviewsHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 12,
   },
-  reviewsTitle: { fontFamily: "InterBold", fontSize: 16, color: "#ffffff" },
-  reviewsAvg: { fontFamily: "InterBold", fontSize: 14, color: "#ffffff" },
+  reviewsTitle: { 
+    fontFamily: "InterBold", 
+    fontSize: 16, 
+    color: "#215432" 
+  },
+  reviewsAvg: { 
+    fontFamily: "InterBold", 
+    fontSize: 14, 
+    color: "#666" 
+  },
 
   reviewCard: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f8f8f8",
     borderRadius: 12,
     padding: 12,
     marginBottom: 10,
   },
-  reviewDate: { fontFamily: "Inter", fontSize: 12, color: "#999", marginBottom: 4 },
-  reviewDivider: { height: 1, backgroundColor: "#e0e0e0", marginVertical: 6 },
-  reviewRatingContainer: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
-  reviewRatingText: { fontFamily: "InterBold", fontSize: 14, color: "#000" },
-  reviewComment: { fontFamily: "Inter", fontSize: 13, color: "#444" },
-  noReviews: { fontFamily: "Inter", fontSize: 14, color: "#ccc", marginTop: 8 },
+  reviewDate: { 
+    fontFamily: "Inter", 
+    fontSize: 12, 
+    color: "#999", 
+    marginBottom: 4 
+  },
+  reviewDivider: { 
+    height: 1, 
+    backgroundColor: "#e0e0e0", 
+    marginVertical: 6 
+  },
+  reviewRatingContainer: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    marginBottom: 4 
+  },
+  reviewRatingText: { 
+    fontFamily: "InterBold", 
+    fontSize: 14, 
+    color: "#000" 
+  },
+  reviewComment: { 
+    fontFamily: "Inter", 
+    fontSize: 13, 
+    color: "#444" 
+  },
+  noReviews: { 
+    fontFamily: "Inter", 
+    fontSize: 14, 
+    color: "#ccc", 
+    marginTop: 8 
+  },
 
-  error: { textAlign: "center", marginTop: 50, color: "red", fontSize: 16 },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    padding: 20,
+    width: "90%",
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontFamily: "InterBold",
+    color: "#215432",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  reportInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    fontFamily: "Inter",
+    textAlignVertical: "top",
+    marginBottom: 10,
+  },
+  characterCount: {
+    fontSize: 12,
+    color: "#999",
+    textAlign: "right",
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  modalCancelButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginRight: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    alignItems: "center",
+  },
+  modalCancelText: {
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#666",
+  },
+  modalSubmitButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  modalSubmitText: {
+    fontSize: 16,
+    fontFamily: "InterBold",
+    color: "#ffffff",
+  },
+
+  error: { 
+    textAlign: "center", 
+    marginTop: 50, 
+    color: "red", 
+    fontSize: 16 
+  },
 });

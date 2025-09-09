@@ -200,10 +200,17 @@ export default function TaskDetailsScreen({ route, navigation }) {
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[styles.tab, activeTab === "details" && styles.activeTab]}
-            onPress={() => setActiveTab("details")}
+            onPress={() => {
+              setActiveTab("details");
+              // Navigate back to task details and pass the task data
+              navigation.navigate("TaskDetails", { 
+                task: task, // Pass the task object
+                taskId: task._id // Also pass taskId for consistency
+              });
+            }}
           >
             <Text style={[styles.tabText, activeTab === "details" && styles.activeTabText]}>
-              Task details
+              Task Details
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -222,7 +229,11 @@ export default function TaskDetailsScreen({ route, navigation }) {
                 
                 if (taskerId) {
                   console.log("Found taskerId:", taskerId);
-                  navigation.navigate("TaskerProfile", { taskerId });
+                  navigation.navigate("TaskerProfile", { 
+                    taskerId: taskerId,
+                    task: task, // Pass the task object
+                    taskId: task._id // Also pass taskId
+                  });
                 } else {
                   console.error("No tasker ID found in task object");
                   Alert.alert(
