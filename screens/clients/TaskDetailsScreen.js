@@ -210,11 +210,31 @@ export default function TaskDetailsScreen({ route, navigation }) {
             style={[styles.tab, activeTab === "offers" && styles.activeTab]}
             onPress={() => {
               setActiveTab("offers");
-              navigation.navigate("ViewBids", { taskId: task._id });
+              if (task.status === "Pending") {
+                navigation.navigate("ViewBids", { taskId: task._id });
+              } else {
+                // Debug: Log the task object to see available fields
+                console.log("Task object:", task);
+                console.log("Task keys:", Object.keys(task));
+                
+                // Try different possible field names for tasker ID
+                const taskerId = task.assignedTo || task.taskerId || task.assignedTasker || task.tasker || task.assignedUser;
+                
+                if (taskerId) {
+                  console.log("Found taskerId:", taskerId);
+                  navigation.navigate("TaskerProfile", { taskerId });
+                } else {
+                  console.error("No tasker ID found in task object");
+                  Alert.alert(
+                    "Tasker Profile Unavailable", 
+                    "Tasker information is not available for this task. The task may not have been assigned to a tasker yet."
+                  );
+                }
+              }
             }}
           >
             <Text style={[styles.tabText, activeTab === "offers" && styles.activeTabText]}>
-              Offers
+              {task.status === "Pending" ? "Offers" : "Tasker's Profile"}
             </Text>
           </TouchableOpacity>
         </View>
