@@ -309,6 +309,14 @@ allTasks.forEach((task) => {
     }
   };
   
+  const handleChat = (task) => {
+    // task.taskerId is just a string ID, not an object
+    const otherUserId = task.taskerId;
+    const name = "Tasker"; // Default name since we don't have the tasker's name here
+    console.log(" Navigating to Chat with:", { name, otherUserId });
+    navigation.navigate("Chat", { name, otherUserId });
+  };
+
   const renderTask = ({ item }) => (
     <TouchableOpacity
       onPress={() => navigation.navigate("TaskDetails", { task: item })}
@@ -393,7 +401,7 @@ allTasks.forEach((task) => {
             {/* Chat Button */}
             <TouchableOpacity
               style={styles.actionBtn}
-              onPress={() => navigation.navigate("Chat", { taskId: item._id, taskerId: item.taskerId })}
+              onPress={() => handleChat(item)}
             >
               <Text style={styles.actionBtnText}>
                 {t("clientMyTasks.chat", "Chat")}
