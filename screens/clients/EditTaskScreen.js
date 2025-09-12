@@ -1,631 +1,537 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
-  StyleSheet,
   TouchableOpacity,
+  StyleSheet,
   ScrollView,
-  Alert,
   SafeAreaView,
-  KeyboardAvoidingView,
-  Platform,
+  Alert,
+  Image,
   Dimensions,
   Modal,
-  I18nManager,
-  Linking,
 } from "react-native";
-
-import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
-import { getTaskById, updateTaskById } from "../../services/taskService";
+import { useTranslation } from "react-i18next";
+import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-import MapView, { Marker } from "react-native-maps";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as SecureStore from "expo-secure-store";
+import { updateTaskById } from "../../services/taskService";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
-const openInGoogleMaps = async (lat, lng, labelRaw = "Task Location") => {
-  try {
-    const label = encodeURIComponent(labelRaw || "Task Location");
-    const appUrl = `comgooglemaps://?q=${lat},${lng}(${label})&center=${lat},${lng}&zoom=14`;
-    const canOpenApp = await Linking.canOpenURL(appUrl);
-    if (canOpenApp) {
-      await Linking.openURL(appUrl);
-      return;
-    }
-    const webUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-    await Linking.openURL(webUrl);
-  } catch (e) {
-    Alert.alert(t("common.errorTitle"), t("common.couldNotOpenMaps"));
-  }
-};
+// Available services from PostTaskScreen
+const AVAILABLE_SERVICES = [
+  "Cleaning",
+  "Moving",
+  "Handyman",
+  "Delivery",
+  "Pet Care",
+  "Tutoring",
+  "Photography",
+  "Event Planning",
+  "Gardening",
+  "Computer Help",
+  "Other"
+];
 
 export default function EditTaskScreen({ route, navigation }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { task } = route.params;
-  const taskId = task._id;
-  const insets = useSafeAreaInsets();
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [houseNumber, setHouseNumber] = useState("");
-  const [streetName, setStreetName] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zipCode, setZipCode] = useState("");
-  const [price, setPrice] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState(task.category || "");
+  const [title, setTitle] = useState(task.title || "");
+  const [description, setDescription] = useState(task.description || "");
+  const [budget, setBudget] = useState(task.budget?.toString() || "");
+  const [address, setAddress] = useState(task.location || "");
+  const [images, setImages] = useState(task.images || []);
+  const [loading, setLoading] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
 
-  // Location-related state
-  const [coords, setCoords] = useState(null);
-  const [mapVisible, setMapVisible] = useState(false);
-  const [tempCoords, setTempCoords] = useState(null);
-  const [tempRegion, setTempRegion] = useState(null);
-
-  const [errors, setErrors] = useState({
-    title: false,
-    description: false,
-    houseNumber: false,
-    streetName: false,
-    city: false,
-    price: false,
-  });
-
-  // Get current location automatically when component mounts
-  useEffect(() => {
-    const getCurrentLocation = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert(t("common.permissionNeeded"), t("common.locationPermissionRequired"));
-          return;
-        }
-        
-        const pos = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        });
-        
-        const { latitude, longitude } = pos.coords;
-        setCoords({ latitude, longitude });
-        setTempRegion({
-          latitude,
-          longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        });
-      } catch (e) {
-        console.log("get location error", e);
-        Alert.alert(t("common.errorTitle"), t("common.couldNotGetLocation"));
-      }
-    };
-    
-    getCurrentLocation();
-  }, []);
-
-  // Open the map picker
-  const openMapPicker = async () => {
-    try {
-      setMapVisible(true);
-      if (coords) {
-        setTempCoords(coords);
-        setTempRegion({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        });
-      }
-    } catch (e) {
-      console.log("openMapPicker error", e);
-      Alert.alert(t("common.errorTitle"), t("common.couldNotOpenMapPicker"));
-    }
-  };
-
-  // Confirm the location chosen in the modal
-  const confirmMapLocation = async () => {
-    if (!tempCoords) return;
-    setCoords(tempCoords);
-    setMapVisible(false);
-  };
-
-  useEffect(() => {
-    const loadTask = async () => {
-      try {
-        const task = await getTaskById(taskId);
-        setTitle(task.title || "");
-        setDescription(task.description || "");
-        
-        // Parse existing location into separate fields if available
-        if (task.location) {
-          // Try to parse existing location string into components
-          const locationParts = task.location.split(',').map(part => part.trim());
-          if (locationParts.length >= 3) {
-            setHouseNumber(locationParts[0] || "");
-            setStreetName(locationParts[1] || "");
-            setCity(locationParts[2] || "");
-            if (locationParts.length >= 4) setState(locationParts[3] || "");
-            if (locationParts.length >= 5) setZipCode(locationParts[4] || "");
-          } else {
-            // Fallback: put everything in street name
-            setStreetName(task.location);
-          }
-        }
-        
-        setPrice(task.budget?.toString() || "");
-        
-        // Load coordinates from existing task
-        if (task.latitude && task.longitude) {
-          setCoords({ latitude: task.latitude, longitude: task.longitude });
-          setTempRegion({
-            latitude: task.latitude,
-            longitude: task.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          });
-        } else if (task.locationGeo?.coordinates) {
-          const lat = task.locationGeo.coordinates[1];
-          const lng = task.locationGeo.coordinates[0];
-          setCoords({ latitude: lat, longitude: lng });
-          setTempRegion({
-            latitude: lat,
-            longitude: lng,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          });
-        }
-      } catch (err) {
-        Alert.alert(t("common.errorTitle"), t("clientEditTask.loadError"));
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadTask();
-  }, [taskId, t]);
-
-  const handleUpdate = async () => {
-    const newErrors = {
-      title: !title.trim(),
-      description: !description.trim(),
-      houseNumber: !houseNumber.trim(),
-      streetName: !streetName.trim(),
-      city: !city.trim(),
-      price: !price.trim(),
-      // Note: state and zipCode remain optional
-    };
-
-    setErrors(newErrors);
-
-    if (Object.values(newErrors).some(Boolean)) {
-      Alert.alert(t("clientEditTask.missingTitle"), t("clientEditTask.missingFields"));
+  const handleSave = async () => {
+    if (!title.trim() || !description.trim() || !budget.trim()) {
+      Alert.alert("Error", "Please fill in all required fields");
       return;
     }
 
-    // Check if coordinates are set
-    if (!coords || !coords.latitude || !coords.longitude) {
-      Alert.alert(t("common.locationRequired"), t("common.pleaseSelectLocation"));
-      return;
-    }
-
-    // Combine address fields into a single location string
-    const fullLocation = [houseNumber, streetName, city, state, zipCode]
-      .filter(Boolean)
-      .join(", ");
-
+    setLoading(true);
     try {
-      await updateTaskById(taskId, {
-        title,
-        description,
-        location: fullLocation,
-        budget: price,
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-        locationGeo: {
-          type: "Point",
-          coordinates: [coords.longitude, coords.latitude]
-        }
+      // Use the existing service method
+      await updateTaskById(task._id, {
+        category,
+        title: title.trim(),
+        description: description.trim(),
+        budget: parseFloat(budget),
+        location: address,
+        images,
       });
-      navigation.goBack();
-    } catch (err) {
-      Alert.alert(t("common.errorTitle"), t("clientEditTask.updateError"));
+
+      Alert.alert("Success", "Task updated successfully", [
+        { text: "OK", onPress: () => navigation.goBack() }
+      ]);
+    } catch (error) {
+      console.log("Update error:", error);
+      Alert.alert("Error", "Failed to update task. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) return <Text style={{ marginTop: 100, textAlign: "center" }}>Loading...</Text>;
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      quality: 0.8,
+    });
 
-  const dirStyle = { writingDirection: i18n.language?.startsWith("ar") ? "rtl" : "ltr" };
+    if (!result.canceled) {
+      setImages([...images, ...result.assets.map(asset => asset.uri)]);
+    }
+  };
+
+  const pickLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission denied", "Location permission is required");
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      const address = await Location.reverseGeocodeAsync({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+
+      if (address.length > 0) {
+        const addr = address[0];
+        setAddress(`${addr.street || ""} ${addr.city || ""} ${addr.region || ""}`.trim());
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to get location");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        style={styles.keyboardView}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-      >
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={styles.headerRow}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={30} color="#ffffff" />
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#215432" />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>Edit Task</Text>
+          <View style={styles.placeholder} />
         </View>
 
-        <Text style={styles.heading}>{t("clientEditTask.heading")}</Text>
+        {/* Green separator line */}
+        <View style={styles.separator} />
 
-        {/* ScrollView with all content including map */}
-        <ScrollView 
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Map inside the scroll view */}
-          {coords && (
-            <View style={styles.mapContainer}>
-              <MapView
-                style={styles.map}
-                initialRegion={{
-                  latitude: coords.latitude,
-                  longitude: coords.longitude,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                }}
-                pointerEvents="none"
-              >
-                <Marker coordinate={coords} />
-              </MapView>
-              <TouchableOpacity style={styles.editLocationButton} onPress={openMapPicker}>
-                <Text style={styles.editLocationText}>Edit Location on Map</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {/* Form fields */}
-          <View style={styles.formContainer}>
-            <TextInput
-              style={[styles.input, dirStyle, errors.title && styles.errorInput]}
-              placeholder={t("clientEditTask.placeholders.title")}
-              value={title}
-              onChangeText={(text) => {
-                setTitle(text);
-                if (errors.title && text.trim()) {
-                  setErrors((prev) => ({ ...prev, title: false }));
-                }
-              }}
-              maxLength={30}
-              placeholderTextColor="#999"
-              returnKeyType="next"
-            />
-
-            <TextInput
-              style={[styles.input, styles.textarea, dirStyle, errors.description && styles.errorInput]}
-              placeholder={t("clientEditTask.placeholders.description")}
-              value={description}
-              onChangeText={(text) => {
-                setDescription(text);
-                if (errors.description && text.trim()) {
-                  setErrors((prev) => ({ ...prev, description: false }));
-                }
-              }}
-              multiline
-              maxLength={150}
-              placeholderTextColor="#999"
-              returnKeyType="next"
-            />
-
-            {/* Address fields */}
-            <Text style={styles.sectionTitle}>{t("clientPostTask.addressSectionTitle")}</Text>
-            
-            <TextInput
-              style={[styles.input, dirStyle, errors.houseNumber && styles.errorInput]}
-              placeholder={t("clientPostTask.addressFields.houseNumber")}
-              value={houseNumber}
-              onChangeText={(text) => {
-                setHouseNumber(text);
-                if (errors.houseNumber && text.trim()) {
-                  setErrors((prev) => ({ ...prev, houseNumber: false }));
-                }
-              }}
-              maxLength={20}
-              placeholderTextColor="#999"
-              returnKeyType="next"
-            />
-
-            <TextInput
-              style={[styles.input, dirStyle, errors.streetName && styles.errorInput]}
-              placeholder={t("clientPostTask.addressFields.streetName")}
-              value={streetName}
-              onChangeText={(text) => {
-                setStreetName(text);
-                if (errors.streetName && text.trim()) {
-                  setErrors((prev) => ({ ...prev, streetName: false }));
-                }
-              }}
-              maxLength={100}
-              placeholderTextColor="#999"
-              returnKeyType="next"
-            />
-
-            <TextInput
-              style={[styles.input, dirStyle, errors.city && styles.errorInput]}
-              placeholder={t("clientPostTask.addressFields.city")}
-              value={city}
-              onChangeText={(text) => {
-                setCity(text);
-                if (errors.city && text.trim()) {
-                  setErrors((prev) => ({ ...prev, city: false }));
-                }
-              }}
-              maxLength={50}
-              placeholderTextColor="#999"
-              returnKeyType="next"
-            />
-
-            <TextInput
-              style={[styles.input, dirStyle]}
-              placeholder={t("clientPostTask.addressFields.state")}
-              value={state}
-              onChangeText={setState}
-              maxLength={50}
-              placeholderTextColor="#999"
-              returnKeyType="next"
-            />
-
-            <TextInput
-              style={[styles.input, dirStyle]}
-              placeholder={t("clientPostTask.addressFields.zipCode")}
-              value={zipCode}
-              onChangeText={setZipCode}
-              maxLength={20}
-              placeholderTextColor="#999"
-              returnKeyType="next"
-            />
-
-            {/* Budget section - separated from address */}
-            <Text style={styles.sectionTitle}>{t("clientPostTask.budgetSectionTitle")}</Text>
-            
-            <TextInput
-              style={[styles.input, dirStyle, errors.price && styles.errorInput]}
-              placeholder={t("clientEditTask.placeholders.price", { currency: "BHD" })}
-              value={price}
-              onChangeText={(text) => {
-                setPrice(text);
-                if (errors.price && text.trim()) {
-                  setErrors((prev) => ({ ...prev, price: false }));
-                }
-              }}
-              keyboardType="numeric"
-              placeholderTextColor="#999"
-              returnKeyType="done"
-            />
-
-            <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-              <Text style={styles.buttonText}>{t("clientEditTask.save")}</Text>
+        {/* Form Fields */}
+        <View style={styles.formContainer}>
+          {/* Category */}
+          <View style={styles.fieldContainer}>
+            <Text style={styles.fieldLabel}>Category</Text>
+            <TouchableOpacity
+              style={styles.categoryBtn}
+              onPress={() => setShowCategoryModal(true)}
+            >
+              <Text style={[styles.categoryText, !category && styles.placeholderText]}>
+                {category || "Select Category"}
+              </Text>
+              <Ionicons name="chevron-down" size={20} color="#999" />
             </TouchableOpacity>
           </View>
-        </ScrollView>
 
-        {/* Map Picker Modal */}
-        <Modal
-          visible={mapVisible}
-          animationType="slide"
-          transparent={false}
-          presentationStyle="fullScreen"
-          statusBarTranslucent={Platform.OS === "android"}
-        >
-          <View style={{ flex: 1, backgroundColor: "#fff", paddingTop: insets.top }}>
-            <View style={styles.modalHeaderRow}>
-              <TouchableOpacity onPress={() => setMapVisible(false)} style={styles.modalBackBtn}>
-                <Ionicons
-                  name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-                  size={24}
-                  color="#215433"
-                />
-              </TouchableOpacity>
-              <Text style={styles.modalHeader}>Select Task Location</Text>
-              <View style={{ width: 24 }} />
+          {/* Task Title */}
+          <View style={styles.fieldContainer}>
+            <View style={styles.labelRow}>
+              <Text style={styles.fieldLabel}>Task Title</Text>
+              <Text style={styles.charLimit}>Maximum 100 Characters</Text>
             </View>
+            <TextInput
+              style={styles.inputField}
+              value={title}
+              onChangeText={(text) => {
+                if (text.length <= 100) setTitle(text);
+              }}
+              placeholder="What do you need done?"
+              placeholderTextColor="#999"
+              maxLength={100}
+            />
+          </View>
 
-            <Text style={styles.modalHeaderSubtitle}>
-              Tap on the map to select your task location
-            </Text>
-
-            {tempRegion && (
-              <MapView
-                style={{ flex: 1 }}
-                initialRegion={tempRegion}
-                onPress={(e) => {
-                  const { latitude, longitude } = e.nativeEvent.coordinate;
-                  setTempCoords({ latitude, longitude });
+          {/* Description */}
+          <View style={styles.fieldContainer}>
+            <View style={styles.labelRow}>
+              <Text style={styles.fieldLabel}>Describe your Task</Text>
+              <Text style={styles.charLimit}>Maximum 350 Characters</Text>
+            </View>
+            <View style={styles.textAreaContainer}>
+              <TextInput
+                style={styles.textArea}
+                value={description}
+                onChangeText={(text) => {
+                  if (text.length <= 350) setDescription(text);
                 }}
-              >
-                {tempCoords && (
-                  <Marker
-                    coordinate={tempCoords}
-                    draggable
-                    onDragEnd={(e) => {
-                      const { latitude, longitude } = e.nativeEvent.coordinate;
-                      setTempCoords({ latitude, longitude });
-                    }}
-                  />
-                )}
-              </MapView>
-            )}
-
-            <View style={styles.mapFooter}>
-              <TouchableOpacity style={[styles.mapBtn, styles.mapCancel]} onPress={() => setMapVisible(false)}>
-                <Text style={styles.mapBtnText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.mapBtn, styles.mapConfirm]} onPress={confirmMapLocation}>
-                <Text style={[styles.mapBtnText, { color: "#fff" }]}>Confirm Location</Text>
+                placeholder="Add a more detailed description of the task you want done"
+                placeholderTextColor="#999"
+                multiline
+                maxLength={350}
+                textAlignVertical="top"
+              />
+              <View style={styles.textAreaSeparator} />
+              <TouchableOpacity style={styles.addMediaBtn} onPress={pickImage}>
+                <Ionicons name="add" size={20} color="#999" />
+                <Text style={styles.addMediaText}>Add Images/Videos</Text>
               </TouchableOpacity>
             </View>
           </View>
-        </Modal>
-      </KeyboardAvoidingView>
+
+          {/* Task Address */}
+          <View style={styles.fieldContainer}>
+            <Text style={styles.fieldLabel}>Task Address</Text>
+            <TouchableOpacity style={styles.addressBtn} onPress={pickLocation}>
+              <View style={styles.addressBtnContent}>
+                <View style={styles.addIcon}>
+                  <Ionicons name="add" size={16} color="#fff" />
+                </View>
+                <Text style={styles.addressBtnText}>Add Task Address</Text>
+              </View>
+            </TouchableOpacity>
+            {address ? (
+              <Text style={styles.addressText}>{address}</Text>
+            ) : null}
+          </View>
+
+          {/* Budget */}
+          <View style={styles.fieldContainer}>
+            <Text style={styles.fieldLabel}>Budget</Text>
+            <View style={styles.budgetContainer}>
+              <TextInput
+                style={styles.budgetInput}
+                value={budget}
+                onChangeText={setBudget}
+                placeholder="Your Budget"
+                placeholderTextColor="#999"
+                keyboardType="numeric"
+              />
+              <Text style={styles.currency}>BHD</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Confirm Changes Button */}
+        <TouchableOpacity
+          style={styles.confirmBtn}
+          onPress={handleSave}
+          disabled={loading}
+        >
+          <Text style={styles.confirmBtnText}>
+            {loading ? "Updating..." : "Confirm Changes"}
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      {/* Category Modal */}
+      <Modal
+        visible={showCategoryModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowCategoryModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Category</Text>
+              <TouchableOpacity
+                style={styles.closeBtn}
+                onPress={() => setShowCategoryModal(false)}
+              >
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.categoryList}>
+              {AVAILABLE_SERVICES.map((service, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.categoryItem,
+                    category === service && styles.selectedCategoryItem
+                  ]}
+                  onPress={() => {
+                    setCategory(service);
+                    setShowCategoryModal(false);
+                  }}
+                >
+                  <Text style={[
+                    styles.categoryItemText,
+                    category === service && styles.selectedCategoryItemText
+                  ]}>
+                    {service}
+                  </Text>
+                  {category === service && (
+                    <Ionicons name="checkmark" size={20} color="#215432" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  keyboardView: { flex: 1 },
-  safeArea: { flex: 1, backgroundColor: "#215432" },
-  scrollView: {
+  safeArea: {
     flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 40,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 24,
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  backBtn: {
-    width: 24,
-    height: 24,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  heading: {
-    fontFamily: "InterBold",
-    fontSize: 32,
-    color: "#ffffff",
-    marginBottom: 30,
-    marginTop: 60,
-    textAlign: "left",
-    paddingHorizontal: 24,
-  },
-  // Map container inside scroll view
-  mapContainer: {
-    marginHorizontal: 24,
-    marginBottom: 20,
-    borderRadius: 12,
-    overflow: "hidden",
     backgroundColor: "#ffffff",
   },
-  map: {
-    width: "100%",
-    height: 200,
-  },
-  editLocationButton: {
-    paddingVertical: 12,
-    alignItems: "center",
-    backgroundColor: "#f2f2f2",
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
-  },
-  editLocationText: {
-    fontSize: 14,
-    color: "#215432",
-    fontFamily: "InterBold",
-  },
-  formContainer: {
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontFamily: "InterBold",
-    fontSize: 18,
-    color: "#ffffff",
-    marginBottom: 16,
-    marginTop: 8,
-  },
-  input: {
+  container: {
+    flex: 1,
     backgroundColor: "#ffffff",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    fontFamily: "Inter",
-    color: "#333",
-    marginBottom: 20,
   },
-  textarea: { 
-    textAlignVertical: "top", 
-    height: 120,
-    paddingTop: 14,
-  },
-  button: {
-    backgroundColor: "#ffffff",
-    paddingVertical: 14,
-    borderRadius: 30,
-    alignItems: "center",
-    width: "100%",
-    marginTop: 30,
-  },
-  buttonText: {
-    fontFamily: "InterBold",
-    fontSize: 16,
-    color: "#215432",
-  },
-  errorInput: {
-    borderWidth: 1,
-    borderColor: "#ff4d4d",
-  },
-  errorText: {
-    color: "#ff4d4d",
-    fontSize: 12,
-    marginTop: 5,
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  modalHeaderRow: {
+  header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#215432",
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontFamily: "InterBold",
+    color: "#333",
+  },
+  placeholder: {
+    width: 40,
+  },
+  separator: {
+    height: 2,
+    backgroundColor: "#215432",
+    marginHorizontal: 20,
+  },
+  formContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 24,
+  },
+  fieldContainer: {
+    marginBottom: 24,
+  },
+  fieldLabel: {
+    fontSize: 16,
+    fontFamily: "InterBold",
+    color: "#215432",
+    marginBottom: 8,
+  },
+  labelRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  charLimit: {
+    fontSize: 12,
+    color: "#666",
+    fontFamily: "Inter",
+  },
+  inputField: {
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    fontFamily: "Inter",
     backgroundColor: "#fff",
   },
-  modalBackBtn: {
+  categoryBtn: {
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  categoryText: {
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#333",
+  },
+  placeholderText: {
+    color: "#999",
+  },
+  textAreaContainer: {
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 8,
+    backgroundColor: "#fff",
+  },
+  textArea: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    fontFamily: "Inter",
+    minHeight: 100,
+    maxHeight: 120,
+  },
+  textAreaSeparator: {
+    height: 1,
+    backgroundColor: "#E0E0E0",
+    marginHorizontal: 16,
+  },
+  addMediaBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  addMediaText: {
+    fontSize: 14,
+    color: "#999",
+    fontFamily: "Inter",
+    marginLeft: 8,
+  },
+  addressBtn: {
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  addressBtnContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  addIcon: {
     width: 24,
     height: 24,
+    borderRadius: 12,
+    backgroundColor: "#215432",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  addressBtnText: {
+    fontSize: 16,
+    color: "#215432",
+    fontFamily: "InterBold",
+  },
+  addressText: {
+    fontSize: 14,
+    color: "#666",
+    fontFamily: "Inter",
+    marginTop: 8,
+  },
+  budgetContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 8,
+    backgroundColor: "#fff",
+  },
+  budgetInput: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    fontFamily: "Inter",
+  },
+  currency: {
+    fontSize: 16,
+    fontFamily: "InterBold",
+    color: "#333",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  confirmBtn: {
+    backgroundColor: "#215432",
+    marginHorizontal: 20,
+    marginVertical: 32,
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  confirmBtnText: {
+    fontSize: 16,
+    fontFamily: "InterBold",
+    color: "#fff",
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "70%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: "InterBold",
+    color: "#333",
+  },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#f5f5f5",
     alignItems: "center",
     justifyContent: "center",
   },
-  modalHeader: {
-    fontFamily: "InterBold",
-    fontSize: 20,
-    color: "#215433",
-    flex: 1,
-    textAlign: "center",
+  categoryList: {
+    maxHeight: 400,
   },
-  modalHeaderSubtitle: {
-    fontFamily: "Inter",
-    fontSize: 14,
-    color: "#666",
-    paddingHorizontal: 24,
-    marginBottom: 20,
-    backgroundColor: "#fff",
-  },
-  mapFooter: {
+  categoryItem: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    paddingHorizontal: 24,
-    paddingBottom: 20,
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
   },
-  mapBtn: {
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: "#215432",
+  selectedCategoryItem: {
+    backgroundColor: "#f0f8f0",
   },
-  mapCancel: {
-    backgroundColor: "#ffffff",
-    borderColor: "#215432",
-    borderWidth: 1,
-  },
-  mapConfirm: {
-    backgroundColor: "#215432",
-  },
-  mapBtnText: {
-    fontFamily: "InterBold",
+  categoryItemText: {
     fontSize: 16,
+    fontFamily: "Inter",
+    color: "#333",
+  },
+  selectedCategoryItemText: {
     color: "#215432",
+    fontFamily: "InterBold",
   },
 });
