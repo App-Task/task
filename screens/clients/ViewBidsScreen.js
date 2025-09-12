@@ -226,25 +226,51 @@ export default function ViewBidsScreen({ route, navigation }) {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.headerRow}>
-        <TouchableOpacity
-          style={styles.backBtn}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={30} color="#215432" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Bids Received</Text>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={30} color="#215432" />
+          </TouchableOpacity>
+          
           <View style={styles.backBtn} />
         </View>
 
-        {loading ? (
-  <ActivityIndicator
-    size="large"
-    color="#215433"
-    style={{ marginTop: 50 }}
-  />
-) : (
-  <FlatList
+        {/* Navigation Tabs - positioned like TaskDetailsScreen */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab]}
+            onPress={() => {
+              // Navigate to task details
+              navigation.navigate("TaskDetails", { 
+                task: { _id: taskId } // Pass the taskId as task object
+              });
+            }}
+          >
+            <Text style={[styles.tabText]}>
+              Task Details
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, styles.activeTab]} // Always show as active
+            onPress={() => {
+              // Do nothing when Offers tab is pressed since we're already on it
+            }}
+          >
+            <Text style={[styles.tabText, styles.activeTabText]}>
+              Offers
+            </Text>
+          </TouchableOpacity>
+        </View>
 
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color="#215433"
+            style={{ marginTop: 50 }}
+          />
+        ) : (
+          <FlatList
             data={bids}
             keyExtractor={(item) => item._id}
             renderItem={renderBid}
@@ -256,16 +282,14 @@ export default function ViewBidsScreen({ route, navigation }) {
         )}
       </View>
 
-
       {accepting && (
-  <View style={styles.acceptingOverlay}>
-    <View style={styles.acceptingBox}>
-      <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 10 }} />
-      <Text style={styles.acceptingText}>{t("clientViewBids.acceptingBid")}</Text>
-    </View>
-  </View>
-)}
-
+        <View style={styles.acceptingOverlay}>
+          <View style={styles.acceptingBox}>
+            <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 10 }} />
+            <Text style={styles.acceptingText}>{t("clientViewBids.acceptingBid")}</Text>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -283,21 +307,46 @@ const styles = StyleSheet.create({
     paddingTop: 10, // Reduced to push content closer to arrow
     paddingHorizontal: 20,
   },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  
   backBtn: {
-    width: 40,
-    height: 40,
-    alignItems: "flex-start",
+    width: 32,
+    height: 32,
+    alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20, // Small space below arrow
   },
   
-  title: {
+  tabContainer: {
+    flexDirection: "row",
+    backgroundColor: "#E5E5E5",
+    borderRadius: 25,
+    padding: 3,
+    marginBottom: 24,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 22,
+    alignItems: "center",
+  },
+  activeTab: {
+    backgroundColor: "#215432",
+  },
+  tabText: {
+    fontSize: 14,
+    fontFamily: "Inter",
+    color: "#666",
+  },
+  activeTabText: {
+    color: "#fff",
     fontFamily: "InterBold",
-    fontSize: 26,
-    color: "#215433",
-    marginBottom: -30, // reduced spacing
   },
-  
   listContent: {
     paddingBottom: 60,
   },
@@ -412,7 +461,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
   },
-
 
   acceptingOverlay: {
     position: "absolute",
