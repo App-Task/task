@@ -90,6 +90,10 @@ export default function EditTaskScreen({ route, navigation }) {
     }
   };
 
+  const removeImage = (indexToRemove) => {
+    setImages(images.filter((_, index) => index !== indexToRemove));
+  };
+
   const pickLocation = async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -191,6 +195,30 @@ export default function EditTaskScreen({ route, navigation }) {
               </TouchableOpacity>
             </View>
           </View>
+
+          {/* Image Gallery */}
+          {images && images.length > 0 && (
+            <View style={styles.imageGalleryContainer}>
+              <Text style={styles.galleryTitle}>Selected Images</Text>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false} 
+                style={styles.imageGallery}
+              >
+                {images.map((imageUri, index) => (
+                  <View key={index} style={styles.imageContainer}>
+                    <Image source={{ uri: imageUri }} style={styles.galleryImage} />
+                    <TouchableOpacity
+                      style={styles.removeImageBtn}
+                      onPress={() => removeImage(index)}
+                    >
+                      <Ionicons name="close" size={16} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+          )}
 
           {/* Task Address */}
           <View style={styles.fieldContainer}>
@@ -409,6 +437,45 @@ const styles = StyleSheet.create({
     color: "#999",
     fontFamily: "Inter",
     marginLeft: 8,
+  },
+  // Image Gallery styles
+  imageGalleryContainer: {
+    marginBottom: 24,
+  },
+  galleryTitle: {
+    fontSize: 14,
+    fontFamily: "InterBold",
+    color: "#215432",
+    marginBottom: 12,
+  },
+  imageGallery: {
+    flexDirection: "row",
+  },
+  imageContainer: {
+    position: "relative",
+    marginRight: 12,
+  },
+  galleryImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    resizeMode: "cover",
+  },
+  removeImageBtn: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   addressBtn: {
     borderWidth: 1,
