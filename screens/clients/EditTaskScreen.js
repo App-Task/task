@@ -18,8 +18,10 @@ import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import * as SecureStore from "expo-secure-store";
 import { updateTaskById } from "../../services/taskService";
+import MapView, { Marker } from "react-native-maps";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 // Available services from PostTaskScreen
 const AVAILABLE_SERVICES = [
@@ -48,6 +50,40 @@ export default function EditTaskScreen({ route, navigation }) {
   const [images, setImages] = useState(task.images || []);
   const [loading, setLoading] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+  
+  // Location states
+  const [coords, setCoords] = useState(null);
+  const [mapVisible, setMapVisible] = useState(false);
+  const [tempCoords, setTempCoords] = useState(null);
+  const [tempRegion, setTempRegion] = useState(null);
+
+  // Initialize location from task data
+  useEffect(() => {
+    if (task.coordinates) {
+      setCoords(task.coordinates);
+    } else if (task.location) {
+      // If we have address but no coordinates, try to geocode it
+      geocodeAddress(task.location);
+    }
+  }, []);
+
+  const geocodeAddress = async (address) => {
+    try {
+      const result = await Location.geocodeAsync(address);
+      if (result.length > 0) {
+        const { latitude, longitude } = result[0];
+        setCoords({ latitude, longitude });
+        setTempRegion({
+          latitude,
+          longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        });
+      }
+    } catch (error) {
+      console.log("Geocoding error:", error);
+    }
+  };
 
   const handleSave = async () => {
     if (!title.trim() || !description.trim() || !budget.trim()) {
@@ -64,6 +100,7 @@ export default function EditTaskScreen({ route, navigation }) {
         description: description.trim(),
         budget: parseFloat(budget),
         location: address,
+        coordinates: coords,
         images,
       });
 
@@ -111,10 +148,71 @@ export default function EditTaskScreen({ route, navigation }) {
       if (address.length > 0) {
         const addr = address[0];
         setAddress(`${addr.street || ""} ${addr.city || ""} ${addr.region || ""}`.trim());
+        setCoords({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
       }
     } catch (error) {
       Alert.alert("Error", "Failed to get location");
     }
+  };
+
+  // Open the map picker
+  const openMapPicker = async () => {
+    try {
+      setMapVisible(true);
+      if (coords) {
+        setTempCoords(coords);
+        setTempRegion({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        });
+      } else {
+        // Get current location if no coordinates available
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === "granted") {
+          const location = await Location.getCurrentPositionAsync({});
+          const { latitude, longitude } = location.coords;
+          setTempCoords({ latitude, longitude });
+          setTempRegion({
+            latitude,
+            longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+        }
+      }
+    } catch (e) {
+      console.log("openMapPicker error", e);
+      Alert.alert("Error", "Failed to open map picker");
+    }
+  };
+
+  // Confirm the location chosen in the modal
+  const confirmMapLocation = async () => {
+    if (!tempCoords) return;
+    
+    setCoords(tempCoords);
+    
+    // Reverse geocode to get address
+    try {
+      const address = await Location.reverseGeocodeAsync({
+        latitude: tempCoords.latitude,
+        longitude: tempCoords.longitude,
+      });
+
+      if (address.length > 0) {
+        const addr = address[0];
+        setAddress(`${addr.street || ""} ${addr.city || ""} ${addr.region || ""}`.trim());
+      }
+    } catch (error) {
+      console.log("Reverse geocoding error:", error);
+    }
+    
+    setMapVisible(false);
   };
 
   return (
@@ -223,17 +321,37 @@ export default function EditTaskScreen({ route, navigation }) {
           {/* Task Address */}
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldLabel}>Task Address</Text>
-            <TouchableOpacity style={styles.addressBtn} onPress={pickLocation}>
+            <TouchableOpacity style={styles.addressBtn} onPress={openMapPicker}>
               <View style={styles.addressBtnContent}>
                 <View style={styles.addIcon}>
-                  <Ionicons name="add" size={16} color="#fff" />
+                  <Ionicons name="location" size={16} color="#fff" />
                 </View>
-                <Text style={styles.addressBtnText}>Add Task Address</Text>
+                <Text style={styles.addressBtnText}>Select Location on Map</Text>
               </View>
             </TouchableOpacity>
             {address ? (
               <Text style={styles.addressText}>{address}</Text>
             ) : null}
+            
+            {/* Show map preview if coordinates available */}
+            {coords && (
+              <View style={styles.mapPreview}>
+                <MapView
+                  style={styles.mapPreviewStyle}
+                  region={{
+                    latitude: coords.latitude,
+                    longitude: coords.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                >
+                  <Marker coordinate={coords} />
+                </MapView>
+                <TouchableOpacity style={styles.editLocationButton} onPress={openMapPicker}>
+                  <Text style={styles.editLocationText}>Edit Location on Map</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
 
           {/* Budget */}
@@ -310,6 +428,62 @@ export default function EditTaskScreen({ route, navigation }) {
             </ScrollView>
           </View>
         </View>
+      </Modal>
+
+        {/* Map Picker Modal */}
+        <Modal
+        visible={mapVisible}
+        transparent={false}
+        animationType="slide"
+        onRequestClose={() => setMapVisible(false)}
+      >
+        <SafeAreaView style={styles.mapModalContainer}>
+          <View style={styles.mapHeader}>
+            <TouchableOpacity
+              style={styles.mapBackBtn}
+              onPress={() => setMapVisible(false)}
+            >
+              <Ionicons name="arrow-back" size={24} color="#215432" />
+            </TouchableOpacity>
+            <Text style={styles.mapHeaderTitle}>Select Task Location</Text>
+            <View style={{ width: 24 }} />
+          </View>
+
+          <Text style={styles.mapHeaderSubtitle}>
+            Tap on the map to select the exact location for your task
+          </Text>
+
+          {tempRegion && (
+            <MapView
+              style={{ flex: 1 }}
+              initialRegion={tempRegion}
+              onPress={(e) => {
+                const { latitude, longitude } = e.nativeEvent.coordinate;
+                setTempCoords({ latitude, longitude });
+              }}
+            >
+              {tempCoords && (
+                <Marker
+                  coordinate={tempCoords}
+                  draggable
+                  onDragEnd={(e) => {
+                    const { latitude, longitude } = e.nativeEvent.coordinate;
+                    setTempCoords({ latitude, longitude });
+                  }}
+                />
+              )}
+            </MapView>
+          )}
+
+          <View style={styles.mapFooter}>
+            <TouchableOpacity style={[styles.mapBtn, styles.mapCancel]} onPress={() => setMapVisible(false)}>
+              <Text style={styles.mapBtnText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.mapBtn, styles.mapConfirm]} onPress={confirmMapLocation}>
+              <Text style={[styles.mapBtnText, { color: "#fff" }]}>Confirm Location</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
@@ -508,6 +682,28 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     marginTop: 8,
   },
+  // Map preview styles
+  mapPreview: {
+    marginTop: 12,
+    borderRadius: 8,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+  },
+  mapPreviewStyle: {
+    height: 120,
+    width: "100%",
+  },
+  editLocationButton: {
+    backgroundColor: "#215432",
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  editLocationText: {
+    color: "#fff",
+    fontFamily: "InterBold",
+    fontSize: 14,
+  },
   budgetContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -600,5 +796,62 @@ const styles = StyleSheet.create({
   selectedCategoryItemText: {
     color: "#215432",
     fontFamily: "InterBold",
+  },
+  // Map Modal styles
+  mapModalContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  mapHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
+  },
+  mapBackBtn: {
+    padding: 4,
+  },
+  mapHeaderTitle: {
+    fontSize: 20,
+    fontFamily: "InterBold",
+    color: "#215432",
+  },
+  mapHeaderSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    backgroundColor: "#fff",
+  },
+  mapFooter: {
+    flexDirection: "row",
+    gap: 12,
+    padding: 20,
+    paddingBottom: 30,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#E0E0E0",
+  },
+  mapBtn: {
+    flex: 1,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  mapCancel: {
+    backgroundColor: "#f2f2f2",
+  },
+  mapConfirm: {
+    backgroundColor: "#215432",
+  },
+  mapBtnText: {
+    fontSize: 16,
+    fontFamily: "InterBold",
+    color: "#215432",
   },
 });
