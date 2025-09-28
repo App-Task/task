@@ -44,6 +44,10 @@ import BankAccountScreen from "../screens/tasker/BankAccountScreen";
 import MyReviewsScreen from "../screens/tasker/MyReviewsScreen";
 import SettingsScreen from "../screens/tasker/SettingsScreen";
 import TaskerTaskDetailsScreen from "../screens/tasker/TaskerTaskDetailsScreen";
+import SendBidScreen from "../screens/tasker/SendBidScreen";
+import EditBidScreen from "../screens/tasker/EditBidScreen";
+import BidSentSuccessScreen from "../screens/tasker/BidSentSuccessScreen";
+import BidUpdatedSuccessScreen from "../screens/tasker/BidUpdatedSuccessScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -105,7 +109,11 @@ export default function MainNavigator() {
 <Stack.Screen name="Documents" component={DocumentsScreen} />
 <Stack.Screen name="BankAccount" component={BankAccountScreen} />
 <Stack.Screen name="Reviews" component={MyReviewsScreen} />
-<Stack.Screen name="TaskerTaskDetails" component={TaskerTaskDetailsScreen} />
+      <Stack.Screen name="TaskerTaskDetails" component={TaskerTaskDetailsScreen} />
+      <Stack.Screen name="SendBid" component={SendBidScreen} />
+      <Stack.Screen name="EditBid" component={EditBidScreen} />
+      <Stack.Screen name="BidSentSuccess" component={BidSentSuccessScreen} />
+      <Stack.Screen name="BidUpdatedSuccess" component={BidUpdatedSuccessScreen} />
 <Stack.Screen name="Settings" component={SettingsScreen} />
 <Stack.Screen name="EditTaskerProfile" component={TaskerEditProfileScreen} />
 

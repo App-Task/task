@@ -5,9 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   Image,
-  TextInput,
   I18nManager,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,9 +23,6 @@ export default function TaskerTaskDetailsScreen({ route }) {
   const { t } = useTranslation();
   const navigation = useNavigation();
 
-  const [submitting, setSubmitting] = useState(false);
-  const [bidAmount, setBidAmount] = useState("");
-  const [message, setMessage] = useState("");
   const [isVerified, setIsVerified] = useState(true);
   const [existingBid, setExistingBid] = useState(null);
   const [loadingBid, setLoadingBid] = useState(true);
@@ -51,8 +46,6 @@ export default function TaskerTaskDetailsScreen({ route }) {
 
         if (foundBid && isMounted) {
           setExistingBid(foundBid);
-          setBidAmount(String(foundBid.amount));
-          setMessage(foundBid.message);
         }
       } catch (err) {
         console.error("❌ Failed to check user or bid:", err.message);
@@ -126,85 +119,6 @@ export default function TaskerTaskDetailsScreen({ route }) {
     };
   }, [task?.location, task?.latitude, task?.longitude]);
 
-  const handleBid = async () => {
-    if (existingBid) {
-      Alert.alert("Already Bid", "You have already submitted a bid for this task.");
-      return;
-    }
-    if (!bidAmount || !message) {
-      Alert.alert("Error", "Please fill in all fields.");
-      return;
-    }
-    if (Number(bidAmount) < 0.1) {
-      Alert.alert("Invalid Bid", "Please enter a valid bid amount.");
-      return;
-    }
-    try {
-      setSubmitting(true);
-      const user = await fetchCurrentUser();
-      if (!user.isVerified) {
-        setSubmitting(false);
-        Alert.alert("Access Denied", "You need to be verified to submit bids.");
-        return;
-      }
-      await axios.post("https://task-kq94.onrender.com/api/bids", {
-        taskId: task._id,
-        taskerId: user._id,
-        amount: Number(bidAmount),
-        message,
-      });
-      setSubmitting(false);
-      Alert.alert("Success", "Your bid has been submitted!", [
-        {
-          text: "OK",
-          onPress: () => {
-            navigation.goBack();
-          },
-        },
-      ]);
-      setBidAmount("");
-      setMessage("");
-    } catch (err) {
-      console.error("❌ Bid error:", err.message);
-      setSubmitting(false);
-      Alert.alert("Error", "Failed to submit bid. Please try again.");
-    }
-  };
-
-  const handleUpdateBid = async () => {
-    if (!existingBid) {
-      Alert.alert("No Bid Found", "You haven't submitted a bid for this task.");
-      return;
-    }
-    if (task.status !== "Pending") {
-      Alert.alert("Cannot Edit", "You cannot edit bids for completed tasks.");
-      return;
-    }
-    if (!bidAmount || !message) {
-      Alert.alert("Error", "Please fill in all fields.");
-      return;
-    }
-    if (Number(bidAmount) < 0.1) {
-      Alert.alert("Invalid Bid", "Please enter a valid bid amount.");
-      return;
-    }
-    try {
-      setSubmitting(true);
-      const res = await axios.patch(
-        `https://task-kq94.onrender.com/api/bids/${existingBid._id}`,
-        { amount: Number(bidAmount), message }
-      );
-      Alert.alert("Success", "Your bid has been updated!", [
-        { text: "OK", onPress: () => navigation.goBack() },
-      ]);
-      setExistingBid(res.data);
-    } catch (err) {
-      console.error("❌ Update bid error:", err.message);
-      Alert.alert("Error", "Failed to update bid. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -353,8 +267,16 @@ export default function TaskerTaskDetailsScreen({ route }) {
             styles.submitButton,
             (!isVerified || !isBiddingAllowed) && styles.submitButtonDisabled
           ]}
-          onPress={isBiddingAllowed ? (existingBid ? handleUpdateBid : handleBid) : null}
-          disabled={!isVerified || !isBiddingAllowed}
+          onPress={() => {
+            if (isBiddingAllowed) {
+              if (existingBid) {
+                navigation.navigate("EditBid", { task, existingBid });
+              } else {
+                navigation.navigate("SendBid", { task });
+              }
+            }
+          }}
+          disabled={false}
         >
           <Text style={styles.submitButtonText}>
             {!isBiddingAllowed
@@ -366,13 +288,6 @@ export default function TaskerTaskDetailsScreen({ route }) {
         </TouchableOpacity>
       </View>
 
-      {submitting && (
-        <View style={styles.loadingOverlay}>
-          <View style={styles.loadingBox}>
-            <Text style={styles.loadingText}>Submitting bid...</Text>
-          </View>
-        </View>
-      )}
 
       {/* Full Screen Image Viewer */}
       {selectedImage && (
