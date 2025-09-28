@@ -7,126 +7,117 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   StyleSheet,
-  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import * as SecureStore from "expo-secure-store";
+import { fetchCurrentUser } from "../../services/auth";
+import axios from "axios";
 
 export default function MyReviewsScreen({ navigation }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState("0.0");
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const taskerId = await SecureStore.getItemAsync("userId");
-        const response = await fetch(`https://task-kq94.onrender.com/api/reviews/all/tasker/${taskerId}`);
+        const user = await fetchCurrentUser();
+        const response = await axios.get(
+          `https://task-kq94.onrender.com/api/reviews/all/tasker/${user._id}`,
+          { headers: { "Content-Type": "application/json" } }
+        );
         
-        // ✅ Check for success
-        if (!response.ok) {
-          const text = await response.text(); // catch HTML error
-          throw new Error(`Failed to fetch: ${response.status} ${text}`);
+        const data = response.data;
+        setReviews(Array.isArray(data) ? data : []);
+
+        // Calculate average rating
+        if (data && data.length > 0) {
+          const avg = (data.reduce((sum, r) => sum + (r.rating || 0), 0) / data.length).toFixed(1);
+          setAverageRating(avg);
         }
-    
-        const data = await response.json();
-        setReviews(data);
       } catch (err) {
-        console.error("❌ Failed to load reviews", err.message);
+        console.error("❌ Failed to load reviews:", err.message);
+        setReviews([]);
       } finally {
         setLoading(false);
       }
     };
     
-  
     fetchReviews();
   }, []);
-  
 
-  const validReviews = Array.isArray(reviews) ? reviews : [];
-  const averageRating = validReviews.length
-  ? (validReviews.reduce((sum, r) => sum + r.rating, 0) / validReviews.length).toFixed(1)
-  : "0.0";
-
-
-
-
-  const renderStars = (count) =>
-    Array.from({ length: 5 }, (_, i) => (
-      <Image
-        key={i}
-        source={require("../../assets/images/Starno background.png")}
-        style={{
-          width: 18,
-          height: 18,
-          opacity: i < count ? 1 : 0.3,
-        }}
+  const renderStars = (rating) => {
+    return Array.from({ length: 5 }, (_, index) => (
+      <Ionicons
+        key={index}
+        name={index < rating ? "star" : "star-outline"}
+        size={16}
+        color="#215433"
+        style={{ marginRight: 2 }}
       />
     ));
+  };
 
-    const renderItem = ({ item }) => (
-      <View style={styles.card}>
-        <View style={styles.ratingHeader}>
-          <View style={styles.ratingContainer}>
-            <Text style={styles.ratingText}>{item.rating}</Text>
-            <Image
-              source={require("../../assets/images/Starno background.png")}
-              style={{
-                width: 16,
-                height: 16,
-                marginLeft: 4,
-              }}
-            />
-          </View>
-        </View>
-        <View style={{ padding: 16 }}>
-          <Text style={styles.reviewer}>
-            {t("taskerReviews.clientName")} {item.clientId?.name || "Client"}
-          </Text>
-          {/* Display the star rating */}
-          <View style={styles.starsContainer}>
-            {renderStars(item.rating)}
-          </View>
-          {item.comment ? <Text style={styles.comment}>{item.comment}</Text> : null}
-        </View>
+  const renderReviewItem = ({ item }) => (
+    <View style={styles.reviewItem}>
+      <Text style={styles.taskTitle}>{item.taskId?.title || "Task Title"}</Text>
+      
+      <View style={styles.starsContainer}>
+        {renderStars(item.rating || 0)}
       </View>
-    );
-    
+      
+      <Text style={styles.reviewText}>
+        {item.comment || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when"}
+      </Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      {/* Back Header */}
-     {/* Back Arrow */}
-<TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-  <Ionicons
-    name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-    size={30}
-    color="#215432"
-  />
-</TouchableOpacity>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons
+            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+            size={24}
+            color="#215433"
+          />
+        </TouchableOpacity>
+      </View>
 
-{/* Title below the arrow */}
-<Text style={styles.header}>{t("taskerReviews.title")}</Text>
+      {/* Title Section */}
+      <View style={styles.titleSection}>
+        <Text style={styles.mainTitle}>My Reviews</Text>
+        <View style={styles.subtitleRow}>
+          <Text style={styles.subtitle}>Reviews</Text>
+          <Text style={styles.avgRating}>Avg Rating: {averageRating}</Text>
+        </View>
+      </View>
 
-<Text style={styles.averageText}>
-  {t("taskerReviews.averageText", { rating: averageRating })}
-</Text>
-
-
+      {/* Reviews List */}
       {loading ? (
-        <ActivityIndicator color="#215433" size="large" style={{ marginTop: 40 }} />
+        <ActivityIndicator 
+          color="#215433" 
+          size="large" 
+          style={styles.loading} 
+        />
       ) : reviews.length === 0 ? (
-        <Text style={styles.empty}>{t("taskerReviews.empty")}</Text>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No reviews yet</Text>
+        </View>
       ) : (
         <FlatList
-          data={validReviews}
-          keyExtractor={(item) => item._id}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 60 }}
+          data={reviews}
+          keyExtractor={(item) => item._id || Math.random().toString()}
+          renderItem={renderReviewItem}
+          contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
-
       )}
     </View>
   );
@@ -135,99 +126,82 @@ export default function MyReviewsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
-    paddingTop: 60, // ✅ reduced so content starts closer to top
-    paddingHorizontal: 20,
+    backgroundColor: "#fff",
   },
-  
-  backBtn: {
-    padding: 4,
-    marginBottom: 20,                           // spacing under the arrow
-    alignSelf: I18nManager.isRTL ? "flex-end" : "flex-start",  // ➜ moves arrow to the right in Arabic
-    marginLeft: I18nManager.isRTL ? 0 : 0,      // keep if you want extra offsets
-    marginRight: I18nManager.isRTL ? 0 : 0
-  },
-  
-  
-
   header: {
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 10,
+  },
+  backButton: {
+    padding: 4,
+  },
+  titleSection: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  mainTitle: {
     fontFamily: "InterBold",
     fontSize: 28,
-    color: "#215432",
-    textAlign: I18nManager.isRTL ? "right" : "left",
-    marginBottom: 10, // ✅ add this to separate from the cards
-  },
-  
-  
-  card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginBottom: 16, // ✅ normal spacing
-    overflow: "hidden",
-  },
-  
-  
-  reviewHeader: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    justifyContent: "space-between",
+    color: "#215433",
     marginBottom: 8,
   },
-  reviewer: {
+  subtitleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  subtitle: {
+    fontFamily: "Inter",
+    fontSize: 16,
+    color: "#215433",
+  },
+  avgRating: {
+    fontFamily: "Inter",
+    fontSize: 16,
+    color: "#215433",
+  },
+  listContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  reviewItem: {
+    paddingVertical: 16,
+  },
+  taskTitle: {
     fontFamily: "InterBold",
     fontSize: 16,
     color: "#215433",
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    marginBottom: 8,
   },
-  stars: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    gap: 2,
+  starsContainer: {
+    flexDirection: "row",
+    marginBottom: 8,
   },
-  comment: {
+  reviewText: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#444",
-    textAlign: I18nManager.isRTL ? "right" : "left",
-    marginTop: 8,
+    color: "#666",
+    lineHeight: 20,
   },
-  empty: {
+  separator: {
+    height: 1,
+    backgroundColor: "#e0e0e0",
+    marginVertical: 8,
+  },
+  loading: {
+    marginTop: 40,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  emptyText: {
     fontFamily: "Inter",
     fontSize: 16,
     color: "#999",
     textAlign: "center",
-    marginTop: 60,
   },
-  averageText: {
-    fontFamily: "Inter",
-    fontSize: 16,
-    color: "#555",
-    marginBottom: 20,
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  averageHighlight: {
-    fontFamily: "InterBold",
-    color: "#215432", // ✅ green rating
-  },
-  ratingHeader: {
-    backgroundColor: "#215432", // ✅ green top bar
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  ratingText: {
-    fontFamily: "InterBold",
-    fontSize: 14,
-    color: "#ffffff",
-  },
-  ratingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  starsContainer: {
-    flexDirection: "row",
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  
-  
 });

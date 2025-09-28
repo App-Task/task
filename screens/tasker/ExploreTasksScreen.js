@@ -2,187 +2,78 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  FlatList,
+  ScrollView,
   TouchableOpacity,
-  TextInput,
   I18nManager,
   ActivityIndicator,
   StyleSheet,
-  Modal,
-  Pressable,
   Alert,
+  RefreshControl,
+  TextInput,
 } from "react-native";
 import { useTranslation } from "react-i18next";
-import Animated, {
-  FadeInUp,
-  useSharedValue,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
 import { fetchCurrentUser } from "../../services/auth";
 import { useFocusEffect } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
-import { Linking } from "react-native";
-import * as Location from "expo-location"; // ✅ NEW (import)
-
-// --------------------------
-const JOB_TYPES = [
-  "Handyman",
-  "Moving",
-  "IKEA assembly",
-  "Cleaning",
-  "Shopping & Delivery",
-  "Yardwork Services",
-  "Dog Walking",
-  "Other",
-];
-
-const formatDateTime = (isoString, isRTL = false) => {
-  const date = new Date(isoString);
-  return date.toLocaleString(isRTL ? "ar-SA" : "en-US", {
-    weekday: "short",
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-  });
-};
-
-// ✅ NEW (helpers: haversine & safe task coords)
-const toRad = (v) => (v * Math.PI) / 180;
-const haversineKm = (a, b) => {
-  const R = 6371;
-  const dLat = toRad(b.lat - a.lat);
-  const dLon = toRad(b.lon - a.lon);
-  const lat1 = toRad(a.lat);
-  const lat2 = toRad(b.lat);
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(h));
-};
-
-// Tries multiple shapes: task.latitude/longitude, task.location.{latitude,longitude}, task.location.coords.{latitude,longitude}
-const getTaskCoords = (task) => {
-  const c1 =
-    typeof task.latitude === "number" && typeof task.longitude === "number"
-      ? { lat: task.latitude, lon: task.longitude }
-      : null;
-
-  const loc = task.location;
-  const c2 =
-    loc &&
-    typeof loc.latitude === "number" &&
-    typeof loc.longitude === "number"
-      ? { lat: loc.latitude, lon: loc.longitude }
-      : null;
-
-  const coords = loc?.coords;
-  const c3 =
-    coords &&
-    typeof coords.latitude === "number" &&
-    typeof coords.longitude === "number"
-      ? { lat: coords.latitude, lon: coords.longitude }
-      : null;
-
-  return c1 || c2 || c3 || null;
-};
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function ExploreTasksScreen({ navigation }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [jobType, setJobType] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [showVerifyBanner, setShowVerifyBanner] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const [userId, setUserId] = useState(null);
-// ✅ NEW (sorting state + device coords)
-const [sortMode, setSortMode] = useState("none");
-const [userCoords, setUserCoords] = useState(null);
-const [locLoading, setLocLoading] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [expandedTasks, setExpandedTasks] = useState(new Set());
 
+  const filterOptions = [
+    { id: "nearest", label: "Nearest to you", icon: "location-outline" },
+    { id: "cleaning", label: "Cleaning", icon: "broom-outline" },
+    { id: "shopping", label: "Shopping & delivery", icon: "bag-outline" },
+    { id: "handyman", label: "Handyman", icon: "construct-outline" },
+    { id: "moving", label: "Moving", icon: "car-outline" },
+    { id: "ikea", label: "IKEA assembly", icon: "hammer-outline" },
+    { id: "yardwork", label: "Yardwork Services", icon: "leaf-outline" },
+    { id: "dogwalking", label: "Dog Walking", icon: "paw-outline" },
+    { id: "other", label: "Other", icon: "ellipsis-horizontal-outline" },
+  ];
 
-  // Scroll animation logic
-  const scrollY = useSharedValue(0);
-  const showAnimation = useSharedValue(false);
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      const currentY = event.contentOffset.y;
-      if (currentY < scrollY.value) {
-        showAnimation.value = true;
-      } else {
-        showAnimation.value = false;
-      }
-      scrollY.value = currentY;
-    },
-  });
-
-  const animationStyle = useAnimatedStyle(() => {
-    return {
-      opacity: withTiming(showAnimation.value ? 1 : 0, { duration: 300 }),
-      transform: [
-        {
-          translateY: withTiming(showAnimation.value ? 0 : -20, {
-            duration: 300,
-          }),
-        },
-      ],
-    };
-  });
+  const fetchUnreadMessages = async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get("https://task-kq94.onrender.com/api/messages/conversations", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const totalUnread = res.data.reduce((sum, convo) => sum + (convo.unreadCount || 0), 0);
+      setUnreadMessages(totalUnread);
+    } catch (err) {
+      console.error("❌ Failed to fetch unread messages:", err.message);
+    }
+  };
 
   const fetchTasks = async () => {
     try {
       const user = await fetchCurrentUser();
       setCurrentUser(user);
+
       if (!user.isVerified) {
-        setShowVerifyBanner(true);
         setTasks([]);
         setFilteredTasks([]);
         setLoading(false);
         return;
       }
-
-      if (
-        !user.name ||
-        !user.gender ||
-        !user.location ||
-        !user.skills ||
-        !user.about
-      ) {
-        setShowVerifyBanner("incomplete");
-        setTasks([]);
-        setFilteredTasks([]);
-        setLoading(false);
-        return;
-      }
-
-      setShowVerifyBanner(false);
 
       const token = await getToken();
-
-      // Get current user data
-      const userRes = await axios.get(
-        "https://task-kq94.onrender.com/api/auth/me",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const currentUserId = userRes.data._id;
-      setUserId(currentUserId);
-
-      // Get all tasks
       const taskRes = await axios.get(
         "https://task-kq94.onrender.com/api/tasks",
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      const allTasks = taskRes.data;
 
-      // Get all bids made by this tasker
+      // Get bids made by this tasker to exclude them
       const bidRes = await axios.get(
         `https://task-kq94.onrender.com/api/bids/tasker/${user._id}`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -191,19 +82,13 @@ const [locLoading, setLocLoading] = useState(false);
         typeof bid.taskId === "object" ? bid.taskId._id : bid.taskId
       );
 
-      // Exclude tasks already bid on
-      const availableTasks = allTasks.filter(
-        (task) => !bidTaskIds.includes(task._id)
+      // Filter out tasks already bid on and only show pending tasks
+      const availableTasks = taskRes.data.filter(
+        (task) => !bidTaskIds.includes(task._id) && task.status === "Pending"
       );
 
-      // ✅ NEW (precompute hasCoords to speed later filtering)
-      const enriched = availableTasks.map((t) => ({
-        ...t,
-        __coords: getTaskCoords(t), // null or {lat,lon}
-      }));
-
-      setTasks(enriched);
-      setFilteredTasks(enriched);
+      setTasks(availableTasks);
+      setFilteredTasks(availableTasks);
     } catch (err) {
       console.error("❌ Error fetching tasks:", err?.message);
     } finally {
@@ -213,464 +98,558 @@ const [locLoading, setLocLoading] = useState(false);
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchTasks();
+    await Promise.all([fetchTasks(), fetchUnreadMessages()]);
     setRefreshing(false);
   };
 
   useFocusEffect(
     React.useCallback(() => {
       fetchTasks();
+      fetchUnreadMessages();
       return () => {};
     }, [])
   );
 
+  // Filter tasks based on selected filter and search query
   useEffect(() => {
-    filterTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, jobType, tasks, sortMode, userCoords]);
-
-  // ✅ NEW (ask for location only when user enables "nearest")
-  const ensureLocation = async () => {
-    try {
-      setLocLoading(true);
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          t("common.permissionRequired"),
-          t("common.locationExplain")
-        );
-        setSortMode("none");
-        return;
-      }
-      const pos = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
-      setUserCoords({
-        lat: pos.coords.latitude,
-        lon: pos.coords.longitude,
-      });
-    } catch (e) {
-      console.log("Location error:", e);
-      Alert.alert(
-        t("common.locationError"),
-        t("common.locationTryAgain")
-      );
-      setSortMode("none");
-    } finally {
-      setLocLoading(false);
-    }
-  };
-
-  const filterTasks = () => {
-    let result = tasks.filter(
-      (task) => task.status === "Pending" && task.userId !== userId
-    );
-
+    let filtered = tasks;
+    
+    // Apply search filter
     if (searchQuery.trim()) {
-      const text = searchQuery.toLowerCase();
-      result = result.filter((task) => task.title?.toLowerCase().includes(text));
+      filtered = filtered.filter(task => 
+        task.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Apply category filter
+    if (selectedFilter && selectedFilter !== "nearest") {
+      const categoryMap = {
+        cleaning: "Cleaning",
+        shopping: "Shopping & Delivery",
+        handyman: "Handyman",
+        moving: "Moving",
+        ikea: "IKEA assembly",
+        yardwork: "Yardwork Services",
+        dogwalking: "Dog Walking",
+        other: "Other"
+      };
+      
+      const category = categoryMap[selectedFilter];
+      if (category) {
+        filtered = filtered.filter(task => task.category === category);
+      }
     }
 
-    if (jobType) {
-      result = result.filter((task) => task.category === jobType);
-    }
+    setFilteredTasks(filtered);
+  }, [selectedFilter, searchQuery, tasks]);
 
-    // ✅ NEW (compute & sort by nearest if enabled and coords exist)
-    if (sortMode === "nearest" && userCoords) {
-      result = result
-        .map((task) => {
-          const c = task.__coords || getTaskCoords(task);
-          if (!c) return { ...task, __distanceKm: null };
-          const d = haversineKm(userCoords, c);
-          return { ...task, __distanceKm: d };
-        })
-        .sort((a, b) => {
-          // Tasks with distance first, sorted ascending; then those without coords
-          const da = a.__distanceKm;
-          const db = b.__distanceKm;
-          if (da == null && db == null) return 0;
-          if (da == null) return 1;
-          if (db == null) return -1;
-          return da - db;
-        });
-    } else {
-      // remove any stale distance when not sorting by nearest
-      result = result.map((t) => ({ ...t, __distanceKm: undefined }));
-    }
-
-    setFilteredTasks(result);
+  const getCategoryIcon = (category) => {
+    const iconMap = {
+      "Cleaning": "broom",
+      "Shopping & Delivery": "shopping",
+      "Handyman": "construct",
+      "Moving": "car",
+      "IKEA assembly": "hammer",
+      "Yardwork Services": "leaf",
+      "Dog Walking": "paw",
+      "Other": "ellipsis-horizontal"
+    };
+    return iconMap[category] || "ellipsis-horizontal";
   };
 
-  const renderTask = ({ item }) => (
-    <Animated.View entering={FadeInUp.duration(400)} style={styles.card}>
-      {/* Header */}
-      <View style={styles.cardHeader}>
-  <Text style={styles.cardHeaderText}>
-    {t("taskerExplore.posted") + ": "}
-    <Text style={{ fontFamily: "Inter" }}> {/* normal weight */}
-      {new Date(item.createdAt).toLocaleDateString(
-        I18nManager.isRTL ? "ar-SA" : "en-GB",
-        { day: "2-digit", month: "short", year: "numeric" }
-      )}
-    </Text>
-    <Text style={{ fontFamily: "InterBold" }}> • </Text> {/* bold dot */}
-    <Text style={{ fontFamily: "Inter" }}> {/* normal weight */}
-      {new Date(item.createdAt).toLocaleTimeString(
-        I18nManager.isRTL ? "ar-SA" : "en-GB",
-        { hour: "2-digit", minute: "2-digit" }
-      )}
-    </Text>
-  </Text>
-</View>
+  const toggleTaskExpansion = (taskId) => {
+    const newExpandedTasks = new Set(expandedTasks);
+    if (newExpandedTasks.has(taskId)) {
+      newExpandedTasks.delete(taskId);
+    } else {
+      newExpandedTasks.add(taskId);
+    }
+    setExpandedTasks(newExpandedTasks);
+  };
 
-<View style={styles.cardBody}>
-  <Text style={styles.title}>{item.title}</Text>
+  const renderTaskCard = (task, index) => {
+    const taskId = task._id || index;
+    const isExpanded = expandedTasks.has(taskId);
+    const description = task.description || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader";
+    const shouldTruncate = description.length > 100;
+    const displayDescription = isExpanded || !shouldTruncate ? description : `${description.substring(0, 100)}...`;
 
-  {typeof item.__distanceKm === "number" && (
-    <View style={styles.distancePill}>
-      <Ionicons name="location-outline" size={14} color="#215433" />
-      <Text style={styles.distanceText}>
-        {item.__distanceKm.toFixed(1)} km
-      </Text>
+    return (
+      <TouchableOpacity 
+        key={taskId} 
+        style={styles.taskCard}
+        onPress={() => navigation.navigate("TaskerTaskDetails", { task })}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.taskTitle}>{task.title || "Task Title"}</Text>
+        
+        <View style={styles.taskTags}>
+          <View style={styles.tag}>
+            <MaterialCommunityIcons 
+              name={getCategoryIcon(task.category)} 
+              size={16} 
+              color="#215433" 
+            />
+            <Text style={styles.tagText}>{task.category || "Other"}</Text>
+          </View>
+          <View style={styles.budgetTag}>
+            <Text style={styles.budgetText}>Client Budget: {task.budget || "5"}BHD</Text>
+          </View>
+        </View>
+
+        <View style={styles.descriptionContainer}>
+          <Text style={styles.taskDescription}>
+            {displayDescription}
+          </Text>
+          {shouldTruncate && (
+            <TouchableOpacity 
+              onPress={(e) => {
+                e.stopPropagation(); // Prevent card navigation when pressing Read More
+                toggleTaskExpansion(taskId);
+              }}
+            >
+              <Text style={styles.readMoreLink}>
+                {isExpanded ? "Read Less" : "Read More..."}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <TouchableOpacity 
+          style={styles.bidButton}
+          onPress={(e) => {
+            e.stopPropagation(); // Prevent card navigation when pressing Bid button
+            navigation.navigate("TaskerTaskDetails", { task });
+          }}
+        >
+          <Text style={styles.bidButtonText}>Bid on Task</Text>
+        </TouchableOpacity>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderVerificationCard = () => (
+    <View style={styles.verificationCard}>
+      <View style={styles.verificationContent}>
+        <Ionicons name="hourglass-outline" size={24} color="#215433" />
+        <Text style={styles.verificationText}>Pending document verification</Text>
+        <Ionicons name="chevron-forward-outline" size={20} color="#215433" />
+      </View>
     </View>
-  )}
+  );
 
-  <Text
-    style={styles.viewDetails}
-    onPress={() => navigation.navigate("TaskerTaskDetails", { task: item })}
-  >
-    {t("taskerExplore.viewDetails")}
-  </Text>
-</View>
+  const renderUnreadMessagesCard = () => (
+    <View style={styles.messagesCard}>
+      <View style={styles.messagesContent}>
+        <View style={styles.chatIconContainer}>
+          <Ionicons name="chatbubble-outline" size={24} color="#215433" />
+          {unreadMessages > 0 && <View style={styles.notificationDot} />}
+        </View>
+        <Text style={styles.messagesText}>{unreadMessages} unread messages</Text>
+        <Ionicons name="chevron-forward-outline" size={20} color="#215433" />
+      </View>
+    </View>
+  );
 
-    </Animated.View>
+  const renderWaitingOnTaskCard = () => (
+    <View style={styles.waitingCard}>
+      <Text style={styles.waitingTitle}>Waiting on a Task?</Text>
+      <Text style={styles.waitingDescription}>
+        Waiting for clients to accept your bids, if they still haven't you'll be able to see it in
+      </Text>
+      <TouchableOpacity 
+        style={styles.bidSentButton}
+        onPress={() => navigation.navigate("MyTasks")}
+      >
+        <Text style={styles.bidSentButtonText}>Bid Sent</Text>
+      </TouchableOpacity>
+      <Text style={styles.activeDescription}>But if they have you'll find it in</Text>
+      <TouchableOpacity 
+        style={styles.activeButton}
+        onPress={() => navigation.navigate("MyTasks")}
+      >
+        <Text style={styles.activeButtonText}>Active</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderSearchSection = () => (
+    <View style={styles.searchSection}>
+      <Text style={styles.searchTitle}>Search for Tasks</Text>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search tasks..."
+        placeholderTextColor="#666"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+      <Text style={styles.filterLabel}>Filter by...</Text>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filterContainer}
+      >
+        {filterOptions.map((filter) => (
+          <TouchableOpacity
+            key={filter.id}
+            style={[
+              styles.filterChip,
+              selectedFilter === filter.id && styles.filterChipActive
+            ]}
+            onPress={() => setSelectedFilter(
+              selectedFilter === filter.id ? null : filter.id
+            )}
+          >
+            <Ionicons 
+              name={filter.icon} 
+              size={16} 
+              color={selectedFilter === filter.id ? "#fff" : "#215433"} 
+            />
+            <Text style={[
+              styles.filterChipText,
+              selectedFilter === filter.id && styles.filterChipTextActive
+            ]}>
+              {filter.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+        {selectedFilter && (
+          <TouchableOpacity
+            style={[styles.filterChip, styles.clearFilterChip]}
+            onPress={() => setSelectedFilter(null)}
+          >
+            <Ionicons name="close-outline" size={16} color="#666" />
+            <Text style={styles.clearFilterText}>Clear</Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
+    </View>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerRow}>
-        <View style={styles.headerTexts}>
-          <Text style={styles.greeting}>
-            {t("taskerExplore.greeting", { name: currentUser?.name || "Tasker" })}
-          </Text>
-          <Text style={styles.subGreeting}>{t("taskerExplore.subGreeting")}</Text>
+    <ScrollView 
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
+    >
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <Text style={styles.greeting}>Hi {currentUser?.name || "Tariq"},</Text>
+          <Text style={styles.welcomeText}>Welcome to TASK!</Text>
         </View>
-
-        <TouchableOpacity onPress={() => setShowModal(true)}>
-          <Ionicons name="filter-outline" size={26} color="#215433" />
+        <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+          <Ionicons name="notifications-outline" size={24} color="#215433" />
         </TouchableOpacity>
       </View>
 
-      {showVerifyBanner === true && (
-        <View style={styles.verifyBanner}>
-          <Text style={styles.verifyText}>
-            {t("taskerExplore.verifyPending")}{" "}
-            <Text
-              style={styles.contactLink}
-              onPress={() => Linking.openURL("mailto:support@taskbh.com")}
-            >
-              {t("taskerExplore.contactUs")}
-            </Text>
-          </Text>
-        </View>
-      )}
+      {/* Verification or Messages Card */}
+      {!currentUser?.isVerified ? renderVerificationCard() : renderUnreadMessagesCard()}
 
-      {showVerifyBanner === "incomplete" && (
-        <View style={styles.verifyBanner}>
-          <Text style={styles.verifyText}>
-            {t("taskerExplore.incompleteProfile")}
-          </Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("EditTaskerProfile")}
-            style={{
-              marginTop: 10,
-              backgroundColor: "#215433",
-              paddingVertical: 10,
-              borderRadius: 20,
-              paddingHorizontal: 18,
-            }}
-          >
-            <Text
-              style={{
-                color: "#fff",
-                fontFamily: "InterBold",
-                textAlign: "center",
-              }}
-            >
-              {t("taskerExplore.finishProfile")}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      {/* Waiting on Task Card */}
+      {renderWaitingOnTaskCard()}
 
-      <TextInput
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        style={styles.searchInput}
-        placeholder={t("taskerExplore.searchPlaceholder")}
-        placeholderTextColor="#ffffff"
-      />
+      {/* Search Section */}
+      {renderSearchSection()}
 
-      {/* ✅ NEW (tiny chips to show active filters/sort) */}
-      <View style={{ flexDirection: "row", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
-        {jobType && (
-          <View style={styles.chip}>
-            <Text style={styles.chipText}>{jobType}</Text>
-          </View>
-        )}
-        {sortMode === "nearest" && (
-          <View style={[styles.chip, { backgroundColor: "#e8f4ec", borderColor: "#c9e5d3" }]}>
-            <Ionicons name="navigate-outline" size={14} color="#215433" />
-            <Text style={[styles.chipText, { marginLeft: 4 }]}>
-              {locLoading ? (t("common.loading") || "Loading…") : (t("taskerExplore.nearest") || "Nearest")}
-            </Text>
-          </View>
-        )}
-      </View>
-
-      {/* Filter / Sort Modal */}
-      <Modal visible={showModal} transparent animationType="fade">
-        <Pressable style={styles.modalOverlay} onPress={() => setShowModal(false)}>
-          <View style={styles.modalSheet}>
-            {/* Job Type */}
-            {JOB_TYPES.map((type) => (
-              <TouchableOpacity
-                key={type}
-                style={styles.optionItem}
-                onPress={() => {
-                  setJobType(type);
-                  setShowModal(false);
-                }}
-              >
-                <Text style={styles.optionText}>
-                  {t(`taskerExplore.jobTypes.${type.toLowerCase()}`) || type}
-                </Text>
-              </TouchableOpacity>
-            ))}
-
-            {/* Divider */}
-            <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
-
-            {/* ✅ NEW (Sort by nearest toggle) */}
-            <TouchableOpacity
-              style={[styles.optionItem, { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}
-              onPress={async () => {
-                if (sortMode === "nearest") {
-                  setSortMode("none");
-                  setShowModal(false);
-                  return;
-                }
-                setSortMode("nearest");
-                setShowModal(false);
-                if (!userCoords) await ensureLocation();
-              }}
-            >
-              <Text style={[styles.optionText, { fontFamily: "InterBold" }]}>
-                {t("taskerExplore.sortNearest") || "Sort by nearest"}
-              </Text>
-              <Ionicons
-                name={sortMode === "nearest" ? "radio-button-on" : "radio-button-off"}
-                size={20}
-                color="#215433"
-              />
-            </TouchableOpacity>
-
-            {/* Clear filters */}
-            <TouchableOpacity
-              style={[styles.optionItem, { borderTopWidth: 1, borderColor: "#ddd" }]}
-              onPress={() => {
-                setJobType(null);
-                setSortMode("none"); // ✅ NEW
-                setShowModal(false);
-              }}
-            >
-              <Text style={[styles.optionText, { color: "red" }]}>
-                {t("taskerExplore.clearFilter")}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </Pressable>
-      </Modal>
-
+      {/* Task Cards */}
       {loading ? (
-        <ActivityIndicator size="large" color="#215433" />
+        <ActivityIndicator size="large" color="#215433" style={styles.loading} />
       ) : filteredTasks.length === 0 ? (
-        <Text style={styles.empty}>{t("taskerExplore.noTasks")}</Text>
+        <Text style={styles.noTasksText}>No tasks available</Text>
       ) : (
-        <Animated.FlatList
-          data={filteredTasks}
-          keyExtractor={(item) => item._id}
-          renderItem={renderTask}
-          contentContainerStyle={{ paddingBottom: 40 }}
-          showsVerticalScrollIndicator={false}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          onScroll={scrollHandler}
-          scrollEventThrottle={16}
-        />
+        filteredTasks.map((task, index) => renderTaskCard(task, index))
       )}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
-    paddingTop: 60,
-    paddingHorizontal: 20,
+    backgroundColor: "#f5f5f5",
   },
-  searchInput: {
-    height: 48,
-    backgroundColor: "#215433",
-    borderRadius: 30,
-    paddingHorizontal: 18,
-    fontSize: 15,
-    marginBottom: 12, // a bit tighter to fit chips
-    fontFamily: "Inter",
-    color: "#ffffff",
-  },
-  empty: {
-    fontFamily: "Inter",
-    fontSize: 16,
-    color: "#999",
-    textAlign: "center",
-    marginTop: 80,
-  },
-  card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    marginBottom: 20,
-    marginHorizontal: 2,
-    borderWidth: 1,
-    borderColor: "#dcdcdc",
-    overflow: "hidden",
-    elevation: 1,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 3,
-  },
-  cardBody: {
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    alignItems: "flex-start",
-  },
-  cardHeader: {
-    backgroundColor: "#215433",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  cardHeaderText: {
-    color: "#ffffff",
-    fontFamily: "Inter", // default to normal
-    fontSize: 12,
-  },
-  title: {
-    fontFamily: "InterBold",
-    fontSize: 16,
-    color: "#666", // changed from #215433 to grey
-    marginBottom: 6,
-    textAlign: "left",
-    marginTop: 4,
-  },
-  viewDetails: {
-    color: "#666", // changed from #215433 to grey
-    fontFamily: "InterBold",
-    fontSize: 13,
-    textDecorationLine: "underline",
-  },
-  headerRow: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+  header: {
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 20,
   },
-  headerTexts: {
+  headerLeft: {
     flex: 1,
-    alignItems: I18nManager.isRTL ? "flex-end" : "flex-start",
   },
   greeting: {
     fontFamily: "InterBold",
-    fontSize: 26,
+    fontSize: 24,
     color: "#215433",
-    marginTop: 30,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    marginBottom: 4,
   },
-  subGreeting: {
+  welcomeText: {
     fontFamily: "Inter",
     fontSize: 16,
     color: "#666",
-    textAlign: I18nManager.isRTL ? "right" : "left",
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "flex-end",
-  },
-  modalSheet: {
+  verificationCard: {
     backgroundColor: "#fff",
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
   },
-  optionItem: {
-    paddingVertical: 12,
+  verificationContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
   },
-  optionText: {
+  verificationText: {
+    flex: 1,
     fontFamily: "Inter",
     fontSize: 16,
     color: "#215433",
+    marginLeft: 12,
   },
-  verifyBanner: {
-    backgroundColor: "#fff4e6",
-    padding: 14,
+  messagesCard: {
+    backgroundColor: "#fff",
+    marginHorizontal: 20,
+    marginBottom: 20,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  messagesContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+  },
+  chatIconContainer: {
+    position: "relative",
+  },
+  notificationDot: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#ff4444",
+  },
+  messagesText: {
+    flex: 1,
+    fontFamily: "Inter",
+    fontSize: 16,
+    color: "#215433",
+    marginLeft: 12,
+  },
+  waitingCard: {
+    backgroundColor: "#fff",
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    padding: 16,
+  },
+  waitingTitle: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 8,
+  },
+  waitingDescription: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 12,
+    lineHeight: 20,
+  },
+  bidSentButton: {
+    backgroundColor: "#e8f4ec",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    alignSelf: "flex-start",
+    marginBottom: 12,
+  },
+  bidSentButtonText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#215433",
+  },
+  activeDescription: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 12,
+  },
+  activeButton: {
+    backgroundColor: "#215433",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    alignSelf: "flex-start",
+  },
+  activeButtonText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#fff",
+  },
+  searchSection: {
+    marginHorizontal: 20,
     marginBottom: 20,
   },
-  verifyText: {
-    color: "#FFA500",
+  searchTitle: {
     fontFamily: "InterBold",
+    fontSize: 18,
+    color: "#666",
+    marginBottom: 12,
+  },
+  searchInput: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    fontFamily: "Inter",
+    marginBottom: 12,
+  },
+  filterLabel: {
+    fontFamily: "Inter",
     fontSize: 14,
-    textAlign: "center",
+    color: "#666",
+    marginBottom: 12,
   },
-  contactLink: {
-    color: "blue",
+  filterContainer: {
+    paddingRight: 20,
+  },
+  filterChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginRight: 8,
+  },
+  filterChipActive: {
+    backgroundColor: "#215433",
+    borderColor: "#215433",
+  },
+  filterChipText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#215433",
+    marginLeft: 6,
+  },
+  filterChipTextActive: {
+    color: "#fff",
+  },
+  clearFilterChip: {
+    backgroundColor: "#f0f0f0",
+    borderColor: "#ccc",
+  },
+  clearFilterText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    marginLeft: 6,
+  },
+  taskCard: {
+    backgroundColor: "#fff",
+    marginHorizontal: 20,
+    marginBottom: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    padding: 16,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  taskTitle: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 12,
+  },
+  taskTags: {
+    flexDirection: "row",
+    marginBottom: 12,
+    gap: 8,
+  },
+  tag: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderRadius: 16,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  tagText: {
+    fontFamily: "Inter",
+    fontSize: 12,
+    color: "#215433",
+    marginLeft: 4,
+  },
+  budgetTag: {
+    backgroundColor: "#f0f0f0",
+    borderRadius: 16,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  budgetText: {
+    fontFamily: "Inter",
+    fontSize: 12,
+    color: "#215433",
+  },
+  descriptionContainer: {
+    marginBottom: 16,
+  },
+  taskDescription: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    lineHeight: 20,
+  },
+  readMoreLink: {
+    color: "#0066cc",
     textDecorationLine: "underline",
-  },
-  // ✅ NEW (distance pill + chips)
-  distancePill: {
-    alignSelf: "flex-start",
-    borderWidth: 1,
-    borderColor: "#dfe7e1",
-    backgroundColor: "#f4f8f5",
-    borderRadius: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginBottom: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  distanceText: {
-    color: "#215433",
     fontFamily: "Inter",
-    fontSize: 12,
+    fontSize: 14,
+    marginTop: 4,
   },
-  chip: {
-    borderWidth: 1,
-    borderColor: "#e3e3e3",
-    borderRadius: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    backgroundColor: "#fafafa",
-    flexDirection: "row",
+  bidButton: {
+    backgroundColor: "#215433",
+    paddingVertical: 12,
+    borderRadius: 8,
     alignItems: "center",
   },
-  chipText: {
+  bidButtonText: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#fff",
+  },
+  loading: {
+    marginVertical: 40,
+  },
+  noTasksText: {
     fontFamily: "Inter",
-    fontSize: 12,
-    color: "#215433",
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginVertical: 40,
   },
 });

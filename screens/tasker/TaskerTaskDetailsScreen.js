@@ -1,21 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Image,
   ScrollView,
-  TextInput,
   TouchableOpacity,
-  Alert,
-  I18nManager,
   StyleSheet,
-  Dimensions,
-  Linking,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
+  Alert,
+  Image,
+  TextInput,
+  I18nManager,
 } from "react-native";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,88 +19,22 @@ import { fetchCurrentUser } from "../../services/auth";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 
-const { height } = Dimensions.get("window");
-
-export default function TaskDetailsScreen({ route }) {
+export default function TaskerTaskDetailsScreen({ route }) {
   const { task: initialTask } = route.params;
   const [task, setTask] = useState(initialTask);
   const { t } = useTranslation();
   const navigation = useNavigation();
 
   const [submitting, setSubmitting] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [bidAmount, setBidAmount] = useState("");
+  const [message, setMessage] = useState("");
+  const [isVerified, setIsVerified] = useState(true);
+  const [existingBid, setExistingBid] = useState(null);
   const [loadingBid, setLoadingBid] = useState(true);
-  const isBiddingAllowed = task.status === "Pending";
-
   const [coords, setCoords] = useState(null);
-  const [geoError, setGeoError] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  // ---- keyboard & scrolling helpers
-  const [kbHeight, setKbHeight] = useState(0);
-  const scrollRef = useRef(null);
-  const positionsRef = useRef({ amount: 0, message: 0 });
-
-  useEffect(() => {
-    const showSub = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-      (e) => setKbHeight(e.endCoordinates?.height ?? 0)
-    );
-    const hideSub = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-      () => setKbHeight(0)
-    );
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
-
-  const scrollToKey = (key) => {
-    const y = positionsRef.current[key] ?? 0;
-    const extraOffset = 140; // push a bit higher above the keyboard
-    scrollRef.current?.scrollTo({ y: Math.max(0, y - extraOffset), animated: true });
-  };
-  // ----
-
-  // Remove the current location fallback - we only want task coordinates
-  // useEffect(() => {
-  //   const getCurrentLocation = async () => {
-  //     try {
-  //       const { status } = await Location.requestForegroundPermissionsAsync();
-  //       if (status !== "granted") {
-  //         console.log("Location permission denied");
-  //         return;
-  //       }
-  //       
-  //       const pos = await Location.getCurrentPositionAsync({
-  //         accuracy: Location.Accuracy.Balanced,
-  //       });
-  //       
-  //       const { latitude, longitude } = pos.coords;
-  //       // Only set current location as fallback if no task coordinates exist
-  //       if (!coords) {
-  //         setCoords({ latitude, longitude });
-  //       }
-  //     } catch (e) {
-  //       console.log("get current location error", e);
-  //     }
-  //   };
-  //   
-  //   getCurrentLocation();
-  // }, []);
-
-  const openInGoogleMaps = async (lat, lng, labelRaw = "Task Location") => {
-    try {
-      const label = encodeURIComponent(labelRaw || "Task Location");
-      const appUrl = `comgooglemaps://?q=${lat},${lng}(${label})&center=${lat},${lng}&zoom=14`;
-      const canOpenApp = await Linking.canOpenURL(appUrl);
-      if (canOpenApp) return Linking.openURL(appUrl);
-      const webUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-      await Linking.openURL(webUrl);
-    } catch (e) {
-      Alert.alert(t("common.errorTitle"), t("common.couldNotOpenMaps"));
-    }
-  };
+  const isBiddingAllowed = task.status === "Pending";
 
   useEffect(() => {
     let isMounted = true;
@@ -152,12 +80,11 @@ export default function TaskDetailsScreen({ route }) {
     fetchFullTask();
   }, []);
 
-  // Only use task coordinates - no fallback to user location
+  // Get task coordinates
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        // First priority: Use task's exact coordinates if available
         if (typeof task?.latitude === "number" && typeof task?.longitude === "number") {
           if (!cancelled) {
             setCoords({ latitude: task.latitude, longitude: task.longitude });
@@ -165,7 +92,6 @@ export default function TaskDetailsScreen({ route }) {
           return;
         }
         
-        // Second priority: Try to parse coordinates from location string
         if (typeof task?.location === "string") {
           const match = task.location.match(/-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?/);
           if (match) {
@@ -179,7 +105,6 @@ export default function TaskDetailsScreen({ route }) {
           }
         }
         
-        // Third priority: Geocode the location string
         if (task?.location && task.location.trim()) {
           try {
             const results = await Location.geocodeAsync(task.location);
@@ -188,19 +113,12 @@ export default function TaskDetailsScreen({ route }) {
               return;
             }
           } catch (e) {
-            // Geocoding failed, continue to next option
+            // Geocoding failed
           }
         }
         
-        // No task coordinates found - don't set any coordinates
-        if (!cancelled) {
-          setCoords(null);
-        }
-        
       } catch (e) {
-        if (!cancelled) {
-          setGeoError(e.message || "Failed to get task location");
-        }
+        console.error("Location error:", e);
       }
     })();
     return () => {
@@ -208,22 +126,17 @@ export default function TaskDetailsScreen({ route }) {
     };
   }, [task?.location, task?.latitude, task?.longitude]);
 
-  const [bidAmount, setBidAmount] = useState("");
-  const [message, setMessage] = useState("");
-  const [isVerified, setIsVerified] = useState(true);
-  const [existingBid, setExistingBid] = useState(null);
-
   const handleBid = async () => {
     if (existingBid) {
-      Alert.alert(t("taskerTaskDetails.alreadyBidTitle"), t("taskerTaskDetails.alreadyBidMessage"));
+      Alert.alert("Already Bid", "You have already submitted a bid for this task.");
       return;
     }
     if (!bidAmount || !message) {
-      Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.fillFields"));
+      Alert.alert("Error", "Please fill in all fields.");
       return;
     }
     if (Number(bidAmount) < 0.1) {
-      Alert.alert(t("taskerTaskDetails.invalidBidTitle"), t("taskerTaskDetails.invalidBidMessage"));
+      Alert.alert("Invalid Bid", "Please enter a valid bid amount.");
       return;
     }
     try {
@@ -231,7 +144,7 @@ export default function TaskDetailsScreen({ route }) {
       const user = await fetchCurrentUser();
       if (!user.isVerified) {
         setSubmitting(false);
-        Alert.alert(t("taskerTaskDetails.accessDeniedTitle"), t("taskerTaskDetails.accessDeniedMessage"));
+        Alert.alert("Access Denied", "You need to be verified to submit bids.");
         return;
       }
       await axios.post("https://task-kq94.onrender.com/api/bids", {
@@ -241,11 +154,10 @@ export default function TaskDetailsScreen({ route }) {
         message,
       });
       setSubmitting(false);
-      Alert.alert(t("taskerTaskDetails.successTitle"), t("taskerTaskDetails.bidSent"), [
+      Alert.alert("Success", "Your bid has been submitted!", [
         {
-          text: t("taskerTaskDetails.ok"),
+          text: "OK",
           onPress: () => {
-            navigation.setParams({ refresh: true });
             navigation.goBack();
           },
         },
@@ -255,25 +167,25 @@ export default function TaskDetailsScreen({ route }) {
     } catch (err) {
       console.error("❌ Bid error:", err.message);
       setSubmitting(false);
-      Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.bidSubmitError"));
+      Alert.alert("Error", "Failed to submit bid. Please try again.");
     }
   };
 
   const handleUpdateBid = async () => {
     if (!existingBid) {
-      Alert.alert(t("taskerTaskDetails.noBidFoundTitle"), t("taskerTaskDetails.noBidFoundMessage"));
+      Alert.alert("No Bid Found", "You haven't submitted a bid for this task.");
       return;
     }
     if (task.status !== "Pending") {
-      Alert.alert(t("taskerTaskDetails.cannotEditTitle"), t("taskerTaskDetails.cannotEditMessage"));
+      Alert.alert("Cannot Edit", "You cannot edit bids for completed tasks.");
       return;
     }
     if (!bidAmount || !message) {
-      Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.fillFields"));
+      Alert.alert("Error", "Please fill in all fields.");
       return;
     }
     if (Number(bidAmount) < 0.1) {
-      Alert.alert(t("taskerTaskDetails.invalidBidTitle"), t("taskerTaskDetails.invalidBidMessage"));
+      Alert.alert("Invalid Bid", "Please enter a valid bid amount.");
       return;
     }
     try {
@@ -282,269 +194,200 @@ export default function TaskDetailsScreen({ route }) {
         `https://task-kq94.onrender.com/api/bids/${existingBid._id}`,
         { amount: Number(bidAmount), message }
       );
-      Alert.alert(t("taskerTaskDetails.successTitle"), t("taskerTaskDetails.bidSent"), [
-        { text: t("taskerTaskDetails.ok"), onPress: () => navigation.goBack() },
+      Alert.alert("Success", "Your bid has been updated!", [
+        { text: "OK", onPress: () => navigation.goBack() },
       ]);
       setExistingBid(res.data);
     } catch (err) {
       console.error("❌ Update bid error:", err.message);
-      Alert.alert(t("taskerTaskDetails.errorTitle"), t("taskerTaskDetails.bidUpdateError"));
+      Alert.alert("Error", "Failed to update bid. Please try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const getStatusStyle = (status) => {
+  const getStatusColor = (status) => {
     switch (status) {
       case "Completed":
-        return { backgroundColor: "#4CAF50" };
+        return "#4CAF50";
       case "Pending":
-        return { backgroundColor: "#FF9800" };
+        return "#FF9800";
+      case "In Progress":
+        return "#FF9800";
       case "Started":
-        return { backgroundColor: "#FFEB3B" };
+        return "#FFEB3B";
       case "Cancelled":
-        return { backgroundColor: "#F44336" };
+        return "#F44336";
       default:
-        return { backgroundColor: "#999" };
+        return "#999";
     }
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
+  };
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <TouchableOpacity
-        style={[styles.backButton, I18nManager.isRTL && { alignSelf: "flex-end" }]}
-        onPress={() => navigation.goBack()}
-      >
-        <Ionicons
-          name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-          size={30}
-          color="#215433"
-        />
-      </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons
+            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+            size={24}
+            color="#215433"
+          />
+        </TouchableOpacity>
+        <View style={styles.headerTitle}>
+          <Text style={styles.headerTitleText}>Task details</Text>
+        </View>
+      </View>
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "height" : undefined}
-        keyboardVerticalOffset={0}
-      >
-<ScrollView
-  ref={scrollRef}
-  style={{ flex: 1, backgroundColor: "#215432" }}   // ⬅️ paint the scroller
-  contentContainerStyle={[
-    styles.container,
-    {
-      flexGrow: 1,
-      minHeight: height + (kbHeight || 0),           // ⬅️ always taller than viewport + keyboard
-      paddingBottom: (kbHeight || 0),                // ⬅️ so green covers under the keyboard
-    },
-  ]}
-  keyboardShouldPersistTaps="handled"
-  keyboardDismissMode="interactive"
-  contentInsetAdjustmentBehavior="never"             // ⬅️ iOS: no auto inset (prevents white peek)
-  bounces={false}                                     // ⬅️ iOS: no bounce to reveal white
-  alwaysBounceVertical={false}                        // ⬅️ iOS: extra safety
-  overScrollMode="never"                              // ⬅️ Android: no overscroll glow/peek
->
-
-          {/* Top header content */}
-{/* Top header content */}
-<View style={[styles.topContent, { backgroundColor: "#ffffff" }]}>
-            <View style={styles.topRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.heading}>{task.title}</Text>
-                <Text style={styles.subText}>
-                  {t("taskerTaskDetails.price")}: {task.budget} BHD
-                </Text>
-                <Text style={styles.subText}>
-                  {new Date(task.createdAt).toLocaleDateString(
-                    I18nManager.isRTL ? "ar-SA" : "en-GB",
-                    { year: "numeric", month: "short", day: "numeric" }
-                  )}{" "}
-                  •{" "}
-                  {new Date(task.createdAt).toLocaleTimeString(
-                    I18nManager.isRTL ? "ar-SA" : "en-GB",
-                    { hour: "2-digit", minute: "2-digit" }
-                  )}
-                </Text>
-              </View>
-              <View style={[styles.statusBadge, getStatusStyle(task.status)]}>
-                <Text style={styles.statusText}>{task.status}</Text>
-              </View>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Task Overview */}
+        <View style={styles.taskOverview}>
+          <View style={styles.taskTitleRow}>
+            <Text style={styles.taskTitle}>{task.title || "Task Title"}</Text>
+            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(task.status) }]}>
+              <Text style={styles.statusText}>{task.status || "In Progress"}</Text>
             </View>
           </View>
-
-          {/* GREEN SHEET – edge-to-edge, rounded top, seamless to bottom */}
-          <View style={[styles.detailsBox, { flexGrow: 1 }]}>
-            {/* Description */}
-            <Text style={styles.detailsText}>
-              <Text style={{ fontFamily: "InterBold" }}>
-                {t("taskerTaskDetails.description")}:{" "}
-              </Text>
-              {task.description || "-"}
-            </Text>
-
-            {/* Images */}
-            <Text style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}>
-              {t("taskerTaskDetails.images")}:
-            </Text>
-            <View style={styles.imageRow}>
-              {task.images?.length > 0 ? (
-                task.images.map((uri, i) => (
-                  <TouchableOpacity key={i} onPress={() => setSelectedImage(uri)}>
-                    <Image source={{ uri }} style={styles.image} />
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <Text style={styles.detailsText}>{t("taskerTaskDetails.noImages")}</Text>
-              )}
+          
+          <View style={styles.taskMeta}>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>Posted on</Text>
+              <Text style={styles.metaValue}>{formatDate(task.createdAt)}</Text>
             </View>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>BUDGET</Text>
+              <Text style={styles.metaValue}>{task.budget || "22"} BHD</Text>
+            </View>
+          </View>
+        </View>
 
-            {/* Location text */}
-            <Text style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}>
-              {t("taskerTaskDetails.location") || "Location"}:
-            </Text>
-            <Text style={styles.detailsText}>
-              {task.location || "Location not specified"}
-            </Text>
+        {/* Divider */}
+        <View style={styles.divider} />
 
-            {/* Map below location text */}
-            {coords ? (
-              <View style={styles.mapContainer}>
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  onPress={() =>
-                    openInGoogleMaps(
-                      coords.latitude,
-                      coords.longitude,
-                      task?.title || "Task Location"
-                    )
-                  }
-                >
-                  <MapView
-                    style={styles.map}
-                    initialRegion={{
-                      latitude: coords.latitude,
-                      longitude: coords.longitude,
-                      latitudeDelta: 0.01,
-                      longitudeDelta: 0.01,
-                    }}
-                    pointerEvents="none"
+        {/* Description */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Description</Text>
+          <Text style={styles.descriptionText}>
+            {task.description || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when"}
+          </Text>
+        </View>
+
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Images */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Images</Text>
+          <View style={styles.imageContainer}>
+            {task.images && task.images.length > 0 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {task.images.map((uri, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.imagePlaceholder}
+                    onPress={() => setSelectedImage(uri)}
                   >
-                    <Marker coordinate={coords} />
-                  </MapView>
-                </TouchableOpacity>
-              </View>
+                    <Image source={{ uri }} style={styles.taskImage} />
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             ) : (
-              <View style={[styles.mapContainer, styles.mapLoading]}>
-                <Text style={styles.mapLoadingText}>
-                  {geoError ? "Location unavailable" : "No location data available for this task"}
-                </Text>
+              <View style={styles.imagePlaceholder}>
+                <Ionicons name="image-outline" size={32} color="#ccc" />
               </View>
             )}
-
-            {/* Bid inputs */}
-            <Text
-              style={[styles.detailsText, { marginTop: 12, fontFamily: "InterBold" }]}
-            >
-              {t("taskerTaskDetails.enterBid")}:
-            </Text>
-
-            <View
-              onLayout={(e) => {
-                positionsRef.current.amount = e.nativeEvent.layout.y;
-              }}
-            >
-              <TextInput
-                style={[
-                  styles.input,
-                  !isBiddingAllowed && { backgroundColor: "#ccc", color: "#666" },
-                ]}
-                placeholder={t("taskerTaskDetails.bidAmount")}
-                value={bidAmount}
-                onChangeText={isBiddingAllowed ? setBidAmount : undefined}
-                keyboardType="numeric"
-                editable={isBiddingAllowed}
-                selectTextOnFocus={isBiddingAllowed}
-                placeholderTextColor="#999"
-                textAlign={I18nManager.isRTL ? "right" : "left"}
-                onFocus={() => scrollToKey("amount")}
-              />
-            </View>
-
-            <View
-              onLayout={(e) => {
-                positionsRef.current.message = e.nativeEvent.layout.y;
-              }}
-            >
-              <TextInput
-                style={[
-                  styles.input,
-                  styles.textarea,
-                  !isBiddingAllowed && { backgroundColor: "#ccc", color: "#666" },
-                ]}
-                placeholder={t("taskerTaskDetails.bidMessage")}
-                value={message}
-                onChangeText={isBiddingAllowed ? setMessage : undefined}
-                editable={isBiddingAllowed}
-                selectTextOnFocus={isBiddingAllowed}
-                multiline
-                maxLength={150}
-                textAlignVertical="top"
-                placeholderTextColor="#999"
-                textAlign={I18nManager.isRTL ? "right" : "left"}
-                onFocus={() => scrollToKey("message")}
-              />
-            </View>
-
-            <TouchableOpacity
-              style={[
-                styles.whiteButton,
-                (!isVerified || !isBiddingAllowed) && { backgroundColor: "#ccc" },
-              ]}
-              onPress={
-                isBiddingAllowed ? (existingBid ? handleUpdateBid : handleBid) : null
-              }
-              disabled={!isVerified || !isBiddingAllowed}
-            >
-              <Text style={styles.whiteButtonText}>
-                {!isBiddingAllowed
-                  ? t("taskerTaskDetails.biddingClosed")
-                  : existingBid
-                  ? t("taskerTaskDetails.updateBid")
-                  : t("taskerTaskDetails.submitBid")}
-              </Text>
-            </TouchableOpacity>
-
-            {/* THIS spacer extends the green sheet to cover under the keyboard */}
-            <View style={{ height: kbHeight }} />
           </View>
+        </View>
 
-          {/* Image full screen preview */}
-          {selectedImage && (
-            <View style={styles.fullScreenOverlay}>
-              <TouchableOpacity
-                style={styles.closeBtnWhite}
-                onPress={() => setSelectedImage(null)}
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Location */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Location</Text>
+          {coords ? (
+            <View style={styles.mapPlaceholder}>
+              <MapView
+                style={styles.map}
+                initialRegion={{
+                  latitude: coords.latitude,
+                  longitude: coords.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
+                pointerEvents="none"
               >
-                <Ionicons name="close" size={26} color="#000" />
-              </TouchableOpacity>
-              <Image
-                source={{ uri: selectedImage }}
-                style={styles.fullScreenImage}
-                resizeMode="contain"
-              />
+                <Marker coordinate={coords} />
+              </MapView>
+            </View>
+          ) : (
+            <View style={styles.mapPlaceholder}>
+              <Ionicons name="location-outline" size={32} color="#ccc" />
             </View>
           )}
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </View>
+
+        {/* Bottom spacing */}
+        <View style={{ height: 120 }} />
+      </ScrollView>
+
+      {/* Fixed Bottom Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          By marking as complete you can review you tasker, this helps make our app a safer and better place for everyone :)
+        </Text>
+        <TouchableOpacity
+          style={[
+            styles.submitButton,
+            (!isVerified || !isBiddingAllowed) && styles.submitButtonDisabled
+          ]}
+          onPress={isBiddingAllowed ? (existingBid ? handleUpdateBid : handleBid) : null}
+          disabled={!isVerified || !isBiddingAllowed}
+        >
+          <Text style={styles.submitButtonText}>
+            {!isBiddingAllowed
+              ? "Bidding Closed"
+              : existingBid
+              ? "Update Bid"
+              : "Submit a bid"}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       {submitting && (
-        <View style={styles.submittingOverlay}>
-          <View style={styles.submittingBox}>
-            <Text style={styles.submittingText}>
-              {t("taskerTaskDetails.submittingBid")}
-            </Text>
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingBox}>
+            <Text style={styles.loadingText}>Submitting bid...</Text>
           </View>
+        </View>
+      )}
+
+      {/* Full Screen Image Viewer */}
+      {selectedImage && (
+        <View style={styles.fullScreenOverlay}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setSelectedImage(null)}
+          >
+            <Ionicons name="close" size={30} color="#fff" />
+          </TouchableOpacity>
+          <Image
+            source={{ uri: selectedImage }}
+            style={styles.fullScreenImage}
+            resizeMode="contain"
+          />
         </View>
       )}
     </SafeAreaView>
@@ -552,129 +395,181 @@ export default function TaskDetailsScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#ffffff" },
-
-  backButton: { paddingHorizontal: 16, paddingTop: 10 },
   container: {
-    backgroundColor: "#ffffff",
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 0, // let green sheet own the bottom
+    flex: 1,
+    backgroundColor: "#fff",
   },
-  
-  topContent: { marginTop: 10, marginBottom: 16 },
-  topRow: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    flex: 1,
+    alignItems: "center",
+  },
+  headerTitleText: {
+    fontFamily: "InterBold",
+    fontSize: 18,
+    color: "#215433",
+  },
+  scrollView: {
+    flex: 1,
+  },
+  taskOverview: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  taskTitleRow: {
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
+    marginBottom: 16,
   },
-  heading: {
+  taskTitle: {
+    flex: 1,
     fontFamily: "InterBold",
-    fontSize: 26,
-    color: "#215433",
-    marginBottom: 4,
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  subText: {
-    fontFamily: "Inter",
-    fontSize: 13,
-    color: "#666",
-    marginBottom: 2,
-    fontWeight: "900",
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    fontSize: 24,
+    color: "#333",
+    marginRight: 12,
   },
   statusBadge: {
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 12,
-    alignSelf: I18nManager.isRTL ? "flex-end" : "flex-start",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
   },
-  statusText: { color: "#fff", fontFamily: "InterBold", fontSize: 13 },
-
-  /** EDGE‑TO‑EDGE GREEN SHEET **/
-  detailsBox: {
-    backgroundColor: "#215432",
-    paddingTop: 16,
-    paddingBottom: 24,
-    marginTop: 16,
-    marginHorizontal: -24, // full-bleed
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    paddingHorizontal: 24, // keep inner gutters
-    minHeight: height * 0.7,
+  statusText: {
+    color: "#fff",
+    fontFamily: "InterBold",
+    fontSize: 12,
   },
-
-  detailsText: {
+  taskMeta: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  metaRow: {
+    alignItems: "flex-start",
+  },
+  metaLabel: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#fff",
-    lineHeight: 20,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    color: "#666",
+    marginBottom: 4,
   },
-
-  imageRow: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    marginTop: 6,
+  metaValue: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#215433",
   },
-  image: {
-    width: 60,
-    height: 60,
+  divider: {
+    height: 1,
+    backgroundColor: "#e0e0e0",
+    marginHorizontal: 20,
+  },
+  section: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  sectionTitle: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 12,
+  },
+  descriptionText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    lineHeight: 22,
+  },
+  imageContainer: {
+    marginTop: 8,
+  },
+  imagePlaceholder: {
+    width: 80,
+    height: 80,
+    backgroundColor: "#f5f5f5",
     borderRadius: 8,
-    marginRight: I18nManager.isRTL ? 0 : 8,
-    marginLeft: I18nManager.isRTL ? 8 : 0,
+    marginRight: 12,
+    justifyContent: "center",
+    alignItems: "center",
   },
-
-  // Map container below location text
-  mapContainer: {
-    marginTop: 12,
-    borderRadius: 12,
-    overflow: "hidden",
-    backgroundColor: "#ffffff",
-    borderWidth: 1,
-    borderColor: "#ddd",
+  taskImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 8,
+  },
+  mapPlaceholder: {
+    height: 150,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    marginTop: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
   map: {
     width: "100%",
-    height: 180,
+    height: "100%",
+    borderRadius: 8,
   },
-  mapLoading: {
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#ccc",
+  footer: {
+    backgroundColor: "#f8f8f8",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
   },
-  mapLoadingText: {
+  footerText: {
     fontFamily: "Inter",
-    fontSize: 14,
+    fontSize: 12,
     color: "#666",
+    textAlign: "center",
+    marginBottom: 16,
+    lineHeight: 18,
   },
-
-  input: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 18,
-    fontSize: 16,
-    fontFamily: "Inter",
-    color: "#333",
-    marginTop: 10,
-    marginBottom: 12,
-  },
-  textarea: { height: 120 },
-
-  whiteButton: {
-    backgroundColor: "#ffffff",
-    paddingVertical: 12,
+  submitButton: {
+    backgroundColor: "#215433",
+    paddingVertical: 16,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 10,
   },
-  whiteButtonText: { color: "#215432", fontFamily: "InterBold", fontSize: 15 },
-
+  submitButtonDisabled: {
+    backgroundColor: "#ccc",
+  },
+  submitButtonText: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#fff",
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingBox: {
+    backgroundColor: "#fff",
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    borderRadius: 12,
+  },
+  loadingText: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#215433",
+  },
   fullScreenOverlay: {
     position: "absolute",
     top: 0,
@@ -686,35 +581,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 9999,
   },
-  fullScreenImage: { width: "100%", height: "100%" },
-  closeBtnWhite: {
+  closeButton: {
     position: "absolute",
-    top: 40,
+    top: 50,
     right: 20,
     zIndex: 10,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 6,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  submittingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
     backgroundColor: "rgba(0,0,0,0.5)",
+    borderRadius: 20,
+    padding: 8,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 9999,
   },
-  submittingBox: {
-    backgroundColor: "#ffffff",
-    paddingVertical: 20,
-    paddingHorizontal: 30,
-    borderRadius: 20,
+  fullScreenImage: {
+    width: "90%",
+    height: "80%",
   },
-  submittingText: { fontFamily: "InterBold", fontSize: 16, color: "#215433" },
 });
