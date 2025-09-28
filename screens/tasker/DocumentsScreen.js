@@ -14,7 +14,7 @@ import axios from "axios";
 import { fetchCurrentUser } from "../../services/auth";
 import { getToken } from "../../services/authStorage";
 import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as ImagePicker from "expo-image-picker";
 
 export default function DocumentsScreen({ navigation, route }) {
