@@ -189,7 +189,10 @@ export default function TaskerProfileScreen({ route, navigation }) {
 
           {/* Reviews */}
           {reviewData.reviews.length === 0 ? (
-            <Text style={styles.noReviews}>{t("taskerProfile.noReviews")}</Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.noReviewsTitle}>No Reviews Yet</Text>
+              <Text style={styles.noReviewsSubtitle}>This Tasker hasn't been rated yet</Text>
+            </View>
           ) : (
             reviewData.reviews.map((rev, idx) => (
               <View key={idx} style={styles.reviewCard}>
@@ -285,13 +288,13 @@ export default function TaskerProfileScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   safeArea: { 
     flex: 1, 
-    backgroundColor: "#ffffff" 
+    backgroundColor: "#F8F8F8" 
   },
   container: {
     paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 40,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F8F8F8",
   },
   backBtn: {
     width: 24,
@@ -306,11 +309,11 @@ const styles = StyleSheet.create({
   // Navigation tabs
   tabContainer: {
     flexDirection: "row",
-    backgroundColor: "#E5E5E5",
+    backgroundColor: "#E0E0E0",
     borderRadius: 25,
-    padding: 3,
+    padding: 4,
     marginBottom: 24,
-    height: 50, // Match the height from TaskDetailsScreen
+    height: 50,
   },
   tab: {
     flex: 1,
@@ -318,15 +321,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 22,
     alignItems: "center",
-    justifyContent: "center", // Center content vertically
+    justifyContent: "center",
   },
   activeTab: {
-    backgroundColor: "#215432",
+    backgroundColor: "#4CAF50",
   },
   tabText: {
     fontSize: 14,
     fontFamily: "Inter",
-    color: "#666",
+    color: "#616161",
   },
   activeTabText: {
     color: "#fff",
@@ -353,14 +356,14 @@ const styles = StyleSheet.create({
     borderRadius: 70,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#e7f0ea",
+    backgroundColor: "#4CAF50",
     borderWidth: 4,
     borderColor: "#ffffff",
   },
   avatarFallbackText: {
     fontFamily: "InterBold",
     fontSize: 48,
-    color: "#215432",
+    color: "#ffffff",
     marginTop: 4,
   },
 
@@ -372,45 +375,45 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     fontFamily: "InterBold",
-    color: "#215432",
-    textAlign: "center",
+    color: "#4CAF50",
+    textAlign: "left",
     marginBottom: 8,
   },
   profileDetails: {
     fontSize: 14,
-    color: "#555",
+    color: "#616161",
     textAlign: I18nManager.isRTL ? "right" : "left",
     marginBottom: 6,
   },
   profileLabel: {
     fontFamily: "InterBold",
-    color: "#215432",
+    color: "#4CAF50",
   },
 
   // About section
   aboutTitle: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#333",
+    color: "#616161",
     lineHeight: 20,
     marginTop: 12,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   aboutBold: { 
     fontFamily: "InterBold", 
-    color: "#215432" 
+    color: "#4CAF50" 
   },
 
   // Report button - WIDER and OVAL/Rounded
   reportButton: {
     backgroundColor: "#F44336",
-    borderRadius: 50, // Very rounded/oval
+    borderRadius: 8,
     paddingVertical: 16,
     paddingHorizontal: 32,
     alignItems: "center",
     marginBottom: 20,
-    alignSelf: "stretch", // Make it cover most of the width
-    marginHorizontal: 20, // Add some margin on sides
+    alignSelf: "stretch",
+    marginHorizontal: 0,
   },
   reportButtonText: {
     color: "#ffffff",
@@ -430,12 +433,29 @@ const styles = StyleSheet.create({
   reviewsTitle: { 
     fontFamily: "InterBold", 
     fontSize: 16, 
-    color: "#215432" 
+    color: "#4CAF50" 
   },
   reviewsAvg: { 
     fontFamily: "InterBold", 
     fontSize: 14, 
-    color: "#666" 
+    color: "#4CAF50" 
+  },
+  emptyContainer: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+  noReviewsTitle: {
+    fontFamily: "InterBold",
+    fontSize: 18,
+    color: "#4CAF50",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  noReviewsSubtitle: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#616161",
+    textAlign: "center",
   },
 
   reviewCard: {

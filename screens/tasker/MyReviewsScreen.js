@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { fetchCurrentUser } from "../../services/auth";
 import axios from "axios";
+import EmptyIllustration from "../../components/EmptyIllustration";
 
 export default function MyReviewsScreen({ navigation }) {
   const { t } = useTranslation();
@@ -107,7 +108,11 @@ export default function MyReviewsScreen({ navigation }) {
         />
       ) : reviews.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No reviews yet</Text>
+          <View style={styles.emptyIllustration}>
+            <EmptyIllustration size={140} />
+          </View>
+          <Text style={styles.emptyTitle}>No reviews yet</Text>
+          <Text style={styles.emptySubtitle}>Start doing tasks to get rated!</Text>
         </View>
       ) : (
         <FlatList
@@ -126,7 +131,7 @@ export default function MyReviewsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F8F8F8",
   },
   header: {
     paddingHorizontal: 20,
@@ -198,10 +203,95 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
   },
-  emptyText: {
+  emptyIllustration: {
+    marginBottom: 30,
+  },
+  illustrationCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#CFD8DC",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  stopwatch: {
+    position: "absolute",
+    right: 15,
+    top: 20,
+    width: 50,
+    height: 50,
+  },
+  stopwatchFace: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#ffffff",
+    borderWidth: 3,
+    borderColor: "#000000",
+    position: "relative",
+    overflow: "hidden",
+  },
+  stopwatchProgress: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: "33%",
+    height: "100%",
+    backgroundColor: "#C6FF00",
+  },
+  stopwatchButton: {
+    position: "absolute",
+    top: -8,
+    left: "50%",
+    marginLeft: -4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#ffffff",
+  },
+  mug: {
+    position: "absolute",
+    left: 10,
+    bottom: 15,
+    width: 30,
+    height: 25,
+    backgroundColor: "#ffffff",
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: "#000000",
+  },
+  mugHandle: {
+    position: "absolute",
+    right: -8,
+    top: 5,
+    width: 8,
+    height: 12,
+    borderWidth: 1,
+    borderColor: "#000000",
+    borderLeftWidth: 0,
+    borderRadius: 0,
+  },
+  mugLiquid: {
+    position: "absolute",
+    top: 2,
+    left: 2,
+    right: 2,
+    height: 8,
+    backgroundColor: "#C6FF00",
+    borderRadius: 1,
+  },
+  emptyTitle: {
+    fontFamily: "InterBold",
+    fontSize: 18,
+    color: "#4CAF50",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  emptySubtitle: {
     fontFamily: "Inter",
-    fontSize: 16,
-    color: "#999",
+    fontSize: 14,
+    color: "#616161",
     textAlign: "center",
   },
 });

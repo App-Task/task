@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
 import { useFocusEffect } from "@react-navigation/native";
+import EmptyIllustration from "../../components/EmptyIllustration";
 
 export default function TaskerMessagesScreen({ navigation }) {
   const { t } = useTranslation();
@@ -108,36 +109,38 @@ export default function TaskerMessagesScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{t("taskerMessages.title")}</Text>
+      <Text style={styles.title}>Messages</Text>
       <View style={styles.searchBar}>
-  <TextInput
-    style={styles.searchInput}
-    placeholder={t("taskerMessages.searchPlaceholder")}
-    placeholderTextColor="#777"
-    value={searchQuery}
-    onChangeText={(text) => setSearchQuery(text)}
-  />
-</View>
-
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search"
+          placeholderTextColor="#777"
+          value={searchQuery}
+          onChangeText={(text) => setSearchQuery(text)}
+        />
+      </View>
 
       {loading && conversations.length === 0 ? (
-        <ActivityIndicator size="large" color="#215433" style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color="#214730" style={{ marginTop: 40 }} />
       ) : conversations.length === 0 ? (
-<Text style={styles.empty}>{t("taskerMessages.empty")}</Text>
+        <View style={styles.emptyContainer}>
+          <View style={styles.emptyIllustration}>
+            <EmptyIllustration size={140} />
+          </View>
+          <Text style={styles.emptyTitle}>No messages yet</Text>
+        </View>
       ) : (
         <FlatList
-        data={conversations.filter((c) =>
-          c.name?.toLowerCase().includes(searchQuery.toLowerCase())
-        )}
-        
-  keyExtractor={(item) => item.otherUserId}
-  renderItem={renderItem}
-  contentContainerStyle={{ paddingBottom: 40 }}
-  showsVerticalScrollIndicator={false}
-  refreshing={refreshing}          // ✅ enables pull-to-refresh spinner
-  onRefresh={handleRefresh}        // ✅ trigger logic on swipe
-/>
-
+          data={conversations.filter((c) =>
+            c.name?.toLowerCase().includes(searchQuery.toLowerCase())
+          )}
+          keyExtractor={(item) => item.otherUserId}
+          renderItem={renderItem}
+          contentContainerStyle={{ paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+        />
       )}
     </View>
   );
@@ -146,16 +149,16 @@ export default function TaskerMessagesScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F8F8F8",
     paddingTop: 90,
     paddingHorizontal: 24,
   },
   title: {
     fontFamily: "InterBold",
-    fontSize: 28, // larger like screenshot
-    color: "#215432", // dark green
+    fontSize: 28,
+    color: "#214730",
     marginBottom: 20,
-    textAlign: "left", // left aligned
+    textAlign: "left",
   },
   card: {
     flexDirection: "row",
@@ -210,12 +213,95 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 12,
   },
-  empty: {
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 100,
+  },
+  emptyIllustration: {
+    marginBottom: 30,
+  },
+  illustrationCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#C4D2D6",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  stopwatch: {
+    position: "absolute",
+    right: 15,
+    top: 20,
+    width: 50,
+    height: 50,
+  },
+  stopwatchFace: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#ffffff",
+    borderWidth: 3,
+    borderColor: "#000000",
+    position: "relative",
+    overflow: "hidden",
+  },
+  stopwatchProgress: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: "33%",
+    height: "100%",
+    backgroundColor: "#C6E265",
+  },
+  stopwatchButton: {
+    position: "absolute",
+    top: -8,
+    left: "50%",
+    marginLeft: -4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#ffffff",
+  },
+  mug: {
+    position: "absolute",
+    left: 10,
+    bottom: 15,
+    width: 30,
+    height: 25,
+    backgroundColor: "#ffffff",
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: "#000000",
+  },
+  mugHandle: {
+    position: "absolute",
+    right: -8,
+    top: 5,
+    width: 8,
+    height: 12,
+    borderWidth: 1,
+    borderColor: "#000000",
+    borderLeftWidth: 0,
+    borderRadius: 0,
+  },
+  mugLiquid: {
+    position: "absolute",
+    top: 2,
+    left: 2,
+    right: 2,
+    height: 8,
+    backgroundColor: "#8BC34A",
+    borderRadius: 1,
+  },
+  emptyTitle: {
     fontFamily: "Inter",
     fontSize: 16,
-    color: "#999",
+    color: "#214730",
     textAlign: "center",
-    marginTop: 40,
   },
 
   avatar: {
@@ -227,7 +313,7 @@ const styles = StyleSheet.create({
   },
 
   searchBar: {
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#E0E0E0",
     borderRadius: 20,
     paddingVertical: 16,
     paddingHorizontal: 16,

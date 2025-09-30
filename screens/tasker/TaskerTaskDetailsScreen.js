@@ -16,6 +16,7 @@ import axios from "axios";
 import { fetchCurrentUser } from "../../services/auth";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
+import EmptyIllustration from "../../components/EmptyIllustration";
 
 export default function TaskerTaskDetailsScreen({ route }) {
   const { task: initialTask } = route.params;
@@ -28,6 +29,7 @@ export default function TaskerTaskDetailsScreen({ route }) {
   const [loadingBid, setLoadingBid] = useState(true);
   const [coords, setCoords] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [activeTab, setActiveTab] = useState("details"); // "details" or "offers"
 
   const isBiddingAllowed = task.status === "Pending";
 
@@ -157,104 +159,134 @@ export default function TaskerTaskDetailsScreen({ route }) {
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
             size={24}
-            color="#215433"
+            color="#4CAF50"
           />
         </TouchableOpacity>
-        <View style={styles.headerTitle}>
-          <Text style={styles.headerTitleText}>Task details</Text>
+        
+        {/* Segmented Control */}
+        <View style={styles.segmentedControl}>
+          <TouchableOpacity
+            style={[styles.segment, activeTab === "details" && styles.activeSegment]}
+            onPress={() => setActiveTab("details")}
+          >
+            <Text style={[styles.segmentText, activeTab === "details" && styles.activeSegmentText]}>
+              Task details
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.segment, activeTab === "offers" && styles.activeSegment]}
+            onPress={() => setActiveTab("offers")}
+          >
+            <Text style={[styles.segmentText, activeTab === "offers" && styles.activeSegmentText]}>
+              Offers
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Task Overview */}
-        <View style={styles.taskOverview}>
-          <View style={styles.taskTitleRow}>
-            <Text style={styles.taskTitle}>{task.title || "Task Title"}</Text>
-            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(task.status) }]}>
-              <Text style={styles.statusText}>{task.status || "In Progress"}</Text>
-            </View>
-          </View>
-          
-          <View style={styles.taskMeta}>
-            <View style={styles.metaRow}>
-              <Text style={styles.metaLabel}>Posted on</Text>
-              <Text style={styles.metaValue}>{formatDate(task.createdAt)}</Text>
-            </View>
-            <View style={styles.metaRow}>
-              <Text style={styles.metaLabel}>BUDGET</Text>
-              <Text style={styles.metaValue}>{task.budget || "22"} BHD</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Divider */}
-        <View style={styles.divider} />
-
-        {/* Description */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Description</Text>
-          <Text style={styles.descriptionText}>
-            {task.description || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when"}
-          </Text>
-        </View>
-
-        {/* Divider */}
-        <View style={styles.divider} />
-
-        {/* Images */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Images</Text>
-          <View style={styles.imageContainer}>
-            {task.images && task.images.length > 0 ? (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {task.images.map((uri, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.imagePlaceholder}
-                    onPress={() => setSelectedImage(uri)}
-                  >
-                    <Image source={{ uri }} style={styles.taskImage} />
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            ) : (
-              <View style={styles.imagePlaceholder}>
-                <Ionicons name="image-outline" size={32} color="#ccc" />
+        {activeTab === "details" ? (
+          <>
+            {/* Task Overview */}
+            <View style={styles.taskOverview}>
+              <View style={styles.taskTitleRow}>
+                <Text style={styles.taskTitle}>{task.title || "Task Title"}</Text>
+                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(task.status) }]}>
+                  <Text style={styles.statusText}>{task.status || "In Progress"}</Text>
+                </View>
               </View>
-            )}
+              
+              <View style={styles.taskMeta}>
+                <View style={styles.metaRow}>
+                  <Text style={styles.metaLabel}>Posted on</Text>
+                  <Text style={styles.metaValue}>{formatDate(task.createdAt)}</Text>
+                </View>
+                <View style={styles.metaRow}>
+                  <Text style={styles.metaLabel}>BUDGET</Text>
+                  <Text style={styles.metaValue}>{task.budget || "22"} BHD</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Divider */}
+            <View style={styles.divider} />
+
+            {/* Description */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Description</Text>
+              <Text style={styles.descriptionText}>
+                {task.description || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when"}
+              </Text>
+            </View>
+
+            {/* Divider */}
+            <View style={styles.divider} />
+
+            {/* Images */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Images</Text>
+              <View style={styles.imageContainer}>
+                {task.images && task.images.length > 0 ? (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {task.images.map((uri, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.imagePlaceholder}
+                        onPress={() => setSelectedImage(uri)}
+                      >
+                        <Image source={{ uri }} style={styles.taskImage} />
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                ) : (
+                  <View style={styles.imagePlaceholder}>
+                    <Ionicons name="image-outline" size={32} color="#ccc" />
+                  </View>
+                )}
+              </View>
+            </View>
+
+            {/* Divider */}
+            <View style={styles.divider} />
+
+            {/* Location */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Location</Text>
+              {coords ? (
+                <View style={styles.mapPlaceholder}>
+                  <MapView
+                    style={styles.map}
+                    initialRegion={{
+                      latitude: coords.latitude,
+                      longitude: coords.longitude,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
+                    }}
+                    pointerEvents="none"
+                  >
+                    <Marker coordinate={coords} />
+                  </MapView>
+                </View>
+              ) : (
+                <View style={styles.mapPlaceholder}>
+                  <Ionicons name="location-outline" size={32} color="#ccc" />
+                </View>
+              )}
+            </View>
+
+            {/* Bottom spacing */}
+            <View style={{ height: 120 }} />
+          </>
+        ) : (
+          /* Offers Tab */
+          <View style={styles.offersContainer}>
+            <View style={styles.emptyIllustration}>
+              <EmptyIllustration size={140} />
+            </View>
+            <Text style={styles.emptyTitle}>No Offers Yet</Text>
+            <Text style={styles.emptySubtitle}>Offers will show here when Taskers bid on you Task!</Text>
           </View>
-        </View>
-
-        {/* Divider */}
-        <View style={styles.divider} />
-
-        {/* Location */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Location</Text>
-          {coords ? (
-            <View style={styles.mapPlaceholder}>
-              <MapView
-                style={styles.map}
-                initialRegion={{
-                  latitude: coords.latitude,
-                  longitude: coords.longitude,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                }}
-                pointerEvents="none"
-              >
-                <Marker coordinate={coords} />
-              </MapView>
-            </View>
-          ) : (
-            <View style={styles.mapPlaceholder}>
-              <Ionicons name="location-outline" size={32} color="#ccc" />
-            </View>
-          )}
-        </View>
-
-        {/* Bottom spacing */}
-        <View style={{ height: 120 }} />
+        )}
       </ScrollView>
 
       {/* Fixed Bottom Footer */}
@@ -312,7 +344,7 @@ export default function TaskerTaskDetailsScreen({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F8F8F8",
   },
   header: {
     flexDirection: "row",
@@ -321,6 +353,130 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
+  },
+  segmentedControl: {
+    flexDirection: "row",
+    backgroundColor: "#E0E0E0",
+    borderRadius: 25,
+    padding: 4,
+    marginLeft: 20,
+    flex: 1,
+  },
+  segment: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 25,
+    alignItems: "center",
+  },
+  activeSegment: {
+    backgroundColor: "#4CAF50",
+  },
+  segmentText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#616161",
+  },
+  activeSegmentText: {
+    fontFamily: "InterBold",
+    color: "#ffffff",
+  },
+  offersContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 100,
+  },
+  emptyIllustration: {
+    marginBottom: 30,
+  },
+  illustrationCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#CFD8DC",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  stopwatch: {
+    position: "absolute",
+    right: 15,
+    top: 20,
+    width: 50,
+    height: 50,
+  },
+  stopwatchFace: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#ffffff",
+    borderWidth: 3,
+    borderColor: "#000000",
+    position: "relative",
+    overflow: "hidden",
+  },
+  stopwatchProgress: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: "33%",
+    height: "100%",
+    backgroundColor: "#C6FF00",
+  },
+  stopwatchButton: {
+    position: "absolute",
+    top: -8,
+    left: "50%",
+    marginLeft: -4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#ffffff",
+  },
+  mug: {
+    position: "absolute",
+    left: 10,
+    bottom: 15,
+    width: 30,
+    height: 25,
+    backgroundColor: "#ffffff",
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: "#000000",
+  },
+  mugHandle: {
+    position: "absolute",
+    right: -8,
+    top: 5,
+    width: 8,
+    height: 12,
+    borderWidth: 1,
+    borderColor: "#000000",
+    borderLeftWidth: 0,
+    borderRadius: 0,
+  },
+  mugLiquid: {
+    position: "absolute",
+    top: 2,
+    left: 2,
+    right: 2,
+    height: 8,
+    backgroundColor: "#C6FF00",
+    borderRadius: 1,
+  },
+  emptyTitle: {
+    fontFamily: "InterBold",
+    fontSize: 18,
+    color: "#4CAF50",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#616161",
+    textAlign: "center",
   },
   backButton: {
     padding: 8,

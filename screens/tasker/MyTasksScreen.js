@@ -14,6 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { fetchCurrentUser } from "../../services/auth";
 import { getToken } from "../../services/authStorage";
+import EmptyIllustration from "../../components/EmptyIllustration";
 
 export default function TaskerMyTasksScreen() {
   const [loading, setLoading] = useState(true);
@@ -325,12 +326,16 @@ export default function TaskerMyTasksScreen() {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Text style={styles.emptyText}>
+      <View style={styles.emptyIllustration}>
+        <EmptyIllustration size={140} />
+      </View>
+      <Text style={styles.emptyTitle}>No Tasks Here</Text>
+      <Text style={styles.emptySubtitle}>
         {activeTab === "bidSent" 
-          ? "No bids sent yet" 
+          ? "Start bidding on Tasks!" 
           : activeTab === "active"
-          ? "No active tasks"
-          : "No previous tasks"
+          ? "Start bidding on Tasks!"
+          : "Start posting on Tasks, and get help today!"
         }
       </Text>
     </View>
@@ -414,13 +419,13 @@ export default function TaskerMyTasksScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F8F8F8",
     paddingTop: 60,
     paddingHorizontal: 20,
   },
   segmentedControl: {
     flexDirection: "row",
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#E0E0E0",
     borderRadius: 25,
     padding: 4,
     marginBottom: 20,
@@ -433,12 +438,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeSegment: {
-    backgroundColor: "#215433",
+    backgroundColor: "#4CAF50",
   },
   segmentText: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#666",
+    color: "#616161",
   },
   activeSegmentText: {
     fontFamily: "InterBold",
@@ -458,10 +463,95 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 100,
   },
-  emptyText: {
+  emptyIllustration: {
+    marginBottom: 30,
+  },
+  illustrationCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#CFD8DC",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  stopwatch: {
+    position: "absolute",
+    right: 15,
+    top: 20,
+    width: 50,
+    height: 50,
+  },
+  stopwatchFace: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#ffffff",
+    borderWidth: 3,
+    borderColor: "#000000",
+    position: "relative",
+    overflow: "hidden",
+  },
+  stopwatchProgress: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: "33%",
+    height: "100%",
+    backgroundColor: "#C6FF00",
+  },
+  stopwatchButton: {
+    position: "absolute",
+    top: -8,
+    left: "50%",
+    marginLeft: -4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#ffffff",
+  },
+  mug: {
+    position: "absolute",
+    left: 10,
+    bottom: 15,
+    width: 30,
+    height: 25,
+    backgroundColor: "#ffffff",
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: "#000000",
+  },
+  mugHandle: {
+    position: "absolute",
+    right: -8,
+    top: 5,
+    width: 8,
+    height: 12,
+    borderWidth: 1,
+    borderColor: "#000000",
+    borderLeftWidth: 0,
+    borderRadius: 0,
+  },
+  mugLiquid: {
+    position: "absolute",
+    top: 2,
+    left: 2,
+    right: 2,
+    height: 8,
+    backgroundColor: "#C6FF00",
+    borderRadius: 1,
+  },
+  emptyTitle: {
+    fontFamily: "InterBold",
+    fontSize: 18,
+    color: "#4CAF50",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  emptySubtitle: {
     fontFamily: "Inter",
-    fontSize: 16,
-    color: "#999",
+    fontSize: 14,
+    color: "#616161",
     textAlign: "center",
   },
   card: {
