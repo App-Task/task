@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F8F8F8",
-    paddingTop: 60,
+    paddingTop: 24,
     paddingHorizontal: 20,
   },
   segmentedControl: {
