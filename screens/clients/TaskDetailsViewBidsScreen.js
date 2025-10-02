@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  FlatList,
   View,
   Text,
   Image,
@@ -20,10 +21,10 @@ import { useIsFocused } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-
+import axios from "axios";
 const { width, height } = Dimensions.get("window");
 
-export default function TaskDetailsScreen({ route, navigation }) {
+export default function TaskDetailsViewBidsScreen({ route, navigation }) {
   const { t } = useTranslation();
   const { task: initialTask } = route.params;
 
@@ -36,6 +37,9 @@ export default function TaskDetailsScreen({ route, navigation }) {
   const [previewImage, setPreviewImage] = useState(null);
   const [coords, setCoords] = useState(null);
   const [activeTab, setActiveTab] = useState("details");
+  const [acceptedBidId, setAcceptedBidId] = useState(null);
+  const [reviews, setReviews] = useState({});
+  const [accepting, setAccepting] = useState(false);
 
   useEffect(() => {
     if (isFocused) {
@@ -51,6 +55,33 @@ export default function TaskDetailsScreen({ route, navigation }) {
       const res = await fetch(`https://task-kq94.onrender.com/api/bids/task/${initialTask._id}`);
       const bidData = await res.json();
       setBids(bidData);
+
+      // Check for accepted bid
+      const accepted = bidData.find((bid) => bid.status === "Accepted");
+      if (accepted) {
+        setAcceptedBidId(accepted._id);
+      } else {
+        setAcceptedBidId(null);
+      }
+
+      // Fetch reviews for taskers
+      const taskerIds = bidData.map((bid) => bid.taskerId?._id).filter(Boolean);
+      const reviewMap = {};
+
+      await Promise.all(
+        taskerIds.map(async (id) => {
+          try {
+            const reviewRes = await axios.get(
+              `https://task-kq94.onrender.com/api/reviews/tasker/${id}`
+            );
+            reviewMap[id] = reviewRes.data;
+          } catch (err) {
+            console.warn(`⚠️ Failed to fetch review for tasker ${id}`);
+          }
+        })
+      );
+
+      setReviews(reviewMap);
     } catch (err) {
       console.error("❌ Task fetch failed:", err.message);
       Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.loadTaskError"));
@@ -155,6 +186,135 @@ export default function TaskDetailsScreen({ route, navigation }) {
       ]
     );
   };
+  const handleAccept = async (bid) => {
+    try {
+      setAccepting(true);
+      const res = await axios.put(`https://task-kq94.onrender.com/api/bids/${bid._id}/accept`);
+      console.log("✅ Bid accepted:", res.data);
+
+      setAcceptedBidId(bid._id);
+      setAccepting(false);
+
+      Alert.alert(
+        t("clientViewBids.acceptedTitle"),
+        t("clientViewBids.acceptedMessage", {
+          name: bid.taskerId?.name || "Tasker",
+        }),
+        [
+          {
+            text: t("clientViewBids.ok"),
+            onPress: () => {
+              navigation.navigate("ClientHome", {
+                screen: "Tasks",
+                params: { refreshTasks: true, targetTab: "Started" },
+              });
+            },
+          },
+        ]
+      );
+    } catch (err) {
+      setAccepting(false);
+      console.error("❌ Accept bid error:", err.message);
+      Alert.alert(t("common.errorTitle"), t("clientViewBids.acceptError"));
+    }
+  };
+
+  const handleChat = (bid) => {
+    const name = bid.taskerId?.name || "Tasker";
+    const otherUserId = bid.taskerId?._id;
+    console.log("💬 Navigating to Chat with:", { name, otherUserId });
+    navigation.navigate("Chat", { name, otherUserId });
+  };
+
+  const renderBid = ({ item }) => {
+    const isThisAccepted =
+      item._id === acceptedBidId || item.status === "Accepted";
+    const alreadyPicked = acceptedBidId && item._id !== acceptedBidId;
+
+    const review = reviews[item.taskerId?._id];
+    const average = review?.average;
+    const comment = review?.latest?.comment;
+
+    return (
+      <View style={styles.card}>
+        <View style={styles.taskerHeader}>
+          <View>
+            <Text style={styles.taskerName}>
+              {item.taskerId?.name || t("clientViewBids.taskerFallbackName")}
+            </Text>
+            {average && (
+              <View style={styles.taskerRatingContainer}>
+                <Text style={styles.taskerRating}>{average.toFixed(1)}</Text>
+                <Image
+                  source={require("../../assets/images/Starno background.png")}
+                  style={{
+                    width: 16,
+                    height: 16,
+                    marginLeft: 4,
+                  }}
+                />
+              </View>
+            )}
+          </View>
+
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("TaskerProfile", {
+                taskerId: item.taskerId?._id,
+              })
+            }
+          >
+            <Text style={styles.viewProfileText}>{t("clientViewBids.viewProfile")}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ padding: 16 }}>
+          <Text style={styles.priceOffered}>
+            {t("clientViewBids.priceOffered")}:{" "}
+            <Text style={{ fontWeight: "bold" }}>{item.amount} {t("clientViewBids.currency")}</Text>
+          </Text>
+          {item.message ? (
+            <Text style={styles.message}>{item.message}</Text>
+          ) : null}
+        </View>
+
+        <View style={styles.buttonsRow}>
+          <TouchableOpacity
+            style={styles.chatBtn}
+            onPress={() => handleChat(item)}
+          >
+            <Text style={styles.chatText}>{t("clientViewBids.chat")}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.acceptBtn,
+              isThisAccepted
+                ? { backgroundColor: "#888" }
+                : alreadyPicked
+                ? { backgroundColor: "#ccc" }
+                : {},
+            ]}
+            onPress={() => {
+              if (!acceptedBidId) {
+                handleAccept(item);
+              }
+            }}
+            disabled={!!acceptedBidId}
+          >
+            <Text style={styles.acceptText}>
+              {isThisAccepted
+                ? "Accepted"
+                : alreadyPicked
+                ? "Tasker already selected"
+                : t("clientViewBids.accept")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -196,55 +356,26 @@ export default function TaskDetailsScreen({ route, navigation }) {
           <View style={styles.backBtn} />
         </View>
 
-        {/* Navigation Tabs - matching ViewBidsScreen structure */}
         <View style={styles.tabContainer}>
           <TouchableOpacity
-            style={[styles.tab, styles.activeTab]} // Always show as active
-            onPress={() => {
-              // Do nothing when Task Details tab is pressed since we're already on it
-            }}
+            style={[styles.tab, activeTab === "details" ? styles.activeTab : null]}
+            onPress={() => setActiveTab("details")}
           >
-            <Text style={[styles.tabText, styles.activeTabText]}>
+            <Text style={[styles.tabText, activeTab === "details" ? styles.activeTabText : null]}>
               Task Details
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.tab]} // Never show as active
-            onPress={() => {
-              if (task.status === "Pending") {
-                navigation.navigate("ViewBids", { taskId: task._id });
-              } else {
-                // Debug: Log the task object to see available fields
-                console.log("Task object:", task);
-                console.log("Task keys:", Object.keys(task));
-                
-                // Try different possible field names for tasker ID
-                const taskerId = task.assignedTo || task.taskerId || task.assignedTasker || task.tasker || task.assignedUser;
-                
-                if (taskerId) {
-                  console.log("Found taskerId:", taskerId);
-                  navigation.navigate("TaskerProfile", { 
-                    taskerId: taskerId,
-                    task: task, // Pass the task object
-                    taskId: task._id // Also pass taskId
-                  });
-                } else {
-                  console.error("No tasker ID found in task object");
-                  Alert.alert(
-                    "Tasker Profile Unavailable", 
-                    "Tasker information is not available for this task. The task may not have been assigned to a tasker yet."
-                  );
-                }
-              }
-            }}
+            style={[styles.tab, activeTab === "offers" ? styles.activeTab : null]}
+            onPress={() => setActiveTab("offers")}
           >
-            <Text style={[styles.tabText]}>
-              {task.status === "Pending" ? "Offers" : "Tasker's Profile"}
+            <Text style={[styles.tabText, activeTab === "offers" ? styles.activeTabText : null]}>
+              Offers
             </Text>
           </TouchableOpacity>
         </View>
-
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        {activeTab === "details" ? (
+          <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
           {/* Separator line above title */}
           <View style={styles.separator} />
 
@@ -405,6 +536,27 @@ export default function TaskDetailsScreen({ route, navigation }) {
             )}
           </View>
         </ScrollView>
+        ) : (
+          <>
+            {loading ? (
+              <ActivityIndicator
+                size="large"
+                color="#215433"
+                style={{ marginTop: 50 }}
+              />
+            ) : (
+              <FlatList
+                data={bids}
+                keyExtractor={(item) => item._id}
+                renderItem={renderBid}
+                ListEmptyComponent={
+                  <Text style={styles.empty}>{t("clientViewBids.noBids")}</Text>
+                }
+                contentContainerStyle={styles.listContent}
+              />
+            )}
+          </>
+        )}
 
         {/* Image Preview */}
         {previewImage && (
@@ -709,4 +861,101 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#215433",
   },
+    // Bid-related styles
+    card: {
+      backgroundColor: "#fff",
+      borderRadius: 12,
+      marginBottom: 16,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    taskerHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: "#E5E5E5",
+    },
+    taskerName: {
+      fontSize: 16,
+      fontFamily: "InterBold",
+      color: "#333",
+    },
+    taskerRatingContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: 4,
+    },
+    taskerRating: {
+      fontSize: 14,
+      fontFamily: "InterBold",
+      color: "#215432",
+    },
+    viewProfileText: {
+      fontSize: 14,
+      fontFamily: "Inter",
+      color: "#215432",
+      textDecorationLine: "underline",
+    },
+    priceOffered: {
+      fontSize: 16,
+      fontFamily: "Inter",
+      color: "#333",
+      marginBottom: 8,
+    },
+    message: {
+      fontSize: 14,
+      fontFamily: "Inter",
+      color: "#666",
+      lineHeight: 20,
+    },
+    buttonsRow: {
+      flexDirection: "row",
+      padding: 16,
+      gap: 12,
+    },
+    chatBtn: {
+      flex: 1,
+      backgroundColor: "#fff",
+      borderWidth: 1,
+      borderColor: "#215432",
+      borderRadius: 8,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+    chatText: {
+      fontSize: 14,
+      fontFamily: "InterBold",
+      color: "#215432",
+    },
+    acceptBtn: {
+      flex: 1,
+      backgroundColor: "#215432",
+      borderRadius: 8,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+    acceptText: {
+      fontSize: 14,
+      fontFamily: "InterBold",
+      color: "#fff",
+    },
+    empty: {
+      textAlign: "center",
+      fontSize: 16,
+      fontFamily: "Inter",
+      color: "#666",
+      marginTop: 50,
+    },
+    listContent: {
+      paddingHorizontal: 20,
+      paddingBottom: 20,
+    },
 });

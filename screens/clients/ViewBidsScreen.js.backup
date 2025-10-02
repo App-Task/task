@@ -17,6 +17,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native";
 
+
+
+
+
 const { width } = Dimensions.get("window");
 
 export default function ViewBidsScreen({ route, navigation }) {
@@ -28,6 +32,7 @@ export default function ViewBidsScreen({ route, navigation }) {
   const [reviews, setReviews] = useState({});
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(false);
+
 
   useFocusEffect(
     React.useCallback(() => {
@@ -116,13 +121,13 @@ export default function ViewBidsScreen({ route, navigation }) {
     }
   };
   
+
   const handleChat = (bid) => {
     const name = bid.taskerId?.name || "Tasker";
     const otherUserId = bid.taskerId?._id;
     console.log("💬 Navigating to Chat with:", { name, otherUserId });
     navigation.navigate("Chat", { name, otherUserId });
   };
-
   const renderBid = ({ item }) => {
     const isThisAccepted =
       item._id === acceptedBidId || item.status === "Accepted";
@@ -214,11 +219,12 @@ export default function ViewBidsScreen({ route, navigation }) {
       </View>
     );
   };
+  
+  
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Header with back button - matching TaskDetailsScreen structure */}
         <View style={styles.headerRow}>
           <TouchableOpacity
             style={styles.backBtn}
@@ -230,7 +236,7 @@ export default function ViewBidsScreen({ route, navigation }) {
           <View style={styles.backBtn} />
         </View>
 
-        {/* Navigation Tabs - matching TaskDetailsScreen structure */}
+        {/* Navigation Tabs - positioned like TaskDetailsScreen */}
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[styles.tab]}
@@ -287,6 +293,8 @@ export default function ViewBidsScreen({ route, navigation }) {
     </SafeAreaView>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -351,6 +359,7 @@ const styles = StyleSheet.create({
     overflow: "hidden", // So the green header connects perfectly to the white box
   },
   
+
   taskerHeader: {
     backgroundColor: "#215432",
     flexDirection: "row",
@@ -362,6 +371,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 12,
   },
   
+
   taskerName: {
     fontFamily: "InterBold",
     fontSize: 18,
@@ -475,4 +485,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#215433",
   },
+
+  
+  
 });

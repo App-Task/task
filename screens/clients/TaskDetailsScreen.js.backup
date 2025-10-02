@@ -183,20 +183,20 @@ export default function TaskDetailsScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        {/* Header with back button - matching ViewBidsScreen structure */}
-        <View style={styles.headerRow}>
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={30} color="#215432" />
-          </TouchableOpacity>
-          
-          <View style={styles.backBtn} />
-        </View>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
+        {/* Header with back button */}
+        <TouchableOpacity
+          style={[styles.backBtn, I18nManager.isRTL && { alignSelf: "flex-end" }]}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons
+            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+            size={24}
+            color="#215433"
+          />
+        </TouchableOpacity>
 
-        {/* Navigation Tabs - matching ViewBidsScreen structure */}
+        {/* Navigation Tabs */}
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[styles.tab, styles.activeTab]} // Always show as active
@@ -244,167 +244,165 @@ export default function TaskDetailsScreen({ route, navigation }) {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-          {/* Separator line above title */}
-          <View style={styles.separator} />
+        {/* Separator line above title */}
+        <View style={styles.separator} />
 
-          {/* Task Title and Status */}
-          <View style={styles.titleSection}>
-            <View style={styles.titleRow}>
-              <Text style={styles.title}>{title}</Text>
-              <View style={[styles.statusBadge, getStatusStyle(task.status)]}>
-                <Text style={styles.statusText}>
-                  {task.status}
-                </Text>
-              </View>
+        {/* Task Title and Status */}
+        <View style={styles.titleSection}>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>{title}</Text>
+            <View style={[styles.statusBadge, getStatusStyle(task.status)]}>
+              <Text style={styles.statusText}>
+                {task.status}
+              </Text>
             </View>
           </View>
+        </View>
 
-          {/* Separator line below title */}
-          <View style={styles.separator} />
+        {/* Separator line below title */}
+        <View style={styles.separator} />
 
-          {/* Posted on and Budget */}
-          <View style={styles.infoSection}>
-            <View style={styles.infoRow}>
-              <View>
-                <Text style={styles.infoLabel}>Posted on</Text>
-                <Text style={styles.infoValue}>
-                  {new Date(task.createdAt).toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric"
-                  })}
-                </Text>
-              </View>
-              <View>
-                <Text style={styles.infoLabel}>BUDGET</Text>
-                <Text style={styles.budgetValue}>{budget} BHD</Text>
-              </View>
+        {/* Posted on and Budget */}
+        <View style={styles.infoSection}>
+          <View style={styles.infoRow}>
+            <View>
+              <Text style={styles.infoLabel}>Posted on</Text>
+              <Text style={styles.infoValue}>
+                {new Date(task.createdAt).toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric"
+                })}
+              </Text>
+            </View>
+            <View>
+              <Text style={styles.infoLabel}>BUDGET</Text>
+              <Text style={styles.budgetValue}>{budget} BHD</Text>
             </View>
           </View>
+        </View>
 
-          {/* Separator line */}
-          <View style={styles.separator} />
+        {/* Separator line */}
+        <View style={styles.separator} />
 
-          {/* Description */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Description</Text>
-            <Text style={styles.sectionValue}>{description}</Text>
-          </View>
+        {/* Description */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Description</Text>
+          <Text style={styles.sectionValue}>{description}</Text>
+        </View>
 
-          {/* Images */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Images</Text>
-            <View style={styles.imageRow}>
-              {images.length > 0 ? (
-                images.map((img, index) => (
-                  <TouchableOpacity key={index} onPress={() => setPreviewImage(img)}>
-                    <Image source={{ uri: img }} style={styles.image} />
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <View style={styles.placeholderImage} />
-              )}
-            </View>
-          </View>
-
-          {/* Separator line */}
-          <View style={styles.separator} />
-
-          {/* Location */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Location</Text>
-            {coords && (
-              <View style={styles.mapContainer}>
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  onPress={() =>
-                    openInGoogleMaps(
-                      coords.latitude,
-                      coords.longitude,
-                      task?.title || "Task Location"
-                    )
-                  }
-                >
-                  <MapView
-                    style={styles.map}
-                    initialRegion={{
-                      latitude: coords.latitude,
-                      longitude: coords.longitude,
-                      latitudeDelta: 0.01,
-                      longitudeDelta: 0.01,
-                    }}
-                    pointerEvents="none"
-                  >
-                    <Marker coordinate={coords} />
-                  </MapView>
+        {/* Images */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Images</Text>
+          <View style={styles.imageRow}>
+            {images.length > 0 ? (
+              images.map((img, index) => (
+                <TouchableOpacity key={index} onPress={() => setPreviewImage(img)}>
+                  <Image source={{ uri: img }} style={styles.image} />
                 </TouchableOpacity>
-              </View>
+              ))
+            ) : (
+              <View style={styles.placeholderImage} />
             )}
           </View>
+        </View>
 
-          {/* Action Buttons */}
-          <View style={styles.buttonSection}>
-            {task.status === "Pending" && (
-              <>
-                {bids.length === 0 && (
-                  <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => navigation.navigate("EditTask", { task })}
-                  >
-                    <Text style={styles.editButtonText}>Edit Task</Text>
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={handleDelete}
-                >
-                  <Text style={styles.cancelButtonText}>Cancel Task</Text>
-                </TouchableOpacity>
-              </>
-            )}
+        {/* Separator line */}
+        <View style={styles.separator} />
 
-            {task.status === "Started" && (
+        {/* Location */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Location</Text>
+          {coords && (
+            <View style={styles.mapContainer}>
               <TouchableOpacity
-                style={styles.completeButton}
-                onPress={() => {
-                  Alert.alert(
-                    t("clientTaskDetails.markCompletedConfirmTitle"),
-                    t("clientTaskDetails.markCompletedConfirmMessage"),
-                    [
-                      { text: t("clientTaskDetails.no") },
-                      {
-                        text: t("clientTaskDetails.yes"),
-                        onPress: async () => {
-                          try {
-                            setCompleting(true);
-                            await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, { method: "PATCH" });
-                            await fetchTask();
-                            setCompleting(false);
-                            navigation.navigate("ClientHome", {
-                              screen: "Tasks",
-                              params: {
-                                refreshTasks: true,
-                                targetTab: "Previous",
-                                subTab: "Completed",
-                                unique: Date.now(),
-                              },
-                            });
-                          } catch {
-                            setCompleting(false);
-                            Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.markCompletedError"));
-                          }
-                        },
-                      },
-                    ]
-                  );
-                }}
+                activeOpacity={0.9}
+                onPress={() =>
+                  openInGoogleMaps(
+                    coords.latitude,
+                    coords.longitude,
+                    task?.title || "Task Location"
+                  )
+                }
               >
-                <Text style={styles.completeButtonText}>Mark as Complete</Text>
+                <MapView
+                  style={styles.map}
+                  initialRegion={{
+                    latitude: coords.latitude,
+                    longitude: coords.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                  pointerEvents="none"
+                >
+                  <Marker coordinate={coords} />
+                </MapView>
               </TouchableOpacity>
-            )}
-          </View>
-        </ScrollView>
+            </View>
+          )}
+        </View>
+
+        {/* Action Buttons */}
+        <View style={styles.buttonSection}>
+          {task.status === "Pending" && (
+            <>
+              {bids.length === 0 && (
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={() => navigation.navigate("EditTask", { task })}
+                >
+                  <Text style={styles.editButtonText}>Edit Task</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleDelete}
+              >
+                <Text style={styles.cancelButtonText}>Cancel Task</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          {task.status === "Started" && (
+            <TouchableOpacity
+              style={styles.completeButton}
+              onPress={() => {
+                Alert.alert(
+                  t("clientTaskDetails.markCompletedConfirmTitle"),
+                  t("clientTaskDetails.markCompletedConfirmMessage"),
+                  [
+                    { text: t("clientTaskDetails.no") },
+                    {
+                      text: t("clientTaskDetails.yes"),
+                      onPress: async () => {
+                        try {
+                          setCompleting(true);
+                          await fetch(`https://task-kq94.onrender.com/api/tasks/${task._id}/complete`, { method: "PATCH" });
+                          await fetchTask();
+                          setCompleting(false);
+                          navigation.navigate("ClientHome", {
+                            screen: "Tasks",
+                            params: {
+                              refreshTasks: true,
+                              targetTab: "Previous",
+                              subTab: "Completed",
+                              unique: Date.now(),
+                            },
+                          });
+                        } catch {
+                          setCompleting(false);
+                          Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.markCompletedError"));
+                        }
+                      },
+                    },
+                  ]
+                );
+              }}
+            >
+              <Text style={styles.completeButtonText}>Mark as Complete</Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {/* Image Preview */}
         {previewImage && (
@@ -418,7 +416,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
             <Image source={{ uri: previewImage }} style={styles.previewImage} resizeMode="contain" />
           </View>
         )}
-      </View>
+      </ScrollView>
 
       {/* Loading overlays */}
       {completing && (
@@ -447,26 +445,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffffff",
   },
-  container: {
+  scrollView: {
     flex: 1,
     backgroundColor: "#ffffff",
-    paddingTop: 10, // Reduced to push content closer to arrow
-    paddingHorizontal: 20,
   },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 20,
+  container: {
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 40,
+    backgroundColor: "#ffffff",
   },
-  
   backBtn: {
     width: 32,
     height: 32,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 20,
   },
   
+  // Navigation tabs
   tabContainer: {
     flexDirection: "row",
     backgroundColor: "#E5E5E5",
@@ -492,15 +489,6 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: "#fff",
     fontFamily: "InterBold",
-  },
-
-  scrollView: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-  },
-  scrollContent: {
-    paddingBottom: 40,
-    backgroundColor: "#ffffff",
   },
 
   // Title section
