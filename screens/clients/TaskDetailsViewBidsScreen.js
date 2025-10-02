@@ -237,62 +237,50 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
 
     return (
       <View style={styles.card}>
+        {/* Green Header */}
         <View style={styles.taskerHeader}>
-          <View>
-            <Text style={styles.taskerName}>
-              {item.taskerId?.name || t("clientViewBids.taskerFallbackName")}
-            </Text>
-            {average && (
-              <View style={styles.taskerRatingContainer}>
-                <Text style={styles.taskerRating}>{average.toFixed(1)}</Text>
-                <Image
-                  source={require("../../assets/images/Starno background.png")}
-                  style={{
-                    width: 16,
-                    height: 16,
-                    marginLeft: 4,
-                  }}
-                />
-              </View>
-            )}
-          </View>
-
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("TaskerProfile", {
-                taskerId: item.taskerId?._id,
-              })
-            }
-          >
-            <Text style={styles.viewProfileText}>{t("clientViewBids.viewProfile")}</Text>
-          </TouchableOpacity>
+          <Text style={styles.taskerName}>
+            {item.taskerId?.name || t("clientViewBids.taskerFallbackName")}
+          </Text>
         </View>
 
-        <View style={{ padding: 16 }}>
+        {/* White Content Area */}
+        <View style={styles.cardContent}>
           <Text style={styles.priceOffered}>
-            {t("clientViewBids.priceOffered")}:{" "}
-            <Text style={{ fontWeight: "bold" }}>{item.amount} {t("clientViewBids.currency")}</Text>
+            {t("clientViewBids.priceOffered")}: <Text style={styles.priceAmount}>{item.amount} {t("clientViewBids.currency")}</Text>
           </Text>
           {item.message ? (
             <Text style={styles.message}>{item.message}</Text>
           ) : null}
         </View>
 
+        {/* Three Buttons Row */}
         <View style={styles.buttonsRow}>
+          <TouchableOpacity
+            style={styles.viewProfileBtn}
+            onPress={() =>
+              navigation.navigate("TaskerProfile", {
+                taskerId: item.taskerId?._id,
+              })
+            }
+          >
+            <Text style={styles.viewProfileBtnText}>{t("clientViewBids.viewProfile")}</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.chatBtn}
             onPress={() => handleChat(item)}
           >
-            <Text style={styles.chatText}>{t("clientViewBids.chat")}</Text>
+            <Text style={styles.chatBtnText}>{t("clientViewBids.chat")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
               styles.acceptBtn,
               isThisAccepted
-                ? { backgroundColor: "#888" }
+                ? styles.acceptedBtn
                 : alreadyPicked
-                ? { backgroundColor: "#ccc" }
+                ? styles.disabledBtn
                 : {},
             ]}
             onPress={() => {
@@ -302,7 +290,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
             }}
             disabled={!!acceptedBidId}
           >
-            <Text style={styles.acceptText}>
+            <Text style={styles.acceptBtnText}>
               {isThisAccepted
                 ? "Accepted"
                 : alreadyPicked
@@ -866,6 +854,9 @@ const styles = StyleSheet.create({
       backgroundColor: "#fff",
       borderRadius: 12,
       marginBottom: 16,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: "#E5E5E5",
       shadowColor: "#000",
       shadowOffset: {
         width: 0,
@@ -877,38 +868,30 @@ const styles = StyleSheet.create({
     },
     taskerHeader: {
       flexDirection: "row",
-      justifyContent: "space-between",
+      justifyContent: "center",
       alignItems: "center",
-      padding: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: "#E5E5E5",
+      backgroundColor: "#215432",
+      paddingVertical: 16,
+      paddingHorizontal: 20,
     },
     taskerName: {
-      fontSize: 16,
+      fontSize: 18,
       fontFamily: "InterBold",
-      color: "#333",
+      color: "#fff",
     },
-    taskerRatingContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginTop: 4,
-    },
-    taskerRating: {
-      fontSize: 14,
-      fontFamily: "InterBold",
-      color: "#215432",
-    },
-    viewProfileText: {
-      fontSize: 14,
-      fontFamily: "Inter",
-      color: "#215432",
-      textDecorationLine: "underline",
+    cardContent: {
+      backgroundColor: "#fff",
+      padding: 20,
     },
     priceOffered: {
-      fontSize: 16,
+      fontSize: 14,
       fontFamily: "Inter",
+      color: "#666",
+      marginBottom: 12,
+    },
+    priceAmount: {
+      fontFamily: "InterBold",
       color: "#333",
-      marginBottom: 8,
     },
     message: {
       fontSize: 14,
@@ -918,34 +901,63 @@ const styles = StyleSheet.create({
     },
     buttonsRow: {
       flexDirection: "row",
-      padding: 16,
-      gap: 12,
+      backgroundColor: "#fff",
+      paddingHorizontal: 16,
+      paddingBottom: 16,
+      gap: 10,
+    },
+    viewProfileBtn: {
+      flex: 1,
+      backgroundColor: "#fff",
+      borderWidth: 1.5,
+      borderColor: "#215432",
+      borderRadius: 25,
+      paddingVertical: 12,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    viewProfileBtnText: {
+      fontSize: 13,
+      fontFamily: "InterBold",
+      color: "#215432",
     },
     chatBtn: {
       flex: 1,
       backgroundColor: "#fff",
-      borderWidth: 1,
+      borderWidth: 1.5,
       borderColor: "#215432",
-      borderRadius: 8,
+      borderRadius: 25,
       paddingVertical: 12,
       alignItems: "center",
+      justifyContent: "center",
     },
-    chatText: {
-      fontSize: 14,
+    chatBtnText: {
+      fontSize: 13,
       fontFamily: "InterBold",
       color: "#215432",
     },
     acceptBtn: {
       flex: 1,
-      backgroundColor: "#215432",
-      borderRadius: 8,
+      backgroundColor: "#fff",
+      borderWidth: 1.5,
+      borderColor: "#215432",
+      borderRadius: 25,
       paddingVertical: 12,
       alignItems: "center",
+      justifyContent: "center",
     },
-    acceptText: {
-      fontSize: 14,
+    acceptedBtn: {
+      backgroundColor: "#888",
+      borderColor: "#888",
+    },
+    disabledBtn: {
+      backgroundColor: "#ccc",
+      borderColor: "#ccc",
+    },
+    acceptBtnText: {
+      fontSize: 13,
       fontFamily: "InterBold",
-      color: "#fff",
+      color: "#215432",
     },
     empty: {
       textAlign: "center",
@@ -955,7 +967,7 @@ const styles = StyleSheet.create({
       marginTop: 50,
     },
     listContent: {
-      paddingHorizontal: 20,
+      paddingTop: 10,
       paddingBottom: 20,
     },
 });
