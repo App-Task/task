@@ -157,8 +157,10 @@ export default function ViewBidsScreen({ route, navigation }) {
   
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate("TaskerProfile", {
-                taskerId: item.taskerId?._id,
+              navigation.navigate("TaskDetails", {
+                task: task,
+                showProfileTabs: true,
+                taskerId: item.taskerId?._id
               })
             }
           >

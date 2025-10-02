@@ -387,7 +387,7 @@ allTasks.forEach((task) => {
         {activeTab === "Pending" && (
           <TouchableOpacity
             style={styles.viewBidsBtn}
-            onPress={() => navigation.navigate("ViewBids", { taskId: item._id })}
+            onPress={() => navigation.navigate("TaskDetails", { task: item, showOffersTab: true })}
           >
             <Text style={styles.viewBidsText}>
               {t("clientMyTasks.viewBids", "View Bids")}
