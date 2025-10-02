@@ -81,7 +81,14 @@ router.get("/task/:taskId", async (req, res) => {
 router.get("/all/tasker/:taskerId", async (req, res) => {
   try {
     const { taskerId } = req.params;
-    const reviews = await Review.find({ taskerId }).populate("clientId", "name");
+    const reviews = await Review.find({ taskerId })
+      .populate("clientId", "name")
+      .populate({
+        path: "taskId",
+        select: "title"
+      });
+    
+    console.log("🔍 Backend - Reviews with populated taskId:", reviews);
     res.json(reviews);
   } catch (err) {
     console.error("❌ Failed to fetch reviews for tasker", err.message);

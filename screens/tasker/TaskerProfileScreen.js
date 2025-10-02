@@ -17,6 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import Modal from "react-native-modal";
+import * as SecureStore from "expo-secure-store";
 
 const { height } = Dimensions.get("window");
 
@@ -42,6 +43,13 @@ export default function TaskerProfileScreen({ route, navigation }) {
         ]);
         setTasker(userRes.data);
         setReviewData({ reviews: reviewRes.data || [] });
+        
+        // Debug: Log the review data structure
+        console.log("🔍 Review data:", reviewRes.data);
+        if (reviewRes.data && reviewRes.data.length > 0) {
+          console.log("🔍 First review structure:", reviewRes.data[0]);
+          console.log("🔍 TaskId in first review:", reviewRes.data[0].taskId);
+        }
       } catch (err) {
         console.error("❌ Error loading tasker or review:", err.message);
       } finally {
@@ -114,7 +122,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
             size={24}
-            color="#215433"
+            color="#215432"
           />
         </TouchableOpacity>
 
@@ -195,30 +203,32 @@ export default function TaskerProfileScreen({ route, navigation }) {
             </View>
           ) : (
             reviewData.reviews.map((rev, idx) => (
-              <View key={idx} style={styles.reviewCard}>
-                <Text style={styles.reviewDate}>
-                  {new Date(rev.createdAt).toLocaleDateString(
-                    I18nManager.isRTL ? "ar-SA" : "en-GB",
-                    { day: "2-digit", month: "short", year: "numeric" }
-                  )}
-                </Text>
+              <React.Fragment key={idx}>
+                <View style={styles.reviewCard}>
+                  <Text style={styles.reviewTaskTitle}>
+                    {rev.taskId?.title || "Task Title"}
+                  </Text>
+                  
+                  <View style={styles.reviewStarsContainer}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Ionicons
+                        key={star}
+                        name={star <= rev.rating ? "star" : "star-outline"}
+                        size={16}
+                        color="#215432"
+                        style={styles.reviewStar}
+                      />
+                    ))}
+                  </View>
 
-                <View style={styles.reviewDivider} />
-
-                <View style={styles.reviewRatingContainer}>
-                  <Image
-                    source={require("../../assets/images/Starno background.png")}
-                    style={{
-                      width: 16,
-                      height: 16,
-                      marginRight: 4,
-                    }}
-                  />
-                  <Text style={styles.reviewRatingText}>{rev.rating}/5</Text>
+                  {rev.comment ? (
+                    <Text style={styles.reviewComment}>{rev.comment}</Text>
+                  ) : null}
                 </View>
-
-                {rev.comment ? <Text style={styles.reviewComment}>{rev.comment}</Text> : null}
-              </View>
+                {idx < reviewData.reviews.length - 1 && (
+                  <View style={styles.reviewDivider} />
+                )}
+              </React.Fragment>
             ))
           )}
         </View>
@@ -229,7 +239,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
         <View style={styles.modalContainer}>
           {isReporting ? (
             <View style={styles.modalContent}>
-              <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 10 }} />
+              <ActivityIndicator size="large" color="#215432" style={{ marginBottom: 10 }} />
               <Text style={styles.modalText}>Submitting report...</Text>
             </View>
           ) : (
@@ -324,7 +334,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   activeTab: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#215432",
   },
   tabText: {
     fontSize: 14,
@@ -356,7 +366,7 @@ const styles = StyleSheet.create({
     borderRadius: 70,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#215432",
     borderWidth: 4,
     borderColor: "#ffffff",
   },
@@ -375,7 +385,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     fontFamily: "InterBold",
-    color: "#4CAF50",
+    color: "#215432",
     textAlign: "left",
     marginBottom: 8,
   },
@@ -387,7 +397,7 @@ const styles = StyleSheet.create({
   },
   profileLabel: {
     fontFamily: "InterBold",
-    color: "#4CAF50",
+    color: "#215432",
   },
 
   // About section
@@ -401,7 +411,7 @@ const styles = StyleSheet.create({
   },
   aboutBold: { 
     fontFamily: "InterBold", 
-    color: "#4CAF50" 
+    color: "#215432" 
   },
 
   // Report button - WIDER and OVAL/Rounded
@@ -428,17 +438,17 @@ const styles = StyleSheet.create({
   reviewsHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 12,
+    marginBottom: 16,
   },
   reviewsTitle: { 
     fontFamily: "InterBold", 
     fontSize: 16, 
-    color: "#4CAF50" 
+    color: "#215432" 
   },
   reviewsAvg: { 
     fontFamily: "InterBold", 
     fontSize: 14, 
-    color: "#4CAF50" 
+    color: "#215432" 
   },
   emptyContainer: {
     alignItems: "center",
@@ -447,7 +457,7 @@ const styles = StyleSheet.create({
   noReviewsTitle: {
     fontFamily: "InterBold",
     fontSize: 18,
-    color: "#4CAF50",
+    color: "#215432",
     textAlign: "center",
     marginBottom: 8,
   },
@@ -459,42 +469,37 @@ const styles = StyleSheet.create({
   },
 
   reviewCard: {
-    backgroundColor: "#f8f8f8",
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 10,
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    padding: 0,
+    marginBottom: 16,
   },
-  reviewDate: { 
-    fontFamily: "Inter", 
-    fontSize: 12, 
-    color: "#999", 
-    marginBottom: 4 
+  reviewTaskTitle: {
+    fontFamily: "InterBold",
+    fontSize: 14,
+    color: "#215432",
+    marginBottom: 8,
+    textAlign: "left",
   },
-  reviewDivider: { 
-    height: 1, 
-    backgroundColor: "#e0e0e0", 
-    marginVertical: 6 
+  reviewStarsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
   },
-  reviewRatingContainer: { 
-    flexDirection: "row", 
-    alignItems: "center", 
-    marginBottom: 4 
-  },
-  reviewRatingText: { 
-    fontFamily: "InterBold", 
-    fontSize: 14, 
-    color: "#000" 
+  reviewStar: {
+    marginRight: 2,
   },
   reviewComment: { 
     fontFamily: "Inter", 
     fontSize: 13, 
-    color: "#444" 
+    color: "#616161",
+    lineHeight: 18,
+    textAlign: "left",
   },
-  noReviews: { 
-    fontFamily: "Inter", 
-    fontSize: 14, 
-    color: "#ccc", 
-    marginTop: 8 
+  reviewDivider: {
+    height: 1,
+    backgroundColor: "#E0E0E0",
+    marginBottom: 16,
   },
 
   // Modal styles
