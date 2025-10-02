@@ -49,6 +49,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
         if (reviewRes.data && reviewRes.data.length > 0) {
           console.log("🔍 First review structure:", reviewRes.data[0]);
           console.log("🔍 TaskId in first review:", reviewRes.data[0].taskId);
+          console.log("🔍 Task title in first review:", reviewRes.data[0].taskId?.title);
         }
       } catch (err) {
         console.error("❌ Error loading tasker or review:", err.message);
@@ -206,7 +207,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
               <React.Fragment key={idx}>
                 <View style={styles.reviewCard}>
                   <Text style={styles.reviewTaskTitle}>
-                    {rev.taskId?.title || "Task Title"}
+                    {rev.taskId?.title || rev.taskTitle || "Task Title"}
                   </Text>
                   
                   <View style={styles.reviewStarsContainer}>

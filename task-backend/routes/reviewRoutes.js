@@ -88,8 +88,26 @@ router.get("/all/tasker/:taskerId", async (req, res) => {
         select: "title"
       });
     
-    console.log("🔍 Backend - Reviews with populated taskId:", reviews);
-    res.json(reviews);
+    // If populate didn't work, manually fetch task titles
+    const reviewsWithTitles = await Promise.all(
+      reviews.map(async (review) => {
+        if (!review.taskId || typeof review.taskId === 'string') {
+          // If taskId is not populated, fetch the task title manually
+          const task = await Task.findById(review.taskId);
+          return {
+            ...review.toObject(),
+            taskId: {
+              _id: review.taskId,
+              title: task ? task.title : "Unknown Task"
+            }
+          };
+        }
+        return review;
+      })
+    );
+    
+    console.log("🔍 Backend - Reviews with task titles:", reviewsWithTitles);
+    res.json(reviewsWithTitles);
   } catch (err) {
     console.error("❌ Failed to fetch reviews for tasker", err.message);
     res.status(500).json({ error: "Failed to fetch reviews" });
