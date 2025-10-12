@@ -143,7 +143,6 @@ export default function PostTaskPage2() {
   // Open the map picker
   const openMapPicker = async () => {
     try {
-      setMapVisible(true);
       if (coords) {
         setTempCoords(coords);
         setTempRegion({
@@ -152,7 +151,32 @@ export default function PostTaskPage2() {
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         });
+      } else {
+        // If no coords yet, try to get current location
+        try {
+          const pos = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+          });
+          const { latitude, longitude } = pos.coords;
+          setTempCoords({ latitude, longitude });
+          setTempRegion({
+            latitude,
+            longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+        } catch (e) {
+          // If location fetch fails, use default location (Bahrain)
+          console.log("Location fetch error, using default", e);
+          setTempRegion({
+            latitude: 26.0667,
+            longitude: 50.5577,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          });
+        }
       }
+      setMapVisible(true);
     } catch (e) {
       console.log("openMapPicker error", e);
       Alert.alert(t("clientPostTask.errorTitle"), t("clientPostTask.mapError"));
@@ -471,7 +495,7 @@ export default function PostTaskPage2() {
               </Text>
             </View>
 
-            {tempRegion && (
+            {tempRegion ? (
               <MapView
                 style={styles.map}
                 initialRegion={tempRegion}
@@ -491,6 +515,10 @@ export default function PostTaskPage2() {
                   />
                 )}
               </MapView>
+            ) : (
+              <View style={styles.mapLoadingContainer}>
+                <Text style={styles.mapLoadingText}>Loading map...</Text>
+              </View>
             )}
 
             <View style={styles.mapFooter}>
@@ -843,6 +871,17 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  mapLoadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
+  },
+  mapLoadingText: {
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#666666",
   },
   mapFooter: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
