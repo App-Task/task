@@ -30,9 +30,14 @@ export default function PostTaskPage3() {
   const [budget, setBudget] = useState("");
   const [budgetError, setBudgetError] = useState(false);
   const [posting, setPosting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleBack = () => {
     navigation.goBack();
+  };
+
+  const handleSuccessDone = () => {
+    navigation.navigate("ClientHome", { screen: "Tasks" });
   };
 
   const handlePostTask = async () => {
@@ -90,20 +95,7 @@ export default function PostTaskPage3() {
 
       console.log("✅ Task posted:", result);
 
-      Alert.alert(
-        t("clientPostTask.successTitle"),
-        t("clientPostTask.successMessage"),
-        [
-          {
-            text: t("clientPostTask.ok"),
-            onPress: () => {
-              setTimeout(() => {
-                navigation.navigate("ClientHome", { screen: "Tasks" });
-              }, 100);
-            },
-          },
-        ]
-      );
+      setShowSuccess(true);
     } catch (err) {
       console.error("❌ Post error:", err.message);
       Alert.alert(t("clientPostTask.errorTitle"), t("clientPostTask.postError"));
@@ -111,6 +103,26 @@ export default function PostTaskPage3() {
       setPosting(false);
     }
   };
+
+  // Show success screen
+  if (showSuccess) {
+    return (
+      <SafeAreaView style={styles.successContainer}>
+        <View style={styles.successContent}>
+          <View style={styles.successIconContainer}>
+            <Ionicons name="checkmark" size={60} color="#215432" />
+          </View>
+          <Text style={styles.successTitle}>Task Posted</Text>
+          <Text style={styles.successDescription}>
+            Your Task has been successfully posted
+          </Text>
+          <TouchableOpacity style={styles.successButton} onPress={handleSuccessDone}>
+            <Text style={styles.successButtonText}>Done</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -349,5 +361,64 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 16,
     color: "#215433",
+  },
+  // Success screen styles
+  successContainer: {
+    flex: 1,
+    backgroundColor: "#f8f9fa",
+  },
+  successContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 40,
+  },
+  successIconContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#ffffff",
+    borderWidth: 3,
+    borderColor: "#215432",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 32,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  successTitle: {
+    fontSize: 28,
+    fontFamily: "InterBold",
+    color: "#215432",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  successDescription: {
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#666666",
+    textAlign: "center",
+    lineHeight: 24,
+    marginBottom: 48,
+  },
+  successButton: {
+    backgroundColor: "#215432",
+    borderRadius: 25,
+    paddingVertical: 16,
+    paddingHorizontal: 48,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  successButtonText: {
+    fontSize: 16,
+    fontFamily: "InterBold",
+    color: "#ffffff",
+    textAlign: "center",
   },
 });
