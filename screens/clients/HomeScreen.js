@@ -3,343 +3,280 @@ import {
   View,
   Text,
   TouchableOpacity,
-  FlatList,
   StyleSheet,
   I18nManager,
-  ActivityIndicator,
   Alert,
+  ScrollView,
 } from "react-native";
 import { useTranslation } from "react-i18next";
-import Animated, { FadeInRight } from "react-native-reanimated";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import useUnreadNotifications from "../../hooks/useUnreadNotifications";
+
 export default function ClientHomeScreen() {
-  const navigation = useNavigation(); // ✅ correctly grabs parent stack navigation
+  const navigation = useNavigation();
   const { t } = useTranslation();
   const unreadCount = useUnreadNotifications();
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [tasks, setTasks] = useState([]);
   const [userName, setUserName] = useState("");
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
-  const loadData = async (isRefresh = false) => {
+  // Function to navigate to Tasks tab with specific targetTab
+  const navigateToTasksTab = (targetTab) => {
+    navigation.navigate("Tasks", { targetTab, refreshTasks: true });
+  };
+
+  const loadUserData = async () => {
     try {
-      if (isRefresh) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-
-      const userId = await SecureStore.getItemAsync("userId");
       const userName = await SecureStore.getItemAsync("userName");
-
-      if (!userId) {
-        throw new Error("User not logged in");
-      }
-
       setUserName(userName || "");
-
-      const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
-      const data = await res.json();
-
-      setTasks(data);
+      
+      // For now, set a mock unread message count
+      // In a real app, you'd fetch this from your messages API
+      setUnreadMessages(unreadCount || 0);
     } catch (err) {
-      console.error("❌ Failed to fetch tasks:", err.message);
-      Alert.alert(t("clientHome.errorTitle"), t("clientHome.loadTasksError"));
-    } finally {
-      if (isRefresh) {
-        setRefreshing(false);
-      } else {
-        setLoading(false);
-      }
+      console.error("❌ Failed to load user data:", err.message);
     }
   };
 
   useEffect(() => {
-    loadData();
+    loadUserData();
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      loadData();
+      loadUserData();
     }, [])
   );
-  
-
-  const handleRefresh = () => {
-    loadData(true);
-  };
-  const renderTask = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("TaskDetails", { task: item })}
-    >
-      <Animated.View entering={FadeInRight.duration(500)} style={styles.taskItem}>
-        {/* ✅ TOP ROW: Status + Date */}
-        <View style={styles.taskTopRow}>
-          <View
-            style={[
-              styles.taskStatusBadge,
-              {
-                backgroundColor:
-                  item.status === "Pending"
-                    ? "#FFA500" // Orange for Pending
-                    : item.status === "Started"
-                    ? "#FFD700" // Yellow for Started
-                    : item.status === "Completed"
-                    ? "#38cb82" // Green for Completed
-                    : "#FF0000", // Red for Cancelled
-
-              },
-            ]}
-          >
-            <Text style={[styles.taskStatusText]}>{t(`clientHome.status.${item.status.toLowerCase()}`)}</Text>
-
-          </View>
-  
-          <Text style={styles.taskDate}>
-            {new Date(item.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })}{" "}
-            •{" "}
-            {new Date(item.createdAt).toLocaleTimeString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </Text>
-        </View>
-  
-        {/* ✅ Divider Line Above Title */}
-        <View style={styles.taskDivider} />
-
-        {/* ✅ TASK TITLE */}
-        <Text style={styles.taskTitle}>{item.title}</Text>
-
-  
-        {/* ✅ VIEW DETAILS LINK */}
-        <Text style={styles.viewDetails}>{t("clientHome.viewDetails")}</Text>
-      </Animated.View>
-    </TouchableOpacity>
-  );
-  
-  
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* 🔔 Notifications button */}
-      <View style={styles.notificationsIcon}>
-  <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-    <Ionicons name="notifications-outline" size={24} color="#215433" />
-    {unreadCount > 0 && (
-      <View style={styles.notificationDot}>
-
-        <Text style={styles.badgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
+    <View style={styles.container}>
+      {/* Header Section */}
+      <View style={styles.header}>
+        <View style={styles.greetingContainer}>
+          <Text style={styles.greeting}>Hi {userName || "Tariq"},</Text>
+          <Text style={styles.subtitle}>Welcome to TASK!</Text>
+        </View>
+        
+        {/* Notifications Icon */}
+        <TouchableOpacity 
+          style={styles.notificationIcon}
+          onPress={() => navigation.navigate("Notifications")}
+        >
+          <Ionicons name="notifications-outline" size={24} color="#000" />
+        </TouchableOpacity>
       </View>
-    )}
-  </TouchableOpacity>
-</View>
 
-  
-      <View style={styles.container}>
-      <Text style={styles.hello}>
-        {t("clientHome.greeting", { name: userName || t("clientHome.defaultName") })}
-      </Text>
-      <Text style={styles.sub}>{t("clientHome.subtitle")}</Text>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Messages Section */}
+        <TouchableOpacity 
+          style={styles.messagesCard}
+          onPress={() => navigation.navigate("Messages")}
+        >
+          <View style={styles.messagesContent}>
+            <View style={styles.messageIconContainer}>
+              <View style={styles.messageIcon}>
+                <Ionicons name="chatbubbles-outline" size={20} color="#fff" />
+              </View>
+              {unreadMessages > 0 && (
+                <View style={styles.messageBadge}>
+                  <Text style={styles.messageBadgeText}>{unreadMessages}</Text>
+                </View>
+              )}
+            </View>
+            <Text style={styles.messagesText}>
+              {unreadMessages > 0 ? `${unreadMessages} unread messages` : "0 unread messages"}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color="#333" />
+          </View>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("ClientHome", { screen: "Post" })}
-      >
-        <Text style={styles.buttonText}>+ {t("clientHome.postTaskBtn")}</Text>
-      </TouchableOpacity>
+        {/* Need something done? Section */}
+        <View style={styles.actionCard}>
+          <Text style={styles.cardTitle}>Need something done?</Text>
+          <Text style={styles.cardDescription}>
+            Have something on your to-do list? Post a task and let Taskers handle it reliably with competitive offers
+          </Text>
+          <TouchableOpacity 
+            style={styles.postTaskButton}
+            onPress={() => navigation.navigate("ClientHome", { screen: "Post" })}
+          >
+            <Text style={styles.postTaskButtonText}>Post a Task</Text>
+          </TouchableOpacity>
+        </View>
 
-      <Text style={styles.sectionTitle}>{t("clientHome.yourTasks")}</Text>
-
-      {loading ? (
-        <ActivityIndicator color="#215433" size="large" />
-      ) : (
-        <FlatList
-          data={tasks}
-          keyExtractor={(item) => item._id}
-          renderItem={renderTask}
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>{t("clientHome.noTasks")}</Text>
-          }
-          contentContainerStyle={{ paddingBottom: 40 }}
-          style={{ width: "100%" }}
-          onRefresh={handleRefresh}
-          refreshing={refreshing}
-        />
-      )}
+        {/* Waiting on a Task? Section */}
+        <View style={styles.actionCard}>
+          <Text style={styles.cardTitle}>Waiting on a Task?</Text>
+          <Text style={styles.cardDescription}>
+            Waiting for Taskers to bid on your tasks? Check Pending tasks for updates
+          </Text>
+          <TouchableOpacity 
+            style={styles.pendingButton}
+            onPress={() => navigateToTasksTab("Pending")}
+          >
+            <Text style={styles.pendingButtonText}>Pending Tasks</Text>
+          </TouchableOpacity>
+          
+          <Text style={styles.cardDescription}>
+            Tasks underway? Tap to check their progress
+          </Text>
+          <TouchableOpacity 
+            style={styles.progressButton}
+            onPress={() => navigateToTasksTab("Started")}
+          >
+            <Text style={styles.progressButtonText}>In Progress Tasks</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
-  </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
-    paddingTop: 120,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    paddingTop: 80,
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+  },
+  greetingContainer: {
+    flex: 1,
+  },
+  greeting: {
+    fontSize: 28,
+    fontFamily: "InterBold",
+    color: "#215433",
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#333",
+  },
+  notificationIcon: {
+    padding: 8,
+  },
+  content: {
+    flex: 1,
     paddingHorizontal: 24,
   },
-  hello: {
-    fontSize: 32,
-    fontFamily: "InterBold",
-    color: "#3B5C48",
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  sub: {
-    fontSize: 16,
-    color: "#666",
-    fontFamily: "Inter",
-    marginTop: 4,
-    marginBottom: 20,
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  button: {
-    backgroundColor: "#2E4A3A",
-    paddingVertical: 14,      // increased from 14 to 16
-    paddingHorizontal: 4,     // add horizontal padding to increase button size
-    borderRadius: 50,         // full pill
-    alignItems: "center",
-    marginBottom: 30,
-    marginHorizontal: 2,     // negative margin to align edges with text
-  },
-  
-  buttonText: {
-    color: "#ffffff",
-    fontFamily: "InterBold",
-    fontSize: 16,
-  },
-  sectionTitle: {
-    fontFamily: "InterBold",
-    fontSize: 18,
-    color: "#215433",
-    marginBottom: 10,
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  taskItem: {
+  messagesCard: {
     backgroundColor: "#ffffff",
-    borderWidth: 1,
-    borderColor: "#dcdcdc", // lighter gray border
-    padding: 14,
     borderRadius: 12,
-    marginBottom: 14,
+    borderWidth: 2,
+    borderColor: "#215433",
+    marginBottom: 20,
+    padding: 16,
+  },
+  messagesContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  messageIconContainer: {
+    position: "relative",
+    marginRight: 12,
+  },
+  messageIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#215433",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  messageBadge: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    backgroundColor: "#FF0000",
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#ffffff",
+  },
+  messageBadgeText: {
+    color: "#ffffff",
+    fontSize: 12,
+    fontFamily: "InterBold",
+  },
+  messagesText: {
+    flex: 1,
+    fontSize: 16,
+    fontFamily: "Inter",
+    color: "#333",
+  },
+  actionCard: {
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 20,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
-    elevation: 1, // Android light shadow
+    elevation: 2,
   },
-  
-  
-  taskTopRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 6,
+  cardTitle: {
+    fontSize: 18,
+    fontFamily: "InterBold",
+    color: "#333",
+    marginBottom: 8,
   },
-  taskDate: {
-    fontSize: 12,
+  cardDescription: {
+    fontSize: 14,
+    fontFamily: "Inter",
     color: "#666",
-    fontFamily: "Inter",
+    lineHeight: 20,
+    marginBottom: 16,
   },
-  taskStatusBadge: {
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  taskStatusText: {
-    color: "#ffffff",
-    fontFamily: "InterBold",
-    fontSize: 12,
-  },
-  viewDetails: {
-    color: "#215433", // ✅ same as title color
-    fontSize: 13,
-    fontFamily: "Inter",
-    marginTop: 4,
-    textDecorationLine: "underline", // ✅ underlined
-  },
-  taskDivider: {
-    height: 2,
-    backgroundColor: "#e0e0e0", // ✅ light gray line
-    marginVertical: 6,
-  },
-  
-  
-  
-  taskTitle: {
-    fontFamily: "Inter",
-    fontSize: 16,
-    color: "#215433",
-  },
-  badge: {
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  badgeText: {
-    fontSize: 13,
-    fontFamily: "InterBold",
-  },
-  emptyText: {
-    fontFamily: "Inter",
-    fontSize: 16,
-    color: "#999",
-    textAlign: "center",
-    marginTop: 40,
-  },
-  notificationsIcon: {
-    position: "absolute",
-    top: 65, // ⬅️ Increased from 30 to 65
-    right: 24,
-    zIndex: 10,
-  },
-
-  notificationDot: {
-    position: "absolute",
-    top: -4,
-    right: -4,
-    backgroundColor: "#c00",
-    borderRadius: 10,
-    minWidth: 16,
-    height: 16,
-    paddingHorizontal: 4,
+  postTaskButton: {
+    backgroundColor: "#215433",
+    borderRadius: 8,
+    paddingVertical: 12,
     alignItems: "center",
-    justifyContent: "center",
-    zIndex: 20,
   },
-  badgeText: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "bold",
+  postTaskButtonText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontFamily: "InterBold",
   },
-
-  taskTextWrapper: {
-    flex: 1,
-    justifyContent: "center",
+  pendingButton: {
+    backgroundColor: "#ffffff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#215433",
+    paddingVertical: 12,
+    alignItems: "center",
+    marginBottom: 16,
   },
-  
-  taskBadgeWrapper: {
-    justifyContent: "center",
-    alignItems: "flex-end",
-    width: 100,
+  pendingButtonText: {
+    color: "#215433",
+    fontSize: 16,
+    fontFamily: "InterBold",
   },
-  
-  taskStatusBadge: {
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+  progressButton: {
+    backgroundColor: "#ffffff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#215433",
+    paddingVertical: 12,
+    alignItems: "center",
   },
-  
-  
-  
+  progressButtonText: {
+    color: "#215433",
+    fontSize: 16,
+    fontFamily: "InterBold",
+  },
 });

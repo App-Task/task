@@ -97,9 +97,6 @@ export default function PostTaskPage1() {
     });
   };
 
-  const handleClose = () => {
-    navigation.navigate("Home");
-  };
 
   const renderCategoryItem = (category) => (
     <TouchableOpacity
@@ -135,9 +132,7 @@ export default function PostTaskPage1() {
       <View style={styles.header}>
         <View style={{ width: 24 }} />
         <Text style={styles.headerTitle}>{t("clientPostTask.page1.title")}</Text>
-        <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-          <Ionicons name="close" size={24} color="#000000" />
-        </TouchableOpacity>
+        <View style={{ width: 24 }} />
       </View>
 
       {/* Progress Indicator */}
@@ -162,7 +157,7 @@ export default function PostTaskPage1() {
 
       {/* Continue Button */}
       {selectedCategory && (
-        <View style={styles.buttonContainer}>
+        <View style={styles.floatingButtonContainer}>
           <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
             <Text style={styles.continueButtonText}>{t("clientPostTask.page1.continue")}</Text>
           </TouchableOpacity>
@@ -222,6 +217,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 20,
+    paddingBottom: 120, // Increased space for floating button
   },
   pageTitle: {
     fontSize: 24,
@@ -291,19 +287,24 @@ const styles = StyleSheet.create({
     marginLeft: I18nManager.isRTL ? 0 : 12,
     marginRight: I18nManager.isRTL ? 12 : 0,
   },
-  buttonContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: "#ffffff",
-    borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
+  floatingButtonContainer: {
+    position: "absolute",
+    bottom: 10,
+    left: 20,
+    right: 20,
+    zIndex: 10,
   },
   continueButton: {
     backgroundColor: "#215432",
-    borderRadius: 8,
+    borderRadius: 25,
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   continueButtonText: {
     fontSize: 16,

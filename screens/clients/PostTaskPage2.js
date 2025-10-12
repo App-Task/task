@@ -277,8 +277,6 @@ export default function PostTaskPage2() {
           <View style={{ flex: 1 }}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={{ width: 24 }} />
-          <Text style={styles.headerTitle}>{t("clientPostTask.page2.title")}</Text>
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
             <Ionicons
               name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
@@ -286,6 +284,8 @@ export default function PostTaskPage2() {
               color="#215432"
             />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>{t("clientPostTask.page2.title")}</Text>
+          <View style={{ width: 24 }} />
         </View>
 
         {/* Progress Indicator */}
@@ -386,7 +386,7 @@ export default function PostTaskPage2() {
         </View>
 
         {/* Continue Button */}
-        <View style={styles.buttonContainer}>
+        <View style={styles.floatingButtonContainer}>
           <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
             <Text style={styles.continueButtonText}>{t("clientPostTask.page2.continue")}</Text>
           </TouchableOpacity>
@@ -632,17 +632,24 @@ const styles = StyleSheet.create({
     textAlign: I18nManager.isRTL ? "right" : "left",
     flex: 1,
   },
-  buttonContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: "#ffffff",
+  floatingButtonContainer: {
+    position: "absolute",
+    bottom: 10,
+    left: 20,
+    right: 20,
+    zIndex: 10,
   },
   continueButton: {
     backgroundColor: "#215432",
-    borderRadius: 8,
+    borderRadius: 25,
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   continueButtonText: {
     fontSize: 16,

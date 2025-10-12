@@ -122,8 +122,6 @@ export default function PostTaskPage3() {
           <View style={{ flex: 1 }}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={{ width: 24 }} />
-          <Text style={styles.headerTitle}>{t("clientPostTask.page3.title")}</Text>
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
             <Ionicons
               name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
@@ -131,6 +129,8 @@ export default function PostTaskPage3() {
               color="#215432"
             />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>{t("clientPostTask.page3.title")}</Text>
+          <View style={{ width: 24 }} />
         </View>
 
         {/* Progress Indicator */}
@@ -170,6 +170,10 @@ export default function PostTaskPage3() {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>{t("clientPostTask.page3.finalPaymentNote")}</Text>
+        </View>
+
+        {/* Floating Post Button */}
+        <View style={styles.floatingButtonContainer}>
           <TouchableOpacity 
             style={styles.postButton} 
             onPress={handlePostTask}
@@ -295,20 +299,32 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    paddingBottom: 20, // Reduced space for floating button
   },
   footerText: {
     fontSize: 14,
     fontFamily: "Inter",
     color: "#999999",
     textAlign: "center",
-    marginBottom: 20,
+  },
+  floatingButtonContainer: {
+    position: "absolute",
+    bottom: 10,
+    left: 20,
+    right: 20,
+    zIndex: 10,
   },
   postButton: {
     backgroundColor: "#215432",
-    borderRadius: 12,
+    borderRadius: 25,
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   postButtonText: {
     fontSize: 16,
