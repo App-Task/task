@@ -36,6 +36,7 @@ export default function PostTaskPage2() {
   const [description, setDescription] = useState("");
   const [titleError, setTitleError] = useState(false);
   const [descError, setDescError] = useState(false);
+  const [addressError, setAddressError] = useState(false);
   const [images, setImages] = useState([]);
   const [imageUploading, setImageUploading] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -71,6 +72,18 @@ export default function PostTaskPage2() {
       }
     } else {
       setDescError(false);
+    }
+
+    if (!address || address.trim().length === 0) {
+      setAddressError(true);
+      hasError = true;
+      if (errorMessage) {
+        errorMessage += "\n\n" + "Please add a task address";
+      } else {
+        errorMessage = "Please add a task address";
+      }
+    } else {
+      setAddressError(false);
     }
 
     if (hasError) {
@@ -165,6 +178,7 @@ export default function PostTaskPage2() {
           addr.postalCode
         ].filter(Boolean).join(", ");
         setAddress(fullAddress);
+        setAddressError(false);
       }
     } catch (e) {
       console.log("Reverse geocoding error", e);
@@ -269,12 +283,8 @@ export default function PostTaskPage2() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={{ flex: 1 }}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={{ flex: 1 }}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
@@ -301,7 +311,12 @@ export default function PostTaskPage2() {
           <View style={styles.section}>
             <View style={I18nManager.isRTL ? styles.labelContainerRTL : styles.labelContainer}>
               <Text style={I18nManager.isRTL ? styles.labelRTL : styles.label}>{t("clientPostTask.page2.taskTitle")}</Text>
-              <Text style={I18nManager.isRTL ? styles.requirementRTL : styles.requirement}>{t("clientPostTask.page2.taskTitleRequirement")}</Text>
+              <Text style={I18nManager.isRTL ? styles.requirementRTL : styles.requirement}>
+                {title.length < 10 
+                  ? `Min ${10 - title.length} more characters`
+                  : "Maximum 100 characters"
+                }
+              </Text>
             </View>
             <TextInput
               style={[
@@ -311,6 +326,7 @@ export default function PostTaskPage2() {
               placeholder={t("clientPostTask.page2.taskTitlePlaceholder")}
               placeholderTextColor="#999"
               value={title}
+              maxLength={100}
               onChangeText={(text) => {
                 setTitle(text);
                 setTitleError(false);
@@ -323,7 +339,12 @@ export default function PostTaskPage2() {
           <View style={styles.section}>
             <View style={I18nManager.isRTL ? styles.labelContainerRTL : styles.labelContainer}>
               <Text style={I18nManager.isRTL ? styles.labelRTL : styles.label}>{t("clientPostTask.page2.describeTask")}</Text>
-              <Text style={I18nManager.isRTL ? styles.requirementRTL : styles.requirement}>{t("clientPostTask.page2.describeTaskRequirement")}</Text>
+              <Text style={I18nManager.isRTL ? styles.requirementRTL : styles.requirement}>
+                {description.length < 25 
+                  ? `Min ${25 - description.length} more characters`
+                  : "Maximum 150 characters"
+                }
+              </Text>
             </View>
             <View style={styles.textAreaContainer}>
               <TextInput
@@ -334,6 +355,7 @@ export default function PostTaskPage2() {
                 placeholder={t("clientPostTask.page2.describeTaskPlaceholder")}
                 placeholderTextColor="#999"
                 value={description}
+                maxLength={150}
                 onChangeText={(text) => {
                   setDescription(text);
                   setDescError(false);
@@ -342,17 +364,27 @@ export default function PostTaskPage2() {
                 textAlignVertical="top"
                 textAlign={I18nManager.isRTL ? "right" : "left"}
               />
-              <TouchableOpacity style={styles.addMediaButton} onPress={pickImages}>
-                <Ionicons name="add" size={16} color="#999" />
-                <Text style={styles.addMediaText}>{t("clientPostTask.page2.addImagesVideos")}</Text>
-              </TouchableOpacity>
             </View>
+            
+            {/* Separator Line */}
+            <View style={styles.separatorLine} />
+            
+            <TouchableOpacity style={styles.addMediaButton} onPress={pickImages}>
+              <Ionicons name="add" size={16} color="#999" />
+              <Text style={styles.addMediaText}>{t("clientPostTask.page2.addImagesVideos")}</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Task Address Section */}
           <View style={styles.addressSection}>
             <Text style={styles.label}>{t("clientPostTask.page2.taskAddress")}</Text>
-            <TouchableOpacity style={styles.addressButton} onPress={openMapPicker}>
+            <TouchableOpacity 
+              style={[
+                styles.addressButton,
+                addressError && styles.addressButtonError
+              ]} 
+              onPress={openMapPicker}
+            >
               <Ionicons name="add" size={20} color="#215432" />
               <Text style={styles.addressButtonText}>
                 {address ? address : t("clientPostTask.page2.addTaskAddress")}
@@ -420,28 +452,28 @@ export default function PostTaskPage2() {
           animationType="slide"
           transparent={false}
           presentationStyle="fullScreen"
-          statusBarTranslucent={Platform.OS === "android"}
         >
-          <View style={{ flex: 1, backgroundColor: "#fff" }}>
-            <View style={styles.modalHeaderRow}>
-              <TouchableOpacity onPress={() => setMapVisible(false)} style={styles.modalBackBtn}>
-                <Ionicons
-                  name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-                  size={24}
-                  color="#215433"
-                />
-              </TouchableOpacity>
-              <Text style={styles.modalHeader}>Select Task Location</Text>
-              <View style={{ width: 24 }} />
+          <SafeAreaView style={styles.mapModalContainer} edges={['top']}>
+            <View style={styles.mapHeaderContainer}>
+              <View style={styles.modalHeaderRow}>
+                <TouchableOpacity onPress={() => setMapVisible(false)} style={styles.modalBackBtn}>
+                  <Ionicons
+                    name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+                    size={24}
+                    color="#215432"
+                  />
+                </TouchableOpacity>
+                <Text style={styles.modalHeader}>Select Task Location</Text>
+                <View style={{ width: 40 }} />
+              </View>
+              <Text style={styles.modalHeaderSubtitle}>
+                Tap on the map to select your task location
+              </Text>
             </View>
-
-            <Text style={styles.modalHeaderSubtitle}>
-              Tap on the map to select your task location
-            </Text>
 
             {tempRegion && (
               <MapView
-                style={{ flex: 1 }}
+                style={styles.map}
                 initialRegion={tempRegion}
                 onPress={(e) => {
                   const { latitude, longitude } = e.nativeEvent.coordinate;
@@ -469,11 +501,10 @@ export default function PostTaskPage2() {
                 <Text style={[styles.mapBtnText, { color: "#fff" }]}>Confirm Location</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </SafeAreaView>
         </Modal>
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
+        </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }
@@ -535,6 +566,7 @@ const styles = StyleSheet.create({
   labelContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 8,
   },
   labelContainerRTL: {
@@ -560,7 +592,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Inter",
     color: "#999999",
-    textAlign: "left",
+    textAlign: "right",
   },
   requirementRTL: {
     fontSize: 12,
@@ -586,6 +618,11 @@ const styles = StyleSheet.create({
   textAreaContainer: {
     position: "relative",
   },
+  separatorLine: {
+    height: 1,
+    backgroundColor: "#f0f0f0",
+    marginVertical: 8,
+  },
   textArea: {
     backgroundColor: "#ffffff",
     borderRadius: 8,
@@ -600,10 +637,12 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   addMediaButton: {
-    position: "absolute",
-    bottom: 8,
-    left: I18nManager.isRTL ? undefined : 16,
-    right: I18nManager.isRTL ? 16 : undefined,
+    backgroundColor: "#ffffff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     gap: 4,
@@ -624,6 +663,10 @@ const styles = StyleSheet.create({
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     gap: 8,
+  },
+  addressButtonError: {
+    borderColor: "#ff4444",
+    borderWidth: 2,
   },
   addressButtonText: {
     fontSize: 16,
@@ -759,56 +802,85 @@ const styles = StyleSheet.create({
     marginTop: -2,
   },
   // Map modal styles
+  mapModalContainer: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  mapHeaderContainer: {
+    backgroundColor: "#ffffff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+    paddingBottom: 16,
+  },
   modalHeaderRow: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 8,
-    backgroundColor: "#fff",
+    paddingTop: 16,
+    paddingBottom: 12,
   },
   modalBackBtn: {
-    padding: 4,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalHeader: {
     fontFamily: "InterBold",
     fontSize: 20,
-    color: "#215433",
+    color: "#215432",
     textAlign: "center",
     flex: 1,
   },
   modalHeaderSubtitle: {
     fontSize: 14,
-    color: "#666",
+    fontFamily: "Inter",
+    color: "#666666",
     paddingHorizontal: 20,
-    marginBottom: 8,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    textAlign: "center",
+    marginTop: 4,
+  },
+  map: {
+    flex: 1,
   },
   mapFooter: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     gap: 12,
-    padding: 16,
-    backgroundColor: "#fff",
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "#eee",
+    padding: 20,
+    paddingBottom: 24,
+    backgroundColor: "#ffffff",
+    borderTopWidth: 1,
+    borderTopColor: "#f0f0f0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
   },
   mapBtn: {
     flex: 1,
-    paddingVertical: 14,
-    borderRadius: 12,
+    paddingVertical: 16,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
   },
   mapCancel: {
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#f5f5f5",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
   },
   mapConfirm: {
     backgroundColor: "#215432",
+    shadowColor: "#215432",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   mapBtnText: {
     fontSize: 16,
     fontFamily: "InterBold",
-    color: "#215433",
+    color: "#333333",
   },
 });

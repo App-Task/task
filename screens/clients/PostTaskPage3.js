@@ -114,12 +114,8 @@ export default function PostTaskPage3() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={{ flex: 1 }}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={{ flex: 1 }}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
@@ -193,9 +189,8 @@ export default function PostTaskPage3() {
             </View>
           </View>
         )}
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
+        </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }
@@ -245,21 +240,22 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 20,
   },
   pageTitle: {
     fontSize: 24,
     fontFamily: "InterBold",
-    color: "#215432",
-    marginBottom: 16,
+    color: "#000000",
+    marginBottom: 24,
+    marginTop: 8,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   pageDescription: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "Inter",
     color: "#666666",
-    lineHeight: 24,
-    marginBottom: 40,
+    lineHeight: 20,
+    marginBottom: 32,
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   budgetInputContainer: {
