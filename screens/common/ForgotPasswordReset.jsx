@@ -18,6 +18,8 @@ export default function ForgotPasswordReset({ navigation, route }) {
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
 
@@ -92,22 +94,46 @@ export default function ForgotPasswordReset({ navigation, route }) {
       />
 
       <Text style={styles.label}>New password</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Must include capital letter & number"
-        secureTextEntry
-        value={newPassword}
-        onChangeText={setNewPassword}
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Must include capital letter & number"
+          secureTextEntry={!showNewPassword}
+          value={newPassword}
+          onChangeText={setNewPassword}
+        />
+        <TouchableOpacity
+          style={styles.eyeWrapper}
+          onPress={() => setShowNewPassword(!showNewPassword)}
+        >
+          <Ionicons
+            name={showNewPassword ? "eye" : "eye-off"}
+            size={20}
+            color="#999"
+          />
+        </TouchableOpacity>
+      </View>
 
       <Text style={styles.label}>Confirm new password</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Repeat your new password"
-        secureTextEntry
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Repeat your new password"
+          secureTextEntry={!showConfirmPassword}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+        />
+        <TouchableOpacity
+          style={styles.eyeWrapper}
+          onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+        >
+          <Ionicons
+            name={showConfirmPassword ? "eye" : "eye-off"}
+            size={20}
+            color="#999"
+          />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity style={styles.button} onPress={handleReset} disabled={loading}>
         <Text style={styles.buttonText}>
@@ -155,6 +181,25 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 18,
     fontFamily: "Inter",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f2f2f2",
+    borderRadius: 8,
+    marginBottom: 18,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    fontSize: 16,
+    color: "#333",
+    fontFamily: "Inter",
+  },
+  eyeWrapper: {
+    paddingHorizontal: 12,
+    paddingVertical: 14,
   },
   button: {
     backgroundColor: "#215432",
