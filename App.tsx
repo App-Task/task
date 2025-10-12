@@ -110,9 +110,9 @@ export default function App() {
   const isRTL = i18next.language === "ar";
 
   return (
-    <View style={{ flex: 1, writingDirection: isRTL ? "rtl" : "ltr", direction: isRTL ? "rtl" : "ltr" }} onLayout={onLayoutRootView}>
+    <View style={{ flex: 1, backgroundColor: "rgba(248, 246, 247)", writingDirection: isRTL ? "rtl" : "ltr", direction: isRTL ? "rtl" : "ltr" }} onLayout={onLayoutRootView}>
       {/* ✅ Global status bar */}
-      <StatusBar style="dark" backgroundColor="#ffffff" />
+      <StatusBar style="dark" backgroundColor="rgba(248, 246, 247)" />
       <NavigationContainer key={isRTL ? "rtl" : "ltr"}>
         <MainNavigator />
       </NavigationContainer>

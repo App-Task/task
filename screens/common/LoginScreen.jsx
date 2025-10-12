@@ -202,7 +202,7 @@ export default function LoginScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
   },
   container: {
     alignItems: "center",

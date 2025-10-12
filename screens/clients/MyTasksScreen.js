@@ -875,7 +875,7 @@ allTasks.forEach((task) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     paddingHorizontal: 20,
     paddingTop: 60,
   },

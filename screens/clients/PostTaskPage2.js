@@ -540,7 +540,7 @@ export default function PostTaskPage2() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
   },
   header: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
@@ -832,7 +832,7 @@ const styles = StyleSheet.create({
   // Map modal styles
   mapModalContainer: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
   },
   mapHeaderContainer: {
     backgroundColor: "#ffffff",

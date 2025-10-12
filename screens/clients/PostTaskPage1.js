@@ -172,7 +172,7 @@ export default function PostTaskPage1() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
   },
   header: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",

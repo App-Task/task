@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 60,
     paddingHorizontal: 24,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     alignItems: "center",
   },
   avatarPlaceholder: {
