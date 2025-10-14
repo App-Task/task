@@ -14,7 +14,7 @@ import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/nativ
 import axios from "axios";
 import { fetchCurrentUser } from "../../services/auth";
 import { getToken } from "../../services/authStorage";
-import EmptyIllustration from "../../components/EmptyIllustration";
+import EmptyState from "../../components/EmptyState";
 import { useCallback } from "react";
 
 export default function TaskerMyTasksScreen() {
@@ -337,22 +337,35 @@ export default function TaskerMyTasksScreen() {
     </View>
   );
 
-  const renderEmpty = () => (
-    <View style={styles.emptyContainer}>
-      <View style={styles.emptyIllustration}>
-        <EmptyIllustration size={140} />
-      </View>
-      <Text style={styles.emptyTitle}>No Tasks Here</Text>
-      <Text style={styles.emptySubtitle}>
-        {activeTab === "bidSent" 
-          ? "Start bidding on Tasks!" 
-          : activeTab === "active"
-          ? "Start bidding on Tasks!"
-          : "Start posting on Tasks, and get help today!"
-        }
-      </Text>
-    </View>
-  );
+  const renderEmpty = () => {
+    const getEmptyContent = () => {
+      switch (activeTab) {
+        case "bidSent":
+          return {
+            title: "No Bids Sent",
+            subtitle: "Start bidding on tasks to see them here!"
+          };
+        case "active":
+          return {
+            title: "No Active Tasks",
+            subtitle: "When clients accept your bids, active tasks will appear here."
+          };
+        case "previous":
+          return {
+            title: "No Previous Tasks",
+            subtitle: "Completed and cancelled tasks will appear here."
+          };
+        default:
+          return {
+            title: "No Tasks Here",
+            subtitle: "Tasks will appear here when available."
+          };
+      }
+    };
+
+    const { title, subtitle } = getEmptyContent();
+    return <EmptyState title={title} subtitle={subtitle} />;
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -388,7 +401,7 @@ export default function TaskerMyTasksScreen() {
               activeTab === "active" && styles.activeSegmentText,
             ]}
           >
-            {activeTab === "active" ? "In Progress" : "Active"}
+            Active
           </Text>
         </TouchableOpacity>
 
@@ -421,7 +434,10 @@ export default function TaskerMyTasksScreen() {
           keyExtractor={(item) => item._id}
           renderItem={activeTab === "bidSent" ? renderBidCard : renderTaskCard}
           ListEmptyComponent={renderEmpty}
-          contentContainerStyle={styles.listContainer}
+          contentContainerStyle={[
+            styles.listContainer,
+            (activeTab === "bidSent" ? bids : tasks).length === 0 && styles.emptyListContainer
+          ]}
           showsVerticalScrollIndicator={false}
         />
       )}
@@ -451,7 +467,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeSegment: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#215433",
   },
   segmentText: {
     fontFamily: "Inter",
@@ -469,6 +485,10 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 20,
+  },
+  emptyListContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
   },
   emptyContainer: {
     flex: 1,

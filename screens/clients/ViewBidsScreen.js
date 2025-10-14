@@ -16,6 +16,7 @@ import axios from "axios";
 import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native";
+import EmptyState from "../../components/EmptyState";
 
 const { width } = Dimensions.get("window");
 
@@ -271,9 +272,15 @@ export default function ViewBidsScreen({ route, navigation }) {
             keyExtractor={(item) => item._id}
             renderItem={renderBid}
             ListEmptyComponent={
-              <Text style={styles.empty}>{t("clientViewBids.noBids")}</Text>
+              <EmptyState 
+                title="No Bids Yet" 
+                subtitle="Taskers will place bids on your task. Check back later!"
+              />
             }
-            contentContainerStyle={styles.listContent}
+            contentContainerStyle={[
+              styles.listContent,
+              bids.length === 0 && { flexGrow: 1, justifyContent: "center" }
+            ]}
           />
         )}
       </View>

@@ -13,6 +13,7 @@ import axios from "axios";
 import { getToken } from "../../services/authStorage"; // adjust if path differs
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import EmptyState from "../../components/EmptyState";
 import { useNavigation } from "@react-navigation/native";
 import i18n from "i18next";
 
@@ -173,7 +174,10 @@ export default function TaskerNotificationsScreen({ navigation, setUnreadNotific
       {loading ? (
         <ActivityIndicator color="#213729" size="large" style={{ marginTop: 40 }} />
       ) : notifications.length === 0 ? (
-        <Text style={styles.empty}>{t("taskerNotifications.empty")}</Text>
+        <EmptyState 
+          title="No Notifications Yet" 
+          subtitle="You'll receive notifications about bids, messages, and task updates here."
+        />
       ) : (
         <FlatList
   data={notifications}

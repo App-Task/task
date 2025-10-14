@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
+import EmptyState from "../../components/EmptyState";
 import { useFocusEffect } from "@react-navigation/native";
 
 export default function MessagesScreen({ navigation }) {
@@ -119,7 +120,10 @@ export default function MessagesScreen({ navigation }) {
       {loading && conversations.length === 0 ? (
         <ActivityIndicator size="large" color="#215433" style={{ marginTop: 40 }} />
       ) : conversations.length === 0 ? (
-        <Text style={styles.empty}>{t("clientMessages.placeholder")}</Text>
+        <EmptyState 
+          title="No Messages Yet" 
+          subtitle="Start conversations with taskers by posting tasks and accepting bids!"
+        />
       ) : (
 <FlatList
   data={conversations.filter((c) =>

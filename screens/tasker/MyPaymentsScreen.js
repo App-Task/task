@@ -9,6 +9,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import EmptyState from "../../components/EmptyState";
 
 const dummyPayments = [
   { id: "1", date: "2024-04-01", amount: 150, task: "Fix Sink" },
@@ -72,7 +73,10 @@ export default function MyPaymentsScreen() {
       {loading ? (
         <ActivityIndicator color="#215433" size="large" style={{ marginTop: 40 }} />
       ) : payments.length === 0 ? (
-        <Text style={styles.empty}>{t("taskerPayments.empty")}</Text>
+        <EmptyState 
+          title="No Payments Yet" 
+          subtitle="Your payment history will appear here once you complete tasks and receive payments."
+        />
       ) : (
         <FlatList
           data={payments}

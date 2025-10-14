@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import EmptyState from "../../components/EmptyState";
 import i18n from "i18next";
 
 
@@ -164,7 +165,10 @@ export default function NotificationsScreen() {
       {loading ? (
         <ActivityIndicator size="large" color="#315052" style={{ marginTop: 30 }} />
       ) : notifications.length === 0 ? (
-        <Text style={styles.empty}>{t("clientNotifications.none")}</Text>
+        <EmptyState 
+          title="No Notifications Yet" 
+          subtitle="You'll receive notifications about bids, messages, and task updates here."
+        />
       ) : (
             <FlatList
       data={notifications}

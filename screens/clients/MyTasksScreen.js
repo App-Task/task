@@ -20,6 +20,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { I18nManager } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import EmptyState from "../../components/EmptyState";
 
 const { width } = Dimensions.get("window");
 
@@ -787,13 +788,15 @@ allTasks.forEach((task) => {
       keyExtractor={(item) => item._id}
       renderItem={renderTask}
       ListEmptyComponent={
-        <Text style={styles.emptyText}>
-          {t("clientMyTasks.noTasks", {
-            status: t(`clientMyTasks.${previousSubTab.toLowerCase()}`),
-          })}
-        </Text>
+        <EmptyState 
+          title={`No ${t(`clientMyTasks.${previousSubTab.toLowerCase()}`)} Tasks`}
+          subtitle={`You don't have any ${t(`clientMyTasks.${previousSubTab.toLowerCase()}`).toLowerCase()} tasks yet.`}
+        />
       }
-      contentContainerStyle={{ paddingTop: 20, paddingBottom: 40 }}
+      contentContainerStyle={[
+        { paddingTop: 20, paddingBottom: 40 },
+        groupedTasks[previousSubTab].length === 0 && { flexGrow: 1, justifyContent: "center" }
+      ]}
     />
   </View>
 ) : (
@@ -803,13 +806,15 @@ allTasks.forEach((task) => {
         keyExtractor={(item) => item._id}
         renderItem={renderTask}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            {t("clientMyTasks.noTasks", {
-              status: t(`clientMyTasks.${activeTab.toLowerCase()}`),
-            })}
-          </Text>
+          <EmptyState 
+            title={`No ${t(`clientMyTasks.${activeTab.toLowerCase()}`)} Tasks`}
+            subtitle={`You don't have any ${t(`clientMyTasks.${activeTab.toLowerCase()}`).toLowerCase()} tasks yet.`}
+          />
         }
-        contentContainerStyle={{ paddingTop: 20, paddingBottom: 40 }}
+        contentContainerStyle={[
+          { paddingTop: 20, paddingBottom: 40 },
+          groupedTasks[activeTab].length === 0 && { flexGrow: 1, justifyContent: "center" }
+        ]}
       />
     )}
   </>

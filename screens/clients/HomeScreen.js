@@ -15,6 +15,8 @@ import { useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import useUnreadNotifications from "../../hooks/useUnreadNotifications";
+import axios from "axios";
+import { getToken } from "../../services/authStorage";
 
 export default function ClientHomeScreen() {
   const navigation = useNavigation();
@@ -22,10 +24,25 @@ export default function ClientHomeScreen() {
   const unreadCount = useUnreadNotifications();
   const [userName, setUserName] = useState("");
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   // Function to navigate to Tasks tab with specific targetTab
   const navigateToTasksTab = (targetTab) => {
     navigation.navigate("Tasks", { targetTab, refreshTasks: true });
+  };
+
+  const fetchUnreadNotifications = async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get("https://task-kq94.onrender.com/api/notifications", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const unreadCount = res.data.filter(notification => !notification.isRead).length;
+      setUnreadNotifications(unreadCount);
+    } catch (err) {
+      console.error("❌ Failed to fetch notifications:", err.message);
+      setUnreadNotifications(0);
+    }
   };
 
   const loadUserData = async () => {
@@ -36,6 +53,9 @@ export default function ClientHomeScreen() {
       // For now, set a mock unread message count
       // In a real app, you'd fetch this from your messages API
       setUnreadMessages(unreadCount || 0);
+      
+      // Fetch unread notifications
+      await fetchUnreadNotifications();
     } catch (err) {
       console.error("❌ Failed to load user data:", err.message);
     }
@@ -65,7 +85,10 @@ export default function ClientHomeScreen() {
           style={styles.notificationIcon}
           onPress={() => navigation.navigate("Notifications")}
         >
-          <Ionicons name="notifications-outline" size={24} color="#000" />
+          <View style={styles.notificationIconContainer}>
+            <Ionicons name="notifications-outline" size={24} color="#000" />
+            {(unreadMessages > 0 || unreadNotifications > 0) && <View style={styles.headerNotificationDot} />}
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -164,6 +187,18 @@ const styles = StyleSheet.create({
   },
   notificationIcon: {
     padding: 8,
+  },
+  notificationIconContainer: {
+    position: "relative",
+  },
+  headerNotificationDot: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#ff4444",
   },
   content: {
     flex: 1,

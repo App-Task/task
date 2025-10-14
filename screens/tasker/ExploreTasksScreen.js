@@ -16,6 +16,7 @@ import axios from "axios";
 import { getToken } from "../../services/authStorage";
 import { fetchCurrentUser } from "../../services/auth";
 import { useFocusEffect } from "@react-navigation/native";
+import EmptyState from "../../components/EmptyState";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function ExploreTasksScreen({ navigation }) {
@@ -361,6 +362,7 @@ export default function ExploreTasksScreen({ navigation }) {
   return (
     <ScrollView 
       style={styles.container}
+      contentContainerStyle={filteredTasks.length === 0 ? styles.emptyScrollContainer : undefined}
       refreshControl={
         <RefreshControl 
           refreshing={refreshing} 
@@ -397,7 +399,10 @@ export default function ExploreTasksScreen({ navigation }) {
       {loading ? (
         <ActivityIndicator size="large" color="#215433" style={styles.loading} />
       ) : filteredTasks.length === 0 ? (
-        <Text style={styles.noTasksText}>No tasks available</Text>
+        <EmptyState 
+          title="No Tasks Available" 
+          subtitle="No tasks match your current filters. Try adjusting your search or filters to find more tasks."
+        />
       ) : (
         filteredTasks.map((task, index) => renderTaskCard(task, index))
       )}
@@ -409,6 +414,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "rgba(248, 246, 247)",
+  },
+  emptyScrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
   },
   header: {
     flexDirection: "row",

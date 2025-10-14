@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { fetchCurrentUser } from "../../services/auth";
 import axios from "axios";
-import EmptyIllustration from "../../components/EmptyIllustration";
+import EmptyState from "../../components/EmptyState";
 
 export default function MyReviewsScreen({ navigation }) {
   const { t } = useTranslation();
@@ -107,13 +107,10 @@ export default function MyReviewsScreen({ navigation }) {
           style={styles.loading} 
         />
       ) : reviews.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <View style={styles.emptyIllustration}>
-            <EmptyIllustration size={140} />
-          </View>
-          <Text style={styles.emptyTitle}>No reviews yet</Text>
-          <Text style={styles.emptySubtitle}>Start doing tasks to get rated!</Text>
-        </View>
+        <EmptyState 
+          title="No Reviews Yet" 
+          subtitle="Start completing tasks to receive reviews from clients!"
+        />
       ) : (
         <FlatList
           data={reviews}
