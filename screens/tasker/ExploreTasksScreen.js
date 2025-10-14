@@ -25,6 +25,7 @@ export default function ExploreTasksScreen({ navigation }) {
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,13 +33,13 @@ export default function ExploreTasksScreen({ navigation }) {
 
   const filterOptions = [
     { id: "nearest", label: "Nearest to you", icon: "location-outline" },
-    { id: "cleaning", label: "Cleaning", icon: "broom-outline" },
+    { id: "cleaning", label: "Cleaning", icon: "water-outline" },
     { id: "shopping", label: "Shopping & delivery", icon: "bag-outline" },
-    { id: "handyman", label: "Handyman", icon: "construct-outline" },
+    { id: "handyman", label: "Handyman", icon: "hammer-outline" },
     { id: "moving", label: "Moving", icon: "car-outline" },
-    { id: "ikea", label: "IKEA assembly", icon: "hammer-outline" },
+    { id: "ikea", label: "IKEA assembly", icon: "build-outline" },
     { id: "yardwork", label: "Yardwork Services", icon: "leaf-outline" },
-    { id: "dogwalking", label: "Dog Walking", icon: "paw-outline" },
+    { id: "dogwalking", label: "Dog Walking", icon: "walk-outline" },
     { id: "other", label: "Other", icon: "ellipsis-horizontal-outline" },
   ];
 
@@ -52,6 +53,20 @@ export default function ExploreTasksScreen({ navigation }) {
       setUnreadMessages(totalUnread);
     } catch (err) {
       console.error("❌ Failed to fetch unread messages:", err.message);
+    }
+  };
+
+  const fetchUnreadNotifications = async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get("https://task-kq94.onrender.com/api/notifications", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const unreadCount = res.data.filter(notification => !notification.isRead).length;
+      setUnreadNotifications(unreadCount);
+    } catch (err) {
+      console.error("❌ Failed to fetch notifications:", err.message);
+      setUnreadNotifications(0);
     }
   };
 
@@ -98,7 +113,7 @@ export default function ExploreTasksScreen({ navigation }) {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([fetchTasks(), fetchUnreadMessages()]);
+    await Promise.all([fetchTasks(), fetchUnreadMessages(), fetchUnreadNotifications()]);
     setRefreshing(false);
   };
 
@@ -106,19 +121,20 @@ export default function ExploreTasksScreen({ navigation }) {
     React.useCallback(() => {
       fetchTasks();
       fetchUnreadMessages();
+      fetchUnreadNotifications();
       return () => {};
     }, [])
   );
 
   // Filter tasks based on selected filter and search query
   useEffect(() => {
-    let filtered = tasks;
+    let filtered = [...tasks]; // Create a copy to avoid mutating original array
     
     // Apply search filter
     if (searchQuery.trim()) {
       filtered = filtered.filter(task => 
-        task.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        task.description?.toLowerCase().includes(searchQuery.toLowerCase())
+        (task.title && task.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
     
@@ -126,7 +142,7 @@ export default function ExploreTasksScreen({ navigation }) {
     if (selectedFilter && selectedFilter !== "nearest") {
       const categoryMap = {
         cleaning: "Cleaning",
-        shopping: "Shopping & Delivery",
+        shopping: "Shopping & Delivery", 
         handyman: "Handyman",
         moving: "Moving",
         ikea: "IKEA assembly",
@@ -137,7 +153,10 @@ export default function ExploreTasksScreen({ navigation }) {
       
       const category = categoryMap[selectedFilter];
       if (category) {
-        filtered = filtered.filter(task => task.category === category);
+        filtered = filtered.filter(task => {
+          const taskCategory = task.category || "";
+          return taskCategory.toLowerCase() === category.toLowerCase();
+        });
       }
     }
 
@@ -146,16 +165,24 @@ export default function ExploreTasksScreen({ navigation }) {
 
   const getCategoryIcon = (category) => {
     const iconMap = {
-      "Cleaning": "broom",
-      "Shopping & Delivery": "shopping",
-      "Handyman": "construct",
-      "Moving": "car",
-      "IKEA assembly": "hammer",
-      "Yardwork Services": "leaf",
-      "Dog Walking": "paw",
-      "Other": "ellipsis-horizontal"
+      "Cleaning": "water-outline",
+      "cleaning": "water-outline",
+      "Shopping & Delivery": "bag-outline",
+      "shopping": "bag-outline",
+      "Handyman": "hammer-outline",
+      "handyman": "hammer-outline",
+      "Moving": "car-outline",
+      "moving": "car-outline",
+      "IKEA assembly": "build-outline",
+      "ikea assembly": "build-outline",
+      "Yardwork Services": "leaf-outline",
+      "yardwork services": "leaf-outline",
+      "Dog Walking": "walk-outline",
+      "dog walking": "walk-outline",
+      "Other": "ellipsis-horizontal-outline",
+      "other": "ellipsis-horizontal-outline"
     };
-    return iconMap[category] || "ellipsis-horizontal";
+    return iconMap[category] || "ellipsis-horizontal-outline";
   };
 
   const toggleTaskExpansion = (taskId) => {
@@ -186,7 +213,7 @@ export default function ExploreTasksScreen({ navigation }) {
         
         <View style={styles.taskTags}>
           <View style={styles.tag}>
-            <MaterialCommunityIcons 
+            <Ionicons 
               name={getCategoryIcon(task.category)} 
               size={16} 
               color="#215433" 
@@ -240,7 +267,11 @@ export default function ExploreTasksScreen({ navigation }) {
   );
 
   const renderUnreadMessagesCard = () => (
-    <View style={styles.messagesCard}>
+    <TouchableOpacity 
+      style={styles.messagesCard}
+      onPress={() => navigation.navigate("Messages")}
+      activeOpacity={0.7}
+    >
       <View style={styles.messagesContent}>
         <View style={styles.chatIconContainer}>
           <Ionicons name="chatbubble-outline" size={24} color="#215433" />
@@ -249,7 +280,7 @@ export default function ExploreTasksScreen({ navigation }) {
         <Text style={styles.messagesText}>{unreadMessages} unread messages</Text>
         <Ionicons name="chevron-forward-outline" size={20} color="#215433" />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderWaitingOnTaskCard = () => (
@@ -260,14 +291,14 @@ export default function ExploreTasksScreen({ navigation }) {
       </Text>
       <TouchableOpacity 
         style={styles.bidSentButton}
-        onPress={() => navigation.navigate("MyTasks")}
+        onPress={() => navigation.navigate("MyTasks", { targetTab: "bidSent" })}
       >
         <Text style={styles.bidSentButtonText}>Bid Sent</Text>
       </TouchableOpacity>
       <Text style={styles.activeDescription}>But if they have you'll find it in</Text>
       <TouchableOpacity 
         style={styles.activeButton}
-        onPress={() => navigation.navigate("MyTasks")}
+        onPress={() => navigation.navigate("MyTasks", { targetTab: "active" })}
       >
         <Text style={styles.activeButtonText}>Active</Text>
       </TouchableOpacity>
@@ -331,7 +362,12 @@ export default function ExploreTasksScreen({ navigation }) {
     <ScrollView 
       style={styles.container}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        <RefreshControl 
+          refreshing={refreshing} 
+          onRefresh={handleRefresh}
+          tintColor="#215432"
+          colors={["#215432"]}
+        />
       }
     >
       {/* Header */}
@@ -341,7 +377,10 @@ export default function ExploreTasksScreen({ navigation }) {
           <Text style={styles.welcomeText}>Welcome to TASK!</Text>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-          <Ionicons name="notifications-outline" size={24} color="#215433" />
+          <View style={styles.notificationIconContainer}>
+            <Ionicons name="notifications-outline" size={24} color="#215433" />
+            {(unreadMessages > 0 || unreadNotifications > 0) && <View style={styles.headerNotificationDot} />}
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -369,18 +408,30 @@ export default function ExploreTasksScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "rgba(248, 246, 247)",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: 80,
     paddingBottom: 20,
   },
   headerLeft: {
     flex: 1,
+  },
+  notificationIconContainer: {
+    position: "relative",
+  },
+  headerNotificationDot: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#ff4444",
   },
   greeting: {
     fontFamily: "InterBold",
@@ -456,46 +507,51 @@ const styles = StyleSheet.create({
   },
   waitingTitle: {
     fontFamily: "InterBold",
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 8,
+    fontSize: 18,
+    color: "#414141",
+    marginBottom: 12,
+    textAlign: "left",
   },
   waitingDescription: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#666",
-    marginBottom: 12,
+    color: "#414141",
+    marginBottom: 16,
     lineHeight: 20,
+    textAlign: "left",
   },
   bidSentButton: {
     backgroundColor: "#e8f4ec",
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 20,
-    alignSelf: "flex-start",
-    marginBottom: 12,
+    borderRadius: 5,
+    marginBottom: 16,
+    width: "100%",
+    alignItems: "center",
   },
   bidSentButtonText: {
     fontFamily: "Inter",
-    fontSize: 14,
+    fontSize: 16,
     color: "#215433",
   },
   activeDescription: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#666",
-    marginBottom: 12,
+    color: "#414141",
+    marginBottom: 16,
+    textAlign: "left",
   },
   activeButton: {
     backgroundColor: "#215433",
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 20,
-    alignSelf: "flex-start",
+    borderRadius: 5,
+    width: "100%",
+    alignItems: "center",
   },
   activeButtonText: {
     fontFamily: "Inter",
-    fontSize: 14,
+    fontSize: 16,
     color: "#fff",
   },
   searchSection: {
@@ -589,6 +645,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 12,
     gap: 8,
+    alignItems: "center",
   },
   tag: {
     flexDirection: "row",
@@ -605,6 +662,8 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   budgetTag: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#f0f0f0",
     borderRadius: 16,
     paddingVertical: 4,

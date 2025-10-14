@@ -10,11 +10,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
 import { fetchCurrentUser } from "../../services/auth";
 import { getToken } from "../../services/authStorage";
 import EmptyIllustration from "../../components/EmptyIllustration";
+import { useCallback } from "react";
 
 export default function TaskerMyTasksScreen() {
   const [loading, setLoading] = useState(true);
@@ -23,10 +24,22 @@ export default function TaskerMyTasksScreen() {
   const [bids, setBids] = useState([]);
   const [taskerId, setTaskerId] = useState("");
   const navigation = useNavigation();
+  const route = useRoute();
 
   useEffect(() => {
     loadData();
   }, [activeTab]);
+
+  // Handle navigation with targetTab parameter
+  useFocusEffect(
+    useCallback(() => {
+      if (route?.params?.targetTab) {
+        setActiveTab(route.params.targetTab);
+        // Clear the param after using it
+        navigation.setParams({ targetTab: null });
+      }
+    }, [route?.params?.targetTab])
+  );
 
   const loadData = async () => {
     setLoading(true);
