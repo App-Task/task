@@ -60,17 +60,18 @@ export default function SendBidScreen() {
         return;
       }
 
-      await axios.post("https://task-kq94.onrender.com/api/bids", {
-        taskId: task._id,
-        taskerId: user._id,
-        amount: Number(bidAmount),
-        message: message.trim(),
-      });
-
       setSubmitting(false);
       
-      // Navigate to success screen
-      navigation.replace("BidSentSuccess", { task });
+      // Navigate to success screen with bid data (don't save yet)
+      navigation.replace("BidSentSuccess", { 
+        task, 
+        bidData: {
+          taskId: task._id,
+          taskerId: user._id,
+          amount: Number(bidAmount),
+          message: message.trim(),
+        }
+      });
       
     } catch (err) {
       setSubmitting(false);
@@ -98,13 +99,11 @@ export default function SendBidScreen() {
 
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
-            <View style={styles.progressFill} />
-            <View style={styles.progressRemaining} />
-          </View>
+          <View style={[styles.progressBar, styles.progressBarActive]} />
+          <View style={[styles.progressBar, styles.progressBarInactive]} />
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Bid Offer Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
@@ -139,13 +138,10 @@ export default function SendBidScreen() {
               maxLength={350}
             />
           </View>
-
-          {/* Bottom spacing */}
-          <View style={{ height: 100 }} />
         </ScrollView>
 
-        {/* Submit Button */}
-        <View style={styles.footer}>
+        {/* Floating Submit Button */}
+        <View style={styles.floatingFooter}>
           <TouchableOpacity
             style={[styles.submitButton, submitting && styles.submitButtonDisabled]}
             onPress={handleSubmitBid}
@@ -171,7 +167,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: "#fff",
   },
   backButton: {
     width: 40,
@@ -185,29 +180,28 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   progressContainer: {
+    flexDirection: "row",
     paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: "#fff",
+    paddingVertical: 16,
+    gap: 8,
   },
   progressBar: {
+    flex: 1,
     height: 4,
+    borderRadius: 2,
+  },
+  progressBarActive: {
+    backgroundColor: "#215432",
+  },
+  progressBarInactive: {
     backgroundColor: "#e0e0e0",
-    borderRadius: 2,
-    flexDirection: "row",
-  },
-  progressFill: {
-    flex: 1,
-    backgroundColor: "#215433",
-    borderRadius: 2,
-  },
-  progressRemaining: {
-    flex: 1,
-    backgroundColor: "#e8f4ec",
-    borderRadius: 2,
   },
   content: {
     flex: 1,
+  },
+  scrollContent: {
     paddingHorizontal: 20,
+    paddingBottom: 120,
   },
   section: {
     marginTop: 24,
@@ -243,18 +237,26 @@ const styles = StyleSheet.create({
     height: 120,
     textAlignVertical: "top",
   },
-  footer: {
-    paddingHorizontal: 20,
+  floatingFooter: {
+    position: "absolute",
+    bottom: 10,
+    left: 20,
+    right: 20,
     paddingVertical: 16,
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
   },
   submitButton: {
     backgroundColor: "#215433",
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   submitButtonDisabled: {
     backgroundColor: "#ccc",

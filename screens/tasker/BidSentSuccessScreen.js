@@ -1,41 +1,63 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import axios from "axios";
 
 export default function BidSentSuccessScreen() {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { task, bidData } = route.params || {};
+  const [saving, setSaving] = useState(false);
 
-  const handleDone = () => {
-    // Navigate back to the task details or task list
-    navigation.navigate("TaskerHome");
+  const handleDone = async () => {
+    if (!bidData) {
+      // If no bid data, just navigate back
+      navigation.navigate("TaskerHome");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      
+      // Save the bid when Done is pressed
+      await axios.post("https://task-kq94.onrender.com/api/bids", bidData);
+      
+      setSaving(false);
+      
+      // Navigate back to the task details or task list
+      navigation.navigate("TaskerHome");
+      
+    } catch (error) {
+      setSaving(false);
+      console.error("❌ Error saving bid:", error);
+      
+      if (error.response?.status === 409) {
+        Alert.alert("Bid Already Exists", "You have already submitted a bid for this task.");
+      } else {
+        Alert.alert("Error", "Failed to save bid. Please try again.");
+      }
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>Send a bid</Text>
       </View>
 
       {/* Progress Bar */}
       <View style={styles.progressContainer}>
-        <View style={styles.progressBar}>
-          <View style={styles.progressFill} />
-          <View style={styles.progressRemaining} />
-        </View>
+        <View style={[styles.progressBar, styles.progressBarActive]} />
+        <View style={[styles.progressBar, styles.progressBarActive]} />
       </View>
 
       {/* Main Content */}
@@ -54,8 +76,14 @@ export default function BidSentSuccessScreen() {
         </Text>
 
         {/* Done Button */}
-        <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
-          <Text style={styles.doneButtonText}>Done</Text>
+        <TouchableOpacity 
+          style={[styles.doneButton, saving && styles.doneButtonDisabled]} 
+          onPress={handleDone}
+          disabled={saving}
+        >
+          <Text style={styles.doneButtonText}>
+            {saving ? "Saving..." : "Done"}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -70,18 +98,9 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: "#fff",
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#215433",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 16,
   },
   headerTitle: {
     fontFamily: "InterBold",
@@ -89,25 +108,21 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   progressContainer: {
+    flexDirection: "row",
     paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: "#fff",
+    paddingVertical: 16,
+    gap: 8,
   },
   progressBar: {
+    flex: 1,
     height: 4,
+    borderRadius: 2,
+  },
+  progressBarActive: {
+    backgroundColor: "#215432",
+  },
+  progressBarInactive: {
     backgroundColor: "#e0e0e0",
-    borderRadius: 2,
-    flexDirection: "row",
-  },
-  progressFill: {
-    flex: 1,
-    backgroundColor: "#215433",
-    borderRadius: 2,
-  },
-  progressRemaining: {
-    flex: 1,
-    backgroundColor: "#e8f4ec",
-    borderRadius: 2,
   },
   content: {
     flex: 1,
@@ -157,6 +172,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
+  },
+  doneButtonDisabled: {
+    backgroundColor: "#ccc",
   },
   doneButtonText: {
     fontFamily: "InterBold",
