@@ -138,7 +138,7 @@ export default function LoginScreen({ navigation, route }) {
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.topBar}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Ionicons name="arrow-back" size={30} color="#215433" />
+            <Ionicons name="arrow-back" size={24} color="#215432" />
           </TouchableOpacity>
         </View>
 
@@ -216,9 +216,10 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   backBtn: {
-    padding: 5,        // smaller padding so it looks like the image
-    borderRadius: 50,  // rounded feel (optional)
-    marginLeft: -10,    // move left to align with title
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: 22,

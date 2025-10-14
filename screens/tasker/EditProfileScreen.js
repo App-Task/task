@@ -230,10 +230,7 @@ const availableSkills = [
           {/* ✅ Top Back Button */}
           <View style={styles.headerRow}>
       <TouchableOpacity
-        style={[
-          styles.backButton,
-          isRTL ? { right: 0, left: undefined } : { left: 0, right: undefined }
-        ]}
+        style={styles.backButton}
         onPress={() => navigation.goBack()}
       >
     <Ionicons
@@ -487,11 +484,10 @@ const styles = StyleSheet.create({
   },
 
   backButton: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
+    width: 40,
+    height: 40,
     justifyContent: "center",
-    paddingHorizontal: 4
+    alignItems: "center",
   },
   
   

@@ -29,7 +29,6 @@ export default function TaskerTaskDetailsScreen({ route }) {
   const [loadingBid, setLoadingBid] = useState(true);
   const [coords, setCoords] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [activeTab, setActiveTab] = useState("details"); // "details" or "offers"
 
   const isBiddingAllowed = task.status === "Pending";
 
@@ -150,8 +149,8 @@ export default function TaskerTaskDetailsScreen({ route }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
+      {/* Back Button */}
+      <View style={styles.backButtonContainer}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -159,140 +158,124 @@ export default function TaskerTaskDetailsScreen({ route }) {
           <Ionicons
             name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
             size={24}
-            color="#4CAF50"
+            color="#215432"
           />
         </TouchableOpacity>
-        
-        {/* Segmented Control */}
-        <View style={styles.segmentedControl}>
-          <TouchableOpacity
-            style={[styles.segment, activeTab === "details" && styles.activeSegment]}
-            onPress={() => setActiveTab("details")}
-          >
-            <Text style={[styles.segmentText, activeTab === "details" && styles.activeSegmentText]}>
-              Task details
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.segment, activeTab === "offers" && styles.activeSegment]}
-            onPress={() => setActiveTab("offers")}
-          >
-            <Text style={[styles.segmentText, activeTab === "offers" && styles.activeSegmentText]}>
-              Offers
-            </Text>
-          </TouchableOpacity>
-        </View>
+      </View>
+
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Task details</Text>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {activeTab === "details" ? (
+        {/* Top Divider */}
+        <View style={styles.divider} />
+
+        {/* Spacing */}
+        <View style={styles.spacing} />
+
+        {/* Divider Above Title */}
+        <View style={styles.divider} />
+
+        {/* Task Overview */}
+        <View style={styles.taskOverview}>
+          <View style={styles.taskTitleRow}>
+            <Text style={styles.taskTitle}>{task.title || "Task Title"}</Text>
+            <View style={[styles.statusBadge, { backgroundColor: "#FFB74D" }]}>
+              <Text style={styles.statusText}>In Progress</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Bottom Divider */}
+        <View style={styles.divider} />
+
+        {/* Task Detail Layout */}
+        <View style={styles.taskDetailLayout}>
+          <View style={styles.taskMeta}>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>Posted on</Text>
+              <Text style={styles.metaValue}>{formatDate(task.createdAt)}</Text>
+            </View>
+            <View style={styles.metaRowRight}>
+              <Text style={styles.metaLabelRight}>BUDGET</Text>
+              <Text style={styles.metaValueRight}>{task.budget || "22"} BHD</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Description */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Description</Text>
+          <Text style={styles.descriptionText}>
+            {task.description || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when"}
+          </Text>
+        </View>
+
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Images - Only show if there are actual images */}
+        {task.images && task.images.length > 0 && (
           <>
-            {/* Task Overview */}
-            <View style={styles.taskOverview}>
-              <View style={styles.taskTitleRow}>
-                <Text style={styles.taskTitle}>{task.title || "Task Title"}</Text>
-                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(task.status) }]}>
-                  <Text style={styles.statusText}>{task.status || "In Progress"}</Text>
-                </View>
-              </View>
-              
-              <View style={styles.taskMeta}>
-                <View style={styles.metaRow}>
-                  <Text style={styles.metaLabel}>Posted on</Text>
-                  <Text style={styles.metaValue}>{formatDate(task.createdAt)}</Text>
-                </View>
-                <View style={styles.metaRow}>
-                  <Text style={styles.metaLabel}>BUDGET</Text>
-                  <Text style={styles.metaValue}>{task.budget || "22"} BHD</Text>
-                </View>
-              </View>
-            </View>
-
-            {/* Divider */}
-            <View style={styles.divider} />
-
-            {/* Description */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Description</Text>
-              <Text style={styles.descriptionText}>
-                {task.description || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when"}
-              </Text>
-            </View>
-
-            {/* Divider */}
-            <View style={styles.divider} />
-
-            {/* Images */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Images</Text>
               <View style={styles.imageContainer}>
-                {task.images && task.images.length > 0 ? (
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    {task.images.map((uri, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.imagePlaceholder}
-                        onPress={() => setSelectedImage(uri)}
-                      >
-                        <Image source={{ uri }} style={styles.taskImage} />
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                ) : (
-                  <View style={styles.imagePlaceholder}>
-                    <Ionicons name="image-outline" size={32} color="#ccc" />
-                  </View>
-                )}
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {task.images.map((uri, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={styles.imagePlaceholder}
+                      onPress={() => setSelectedImage(uri)}
+                    >
+                      <Image source={{ uri }} style={styles.taskImage} />
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
               </View>
             </View>
-
             {/* Divider */}
             <View style={styles.divider} />
-
-            {/* Location */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Location</Text>
-              {coords ? (
-                <View style={styles.mapPlaceholder}>
-                  <MapView
-                    style={styles.map}
-                    initialRegion={{
-                      latitude: coords.latitude,
-                      longitude: coords.longitude,
-                      latitudeDelta: 0.01,
-                      longitudeDelta: 0.01,
-                    }}
-                    pointerEvents="none"
-                  >
-                    <Marker coordinate={coords} />
-                  </MapView>
-                </View>
-              ) : (
-                <View style={styles.mapPlaceholder}>
-                  <Ionicons name="location-outline" size={32} color="#ccc" />
-                </View>
-              )}
-            </View>
-
-            {/* Bottom spacing */}
-            <View style={{ height: 120 }} />
           </>
-        ) : (
-          /* Offers Tab */
-          <View style={styles.offersContainer}>
-            <View style={styles.emptyIllustration}>
-              <EmptyIllustration size={140} />
-            </View>
-            <Text style={styles.emptyTitle}>No Offers Yet</Text>
-            <Text style={styles.emptySubtitle}>Offers will show here when Taskers bid on you Task!</Text>
-          </View>
         )}
+
+        {/* Location */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Location</Text>
+          {coords ? (
+            <View style={styles.mapPlaceholder}>
+              <MapView
+                style={styles.map}
+                initialRegion={{
+                  latitude: coords.latitude,
+                  longitude: coords.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
+                pointerEvents="none"
+              >
+                <Marker coordinate={coords} />
+              </MapView>
+            </View>
+          ) : (
+            <View style={styles.mapPlaceholder}>
+              <Ionicons name="location-outline" size={32} color="#ccc" />
+            </View>
+          )}
+        </View>
+
+        {/* Bottom spacing */}
+        <View style={{ height: 120 }} />
       </ScrollView>
 
       {/* Fixed Bottom Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          By marking as complete you can review you tasker, this helps make our app a safer and better place for everyone :)
+          Place a Bid on the Task, Clients will then select a Tasker, Which could be you :)
         </Text>
         <TouchableOpacity
           style={[
@@ -315,7 +298,7 @@ export default function TaskerTaskDetailsScreen({ route }) {
               ? "Bidding Closed"
               : existingBid
               ? "Update Bid"
-              : "Submit a bid"}
+              : "Place a bid"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -344,170 +327,56 @@ export default function TaskerTaskDetailsScreen({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: "rgba(248, 246, 247)",
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
+  backButtonContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  segmentedControl: {
-    flexDirection: "row",
-    backgroundColor: "#E0E0E0",
-    borderRadius: 25,
-    padding: 4,
-    marginLeft: 20,
-    flex: 1,
-  },
-  segment: {
-    flex: 1,
     paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 25,
-    alignItems: "center",
-  },
-  activeSegment: {
-    backgroundColor: "#4CAF50",
-  },
-  segmentText: {
-    fontFamily: "Inter",
-    fontSize: 14,
-    color: "#616161",
-  },
-  activeSegmentText: {
-    fontFamily: "InterBold",
-    color: "#ffffff",
-  },
-  offersContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: 100,
-  },
-  emptyIllustration: {
-    marginBottom: 30,
-  },
-  illustrationCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#CFD8DC",
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
-  },
-  stopwatch: {
-    position: "absolute",
-    right: 15,
-    top: 20,
-    width: 50,
-    height: 50,
-  },
-  stopwatchFace: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#ffffff",
-    borderWidth: 3,
-    borderColor: "#000000",
-    position: "relative",
-    overflow: "hidden",
-  },
-  stopwatchProgress: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    width: "33%",
-    height: "100%",
-    backgroundColor: "#C6FF00",
-  },
-  stopwatchButton: {
-    position: "absolute",
-    top: -8,
-    left: "50%",
-    marginLeft: -4,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#ffffff",
-  },
-  mug: {
-    position: "absolute",
-    left: 10,
-    bottom: 15,
-    width: 30,
-    height: 25,
-    backgroundColor: "#ffffff",
-    borderRadius: 3,
-    borderWidth: 1,
-    borderColor: "#000000",
-  },
-  mugHandle: {
-    position: "absolute",
-    right: -8,
-    top: 5,
-    width: 8,
-    height: 12,
-    borderWidth: 1,
-    borderColor: "#000000",
-    borderLeftWidth: 0,
-    borderRadius: 0,
-  },
-  mugLiquid: {
-    position: "absolute",
-    top: 2,
-    left: 2,
-    right: 2,
-    height: 8,
-    backgroundColor: "#C6FF00",
-    borderRadius: 1,
-  },
-  emptyTitle: {
-    fontFamily: "InterBold",
-    fontSize: 18,
-    color: "#4CAF50",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontFamily: "Inter",
-    fontSize: 14,
-    color: "#616161",
-    textAlign: "center",
   },
   backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    flex: 1,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
     alignItems: "center",
   },
-  headerTitleText: {
+  header: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: "#215432",
+  },
+  headerTitle: {
     fontFamily: "InterBold",
     fontSize: 18,
-    color: "#215433",
+    color: "#ffffff",
   },
   scrollView: {
     flex: 1,
   },
   taskOverview: {
     paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 0,
+  },
+  spacing: {
+    height: 20,
+  },
+  taskDetailLayout: {
+    paddingHorizontal: 20,
     paddingVertical: 20,
   },
   taskTitleRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 16,
+    alignItems: "center",
+    marginBottom: 20,
   },
   taskTitle: {
     flex: 1,
     fontFamily: "InterBold",
-    fontSize: 24,
-    color: "#333",
+    fontSize: 28,
+    color: "#215432",
     marginRight: 12,
   },
   statusBadge: {
@@ -523,9 +392,28 @@ const styles = StyleSheet.create({
   taskMeta: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "flex-start",
   },
   metaRow: {
+    flex: 1,
     alignItems: "flex-start",
+  },
+  metaRowRight: {
+    flex: 1,
+    alignItems: "flex-end",
+  },
+  metaLabelRight: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
+    textAlign: "right",
+  },
+  metaValueRight: {
+    fontFamily: "InterBold",
+    fontSize: 20,
+    color: "#215433",
+    textAlign: "right",
   },
   metaLabel: {
     fontFamily: "Inter",
@@ -535,13 +423,14 @@ const styles = StyleSheet.create({
   },
   metaValue: {
     fontFamily: "InterBold",
-    fontSize: 16,
+    fontSize: 20,
     color: "#215433",
   },
   divider: {
     height: 1,
     backgroundColor: "#e0e0e0",
     marginHorizontal: 20,
+    marginTop: 0,
   },
   section: {
     paddingHorizontal: 20,
@@ -550,7 +439,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: "InterBold",
     fontSize: 16,
-    color: "#333",
+    color: "#666666",
     marginBottom: 12,
   },
   descriptionText: {
@@ -561,6 +450,10 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     marginTop: 8,
+  },
+  imagesRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   imagePlaceholder: {
     width: 80,
@@ -590,11 +483,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   footer: {
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "rgba(248, 246, 247)",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
     borderTopWidth: 1,
     borderTopColor: "#e0e0e0",
   },
@@ -607,10 +498,18 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   submitButton: {
-    backgroundColor: "#215433",
+    backgroundColor: "#215432",
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   submitButtonDisabled: {
     backgroundColor: "#ccc",

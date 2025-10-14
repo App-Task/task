@@ -94,7 +94,7 @@ export default function EditBidScreen() {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <Ionicons name="arrow-back" size={24} color="#215432" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Bid</Text>
         </View>
@@ -179,11 +179,8 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "#215433",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 16,
   },
   headerTitle: {
     fontFamily: "InterBold",

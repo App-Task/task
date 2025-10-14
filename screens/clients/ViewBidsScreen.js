@@ -227,7 +227,7 @@ export default function ViewBidsScreen({ route, navigation }) {
             style={styles.backBtn}
             onPress={() => navigation.goBack()}
           >
-            <Ionicons name="arrow-back" size={30} color="#215432" />
+            <Ionicons name="arrow-back" size={24} color="#215432" />
           </TouchableOpacity>
           
           <View style={styles.backBtn} />

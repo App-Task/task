@@ -194,7 +194,10 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   backBtn: {
-    padding: 4,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: 24,

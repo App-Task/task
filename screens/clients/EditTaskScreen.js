@@ -508,12 +508,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "#ffffff",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#215432",
   },
   headerTitle: {
     fontSize: 20,
@@ -813,7 +809,10 @@ const styles = StyleSheet.create({
     borderBottomColor: "#E0E0E0",
   },
   mapBackBtn: {
-    padding: 4,
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
   },
   mapHeaderTitle: {
     fontSize: 20,

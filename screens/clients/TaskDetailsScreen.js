@@ -461,8 +461,8 @@ const styles = StyleSheet.create({
   },
   
   backBtn: {
-    width: 32,
-    height: 32,
+    width: 40,
+    height: 40,
     alignItems: "center",
     justifyContent: "center",
   },
