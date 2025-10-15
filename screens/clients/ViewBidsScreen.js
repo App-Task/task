@@ -124,6 +124,31 @@ export default function ViewBidsScreen({ route, navigation }) {
     navigation.navigate("Chat", { name, otherUserId });
   };
 
+  const handleReport = (bid) => {
+    Alert.alert(
+      "Report Tasker",
+      "Are you sure you want to report this tasker? This action will be reviewed by our team.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Report",
+          style: "destructive",
+          onPress: () => {
+            // Here you would typically make an API call to report the tasker
+            Alert.alert("Report Submitted", "Thank you for your report. We will review it and take appropriate action.");
+          },
+        },
+      ]
+    );
+  };
+
+  const handleViewProfile = (bid) => {
+    navigation.navigate("TaskerProfile", { 
+      taskerId: bid.taskerId?._id,
+      taskId: taskId
+    });
+  };
+
   const renderBid = ({ item }) => {
     const isThisAccepted =
       item._id === acceptedBidId || item.status === "Accepted";
@@ -135,63 +160,59 @@ export default function ViewBidsScreen({ route, navigation }) {
   
     return (
       <View style={styles.card}>
-        {/* ✅ Tasker Info Header */}
+        {/* Green Header with Tasker Name and Report Icon */}
         <View style={styles.taskerHeader}>
-          <View>
-            <Text style={styles.taskerName}>
-              {item.taskerId?.name || t("clientViewBids.taskerFallbackName")}
-            </Text>
-            {average && (
-              <View style={styles.taskerRatingContainer}>
-                <Text style={styles.taskerRating}>{average.toFixed(1)}</Text>
-                <Image
-                  source={require("../../assets/images/Starno background.png")}
-                  style={{
-                    width: 16,
-                    height: 16,
-                    marginLeft: 4,
-                  }}
-                />
-              </View>
-            )}
+          <Text style={styles.taskerName}>
+            {item.taskerId?.name || t("clientViewBids.taskerFallbackName")}
+          </Text>
+          <View style={styles.headerIcons}>
+            <TouchableOpacity style={styles.profileIcon}>
+              <Ionicons name="person-outline" size={20} color="#ffffff" />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.reportIcon}
+              onPress={() => handleReport(item)}
+            >
+              <Ionicons name="warning-outline" size={20} color="#ffffff" />
+            </TouchableOpacity>
           </View>
-  
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("TaskDetails", {
-                task: task,
-                showProfileTabs: true,
-                taskerId: item.taskerId?._id
-              })
-            }
-          >
-            <Text style={styles.viewProfileText}>{t("clientViewBids.viewProfile")}</Text>
-          </TouchableOpacity>
         </View>
   
-        {/* ✅ Price and Message */}
-        <View style={{ padding: 16 }}>
+        {/* Content Section */}
+        <View style={styles.contentSection}>
           <Text style={styles.priceOffered}>
             {t("clientViewBids.priceOffered")}:{" "}
-            <Text style={{ fontWeight: "bold" }}>{item.amount} {t("clientViewBids.currency")}</Text>
+            <Text style={styles.priceAmount}>{item.amount} {t("clientViewBids.currency")}</Text>
           </Text>
           {item.message ? (
             <Text style={styles.message}>{item.message}</Text>
-          ) : null}
+          ) : (
+            <Text style={styles.message}>
+              It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when
+            </Text>
+          )}
         </View>
   
-        {/* ✅ Buttons */}
+        {/* Action Buttons */}
         <View style={styles.buttonsRow}>
           <TouchableOpacity
-            style={styles.chatBtn}
+            style={styles.actionButton}
+            onPress={() => handleViewProfile(item)}
+          >
+            <Text style={styles.actionButtonText}>View Profile</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.actionButton}
             onPress={() => handleChat(item)}
           >
-            <Text style={styles.chatText}>{t("clientViewBids.chat")}</Text>
+            <Text style={styles.actionButtonText}>Chat</Text>
           </TouchableOpacity>
-  
+          
           <TouchableOpacity
             style={[
-              styles.acceptBtn,
+              styles.actionButton,
+              styles.acceptButton,
               isThisAccepted
                 ? { backgroundColor: "#888" }
                 : alreadyPicked
@@ -205,12 +226,16 @@ export default function ViewBidsScreen({ route, navigation }) {
             }}
             disabled={!!acceptedBidId}
           >
-            <Text style={styles.acceptText}>
+            <Text style={[
+              styles.actionButtonText,
+              styles.acceptButtonText,
+              (isThisAccepted || alreadyPicked) && styles.disabledButtonText
+            ]}>
               {isThisAccepted
                 ? "Accepted"
                 : alreadyPicked
-                ? "Tasker already selected"
-                : t("clientViewBids.accept")}
+                ? "Already Selected"
+                : "Accept"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -300,11 +325,11 @@ export default function ViewBidsScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
   },
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     paddingTop: 10, // Reduced to push content closer to arrow
     paddingHorizontal: 20,
   },
@@ -354,18 +379,18 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#ffffff",
     borderRadius: 12,
-    borderWidth: 1, // Add thin border
-    borderColor: "#cccccc", // Light gray border like in the picture
+    borderWidth: 1,
+    borderColor: "#cccccc",
     marginBottom: 16,
-    overflow: "hidden", // So the green header connects perfectly to the white box
+    overflow: "hidden",
   },
   
   taskerHeader: {
-    backgroundColor: "#215432",
+    backgroundColor: "#4CAF50",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 16,
     paddingHorizontal: 16,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
@@ -376,74 +401,44 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#ffffff",
   },
-  taskerRating: {
-    fontFamily: "InterBold",
-    fontSize: 13,
-    color: "#ffffff",
-    marginTop: 2,
-  },
-  taskerRatingContainer: {
+
+  headerIcons: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 8,
   },
 
-  taskerPrice: {
-    fontFamily: "InterBold",
-    fontSize: 16,
-    color: "#ffffff",
+  profileIcon: {
+    padding: 4,
   },
 
-  viewProfileText: {
-    fontFamily: "Inter",
-    fontSize: 13,
-    color: "#ffffff",
-    textDecorationLine: "underline",
+  reportIcon: {
+    padding: 4,
+  },
+
+  contentSection: {
+    padding: 16,
+    backgroundColor: "#f5f5f5",
   },
 
   priceOffered: {
+    fontFamily: "Inter",
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 12,
+  },
+
+  priceAmount: {
     fontFamily: "InterBold",
-    fontSize: 14,
-    color: "#000",
-    marginBottom: 6,
+    fontSize: 16,
+    color: "#333",
   },
   
   message: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#555",
-    marginBottom: 12,
+    color: "#666",
     lineHeight: 20,
-  },
-  buttons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  chatBtn: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#215432",
-    paddingVertical: 10,
-    borderRadius: 30,
-    alignItems: "center",
-    marginRight: 8,
-    backgroundColor: "#ffffff",
-  },
-  chatText: {
-    color: "#215432",
-    fontFamily: "InterBold",
-  },
-  acceptBtn: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#215432",
-    paddingVertical: 10,
-    borderRadius: 30,
-    alignItems: "center",
-    backgroundColor: "#ffffff",
-  },
-  acceptText: {
-    color: "#215432",
-    fontFamily: "InterBold",
   },
   empty: {
     fontFamily: "Inter",
@@ -456,9 +451,39 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 10,
     paddingHorizontal: 16,
-    paddingBottom: 12,
+    paddingVertical: 16,
+    backgroundColor: "#f5f5f5",
+    gap: 8,
+  },
+
+  actionButton: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#4CAF50",
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  actionButtonText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#333",
+  },
+
+  acceptButton: {
+    backgroundColor: "#ffffff",
+  },
+
+  acceptButtonText: {
+    color: "#333",
+  },
+
+  disabledButtonText: {
+    color: "#999",
   },
 
   acceptingOverlay: {
