@@ -100,10 +100,10 @@ router.post("/", async (req, res) => {
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
 
   const senderId = decoded.userId || decoded.id;
-  const { receiver, text, taskId } = req.body;
+  const { receiver, text, taskId, image } = req.body;
 
-  if (!receiver || !text) {
-    return res.status(400).json({ error: "Receiver and text required" });
+  if (!receiver || (!text && !image)) {
+    return res.status(400).json({ error: "Receiver and text or image required" });
   }
 
   try {
@@ -113,7 +113,8 @@ router.post("/", async (req, res) => {
     const message = await Message.create({
       sender: senderId,
       receiver,
-      text,
+      text: text || "",
+      image: image || null,
       taskId,
     });
 

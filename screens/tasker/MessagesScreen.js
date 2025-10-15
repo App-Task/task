@@ -76,7 +76,7 @@ export default function TaskerMessagesScreen({ navigation }) {
 
     return (
       <TouchableOpacity
-        style={[styles.card, isUnread && styles.unreadCard]}
+        style={styles.card}
         onPress={() =>
           navigation.navigate("Chat", {
             name: item.name,
@@ -161,11 +161,10 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 0,
     borderBottomWidth: 1,
-    borderBottomColor: "#d6e8b0", // light green like screenshot
-    backgroundColor: "#ffffff",
+    borderBottomColor: "#E0E0E0",
   },
   
   row: {

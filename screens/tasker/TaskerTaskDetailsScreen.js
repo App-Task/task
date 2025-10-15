@@ -163,7 +163,7 @@ export default function TaskerTaskDetailsScreen({ route }) {
         </TouchableOpacity>
       </View>
 
-      {/* Header */}
+      {/* Fixed Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Task details</Text>
       </View>

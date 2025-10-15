@@ -23,6 +23,8 @@ export default function TaskerMyTasksScreen() {
   const [tasks, setTasks] = useState([]);
   const [bids, setBids] = useState([]);
   const [taskerId, setTaskerId] = useState("");
+  const [editingBidId, setEditingBidId] = useState(null); // Track which bid is being edited
+  const [withdrawingBidId, setWithdrawingBidId] = useState(null); // Track which bid is being withdrawn
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -103,6 +105,10 @@ export default function TaskerMyTasksScreen() {
 
   const handleEditBid = async (item) => {
     try {
+      // Get the bid ID for loading state
+      const bidId = item._id || item.taskId?._id || item.taskId;
+      setEditingBidId(bidId);
+      
       let task, bid;
       
       if (item.taskId && typeof item.taskId === "object") {
@@ -125,6 +131,7 @@ export default function TaskerMyTasksScreen() {
         );
         
         if (!bid) {
+          setEditingBidId(null);
           Alert.alert("Error", "Bid not found for this task.");
           return;
         }
@@ -134,7 +141,11 @@ export default function TaskerMyTasksScreen() {
         task: task, 
         existingBid: bid 
       });
+      
+      // Reset loading state after a short delay (navigation started)
+      setTimeout(() => setEditingBidId(null), 500);
     } catch (err) {
+      setEditingBidId(null);
       console.error("❌ Edit bid error:", err.message);
       Alert.alert("Error", "Failed to load bid information.");
     }
@@ -142,6 +153,9 @@ export default function TaskerMyTasksScreen() {
 
   const handleWithdrawBid = async (item) => {
     try {
+      // Set loading state immediately
+      setWithdrawingBidId(item._id);
+      
       let bid;
       
       if (item.taskId && typeof item.taskId === "object") {
@@ -160,6 +174,7 @@ export default function TaskerMyTasksScreen() {
         );
         
         if (!bid) {
+          setWithdrawingBidId(null);
           Alert.alert("Error", "Bid not found for this task.");
           return;
         }
@@ -169,7 +184,11 @@ export default function TaskerMyTasksScreen() {
         "Withdraw Bid",
         "Are you sure you want to withdraw this bid?",
         [
-          { text: "Cancel", style: "cancel" },
+          { 
+            text: "Cancel", 
+            style: "cancel",
+            onPress: () => setWithdrawingBidId(null)
+          },
           {
             text: "Withdraw",
             style: "destructive",
@@ -187,7 +206,9 @@ export default function TaskerMyTasksScreen() {
                 console.log("✅ Withdraw bid response:", response.data);
                 Alert.alert("Success", "Bid withdrawn successfully.");
                 loadData(); // Refresh the data
+                setWithdrawingBidId(null);
               } catch (err) {
+                setWithdrawingBidId(null);
                 console.error("❌ Withdraw bid error:", err.message);
                 console.error("❌ Error response:", err.response?.data);
                 console.error("❌ Error status:", err.response?.status);
@@ -198,6 +219,7 @@ export default function TaskerMyTasksScreen() {
         ]
       );
     } catch (err) {
+      setWithdrawingBidId(null);
       console.error("❌ Withdraw bid error:", err.message);
       Alert.alert("Error", "Failed to load bid information.");
     }
@@ -287,16 +309,26 @@ export default function TaskerMyTasksScreen() {
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
           <TouchableOpacity
-            style={styles.actionButton}
+            style={[styles.actionButton, editingBidId === item._id && styles.actionButtonLoading]}
             onPress={() => handleEditBid(bidData || item)}
+            disabled={editingBidId === item._id || withdrawingBidId === item._id}
           >
-            <Text style={styles.actionButtonText}>Edit Bid</Text>
+            {editingBidId === item._id ? (
+              <ActivityIndicator size="small" color="#ffffff" />
+            ) : (
+              <Text style={styles.actionButtonText}>Edit Bid</Text>
+            )}
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.actionButton}
+            style={[styles.actionButton, withdrawingBidId === item._id && styles.actionButtonLoading]}
             onPress={() => handleWithdrawBid(bidData || item)}
+            disabled={withdrawingBidId === item._id || editingBidId === item._id}
           >
-            <Text style={styles.actionButtonText}>Withdraw Bid</Text>
+            {withdrawingBidId === item._id ? (
+              <ActivityIndicator size="small" color="#ffffff" />
+            ) : (
+              <Text style={styles.actionButtonText}>Withdraw Bid</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -644,8 +676,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#215433",
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 20,
     alignItems: "center",
+  },
+  actionButtonLoading: {
+    opacity: 0.7,
   },
   actionButtonText: {
     fontFamily: "InterBold",

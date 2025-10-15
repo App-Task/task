@@ -67,10 +67,7 @@ export default function MessagesScreen({ navigation }) {
   
     return (
       <TouchableOpacity
-        style={[
-          styles.card,
-          isUnread && styles.unreadCard, // highlight if unread
-        ]}
+        style={styles.card}
         onPress={() =>
           navigation.navigate("Chat", {
             name: item.name,
@@ -163,11 +160,10 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 0,
     borderBottomWidth: 1,
-    borderBottomColor: "#d6e8b0", // ✅ light green border like screenshot
-    backgroundColor: "#ffffff", // ✅ flat white background
+    borderBottomColor: "#E0E0E0",
   },
   
   row: {
@@ -224,9 +220,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
     marginTop: -10,
-  },
-  unreadCard: {
-    backgroundColor: "#e5ffd4", // light green to highlight unread
   },
 
   avatar: {

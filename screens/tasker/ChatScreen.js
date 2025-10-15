@@ -9,6 +9,8 @@ import {
   I18nManager,
   Image,
   ActivityIndicator,
+  Modal,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
@@ -18,6 +20,7 @@ import { getToken } from "../../services/authStorage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dimensions } from "react-native";
 import { KeyboardAvoidingView, Platform } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 
 const { width } = Dimensions.get("window");
@@ -30,6 +33,8 @@ export default function TaskerChatScreen({ navigation, route }) {
   const [message, setMessage] = useState("");
   const [currentUserId, setCurrentUserId] = useState("");
   const [sending, setSending] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [viewingImage, setViewingImage] = useState(null);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -76,16 +81,65 @@ export default function TaskerChatScreen({ navigation, route }) {
     }
   };
 
+  const pickImage = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Denied", "We need camera roll permissions to send images.");
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.7,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setSelectedImage(result.assets[0].uri);
+      }
+    } catch (err) {
+      console.error("❌ Error picking image:", err.message);
+      Alert.alert("Error", "Failed to pick image");
+    }
+  };
+
   const sendMessage = async () => {
-    if (!message.trim()) return;
+    if (!message.trim() && !selectedImage) return;
     setSending(true);
     try {
       const token = await getToken();
+      
+      let imageUrl = null;
+      if (selectedImage) {
+        // Upload image first
+        const formData = new FormData();
+        formData.append("file", {
+          uri: selectedImage,
+          type: "image/jpeg",
+          name: "chat-image.jpg",
+        });
+
+        const uploadRes = await axios.post(
+          "https://task-kq94.onrender.com/api/upload",
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        imageUrl = uploadRes.data.url;
+      }
+
       const res = await axios.post(
         `https://task-kq94.onrender.com/api/messages`,
         {
           receiver: otherUserId,
-          text: message.trim(),
+          text: message.trim() || "📷 Image",
+          image: imageUrl,
         },
         {
           headers: {
@@ -106,8 +160,10 @@ export default function TaskerChatScreen({ navigation, route }) {
 
       setMessages((prev) => [newMessage, ...prev]);
       setMessage("");
+      setSelectedImage(null);
     } catch (err) {
       console.error("❌ Error sending message:", err.message);
+      Alert.alert("Error", "Failed to send message");
     } finally {
       setSending(false);
     }
@@ -140,7 +196,12 @@ export default function TaskerChatScreen({ navigation, route }) {
             isMine ? { borderTopRightRadius: 0 } : { borderTopLeftRadius: 0 },
           ]}
         >
-          <Text style={styles.messageText}>{item.text}</Text>
+          {item.image && (
+            <TouchableOpacity onPress={() => setViewingImage(item.image)}>
+              <Image source={{ uri: item.image }} style={styles.messageImage} />
+            </TouchableOpacity>
+          )}
+          {item.text && <Text style={styles.messageText}>{item.text}</Text>}
           <Text style={styles.timestamp}>
             {item.timestamp ||
               new Date(item.createdAt).toLocaleTimeString([], {
@@ -181,30 +242,61 @@ export default function TaskerChatScreen({ navigation, route }) {
     inverted
   />
 
-  <View style={styles.inputRow}>
-    <TextInput
-      value={message}
-      onChangeText={setMessage}
-      style={styles.input}
-      placeholder={t("clientChat.placeholder")}
-      placeholderTextColor="#aaa"
-      textAlign={I18nManager.isRTL ? "right" : "left"}
-    />
-    <TouchableOpacity
-      style={[styles.sendButton, sending && { backgroundColor: "#888" }]}
-      onPress={sendMessage}
-      disabled={sending}
-    >
-      {sending ? (
-        <ActivityIndicator color="#fff" size="small" />
-      ) : (
-        <Ionicons name="send" size={20} color="#ffffff" />
-      )}
-    </TouchableOpacity>
+  <View>
+    {selectedImage && (
+      <View style={styles.imagePreviewContainer}>
+        <Image source={{ uri: selectedImage }} style={styles.imagePreview} />
+        <TouchableOpacity
+          style={styles.removeImageButton}
+          onPress={() => setSelectedImage(null)}
+        >
+          <Ionicons name="close-circle" size={24} color="#215433" />
+        </TouchableOpacity>
+      </View>
+    )}
+    <View style={styles.inputRow}>
+      <TouchableOpacity style={styles.attachButton} onPress={pickImage}>
+        <Ionicons name="image-outline" size={24} color="#215433" />
+      </TouchableOpacity>
+      <TextInput
+        value={message}
+        onChangeText={setMessage}
+        style={styles.input}
+        placeholder={t("clientChat.placeholder")}
+        placeholderTextColor="#aaa"
+        textAlign={I18nManager.isRTL ? "right" : "left"}
+      />
+      <TouchableOpacity
+        style={[styles.sendButton, sending && { backgroundColor: "#888" }]}
+        onPress={sendMessage}
+        disabled={sending}
+      >
+        {sending ? (
+          <ActivityIndicator color="#fff" size="small" />
+        ) : (
+          <Ionicons name="send" size={20} color="#ffffff" />
+        )}
+      </TouchableOpacity>
+    </View>
   </View>
 </View>
 
   </KeyboardAvoidingView>
+
+  {/* Full Screen Image Viewer */}
+  {viewingImage && (
+    <Modal visible={true} transparent={true} onRequestClose={() => setViewingImage(null)}>
+      <View style={styles.imageViewerContainer}>
+        <TouchableOpacity
+          style={styles.closeImageButton}
+          onPress={() => setViewingImage(null)}
+        >
+          <Ionicons name="close" size={30} color="#fff" />
+        </TouchableOpacity>
+        <Image source={{ uri: viewingImage }} style={styles.fullImage} resizeMode="contain" />
+      </View>
+    </Modal>
+  )}
 </SafeAreaView>
   );
 }
@@ -312,5 +404,52 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 30,
   },
-  
+  attachButton: {
+    marginRight: 10,
+    padding: 8,
+  },
+  imagePreviewContainer: {
+    padding: 12,
+    borderTopWidth: 1,
+    borderColor: "#eee",
+    backgroundColor: "#fff",
+    position: "relative",
+  },
+  imagePreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+  },
+  removeImageButton: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+  },
+  messageImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  imageViewerContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  closeImageButton: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    borderRadius: 20,
+    padding: 8,
+  },
+  fullImage: {
+    width: "90%",
+    height: "80%",
+  },
 });
