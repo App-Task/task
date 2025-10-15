@@ -394,12 +394,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
+    // Force refresh - green header for bid cards
   },
   
   taskerName: {
     fontFamily: "InterBold",
     fontSize: 18,
-    color: "#ffffff",
+    color: "#FF0000", // CHANGED TO RED - TESTING IF CHANGES LOAD
   },
 
   headerIcons: {
