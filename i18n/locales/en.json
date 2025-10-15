@@ -593,6 +593,8 @@
     "someone": "someone",
     "newBid": "New Bid on Your Task",
     "newBidMessage": "A new bid was placed on your task \"{{title}}\"",
+    "bidWithdrawn": "Bid Withdrawn",
+    "bidWithdrawnMessage": "A bid was withdrawn from your task \"{{title}}\"",
     "hired": "You've Been Hired!",
     "hiredMessage": "You've been hired for the task \"{{title}}\"",
     "newReview": "New Review",

@@ -76,13 +76,6 @@ export default function ExploreTasksScreen({ navigation }) {
       const user = await fetchCurrentUser();
       setCurrentUser(user);
 
-      if (!user.isVerified) {
-        setTasks([]);
-        setFilteredTasks([]);
-        setLoading(false);
-        return;
-      }
-
       const token = await getToken();
       const taskRes = await axios.get(
         "https://task-kq94.onrender.com/api/tasks",
@@ -356,6 +349,8 @@ export default function ExploreTasksScreen({ navigation }) {
           </TouchableOpacity>
         )}
       </ScrollView>
+      {/* Divider after filter badges */}
+      <View style={styles.divider} />
     </View>
   );
 
@@ -458,8 +453,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderWidth: 2,
+    borderColor: "#000000",
   },
   verificationContent: {
     flexDirection: "row",
@@ -478,8 +473,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderWidth: 2,
+    borderColor: "#000000",
   },
   messagesContent: {
     flexDirection: "row",
@@ -510,8 +505,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderWidth: 2,
+    borderColor: "#000000",
     padding: 16,
   },
   waitingTitle: {
@@ -569,7 +564,7 @@ const styles = StyleSheet.create({
   },
   searchTitle: {
     fontFamily: "InterBold",
-    fontSize: 18,
+    fontSize: 28,
     color: "#666",
     marginBottom: 12,
   },
@@ -592,6 +587,11 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     paddingRight: 20,
+  },
+  divider: {
+    height: 2,
+    backgroundColor: "#e0e0e0",
+    marginTop: 20,
   },
   filterChip: {
     flexDirection: "row",
@@ -632,8 +632,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 16,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderWidth: 2,
+    borderColor: "#000000",
     padding: 16,
     elevation: 2,
     shadowColor: "#000",

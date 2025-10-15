@@ -176,15 +176,22 @@ export default function TaskerMyTasksScreen() {
             onPress: async () => {
               try {
                 const token = await getToken();
-                await axios.delete(
+                console.log("🔍 Attempting to withdraw bid:", bid._id);
+                console.log("🔍 Bid object:", bid);
+                
+                const response = await axios.delete(
                   `https://task-kq94.onrender.com/api/bids/${bid._id}`,
                   { headers: { Authorization: `Bearer ${token}` } }
                 );
+                
+                console.log("✅ Withdraw bid response:", response.data);
                 Alert.alert("Success", "Bid withdrawn successfully.");
                 loadData(); // Refresh the data
               } catch (err) {
                 console.error("❌ Withdraw bid error:", err.message);
-                Alert.alert("Error", "Failed to withdraw bid. Please try again.");
+                console.error("❌ Error response:", err.response?.data);
+                console.error("❌ Error status:", err.response?.status);
+                Alert.alert("Error", `Failed to withdraw bid: ${err.response?.data?.error || err.message}`);
               }
             },
           },

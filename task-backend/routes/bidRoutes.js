@@ -168,7 +168,7 @@ router.get("/tasker/:taskerId", async (req, res) => {
   }
 });
 
-// In your backend bidRoutes.js
+// ✅ PATCH /api/bids/:bidId — update a bid
 router.patch("/:bidId", async (req, res) => {
   try {
     const { bidId } = req.params;
@@ -177,8 +177,8 @@ router.patch("/:bidId", async (req, res) => {
     const bid = await Bid.findById(bidId);
     if (!bid) return res.status(404).json({ error: "Bid not found" });
 
-    // Block if client already accepted
-    if (bid.isAccepted) return res.status(403).json({ error: "Bid already accepted" });
+    // Block if bid is already accepted
+    if (bid.status === "Accepted") return res.status(403).json({ error: "Bid already accepted" });
 
     bid.amount = amount;
     bid.message = message;
@@ -188,6 +188,58 @@ router.patch("/:bidId", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Update failed" });
+  }
+});
+
+// ✅ DELETE /api/bids/:bidId — withdraw a bid
+router.delete("/:bidId", verifyTokenMiddleware, async (req, res) => {
+  try {
+    console.log("🔍 DELETE /api/bids/:bidId called with bidId:", req.params.bidId);
+    const { bidId } = req.params;
+    const taskerId = req.user.userId || req.user.id;
+
+    console.log("🔍 Looking for bid with ID:", bidId);
+    const bid = await Bid.findById(bidId);
+    if (!bid) {
+      console.log("❌ Bid not found with ID:", bidId);
+      return res.status(404).json({ error: "Bid not found" });
+    }
+
+    // Check if the bid belongs to the authenticated tasker
+    if (bid.taskerId.toString() !== taskerId) {
+      return res.status(403).json({ error: "Unauthorized to withdraw this bid" });
+    }
+
+    // Block if bid is already accepted
+    if (bid.status === "Accepted") {
+      return res.status(403).json({ error: "Cannot withdraw accepted bid" });
+    }
+
+    // ✅ Decrement bidCount on Task
+    await Task.findByIdAndUpdate(bid.taskId, { $inc: { bidCount: -1 } });
+
+    // Delete the bid
+    await Bid.findByIdAndDelete(bidId);
+
+    // ✅ Notify client that a bid was withdrawn
+    const task = await Task.findById(bid.taskId);
+    if (task) {
+      const notification = new Notification({
+        userId: task.userId,
+        type: "bid",
+        title: "notification.bidWithdrawn",
+        message: `notification.bidWithdrawnMessage|${task.title}`,
+        relatedTaskId: bid.taskId,
+      });
+
+      await notification.save();
+      console.log("✅ Notification created for bid withdrawal:", task.userId.toString());
+    }
+
+    res.json({ message: "Bid withdrawn successfully" });
+  } catch (err) {
+    console.error("❌ Withdraw bid error:", err.message);
+    res.status(500).json({ error: "Failed to withdraw bid" });
   }
 });
 

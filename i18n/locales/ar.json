@@ -615,6 +615,8 @@
      "someone": "شخص ما",
      "newBid": "عرض جديد على مهمتك",
      "newBidMessage": "تم تقديم عرض جديد على مهمتك \"{{title}}\"",
+     "bidWithdrawn": "تم سحب العرض",
+     "bidWithdrawnMessage": "تم سحب عرض من مهمتك \"{{title}}\"",
      "hired": "تم اختيارك!",
      "hiredMessage": "تم اختيارك للمهمة \"{{title}}\"",
      "newReview": "تقييم جديد",
