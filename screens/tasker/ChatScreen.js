@@ -115,23 +115,29 @@ export default function TaskerChatScreen({ navigation, route }) {
       if (selectedImage) {
         // Upload image first
         const formData = new FormData();
-        formData.append("file", {
+        formData.append("image", {
           uri: selectedImage,
           type: "image/jpeg",
           name: "chat-image.jpg",
         });
 
-        const uploadRes = await axios.post(
+        const uploadRes = await fetch(
           "https://task-kq94.onrender.com/api/upload",
-          formData,
           {
+            method: "POST",
             headers: {
-              Authorization: `Bearer ${token}`,
               "Content-Type": "multipart/form-data",
             },
+            body: formData,
           }
         );
-        imageUrl = uploadRes.data.url;
+        
+        const uploadData = await uploadRes.json();
+        if (uploadData.imageUrl) {
+          imageUrl = uploadData.imageUrl;
+        } else {
+          throw new Error("Image upload failed");
+        }
       }
 
       const res = await axios.post(
