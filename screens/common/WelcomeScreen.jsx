@@ -155,13 +155,13 @@ export default function WelcomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     justifyContent: "center",
     alignItems: "center",
   },
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     alignItems: "center",
     justifyContent: "flex-start",
     paddingHorizontal: 30,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   loadingBox: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     borderRadius: 16,
     padding: 30,
     alignItems: "center",

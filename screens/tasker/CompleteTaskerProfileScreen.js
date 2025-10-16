@@ -251,13 +251,13 @@ export default function CompleteTaskerProfileScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#ffffff" }}
+      style={{ flex: 1, backgroundColor: "rgba(248, 246, 247)" }}
       behavior={Platform.OS === "ios" ? "height" : undefined}
       keyboardVerticalOffset={0}
     >
       <ScrollView
         ref={scrollRef}
-        style={{ flex: 1, backgroundColor: "#ffffff" }}
+        style={{ flex: 1, backgroundColor: "rgba(248, 246, 247)" }}
         contentContainerStyle={[styles.container, { paddingBottom: 20 }]}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive"
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
     color: "#215433",
   },
   container: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     paddingTop: 60,
     paddingHorizontal: 24,
     paddingBottom: 40,
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
     color: "#ffffff",
   },
   dropdown: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     borderRadius: 12,
     marginTop: 8,
     borderWidth: 1,

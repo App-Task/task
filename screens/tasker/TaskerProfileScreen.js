@@ -13,6 +13,8 @@ import {
   Alert,
   TextInput,
 } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -23,11 +25,17 @@ const { height } = Dimensions.get("window");
 
 export default function TaskerProfileScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { taskerId, taskId } = route.params;
+  const { taskerId, taskId, task } = route.params;
   const [tasker, setTasker] = useState(null);
   const [reviewData, setReviewData] = useState({ reviews: [] });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("profile");
+  const [taskData, setTaskData] = useState(task);
+  const [coords, setCoords] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [bids, setBids] = useState([]);
+  const [completing, setCompleting] = useState(false);
+  const [canceling, setCanceling] = useState(false);
   
   // Report modal states
   const [showReportModal, setShowReportModal] = useState(false);
@@ -35,30 +43,145 @@ export default function TaskerProfileScreen({ route, navigation }) {
   const [isReporting, setIsReporting] = useState(false);
 
   useEffect(() => {
-    const fetchTaskerAndReview = async () => {
+    const fetchData = async () => {
       try {
-        const [userRes, reviewRes] = await Promise.all([
+        const [userRes, reviewRes, taskRes] = await Promise.all([
           axios.get(`https://task-kq94.onrender.com/api/users/${taskerId}`),
           axios.get(`https://task-kq94.onrender.com/api/reviews/all/tasker/${taskerId}`),
+          taskId ? axios.get(`https://task-kq94.onrender.com/api/tasks/${taskId}`) : Promise.resolve(null)
         ]);
         setTasker(userRes.data);
         setReviewData({ reviews: reviewRes.data || [] });
+        if (taskRes && taskRes.data) {
+          setTaskData(taskRes.data);
+        }
         
-        // Debug: Log the review data structure
-        console.log("🔍 Review data:", reviewRes.data);
-        if (reviewRes.data && reviewRes.data.length > 0) {
-          console.log("🔍 First review structure:", reviewRes.data[0]);
-          console.log("🔍 TaskId in first review:", reviewRes.data[0].taskId);
-          console.log("🔍 Task title in first review:", reviewRes.data[0].taskId?.title);
+        // Fetch bids for the task
+        if (taskId) {
+          const bidRes = await fetch(`https://task-kq94.onrender.com/api/bids/task/${taskId}`);
+          const bidData = await bidRes.json();
+          setBids(bidData);
         }
       } catch (err) {
-        console.error("❌ Error loading tasker or review:", err.message);
+        console.error("❌ Error loading data:", err.message);
       } finally {
         setLoading(false);
       }
     };
-    fetchTaskerAndReview();
-  }, [taskerId]);
+    fetchData();
+  }, [taskerId, taskId]);
+
+  // Derive coords from task location
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        if (!taskData) return;
+        
+        if (typeof taskData?.latitude === "number" && typeof taskData?.longitude === "number") {
+          if (!cancelled) setCoords({ latitude: taskData.latitude, longitude: taskData.longitude });
+          return;
+        }
+        if (typeof taskData?.location === "string") {
+          const match = taskData.location.match(/-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?/);
+          if (match) {
+            const [lat, lng] = match[0].split(",").map((v) => parseFloat(v.trim()));
+            if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+              if (!cancelled) setCoords({ latitude: lat, longitude: lng });
+              return;
+            }
+          }
+        }
+        if (taskData?.location) {
+          const results = await Location.geocodeAsync(taskData.location);
+          if (results && results[0] && !cancelled) {
+            setCoords({ latitude: results[0].latitude, longitude: results[0].longitude });
+          }
+        }
+      } catch (e) {
+        console.log("Geocoding error:", e);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [taskData?.location, taskData?.latitude, taskData?.longitude]);
+
+  // Helper functions for task details
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Completed":
+        return "#4CAF50";
+      case "Pending":
+        return "#FF9800";
+      case "Started":
+      case "In Progress":
+        return "#FFB74D";
+      case "Cancelled":
+        return "#F44336";
+      default:
+        return "#999";
+    }
+  };
+
+  const handleDelete = async () => {
+    Alert.alert(
+      t("clientTaskDetails.cancelTaskConfirmTitle"),
+      t("clientTaskDetails.cancelTaskConfirmMessage"),
+      [
+        { text: t("clientTaskDetails.no") },
+        {
+          text: t("clientTaskDetails.yes"),
+          onPress: async () => {
+            try {
+              const clientId = await SecureStore.getItemAsync("userId");
+              if (!clientId) {
+                Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.userIdNotFound"));
+                return;
+              }
+              setCanceling(true);
+              const cancelPayload = { cancelledBy: clientId };
+              const res = await fetch(
+                `https://task-kq94.onrender.com/api/tasks/${taskData._id}/cancel`,
+                {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(cancelPayload),
+                }
+              );
+              if (!res.ok) throw new Error("Failed to cancel task");
+              setCanceling(false);
+              Alert.alert(t("clientTaskDetails.taskCancelled"));
+              navigation.navigate("ClientHome", {
+                screen: "Tasks",
+                params: {
+                  refreshTasks: true,
+                  targetTab: "Previous",
+                  subTab: "Cancelled",
+                  unique: Date.now(),
+                },
+              });
+            } catch (err) {
+              setCanceling(false);
+              Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.cancelTaskError"));
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const submitReport = async () => {
     if (!reportReason.trim()) return;
@@ -112,8 +235,8 @@ export default function TaskerProfileScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView
-        style={{ flex: 1, backgroundColor: "#ffffff" }}
+        <ScrollView
+        style={{ flex: 1, backgroundColor: "rgba(248, 246, 247)" }}
         contentContainerStyle={styles.container}
         bounces={false}
         overScrollMode="never"
@@ -131,11 +254,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[styles.tab, activeTab === "details" && styles.activeTab]}
-            onPress={() => {
-              setActiveTab("details");
-              // Go back to the existing TaskDetails screen instead of navigating to a new one
-              navigation.goBack();
-            }}
+            onPress={() => setActiveTab("details")}
           >
             <Text style={[styles.tabText, activeTab === "details" && styles.activeTabText]}>
               Task Details
@@ -151,89 +270,290 @@ export default function TaskerProfileScreen({ route, navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Big centered avatar */}
-        <View style={styles.avatarWrap}>
-          {tasker.profileImage ? (
-            <Image source={{ uri: tasker.profileImage }} style={styles.avatar} />
-          ) : (
-            <View style={styles.avatarFallback}>
-              <Text style={styles.avatarFallbackText}>{firstInitial}</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Name & basics */}
-        <View style={styles.infoSection}>
-          <Text style={styles.name}>{tasker.name}</Text>
-
-          <Text style={styles.profileDetails}>
-            <Text style={styles.profileLabel}>{t("taskerProfile.location")} </Text>
-            {tasker.location || t("taskerProfile.notProvided")}
-          </Text>
-
-          {/* About section moved here */}
-          <Text style={styles.aboutTitle}>
-            <Text style={styles.aboutBold}>{t("taskerProfile.about")} </Text>
-            {tasker.about || t("taskerProfile.notProvided")}
-          </Text>
-        </View>
-
-        {/* Report User Button */}
-        <TouchableOpacity 
-          style={styles.reportButton}
-          onPress={() => setShowReportModal(true)}
-        >
-          <Text style={styles.reportButtonText}>Report User</Text>
-        </TouchableOpacity>
-
-        {/* Reviews Section */}
-        <View style={styles.reviewsSection}>
-          {/* Reviews Header */}
-          <View style={styles.reviewsHeader}>
-            <Text style={styles.reviewsTitle}>{t("taskerProfile.reviews")}</Text>
-            <Text style={styles.reviewsAvg}>
-              {t("taskerProfile.avgRating")} {avg}
-            </Text>
-          </View>
-
-          {/* Reviews */}
-          {reviewData.reviews.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.noReviewsTitle}>No Reviews Yet</Text>
-              <Text style={styles.noReviewsSubtitle}>This Tasker hasn't been rated yet</Text>
-            </View>
-          ) : (
-            reviewData.reviews.map((rev, idx) => (
-              <React.Fragment key={idx}>
-                <View style={styles.reviewCard}>
-                  <Text style={styles.reviewTaskTitle}>
-                    {rev.taskId?.title || rev.taskTitle || "Task Title"}
-                  </Text>
-                  
-                  <View style={styles.reviewStarsContainer}>
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Ionicons
-                        key={star}
-                        name={star <= rev.rating ? "star" : "star-outline"}
-                        size={16}
-                        color="#215432"
-                        style={styles.reviewStar}
-                      />
-                    ))}
-                  </View>
-
-                  {rev.comment ? (
-                    <Text style={styles.reviewComment}>{rev.comment}</Text>
-                  ) : null}
+        {/* Conditional Content Based on Active Tab */}
+        {activeTab === "profile" ? (
+          <>
+            {/* Big centered avatar */}
+            <View style={styles.avatarWrap}>
+              {tasker.profileImage ? (
+                <Image source={{ uri: tasker.profileImage }} style={styles.avatar} />
+              ) : (
+                <View style={styles.avatarFallback}>
+                  <Text style={styles.avatarFallbackText}>{firstInitial}</Text>
                 </View>
-                {idx < reviewData.reviews.length - 1 && (
-                  <View style={styles.reviewDivider} />
-                )}
-              </React.Fragment>
-            ))
-          )}
-        </View>
+              )}
+            </View>
+
+            {/* Name & basics */}
+            <View style={styles.infoSection}>
+              <Text style={styles.name}>{tasker.name}</Text>
+
+              <Text style={styles.profileDetails}>
+                {tasker.location || "Bahrain"}
+              </Text>
+
+              {/* About section moved here */}
+              <Text style={styles.aboutTitle}>
+                <Text style={styles.aboutBold}>About: </Text>
+                {tasker.about || "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using"}
+              </Text>
+            </View>
+
+            {/* Report User Button */}
+            <TouchableOpacity 
+              style={styles.reportButton}
+              onPress={() => setShowReportModal(true)}
+            >
+              <Text style={styles.reportButtonText}>Report User</Text>
+            </TouchableOpacity>
+
+            {/* Reviews Section */}
+            <View style={styles.reviewsSection}>
+              {/* Reviews Header */}
+              <View style={styles.reviewsHeader}>
+                <Text style={styles.reviewsTitle}>Reviews</Text>
+                <Text style={styles.reviewsAvg}>
+                  Avg Rating: {avg}
+                </Text>
+              </View>
+
+              {/* Divider */}
+              <View style={styles.reviewsDivider} />
+
+              {/* Reviews */}
+              {reviewData.reviews.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.noReviewsTitle}>No Reviews Yet</Text>
+                  <Text style={styles.noReviewsSubtitle}>This Tasker hasn't been rated yet</Text>
+                </View>
+              ) : (
+                reviewData.reviews.map((rev, idx) => (
+                  <View key={idx} style={styles.reviewCard}>
+                    <Text style={styles.reviewTaskTitle}>
+                      {rev.taskId?.title || rev.taskTitle || "Task Title"}
+                    </Text>
+                    
+                    <View style={styles.reviewStarsContainer}>
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        let starName = "star-outline";
+                        if (star <= Math.floor(rev.rating)) {
+                          starName = "star";
+                        } else if (star === Math.ceil(rev.rating) && rev.rating % 1 !== 0) {
+                          starName = "star-half";
+                        }
+                        return (
+                          <Ionicons
+                            key={star}
+                            name={starName}
+                            size={16}
+                            color="#215432"
+                            style={styles.reviewStar}
+                          />
+                        );
+                      })}
+                    </View>
+
+                    <Text style={styles.reviewComment}>
+                      {rev.comment || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when"}
+                    </Text>
+                  </View>
+                ))
+              )}
+            </View>
+          </>
+        ) : (
+          // Task Details Content
+          <>
+            {/* Spacing */}
+            <View style={styles.spacing} />
+
+            {/* Divider Above Title */}
+            <View style={styles.divider} />
+
+            {/* Task Overview */}
+            <View style={styles.taskOverview}>
+              <View style={styles.taskTitleRow}>
+                <Text style={styles.taskTitle}>{taskData?.title || "Task Title"}</Text>
+                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(taskData?.status) }]}>
+                  <Text style={styles.statusText}>{taskData?.status}</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Bottom Divider */}
+            <View style={styles.divider} />
+
+            {/* Task Detail Layout */}
+            <View style={styles.taskDetailLayout}>
+              <View style={styles.taskMeta}>
+                <View style={styles.metaRow}>
+                  <Text style={styles.metaLabel}>Posted on</Text>
+                  <Text style={styles.metaValue}>{formatDate(taskData?.createdAt)}</Text>
+                </View>
+                <View style={styles.metaRowRight}>
+                  <Text style={styles.metaLabelRight}>BUDGET</Text>
+                  <Text style={styles.metaValueRight}>{taskData?.budget || "0"} BHD</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Divider */}
+            <View style={styles.divider} />
+
+            {/* Description */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Description</Text>
+              <Text style={styles.descriptionText}>
+                {taskData?.description || "No description provided"}
+              </Text>
+            </View>
+
+            {/* Divider */}
+            <View style={styles.divider} />
+
+            {/* Images - Only show if there are actual images */}
+            {taskData?.images && taskData.images.length > 0 && (
+              <>
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Images</Text>
+                  <View style={styles.imageContainer}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                      {taskData.images.map((uri, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.imagePlaceholder}
+                          onPress={() => setPreviewImage(uri)}
+                        >
+                          <Image source={{ uri }} style={styles.taskImage} />
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+                </View>
+                {/* Divider */}
+                <View style={styles.divider} />
+              </>
+            )}
+
+            {/* Location */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Location</Text>
+              {coords ? (
+                <View style={styles.mapPlaceholder}>
+                  <MapView
+                    style={styles.map}
+                    initialRegion={{
+                      latitude: coords.latitude,
+                      longitude: coords.longitude,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
+                    }}
+                    pointerEvents="none"
+                  >
+                    <Marker coordinate={coords} />
+                  </MapView>
+                </View>
+              ) : (
+                <View style={styles.mapPlaceholder}>
+                  <Ionicons name="location-outline" size={32} color="#ccc" />
+                </View>
+              )}
+            </View>
+
+            {/* Action Buttons */}
+            <View style={styles.buttonSection}>
+              {taskData?.status === "Pending" && (
+                <>
+                  {bids.length === 0 && (
+                    <TouchableOpacity
+                      style={styles.editButton}
+                      onPress={() => navigation.navigate("EditTask", { task: taskData })}
+                    >
+                      <Text style={styles.editButtonText}>Edit Task</Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={handleDelete}
+                    disabled={canceling}
+                  >
+                    {canceling ? (
+                      <ActivityIndicator color="#fff" size="small" />
+                    ) : (
+                      <Text style={styles.cancelButtonText}>Cancel Task</Text>
+                    )}
+                  </TouchableOpacity>
+                </>
+              )}
+
+              {taskData?.status === "Started" && (
+                <TouchableOpacity
+                  style={styles.completeButton}
+                  onPress={() => {
+                    Alert.alert(
+                      t("clientTaskDetails.markCompletedConfirmTitle"),
+                      t("clientTaskDetails.markCompletedConfirmMessage"),
+                      [
+                        { text: t("clientTaskDetails.no") },
+                        {
+                          text: t("clientTaskDetails.yes"),
+                          onPress: async () => {
+                            try {
+                              setCompleting(true);
+                              await fetch(`https://task-kq94.onrender.com/api/tasks/${taskData._id}/complete`, { method: "PATCH" });
+                              // Refresh task data
+                              const taskRes = await axios.get(`https://task-kq94.onrender.com/api/tasks/${taskId}`);
+                              if (taskRes && taskRes.data) {
+                                setTaskData(taskRes.data);
+                              }
+                              setCompleting(false);
+                              navigation.navigate("ClientHome", {
+                                screen: "Tasks",
+                                params: {
+                                  refreshTasks: true,
+                                  targetTab: "Previous",
+                                  subTab: "Completed",
+                                  unique: Date.now(),
+                                },
+                              });
+                            } catch {
+                              setCompleting(false);
+                              Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.markCompletedError"));
+                            }
+                          },
+                        },
+                      ]
+                    );
+                  }}
+                  disabled={completing}
+                >
+                  {completing ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Text style={styles.completeButtonText}>Mark as Complete</Text>
+                  )}
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Bottom spacing */}
+            <View style={{ height: 40 }} />
+          </>
+        )}
       </ScrollView>
+
+      {/* Image Preview */}
+      {previewImage && (
+        <View style={styles.previewOverlay}>
+          <TouchableOpacity
+            style={styles.closePreviewBtn}
+            onPress={() => setPreviewImage(null)}
+          >
+            <Ionicons name="close" size={30} color="#fff" />
+          </TouchableOpacity>
+          <Image source={{ uri: previewImage }} style={styles.previewImage} resizeMode="contain" />
+        </View>
+      )}
 
       {/* Report Modal */}
       <Modal isVisible={showReportModal}>
@@ -299,13 +619,13 @@ export default function TaskerProfileScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   safeArea: { 
     flex: 1, 
-    backgroundColor: "#F8F8F8" 
+    backgroundColor: "rgba(248, 246, 247)" 
   },
   container: {
     paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 40,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: "rgba(248, 246, 247)",
   },
   backBtn: {
     width: 24,
@@ -320,11 +640,10 @@ const styles = StyleSheet.create({
   // Navigation tabs
   tabContainer: {
     flexDirection: "row",
-    backgroundColor: "#E0E0E0",
+    backgroundColor: "#E5E5E5",
     borderRadius: 25,
-    padding: 4,
+    padding: 3,
     marginBottom: 24,
-    height: 50,
   },
   tab: {
     flex: 1,
@@ -340,7 +659,7 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 14,
     fontFamily: "Inter",
-    color: "#616161",
+    color: "#666",
   },
   activeTabText: {
     color: "#fff",
@@ -384,7 +703,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   name: {
-    fontSize: 24,
+    fontSize: 22,
     fontFamily: "InterBold",
     color: "#215432",
     textAlign: "left",
@@ -405,7 +724,7 @@ const styles = StyleSheet.create({
   aboutTitle: {
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#616161",
+    color: "#215432",
     lineHeight: 20,
     marginTop: 12,
     textAlign: I18nManager.isRTL ? "right" : "left",
@@ -418,7 +737,7 @@ const styles = StyleSheet.create({
   // Report button - WIDER and OVAL/Rounded
   reportButton: {
     backgroundColor: "#F44336",
-    borderRadius: 8,
+    borderRadius: 25,
     paddingVertical: 16,
     paddingHorizontal: 32,
     alignItems: "center",
@@ -451,6 +770,11 @@ const styles = StyleSheet.create({
     fontSize: 14, 
     color: "#215432" 
   },
+  reviewsDivider: {
+    height: 1,
+    backgroundColor: "#E0E0E0",
+    marginBottom: 16,
+  },
   emptyContainer: {
     alignItems: "center",
     marginTop: 20,
@@ -473,7 +797,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderRadius: 0,
     padding: 0,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   reviewTaskTitle: {
     fontFamily: "InterBold",
@@ -582,5 +906,202 @@ const styles = StyleSheet.create({
     marginTop: 50, 
     color: "red", 
     fontSize: 16 
+  },
+  
+  // Task Details Styles
+  spacing: {
+    height: 20,
+  },
+  divider: {
+    height: 2,
+    backgroundColor: "#e0e0e0",
+    marginHorizontal: 20,
+    marginVertical: 20,
+  },
+  taskOverview: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  taskTitleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  taskTitle: {
+    flex: 1,
+    fontFamily: "InterBold",
+    fontSize: 28,
+    color: "#215432",
+    marginRight: 12,
+  },
+  statusBadge: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  statusText: {
+    color: "#fff",
+    fontFamily: "InterBold",
+    fontSize: 12,
+  },
+  taskDetailLayout: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  taskMeta: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  metaRow: {
+    flex: 1,
+    alignItems: "flex-start",
+  },
+  metaRowRight: {
+    flex: 1,
+    alignItems: "flex-end",
+  },
+  metaLabel: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
+  },
+  metaValue: {
+    fontFamily: "InterBold",
+    fontSize: 20,
+    color: "#215433",
+  },
+  metaLabelRight: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
+    textAlign: "right",
+  },
+  metaValueRight: {
+    fontFamily: "InterBold",
+    fontSize: 20,
+    color: "#215433",
+    textAlign: "right",
+  },
+  section: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  sectionTitle: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#666666",
+    marginBottom: 12,
+  },
+  descriptionText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    lineHeight: 22,
+  },
+  imageContainer: {
+    marginTop: 8,
+  },
+  imagePlaceholder: {
+    width: 80,
+    height: 80,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    marginRight: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  taskImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 8,
+  },
+  mapPlaceholder: {
+    height: 150,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    marginTop: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  map: {
+    width: "100%",
+    height: "100%",
+  },
+  
+  // Button section styles
+  buttonSection: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  editButton: {
+    backgroundColor: "#ffffff",
+    borderWidth: 2,
+    borderColor: "#215432",
+    borderRadius: 25,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  editButtonText: {
+    color: "#215432",
+    fontFamily: "InterBold",
+    fontSize: 16,
+  },
+  cancelButton: {
+    backgroundColor: "#215432",
+    borderWidth: 2,
+    borderColor: "#215432",
+    borderRadius: 25,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  cancelButtonText: {
+    color: "#fff",
+    fontFamily: "InterBold",
+    fontSize: 16,
+  },
+  completeButton: {
+    backgroundColor: "#215432",
+    borderWidth: 2,
+    borderColor: "#215432",
+    borderRadius: 25,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  completeButtonText: {
+    color: "#fff",
+    fontFamily: "InterBold",
+    fontSize: 16,
+  },
+  
+  // Preview overlay
+  previewOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  previewImage: {
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height * 0.8,
+  },
+  closePreviewBtn: {
+    position: "absolute",
+    top: 40,
+    left: I18nManager.isRTL ? undefined : 20,
+    right: I18nManager.isRTL ? 20 : undefined,
+    zIndex: 1001,
   },
 });

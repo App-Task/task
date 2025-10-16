@@ -168,7 +168,7 @@ export default function TaskerProfileScreen({ navigation }) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+    <View style={{ flex: 1, backgroundColor: "rgba(248, 246, 247)" }}>
       <ScrollView contentContainerStyle={styles.container}>
   
       <TouchableOpacity onPress={handleChangeProfilePicture} style={styles.avatarWrapper}>
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     paddingTop: 100,
     paddingBottom: 60,
     paddingHorizontal: 24,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     alignItems: "center",
   },
   avatarWrapper: {

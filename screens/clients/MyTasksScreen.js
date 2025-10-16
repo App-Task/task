@@ -323,19 +323,35 @@ allTasks.forEach((task) => {
       onPress={() => navigation.navigate("TaskDetails", { task: item })}
     >
       <View style={styles.card}>
-        {/* ✅ Date Row */}
-        <Text style={styles.cardDate}>
-          {new Date(item.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })}{" "}
-          •{" "}
-          {new Date(item.createdAt).toLocaleTimeString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </Text>
+        {/* ✅ Date Row with Report Icon */}
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+          <Text style={styles.cardDate}>
+            {new Date(item.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })}{" "}
+            •{" "}
+            {new Date(item.createdAt).toLocaleTimeString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Text>
+          
+          {/* Report Icon for Started Tab */}
+          {activeTab === "Started" && item.taskerId && (
+            <TouchableOpacity
+              style={styles.reportIcon}
+              onPress={(e) => {
+                e.stopPropagation();
+                setReportTask(item);
+                setShowReportModal(true);
+              }}
+            >
+              <Ionicons name="flag-outline" size={18} color="#666" />
+            </TouchableOpacity>
+          )}
+        </View>
   
         {/* ✅ Divider Line Above Title */}
         <View style={{ height: 1, backgroundColor: "#e0e0e0", marginVertical: 6 }} />
@@ -391,7 +407,7 @@ allTasks.forEach((task) => {
             onPress={() => navigation.navigate("TaskDetails", { task: item, showOffersTab: true })}
           >
             <Text style={styles.viewBidsText}>
-              {t("clientMyTasks.viewBids", "View Bids")}
+              {t("clientMyTasks.viewBids", "View Bids")} ({item.bidCount || 0} {item.bidCount === 1 ? 'bid' : 'bids'} received)
             </Text>
           </TouchableOpacity>
         )}
@@ -596,7 +612,7 @@ allTasks.forEach((task) => {
                 </View>
               ) : (
                 <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-                  <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#215433", marginBottom: 12 }}>
+                  <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#215433", marginBottom: 12, textAlign: "center" }}>
                     {t("clientReview.title", "Rate Your Tasker")}
                   </Text>
 
@@ -664,11 +680,11 @@ allTasks.forEach((task) => {
             </View>
           ) : (
             <>
-              <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#215433", marginBottom: 12 }}>
+              <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#215433", marginBottom: 12, textAlign: "center" }}>
                 {t("clientMyTasks.reportPromptTitle", "Report Tasker")}
               </Text>
 
-              <Text style={{ fontFamily: "Inter", fontSize: 14, color: "#666", marginBottom: 16 }}>
+              <Text style={{ fontFamily: "Inter", fontSize: 14, color: "#666", marginBottom: 16, textAlign: "center" }}>
                 {t("clientMyTasks.reportPromptMessage", "Please describe the issue with this tasker:")}
               </Text>
 
@@ -795,7 +811,7 @@ allTasks.forEach((task) => {
       }
       contentContainerStyle={[
         { paddingTop: 20, paddingBottom: 40 },
-        groupedTasks[previousSubTab].length === 0 && { flexGrow: 1, justifyContent: "center" }
+        groupedTasks[previousSubTab].length === 0 && { flexGrow: 1, justifyContent: "center", paddingTop: 120 }
       ]}
     />
   </View>
@@ -928,6 +944,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 3,
     elevation: 2,
+  },
+  reportIcon: {
+    padding: 4,
   },
   
   

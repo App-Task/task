@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,6 +17,8 @@ import { fetchCurrentUser } from "../../services/auth";
 import { getToken } from "../../services/authStorage";
 import EmptyState from "../../components/EmptyState";
 import { useCallback } from "react";
+import Modal from "react-native-modal";
+import * as SecureStore from "expo-secure-store";
 
 export default function TaskerMyTasksScreen() {
   const [loading, setLoading] = useState(true);
@@ -25,6 +28,10 @@ export default function TaskerMyTasksScreen() {
   const [taskerId, setTaskerId] = useState("");
   const [editingBidId, setEditingBidId] = useState(null); // Track which bid is being edited
   const [withdrawingBidId, setWithdrawingBidId] = useState(null); // Track which bid is being withdrawn
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportTask, setReportTask] = useState(null);
+  const [isReporting, setIsReporting] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -274,6 +281,41 @@ export default function TaskerMyTasksScreen() {
     });
   };
 
+  const submitReport = async () => {
+    if (!reportReason.trim() || !reportTask) return;
+    try {
+      setIsReporting(true);
+      const token = await SecureStore.getItemAsync("token");
+      await fetch("https://task-kq94.onrender.com/api/reports", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          reporterId: taskerId,
+          reportedUserId: reportTask.userId || reportTask.user?._id,
+          reason: reportReason,
+          taskId: reportTask._id,
+        }),
+      });
+      
+      setIsReporting(false);
+      setShowReportModal(false);
+      setReportReason("");
+      setReportTask(null);
+      
+      Alert.alert(
+        "Report Submitted",
+        "Thank you for your report. We will review it shortly."
+      );
+    } catch (err) {
+      setIsReporting(false);
+      console.error("❌ Report error:", err.message);
+      Alert.alert("Error", "Failed to submit report. Please try again.");
+    }
+  };
+
   const renderBidCard = ({ item }) => {
     // Check if item is a bid object or a task object
     const isBidObject = item.taskId !== undefined;
@@ -337,24 +379,38 @@ export default function TaskerMyTasksScreen() {
 
   const renderTaskCard = ({ item }) => (
     <View style={styles.card}>
-      {/* Date and Time */}
-      <Text style={styles.dateText}>
-        {new Date(item.createdAt).toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        })}{" "}
-        •{" "}
-        {new Date(item.createdAt).toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </Text>
+      {/* Date and Time with Report Icon */}
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+        <Text style={styles.dateText}>
+          {new Date(item.createdAt).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}{" "}
+          •{" "}
+          {new Date(item.createdAt).toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </Text>
 
-      {/* Participants Icon */}
-      <View style={styles.participantsIcon}>
-        <Ionicons name="people-outline" size={16} color="#666" />
+        {/* Report Icon for Active Tab */}
+        {activeTab === "active" && (
+          <TouchableOpacity
+            style={{ padding: 4 }}
+            onPress={(e) => {
+              e.stopPropagation();
+              setReportTask(item);
+              setShowReportModal(true);
+            }}
+          >
+            <Ionicons name="flag-outline" size={18} color="#666" />
+          </TouchableOpacity>
+        )}
       </View>
+
+      {/* Divider Line Above Title */}
+      <View style={{ height: 1, backgroundColor: "#e0e0e0", marginVertical: 6 }} />
 
       {/* Task Title */}
       <Text style={styles.taskTitle}>{item.title || "Task Title"}</Text>
@@ -480,6 +536,94 @@ export default function TaskerMyTasksScreen() {
           showsVerticalScrollIndicator={false}
         />
       )}
+
+      {/* Report Modal */}
+      <Modal isVisible={showReportModal}>
+        <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20 }}>
+          {isReporting ? (
+            <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40 }}>
+              <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 12 }} />
+              <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#215433" }}>
+                Submitting report...
+              </Text>
+            </View>
+          ) : (
+            <>
+              <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#215433", marginBottom: 12, textAlign: "center" }}>
+                Report Client
+              </Text>
+
+              <Text style={{ fontFamily: "Inter", fontSize: 14, color: "#666", marginBottom: 16, textAlign: "center" }}>
+                Please describe the issue with this client:
+              </Text>
+
+              <TextInput
+                placeholder="Describe the issue..."
+                placeholderTextColor="#999"
+                value={reportReason}
+                onChangeText={(text) => {
+                  if (text.length <= 300) setReportReason(text);
+                }}
+                style={{
+                  borderWidth: 1,
+                  borderColor: "#ccc",
+                  borderRadius: 12,
+                  padding: 12,
+                  marginBottom: 8,
+                  fontFamily: "Inter",
+                  fontSize: 14,
+                  color: "#333",
+                  textAlignVertical: "top",
+                  height: 80,
+                }}
+                multiline
+                maxLength={300}
+              />
+
+              <Text style={{ fontFamily: "Inter", fontSize: 12, color: "#999", marginBottom: 20 }}>
+                {reportReason.length}/300 characters
+              </Text>
+
+              <View style={{ flexDirection: "row", gap: 12 }}>
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#f5f5f5",
+                    paddingVertical: 12,
+                    borderRadius: 30,
+                    alignItems: "center",
+                  }}
+                  onPress={() => {
+                    setShowReportModal(false);
+                    setReportReason("");
+                    setReportTask(null);
+                  }}
+                >
+                  <Text style={{ color: "#666", fontFamily: "InterBold", fontSize: 16 }}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    backgroundColor: reportReason.trim() ? "#215433" : "#ccc",
+                    paddingVertical: 12,
+                    borderRadius: 30,
+                    alignItems: "center",
+                  }}
+                  onPress={submitReport}
+                  disabled={!reportReason.trim()}
+                >
+                  <Text style={{ color: "#fff", fontFamily: "InterBold", fontSize: 16 }}>
+                    Submit
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -690,7 +834,7 @@ const styles = StyleSheet.create({
   chatButton: {
     backgroundColor: "#215433",
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 25,
     alignItems: "center",
   },
   chatButtonText: {

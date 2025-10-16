@@ -97,6 +97,8 @@ export default function MyReviewsScreen({ navigation }) {
           <Text style={styles.subtitle}>Reviews</Text>
           <Text style={styles.avgRating}>Avg Rating: {averageRating}</Text>
         </View>
+        {/* Divider */}
+        <View style={styles.divider} />
       </View>
 
       {/* Reviews List */}
@@ -107,10 +109,12 @@ export default function MyReviewsScreen({ navigation }) {
           style={styles.loading} 
         />
       ) : reviews.length === 0 ? (
-        <EmptyState 
-          title="No Reviews Yet" 
-          subtitle="Start completing tasks to receive reviews from clients!"
-        />
+        <View style={styles.emptyStateContainer}>
+          <EmptyState 
+            title="No Reviews Yet" 
+            subtitle="Start completing tasks to receive reviews from clients!"
+          />
+        </View>
       ) : (
         <FlatList
           data={reviews}
@@ -163,6 +167,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#215433",
   },
+  divider: {
+    height: 1,
+    backgroundColor: "#e0e0e0",
+    marginTop: 16,
+  },
   listContainer: {
     paddingHorizontal: 20,
     paddingBottom: 40,
@@ -193,6 +202,9 @@ const styles = StyleSheet.create({
   },
   loading: {
     marginTop: 40,
+  },
+  emptyStateContainer: {
+    marginTop: -80,
   },
   emptyContainer: {
     flex: 1,

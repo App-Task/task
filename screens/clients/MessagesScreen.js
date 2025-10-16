@@ -145,7 +145,7 @@ export default function MessagesScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     paddingTop: 90,
     paddingHorizontal: 24,
   },

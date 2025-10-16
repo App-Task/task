@@ -85,7 +85,7 @@ export default function PaymentMethodsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     paddingHorizontal: 24,
     paddingTop: 60,
   },

@@ -147,7 +147,7 @@ export default function TaskerMessagesScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: "rgba(248, 246, 247)",
     paddingTop: 90,
     paddingHorizontal: 24,
   },

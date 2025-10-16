@@ -86,8 +86,34 @@ export default function EditTaskScreen({ route, navigation }) {
   };
 
   const handleSave = async () => {
-    if (!title.trim() || !description.trim() || !budget.trim()) {
-      Alert.alert("Error", "Please fill in all required fields");
+    let hasError = false;
+    let errorMessage = "";
+
+    if (!title || title.trim().length < 10) {
+      hasError = true;
+      errorMessage = "Title must be at least 10 characters long";
+    }
+
+    if (!description || description.trim().length < 25) {
+      hasError = true;
+      if (errorMessage) {
+        errorMessage += "\n\nDescription must be at least 25 characters long";
+      } else {
+        errorMessage = "Description must be at least 25 characters long";
+      }
+    }
+
+    if (!budget.trim()) {
+      hasError = true;
+      if (errorMessage) {
+        errorMessage += "\n\nPlease enter a budget";
+      } else {
+        errorMessage = "Please enter a budget";
+      }
+    }
+
+    if (hasError) {
+      Alert.alert("Validation Error", errorMessage);
       return;
     }
 
@@ -104,9 +130,7 @@ export default function EditTaskScreen({ route, navigation }) {
         images,
       });
 
-      Alert.alert("Success", "Task updated successfully", [
-        { text: "OK", onPress: () => navigation.goBack() }
-      ]);
+      navigation.navigate("TaskUpdatedSuccess");
     } catch (error) {
       console.log("Update error:", error);
       Alert.alert("Error", "Failed to update task. Please try again.");
@@ -253,7 +277,12 @@ export default function EditTaskScreen({ route, navigation }) {
           <View style={styles.fieldContainer}>
             <View style={styles.labelRow}>
               <Text style={styles.fieldLabel}>Task Title</Text>
-              <Text style={styles.charLimit}>Maximum 100 Characters</Text>
+              <Text style={styles.charLimit}>
+                {title.length < 10 
+                  ? `Min ${10 - title.length} more characters`
+                  : "Maximum 100 characters"
+                }
+              </Text>
             </View>
             <TextInput
               style={styles.inputField}
@@ -271,19 +300,24 @@ export default function EditTaskScreen({ route, navigation }) {
           <View style={styles.fieldContainer}>
             <View style={styles.labelRow}>
               <Text style={styles.fieldLabel}>Describe your Task</Text>
-              <Text style={styles.charLimit}>Maximum 350 Characters</Text>
+              <Text style={styles.charLimit}>
+                {description.length < 25 
+                  ? `Min ${25 - description.length} more characters`
+                  : "Maximum 150 characters"
+                }
+              </Text>
             </View>
             <View style={styles.textAreaContainer}>
               <TextInput
                 style={styles.textArea}
                 value={description}
                 onChangeText={(text) => {
-                  if (text.length <= 350) setDescription(text);
+                  if (text.length <= 150) setDescription(text);
                 }}
                 placeholder="Add a more detailed description of the task you want done"
                 placeholderTextColor="#999"
                 multiline
-                maxLength={350}
+                maxLength={150}
                 textAlignVertical="top"
               />
               <View style={styles.textAreaSeparator} />

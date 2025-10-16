@@ -49,6 +49,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [isReporting, setIsReporting] = useState(false);
+  const [reportBid, setReportBid] = useState(null);
 
   useEffect(() => {
     if (isFocused) {
@@ -266,21 +267,8 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
   };
 
   const handleReport = (bid) => {
-    Alert.alert(
-      "Report Tasker",
-      "Are you sure you want to report this tasker? This action will be reviewed by our team.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Report",
-          style: "destructive",
-          onPress: () => {
-            // Here you would typically make an API call to report the tasker
-            Alert.alert("Report Submitted", "Thank you for your report. We will review it and take appropriate action.");
-          },
-        },
-      ]
-    );
+    setReportBid(bid);
+    setShowReportModal(true);
   };
 
   const handleViewProfile = (bid) => {
@@ -310,9 +298,12 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
     setIsReporting(true);
     try {
       const userId = await SecureStore.getItemAsync("userId");
+      // Determine which tasker to report (from bid or from profile)
+      const reportedUserId = reportBid?.taskerId?._id || tasker?._id;
+      
       await axios.post("https://task-kq94.onrender.com/api/reports", {
         reporterId: userId,
-        reportedUserId: tasker?._id,
+        reportedUserId: reportedUserId,
         reason: reportReason,
         taskId: task._id,
       });
@@ -320,6 +311,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
       setIsReporting(false);
       setShowReportModal(false);
       setReportReason("");
+      setReportBid(null);
       Alert.alert("Report Submitted", "Thank you for your report. We will review it shortly.");
     } catch (err) {
       setIsReporting(false);
@@ -869,6 +861,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                   onPress={() => {
                     setShowReportModal(false);
                     setReportReason("");
+                    setReportBid(null);
                   }}
                 >
                   <Text style={styles.modalCancelText}>Cancel</Text>
@@ -949,15 +942,14 @@ const styles = StyleSheet.create({
       flex: 1,
     },
     taskOverview: {
-      paddingHorizontal: 20,
-      paddingTop: 20,
-      paddingBottom: 20,
+      paddingHorizontal: 0,
+      paddingVertical: 20,
     },
     spacing: {
       height: 20,
     },
     taskDetailLayout: {
-      paddingHorizontal: 20,
+      paddingHorizontal: 0,
       paddingVertical: 20,
     },
     taskTitleRow: {
@@ -1017,7 +1009,7 @@ const styles = StyleSheet.create({
     },
     section: {
       paddingHorizontal: 20,
-      paddingBottom: 20,
+      paddingVertical: 20,
     },
     sectionTitle: {
       fontFamily: "InterBold",

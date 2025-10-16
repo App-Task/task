@@ -81,7 +81,7 @@ export default function SettingsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     paddingTop: 60,
     paddingBottom: 40,
     paddingHorizontal: 24,
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   loadingBox: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247)",
     borderRadius: 16,
     padding: 30,
     alignItems: "center",

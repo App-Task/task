@@ -20,6 +20,7 @@ import TaskerEditProfileScreen from "../screens/tasker/EditProfileScreen";
 import TaskDetailsScreen from "../screens/clients/TaskDetailsScreen";
 import TaskDetailsViewBidsScreen from "../screens/clients/TaskDetailsViewBidsScreen";
 import EditTaskScreen from "../screens/clients/EditTaskScreen";
+import TaskUpdatedSuccessScreen from "../screens/clients/TaskUpdatedSuccessScreen";
 import ViewBidsScreen from "../screens/clients/ViewBidsScreen";
 import ChatScreen from "../screens/clients/ChatScreen";
 import EditProfileScreen from "../screens/clients/EditProfileScreen";
@@ -78,7 +79,9 @@ export default function MainNavigator() {
       {/* Client Home & Subscreens */}
       <Stack.Screen name="ClientHome" component={BottomTabNavigator} />
       <Stack.Screen name="TaskDetails" component={TaskDetailsViewBidsScreen} />
+      <Stack.Screen name="TaskDetailsOnly" component={TaskDetailsScreen} />
       <Stack.Screen name="EditTask" component={EditTaskScreen} />
+      <Stack.Screen name="TaskUpdatedSuccess" component={TaskUpdatedSuccessScreen} />
       <Stack.Screen name="ViewBids" component={ViewBidsScreen} />
       <Stack.Screen name="Chat" component={ChatScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
