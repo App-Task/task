@@ -53,7 +53,7 @@ export default function MyReviewsScreen({ navigation }) {
       <Ionicons
         key={index}
         name={index < rating ? "star" : "star-outline"}
-        size={16}
+        size={20}
         color="#215433"
         style={{ marginRight: 2 }}
       />
@@ -61,16 +61,20 @@ export default function MyReviewsScreen({ navigation }) {
   };
 
   const renderReviewItem = ({ item }) => (
-    <View style={styles.reviewItem}>
-      <Text style={styles.taskTitle}>{item.taskId?.title || "Task Title"}</Text>
-      
-      <View style={styles.starsContainer}>
-        {renderStars(item.rating || 0)}
+    <View>
+      <View style={styles.reviewItem}>
+        <Text style={styles.taskTitle}>{item.taskId?.title || "Task Title"}</Text>
+        
+        <View style={styles.starsContainer}>
+          {renderStars(item.rating || 0)}
+        </View>
+        
+        <Text style={styles.reviewText}>
+          {item.comment || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when"}
+        </Text>
       </View>
-      
-      <Text style={styles.reviewText}>
-        {item.comment || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when"}
-      </Text>
+      {/* Divider after each review */}
+      <View style={styles.reviewDivider} />
     </View>
   );
 
@@ -122,7 +126,6 @@ export default function MyReviewsScreen({ navigation }) {
           renderItem={renderReviewItem}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
       )}
     </View>
@@ -177,11 +180,12 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   reviewItem: {
-    paddingVertical: 16,
+    paddingTop: 0,
+    paddingBottom: 16,
   },
   taskTitle: {
     fontFamily: "InterBold",
-    fontSize: 16,
+    fontSize: 20,
     color: "#215433",
     marginBottom: 8,
   },
@@ -199,6 +203,12 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#e0e0e0",
     marginVertical: 8,
+  },
+  reviewDivider: {
+    height: 1,
+    backgroundColor: "#e0e0e0",
+    marginTop: 16,
+    marginBottom: 0,
   },
   loading: {
     marginTop: 40,

@@ -235,7 +235,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-        <ScrollView
+      <ScrollView
         style={{ flex: 1, backgroundColor: "rgba(248, 246, 247)" }}
         contentContainerStyle={styles.container}
         bounces={false}
@@ -273,67 +273,67 @@ export default function TaskerProfileScreen({ route, navigation }) {
         {/* Conditional Content Based on Active Tab */}
         {activeTab === "profile" ? (
           <>
-            {/* Big centered avatar */}
-            <View style={styles.avatarWrap}>
-              {tasker.profileImage ? (
-                <Image source={{ uri: tasker.profileImage }} style={styles.avatar} />
-              ) : (
-                <View style={styles.avatarFallback}>
-                  <Text style={styles.avatarFallbackText}>{firstInitial}</Text>
-                </View>
-              )}
+        {/* Big centered avatar */}
+        <View style={styles.avatarWrap}>
+          {tasker.profileImage ? (
+            <Image source={{ uri: tasker.profileImage }} style={styles.avatar} />
+          ) : (
+            <View style={styles.avatarFallback}>
+              <Text style={styles.avatarFallbackText}>{firstInitial}</Text>
             </View>
+          )}
+        </View>
 
-            {/* Name & basics */}
-            <View style={styles.infoSection}>
-              <Text style={styles.name}>{tasker.name}</Text>
+        {/* Name & basics */}
+        <View style={styles.infoSection}>
+          <Text style={styles.name}>{tasker.name}</Text>
 
-              <Text style={styles.profileDetails}>
+          <Text style={styles.profileDetails}>
                 {tasker.location || "Bahrain"}
-              </Text>
+          </Text>
 
-              {/* About section moved here */}
-              <Text style={styles.aboutTitle}>
+          {/* About section moved here */}
+          <Text style={styles.aboutTitle}>
                 <Text style={styles.aboutBold}>About: </Text>
                 {tasker.about || "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using"}
-              </Text>
-            </View>
+          </Text>
+        </View>
 
-            {/* Report User Button */}
-            <TouchableOpacity 
-              style={styles.reportButton}
-              onPress={() => setShowReportModal(true)}
-            >
-              <Text style={styles.reportButtonText}>Report User</Text>
-            </TouchableOpacity>
+        {/* Report User Button */}
+        <TouchableOpacity 
+          style={styles.reportButton}
+          onPress={() => setShowReportModal(true)}
+        >
+          <Text style={styles.reportButtonText}>Report User</Text>
+        </TouchableOpacity>
 
-            {/* Reviews Section */}
-            <View style={styles.reviewsSection}>
-              {/* Reviews Header */}
-              <View style={styles.reviewsHeader}>
+        {/* Reviews Section */}
+        <View style={styles.reviewsSection}>
+          {/* Reviews Header */}
+          <View style={styles.reviewsHeader}>
                 <Text style={styles.reviewsTitle}>Reviews</Text>
-                <Text style={styles.reviewsAvg}>
+            <Text style={styles.reviewsAvg}>
                   Avg Rating: {avg}
-                </Text>
-              </View>
+            </Text>
+          </View>
 
               {/* Divider */}
               <View style={styles.reviewsDivider} />
 
-              {/* Reviews */}
-              {reviewData.reviews.length === 0 ? (
-                <View style={styles.emptyContainer}>
-                  <Text style={styles.noReviewsTitle}>No Reviews Yet</Text>
-                  <Text style={styles.noReviewsSubtitle}>This Tasker hasn't been rated yet</Text>
-                </View>
-              ) : (
-                reviewData.reviews.map((rev, idx) => (
+          {/* Reviews */}
+          {reviewData.reviews.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.noReviewsTitle}>No Reviews Yet</Text>
+              <Text style={styles.noReviewsSubtitle}>This Tasker hasn't been rated yet</Text>
+            </View>
+          ) : (
+            reviewData.reviews.map((rev, idx) => (
                   <View key={idx} style={styles.reviewCard}>
-                    <Text style={styles.reviewTaskTitle}>
-                      {rev.taskId?.title || rev.taskTitle || "Task Title"}
-                    </Text>
-                    
-                    <View style={styles.reviewStarsContainer}>
+                  <Text style={styles.reviewTaskTitle}>
+                    {rev.taskId?.title || rev.taskTitle || "Task Title"}
+                  </Text>
+                  
+                  <View style={styles.reviewStarsContainer}>
                       {[1, 2, 3, 4, 5].map((star) => {
                         let starName = "star-outline";
                         if (star <= Math.floor(rev.rating)) {
@@ -342,13 +342,13 @@ export default function TaskerProfileScreen({ route, navigation }) {
                           starName = "star-half";
                         }
                         return (
-                          <Ionicons
-                            key={star}
+                      <Ionicons
+                        key={star}
                             name={starName}
-                            size={16}
-                            color="#215432"
-                            style={styles.reviewStar}
-                          />
+                        size={16}
+                        color="#215432"
+                        style={styles.reviewStar}
+                      />
                         );
                       })}
                     </View>
@@ -533,8 +533,8 @@ export default function TaskerProfileScreen({ route, navigation }) {
                     <Text style={styles.completeButtonText}>Mark as Complete</Text>
                   )}
                 </TouchableOpacity>
-              )}
-            </View>
+          )}
+        </View>
 
             {/* Bottom spacing */}
             <View style={{ height: 40 }} />
