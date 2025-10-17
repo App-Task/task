@@ -158,12 +158,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   subtitle: {
-    fontFamily: "Inter",
+    fontFamily: "InterBold",
     fontSize: 16,
     color: "#215433",
   },
   avgRating: {
-    fontFamily: "Inter",
+    fontFamily: "InterBold",
     fontSize: 16,
     color: "#215433",
   },
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   emptyStateContainer: {
-    marginTop: -80,
+    marginTop: 40,
   },
   emptyContainer: {
     flex: 1,

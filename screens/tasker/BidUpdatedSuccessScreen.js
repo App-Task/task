@@ -25,7 +25,7 @@ export default function BidUpdatedSuccessScreen() {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={24} color="#215432" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Bid</Text>
       </View>
@@ -33,8 +33,7 @@ export default function BidUpdatedSuccessScreen() {
       {/* Progress Bar */}
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
-          <View style={styles.progressFill} />
-          <View style={styles.progressRemaining} />
+          <View style={styles.progressFillComplete} />
         </View>
       </View>
 
@@ -65,23 +64,19 @@ export default function BidUpdatedSuccessScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "rgba(248, 246, 247)",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: "#fff",
   },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "#215433",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 16,
   },
   headerTitle: {
     fontFamily: "InterBold",
@@ -90,24 +85,30 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: "#fff",
+    paddingBottom: 20,
+    backgroundColor: "rgba(248, 246, 247)",
   },
   progressBar: {
-    height: 4,
-    backgroundColor: "#e0e0e0",
-    borderRadius: 2,
-    flexDirection: "row",
+    height: 6,
+    backgroundColor: "#E5E5E5",
+    borderRadius: 3,
+    overflow: "hidden",
   },
   progressFill: {
     flex: 1,
-    backgroundColor: "#215433",
-    borderRadius: 2,
+    backgroundColor: "#215432",
+    borderRadius: 3,
+  },
+  progressFillComplete: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#215432",
+    borderRadius: 3,
   },
   progressRemaining: {
     flex: 1,
     backgroundColor: "#e8f4ec",
-    borderRadius: 2,
+    borderRadius: 3,
   },
   content: {
     flex: 1,
@@ -153,10 +154,13 @@ const styles = StyleSheet.create({
   },
   doneButton: {
     backgroundColor: "#215433",
-    paddingHorizontal: 60,
+    paddingHorizontal: 100,
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 30,
     alignItems: "center",
+    minWidth: 280,
+    alignSelf: "stretch",
+    marginHorizontal: 40,
   },
   doneButtonText: {
     fontFamily: "InterBold",

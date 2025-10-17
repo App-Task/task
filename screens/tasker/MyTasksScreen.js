@@ -338,6 +338,9 @@ export default function TaskerMyTasksScreen() {
           })}
         </Text>
 
+        {/* Divider Line Above Title */}
+        <View style={{ height: 1, backgroundColor: "#e0e0e0", marginVertical: 6 }} />
+
         {/* Task Title */}
         <Text style={styles.taskTitle}>
           {(task || item).title || "Task Title"}
