@@ -8,6 +8,7 @@ import {
   Alert,
   ActivityIndicator,
   TextInput,
+  RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,8 +20,10 @@ import EmptyState from "../../components/EmptyState";
 import { useCallback } from "react";
 import Modal from "react-native-modal";
 import * as SecureStore from "expo-secure-store";
+import { useTranslation } from "react-i18next";
 
 export default function TaskerMyTasksScreen() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("bidSent"); // "bidSent", "active", "previous"
   const [tasks, setTasks] = useState([]);
@@ -32,6 +35,7 @@ export default function TaskerMyTasksScreen() {
   const [reportReason, setReportReason] = useState("");
   const [reportTask, setReportTask] = useState(null);
   const [isReporting, setIsReporting] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -104,10 +108,16 @@ export default function TaskerMyTasksScreen() {
       }
     } catch (err) {
       console.error("❌ Error loading data:", err.message);
-      Alert.alert("Error", "Failed to load data. Please try again.");
+      Alert.alert(t("taskerMyTasks.errorTitle"), t("taskerMyTasks.loadError"));
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadData();
   };
 
   const handleEditBid = async (item) => {
@@ -139,7 +149,7 @@ export default function TaskerMyTasksScreen() {
         
         if (!bid) {
           setEditingBidId(null);
-          Alert.alert("Error", "Bid not found for this task.");
+          Alert.alert(t("taskerMyTasks.errorTitle"), t("taskerMyTasks.bidNotFound"));
           return;
         }
       }
@@ -154,7 +164,7 @@ export default function TaskerMyTasksScreen() {
     } catch (err) {
       setEditingBidId(null);
       console.error("❌ Edit bid error:", err.message);
-      Alert.alert("Error", "Failed to load bid information.");
+      Alert.alert(t("taskerMyTasks.errorTitle"), t("taskerMyTasks.bidLoadError"));
     }
   };
 
@@ -182,22 +192,22 @@ export default function TaskerMyTasksScreen() {
         
         if (!bid) {
           setWithdrawingBidId(null);
-          Alert.alert("Error", "Bid not found for this task.");
+          Alert.alert(t("taskerMyTasks.errorTitle"), t("taskerMyTasks.bidNotFound"));
           return;
         }
       }
       
       Alert.alert(
-        "Withdraw Bid",
-        "Are you sure you want to withdraw this bid?",
+        t("taskerMyTasks.withdrawBid"),
+        t("taskerMyTasks.withdrawConfirm"),
         [
           { 
-            text: "Cancel", 
+            text: t("taskerMyTasks.cancel"), 
             style: "cancel",
             onPress: () => setWithdrawingBidId(null)
           },
           {
-            text: "Withdraw",
+            text: t("taskerMyTasks.withdraw"),
             style: "destructive",
             onPress: async () => {
               try {
@@ -211,7 +221,7 @@ export default function TaskerMyTasksScreen() {
                 );
                 
                 console.log("✅ Withdraw bid response:", response.data);
-                Alert.alert("Success", "Bid withdrawn successfully.");
+                Alert.alert(t("taskerMyTasks.success"), t("taskerMyTasks.withdrawSuccess"));
                 loadData(); // Refresh the data
                 setWithdrawingBidId(null);
               } catch (err) {
@@ -219,7 +229,7 @@ export default function TaskerMyTasksScreen() {
                 console.error("❌ Withdraw bid error:", err.message);
                 console.error("❌ Error response:", err.response?.data);
                 console.error("❌ Error status:", err.response?.status);
-                Alert.alert("Error", `Failed to withdraw bid: ${err.response?.data?.error || err.message}`);
+                Alert.alert(t("taskerMyTasks.errorTitle"), t("taskerMyTasks.withdrawError"));
               }
             },
           },
@@ -228,7 +238,7 @@ export default function TaskerMyTasksScreen() {
     } catch (err) {
       setWithdrawingBidId(null);
       console.error("❌ Withdraw bid error:", err.message);
-      Alert.alert("Error", "Failed to load bid information.");
+      Alert.alert(t("taskerMyTasks.errorTitle"), t("taskerMyTasks.bidLoadError"));
     }
   };
 
@@ -246,7 +256,7 @@ export default function TaskerMyTasksScreen() {
       } else if (item.taskId && typeof item.taskId === "string") {
         // It's a bid object with string taskId - this shouldn't happen with our new logic
         console.error("❌ Unexpected: bid has string taskId after population");
-        Alert.alert("Error", "Task data is not properly loaded.");
+        Alert.alert(t("taskerMyTasks.errorTitle"), t("taskerMyTasks.taskDataError"));
         return;
       } else {
         // It's already a task object (API returned tasks instead of bids)
@@ -262,21 +272,22 @@ export default function TaskerMyTasksScreen() {
     // Ensure task has required properties
     if (!task || !task._id) {
       console.error("❌ Task data missing:", { task, item, activeTab });
-      Alert.alert("Error", "Task information is not available.");
+      Alert.alert(t("taskerMyTasks.errorTitle"), t("taskerMyTasks.taskInfoError"));
       return;
     }
     
     // Ensure task has status property
     if (!task.status) {
-      task.status = "Pending"; // Default status
+      task.status = t("taskerMyTasks.statusTypes.pending"); // Default status
     }
     
     navigation.navigate("TaskerTaskDetails", { task });
   };
 
+
   const handleChat = (task) => {
     navigation.navigate("Chat", {
-      name: task.user?.name || "Client",
+      name: task.user?.name || t("taskerMyTasks.clientFallback"),
       otherUserId: task.user?._id || task.userId,
     });
   };
@@ -306,13 +317,13 @@ export default function TaskerMyTasksScreen() {
       setReportTask(null);
       
       Alert.alert(
-        "Report Submitted",
-        "Thank you for your report. We will review it shortly."
+        t("taskerMyTasks.reportedTitle"),
+        t("taskerMyTasks.reportedMessage")
       );
     } catch (err) {
       setIsReporting(false);
       console.error("❌ Report error:", err.message);
-      Alert.alert("Error", "Failed to submit report. Please try again.");
+      Alert.alert(t("taskerMyTasks.errorTitle"), t("taskerMyTasks.reportError"));
     }
   };
 
@@ -343,12 +354,12 @@ export default function TaskerMyTasksScreen() {
 
         {/* Task Title */}
         <Text style={styles.taskTitle}>
-          {(task || item).title || "Task Title"}
+          {(task || item).title || t("taskerMyTasks.taskTitleFallback")}
         </Text>
 
         {/* View Details Link */}
         <TouchableOpacity onPress={() => handleViewDetails(item)}>
-          <Text style={styles.viewDetailsLink}>View Details</Text>
+          <Text style={styles.viewDetailsLink}>{t("taskerMyTasks.viewDetails")}</Text>
         </TouchableOpacity>
 
         {/* Action Buttons */}
@@ -361,7 +372,7 @@ export default function TaskerMyTasksScreen() {
             {editingBidId === item._id ? (
               <ActivityIndicator size="small" color="#ffffff" />
             ) : (
-              <Text style={styles.actionButtonText}>Edit Bid</Text>
+              <Text style={styles.actionButtonText}>{t("taskerMyTasks.editBid")}</Text>
             )}
           </TouchableOpacity>
           <TouchableOpacity
@@ -372,7 +383,7 @@ export default function TaskerMyTasksScreen() {
             {withdrawingBidId === item._id ? (
               <ActivityIndicator size="small" color="#ffffff" />
             ) : (
-              <Text style={styles.actionButtonText}>Withdraw Bid</Text>
+              <Text style={styles.actionButtonText}>{t("taskerMyTasks.withdrawBid")}</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -416,11 +427,41 @@ export default function TaskerMyTasksScreen() {
       <View style={{ height: 1, backgroundColor: "#e0e0e0", marginVertical: 6 }} />
 
       {/* Task Title */}
-      <Text style={styles.taskTitle}>{item.title || "Task Title"}</Text>
+      <Text style={styles.taskTitle}>{item.title || t("taskerMyTasks.taskTitleFallback")}</Text>
+
+      {/* Status Text for Previous Tab */}
+      {activeTab === "previous" && (
+        <>
+          {item.status?.toLowerCase() === "completed" && (
+            <Text
+              style={{
+                fontFamily: "InterBold",
+                color: "#27a567",
+                marginTop: 4,
+                marginBottom: 8,
+              }}
+            >
+              {t("taskerMyTasks.statusTypes.completed")}
+            </Text>
+          )}
+          {item.status?.toLowerCase() === "cancelled" && (
+            <Text
+              style={{
+                fontFamily: "InterBold",
+                color: "#c00",
+                marginTop: 4,
+                marginBottom: 8,
+              }}
+            >
+              {t("taskerMyTasks.statusTypes.cancelled")}
+            </Text>
+          )}
+        </>
+      )}
 
       {/* View Task Details Link */}
       <TouchableOpacity onPress={() => handleViewDetails(item)}>
-        <Text style={styles.viewDetailsLink}>View Task Details</Text>
+        <Text style={styles.viewDetailsLink}>{t("taskerMyTasks.viewTaskDetails")}</Text>
       </TouchableOpacity>
 
       {/* Chat Button */}
@@ -429,7 +470,7 @@ export default function TaskerMyTasksScreen() {
           style={styles.chatButton}
           onPress={() => handleChat(item)}
         >
-          <Text style={styles.chatButtonText}>Chat</Text>
+          <Text style={styles.chatButtonText}>{t("taskerMyTasks.chat")}</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -440,23 +481,23 @@ export default function TaskerMyTasksScreen() {
       switch (activeTab) {
         case "bidSent":
           return {
-            title: "No Bids Sent",
-            subtitle: "Start bidding on tasks to see them here!"
+            title: t("taskerMyTasks.emptyBidSent.title"),
+            subtitle: t("taskerMyTasks.emptyBidSent.subtitle")
           };
         case "active":
           return {
-            title: "No Active Tasks",
-            subtitle: "When clients accept your bids, active tasks will appear here."
+            title: t("taskerMyTasks.emptyActive.title"),
+            subtitle: t("taskerMyTasks.emptyActive.subtitle")
           };
         case "previous":
           return {
-            title: "No Previous Tasks",
-            subtitle: "Completed and cancelled tasks will appear here."
+            title: t("taskerMyTasks.emptyPrevious.title"),
+            subtitle: t("taskerMyTasks.emptyPrevious.subtitle")
           };
         default:
           return {
-            title: "No Tasks Here",
-            subtitle: "Tasks will appear here when available."
+            title: t("taskerMyTasks.emptyDefault.title"),
+            subtitle: t("taskerMyTasks.emptyDefault.subtitle")
           };
       }
     };
@@ -476,14 +517,14 @@ export default function TaskerMyTasksScreen() {
           ]}
           onPress={() => setActiveTab("bidSent")}
         >
-          <Text
-            style={[
-              styles.segmentText,
-              activeTab === "bidSent" && styles.activeSegmentText,
-            ]}
-          >
-            Bid Sent
-          </Text>
+            <Text
+              style={[
+                styles.segmentText,
+                activeTab === "bidSent" && styles.activeSegmentText,
+              ]}
+            >
+              {t("taskerMyTasks.bidSent")}
+            </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -493,14 +534,14 @@ export default function TaskerMyTasksScreen() {
           ]}
           onPress={() => setActiveTab("active")}
         >
-          <Text
-            style={[
-              styles.segmentText,
-              activeTab === "active" && styles.activeSegmentText,
-            ]}
-          >
-            Active
-          </Text>
+            <Text
+              style={[
+                styles.segmentText,
+                activeTab === "active" && styles.activeSegmentText,
+              ]}
+            >
+              {t("taskerMyTasks.active")}
+            </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -510,21 +551,21 @@ export default function TaskerMyTasksScreen() {
           ]}
           onPress={() => setActiveTab("previous")}
         >
-          <Text
-            style={[
-              styles.segmentText,
-              activeTab === "previous" && styles.activeSegmentText,
-            ]}
-          >
-            Previous
-          </Text>
+            <Text
+              style={[
+                styles.segmentText,
+                activeTab === "previous" && styles.activeSegmentText,
+              ]}
+            >
+              {t("taskerMyTasks.previous")}
+            </Text>
         </TouchableOpacity>
       </View>
 
       {/* Content */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#215433" />
+          <ActivityIndicator size="large" color="#000000" />
         </View>
       ) : (
         <FlatList
@@ -532,6 +573,15 @@ export default function TaskerMyTasksScreen() {
           keyExtractor={(item) => item._id}
           renderItem={activeTab === "bidSent" ? renderBidCard : renderTaskCard}
           ListEmptyComponent={renderEmpty}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#000000"
+              colors={["#000000"]}
+              progressBackgroundColor="#ffffff"
+            />
+          }
           contentContainerStyle={[
             styles.listContainer,
             (activeTab === "bidSent" ? bids : tasks).length === 0 && styles.emptyListContainer
@@ -545,23 +595,23 @@ export default function TaskerMyTasksScreen() {
         <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20 }}>
           {isReporting ? (
             <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40 }}>
-              <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 12 }} />
+              <ActivityIndicator size="large" color="#000000" style={{ marginBottom: 12 }} />
               <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#215433" }}>
-                Submitting report...
+                {t("taskerMyTasks.submittingReport")}
               </Text>
             </View>
           ) : (
             <>
               <Text style={{ fontFamily: "InterBold", fontSize: 18, color: "#215433", marginBottom: 12, textAlign: "center" }}>
-                Report Client
+                {t("taskerMyTasks.reportClient")}
               </Text>
 
               <Text style={{ fontFamily: "Inter", fontSize: 14, color: "#666", marginBottom: 16, textAlign: "center" }}>
-                Please describe the issue with this client:
+                {t("taskerMyTasks.reportPrompt")}
               </Text>
 
               <TextInput
-                placeholder="Describe the issue..."
+                placeholder={t("taskerMyTasks.reportPlaceholder")}
                 placeholderTextColor="#999"
                 value={reportReason}
                 onChangeText={(text) => {
@@ -584,7 +634,7 @@ export default function TaskerMyTasksScreen() {
               />
 
               <Text style={{ fontFamily: "Inter", fontSize: 12, color: "#999", marginBottom: 20 }}>
-                {reportReason.length}/300 characters
+                {reportReason.length}/300 {t("taskerMyTasks.characters")}
               </Text>
 
               <View style={{ flexDirection: "row", gap: 12 }}>
@@ -603,7 +653,7 @@ export default function TaskerMyTasksScreen() {
                   }}
                 >
                   <Text style={{ color: "#666", fontFamily: "InterBold", fontSize: 16 }}>
-                    Cancel
+                    {t("taskerMyTasks.cancel")}
                   </Text>
                 </TouchableOpacity>
 
@@ -619,7 +669,7 @@ export default function TaskerMyTasksScreen() {
                   disabled={!reportReason.trim()}
                 >
                   <Text style={{ color: "#fff", fontFamily: "InterBold", fontSize: 16 }}>
-                    Submit
+                    {t("taskerMyTasks.reportSubmit")}
                   </Text>
                 </TouchableOpacity>
               </View>

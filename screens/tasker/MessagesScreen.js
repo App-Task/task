@@ -7,7 +7,8 @@ import {
   I18nManager,
   StyleSheet,
   ActivityIndicator,
-  TextInput, // ✅ added
+  TextInput,
+  RefreshControl,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -136,8 +137,15 @@ export default function TaskerMessagesScreen({ navigation }) {
           renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor="#000000"
+              colors={["#000000"]}
+              progressBackgroundColor="#ffffff"
+            />
+          }
         />
       )}
     </View>

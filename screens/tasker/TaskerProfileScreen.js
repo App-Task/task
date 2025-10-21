@@ -210,7 +210,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <ActivityIndicator size="large" color="#215432" style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color="#000000" style={{ marginTop: 40 }} />
       </SafeAreaView>
     );
   }
@@ -560,7 +560,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
         <View style={styles.modalContainer}>
           {isReporting ? (
             <View style={styles.modalContent}>
-              <ActivityIndicator size="large" color="#215432" style={{ marginBottom: 10 }} />
+              <ActivityIndicator size="large" color="#000000" style={{ marginBottom: 10 }} />
               <Text style={styles.modalText}>Submitting report...</Text>
             </View>
           ) : (

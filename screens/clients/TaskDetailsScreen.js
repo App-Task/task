@@ -171,7 +171,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="#215433" style={{ marginTop: 100 }} />
+        <ActivityIndicator size="large" color="#000000" style={{ marginTop: 100 }} />
       </SafeAreaView>
     );
   }

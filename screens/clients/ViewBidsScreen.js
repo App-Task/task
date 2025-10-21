@@ -313,7 +313,7 @@ export default function ViewBidsScreen({ route, navigation }) {
       {accepting && (
         <View style={styles.acceptingOverlay}>
           <View style={styles.acceptingBox}>
-            <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 10 }} />
+            <ActivityIndicator size="large" color="#000000" style={{ marginBottom: 10 }} />
             <Text style={styles.acceptingText}>{t("clientViewBids.acceptingBid")}</Text>
           </View>
         </View>

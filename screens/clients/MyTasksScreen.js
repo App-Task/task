@@ -13,6 +13,7 @@ import {
   Keyboard,
   ScrollView,
   Image,
+  RefreshControl,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import * as SecureStore from "expo-secure-store";
@@ -135,15 +136,14 @@ export default function MyTasksScreen({ navigation, route }) {
   const [reportTask, setReportTask] = useState(null);
   const [completing, setCompleting] = useState(false);
   const [canceling, setCanceling] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchTasks = async () => {
-        try {
-          setLoading(true);
-          const userId = await SecureStore.getItemAsync("userId");
-          if (!userId) throw new Error("No user ID");
-          setUserId(userId);
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const userId = await SecureStore.getItemAsync("userId");
+      if (!userId) throw new Error("No user ID");
+      setUserId(userId);
           
       
           const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
@@ -194,16 +194,22 @@ allTasks.forEach((task) => {
             }
           }
       
-        } catch (err) {
-          console.error("❌ Failed to fetch tasks:", err.message);
-          Alert.alert(t("clientMyTasks.errorTitle"), t("clientMyTasks.fetchError"));
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      
-  
+      } catch (err) {
+        console.error("❌ Failed to fetch tasks:", err.message);
+        Alert.alert(t("clientMyTasks.errorTitle"), t("clientMyTasks.fetchError"));
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchTasks();
+  };
+
+  useFocusEffect(
+    useCallback(() => {
       const handleReviewIntent = async () => {
         if (route?.params?.showReview && route?.params?.completedTask) {
           const task = route.params.completedTask;
@@ -605,7 +611,7 @@ allTasks.forEach((task) => {
             <View style={{ backgroundColor: "#fff", padding: 24, borderRadius: 20, maxHeight: "80%" }}>
               {submittingReview ? (
                 <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40 }}>
-                  <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 12 }} />
+                  <ActivityIndicator size="large" color="#000000" style={{ marginBottom: 12 }} />
                   <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#215433" }}>
                     {t("clientReview.submitting", "Submitting review...")}
                   </Text>
@@ -778,7 +784,7 @@ allTasks.forEach((task) => {
 
       {/* Task List */}
       {loading ? (
-  <ActivityIndicator size="large" color="#215433" style={{ marginTop: 40 }} />
+  <ActivityIndicator size="large" color="#000000" style={{ marginTop: 40 }} />
 ) : (
   <>
     {activeTab === "Previous" ? (
@@ -803,6 +809,15 @@ allTasks.forEach((task) => {
       data={groupedTasks[previousSubTab]}
       keyExtractor={(item) => item._id}
       renderItem={renderTask}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor="#000000"
+          colors={["#000000"]}
+          progressBackgroundColor="#ffffff"
+        />
+      }
       ListEmptyComponent={
         <EmptyState 
           title={`No ${t(`clientMyTasks.${previousSubTab.toLowerCase()}`)} Tasks`}
@@ -821,6 +836,15 @@ allTasks.forEach((task) => {
         data={groupedTasks[activeTab]}
         keyExtractor={(item) => item._id}
         renderItem={renderTask}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#000000"
+            colors={["#000000"]}
+            progressBackgroundColor="#ffffff"
+          />
+        }
         ListEmptyComponent={
           <EmptyState 
             title={`No ${t(`clientMyTasks.${activeTab.toLowerCase()}`)} Tasks`}
@@ -856,7 +880,7 @@ allTasks.forEach((task) => {
       borderRadius: 20,
       alignItems: "center",
     }}>
-      <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 10 }} />
+      <ActivityIndicator size="large" color="#000000" style={{ marginBottom: 10 }} />
       <Text style={{ fontFamily: "InterBold", fontSize: 16, color: "#215433" }}>
         {t("clientReview.submitting", "Submitting review...")}
       </Text>
@@ -881,7 +905,7 @@ allTasks.forEach((task) => {
       borderRadius: 16,
       alignItems: "center",
     }}>
-      <ActivityIndicator size="large" color="#215433" />
+      <ActivityIndicator size="large" color="#000000" />
       <Text style={{ fontFamily: "InterBold", marginTop: 10, color: "#215433" }}>
         {t("clientMyTasks.submittingReport")}
       </Text>

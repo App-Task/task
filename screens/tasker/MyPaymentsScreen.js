@@ -71,7 +71,7 @@ export default function MyPaymentsScreen() {
       </View>
 
       {loading ? (
-        <ActivityIndicator color="#215433" size="large" style={{ marginTop: 40 }} />
+        <ActivityIndicator color="#000000" size="large" style={{ marginTop: 40 }} />
       ) : payments.length === 0 ? (
         <EmptyState 
           title="No Payments Yet" 

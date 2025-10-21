@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   I18nManager,
   StyleSheet,
+  RefreshControl,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,8 +19,17 @@ const samplePayments = [
 
 export default function MyPaymentsScreen({ navigation }) {
   const { t } = useTranslation();
+  const [refreshing, setRefreshing] = useState(false);
 
   const total = samplePayments.reduce((acc, p) => acc + p.amount, 0);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    // Simulate API call
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -64,6 +74,15 @@ export default function MyPaymentsScreen({ navigation }) {
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#000000"
+            colors={["#000000"]}
+            progressBackgroundColor="#ffffff"
+          />
+        }
       />
     </View>
   );

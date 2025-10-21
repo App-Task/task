@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   StyleSheet,
+  RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
@@ -19,9 +20,9 @@ export default function MyReviewsScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState("0.0");
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const fetchReviews = async () => {
+  const fetchReviews = async () => {
       try {
         const user = await fetchCurrentUser();
         const response = await axios.get(
@@ -42,9 +43,16 @@ export default function MyReviewsScreen({ navigation }) {
         setReviews([]);
       } finally {
         setLoading(false);
+        setRefreshing(false);
       }
     };
-    
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchReviews();
+  };
+
+  useEffect(() => {
     fetchReviews();
   }, []);
 
@@ -108,7 +116,7 @@ export default function MyReviewsScreen({ navigation }) {
       {/* Reviews List */}
       {loading ? (
         <ActivityIndicator 
-          color="#215433" 
+          color="#000000" 
           size="large" 
           style={styles.loading} 
         />
@@ -124,6 +132,15 @@ export default function MyReviewsScreen({ navigation }) {
           data={reviews}
           keyExtractor={(item) => item._id || Math.random().toString()}
           renderItem={renderReviewItem}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#000000"
+              colors={["#000000"]}
+              progressBackgroundColor="#ffffff"
+            />
+          }
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
         />

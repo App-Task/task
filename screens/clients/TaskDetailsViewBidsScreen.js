@@ -14,6 +14,7 @@ import {
   I18nManager,
   Linking,
   TextInput,
+  RefreshControl,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
@@ -50,6 +51,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
   const [reportReason, setReportReason] = useState("");
   const [isReporting, setIsReporting] = useState(false);
   const [reportBid, setReportBid] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (isFocused) {
@@ -102,6 +104,15 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
       Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.loadTaskError"));
     } finally {
       setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchTask();
+    if (tasker && tasker._id) {
+      await fetchTaskerProfile(tasker._id);
     }
   };
 
@@ -425,7 +436,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <ActivityIndicator size="large" color="#215433" style={{ marginTop: 100 }} />
+        <ActivityIndicator size="large" color="#000000" style={{ marginTop: 100 }} />
       </SafeAreaView>
     );
   }
@@ -497,7 +508,19 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
           )}
         </View>
         {activeTab === "details" ? (
-          <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <ScrollView 
+            style={styles.scrollView} 
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor="#000000"
+                colors={["#000000"]}
+                progressBackgroundColor="#ffffff"
+              />
+            }
+          >
             {/* Spacing */}
             <View style={styles.spacing} />
 
@@ -692,7 +715,19 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
         ) : activeTab === "profile" ? (
           <>
             {tasker ? (
-              <ScrollView style={styles.profileScrollView} contentContainerStyle={styles.profileScrollContent}>
+              <ScrollView 
+                style={styles.profileScrollView} 
+                contentContainerStyle={styles.profileScrollContent}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    tintColor="#000000"
+                    colors={["#000000"]}
+                    progressBackgroundColor="#ffffff"
+                  />
+                }
+              >
                 {/* Big centered avatar */}
                 <View style={styles.avatarWrap}>
                   {tasker.profileImage ? (
@@ -784,7 +819,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
               </ScrollView>
             ) : (
               <View style={styles.profileLoadingContainer}>
-                <ActivityIndicator size="large" color="#215432" />
+                <ActivityIndicator size="large" color="#000000" />
                 <Text style={styles.profileLoadingText}>Loading tasker profile...</Text>
               </View>
             )}
@@ -809,7 +844,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
       {completing && (
         <View style={styles.overlay}>
           <View style={styles.overlayBox}>
-            <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 10 }} />
+            <ActivityIndicator size="large" color="#000000" style={{ marginBottom: 10 }} />
             <Text style={styles.overlayText}>{t("clientTaskDetails.completingTask")}</Text>
           </View>
         </View>
@@ -818,7 +853,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
       {canceling && (
         <View style={styles.overlay}>
           <View style={styles.overlayBox}>
-            <ActivityIndicator size="large" color="#215433" style={{ marginBottom: 10 }} />
+            <ActivityIndicator size="large" color="#000000" style={{ marginBottom: 10 }} />
             <Text style={styles.overlayText}>{t("clientTaskDetails.cancelingTask")}</Text>
           </View>
         </View>
@@ -829,7 +864,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
         <View style={styles.modalContainer}>
           {isReporting ? (
             <View style={styles.modalContent}>
-              <ActivityIndicator size="large" color="#215432" style={{ marginBottom: 10 }} />
+              <ActivityIndicator size="large" color="#000000" style={{ marginBottom: 10 }} />
               <Text style={styles.modalText}>Submitting report...</Text>
             </View>
           ) : (

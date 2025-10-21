@@ -599,7 +599,40 @@
    "verifyPending": "مستنداتك ما زالت تحتاج للمراجعة (قد يستغرق الأمر حتى 48 ساعة)،",
    "contactUs": "تواصل معنا",
    "submittingReport": "جاري إرسال البلاغ...",
-   "cancelling": "جاري الإلغاء..."
+   "cancelling": "جاري الإلغاء...",
+   "viewTaskDetails": "عرض تفاصيل المهمة",
+   "reportPrompt": "يرجى وصف المشكلة مع هذا العميل:",
+   "reportPlaceholder": "وصف المشكلة...",
+   "bidNotFound": "لم يتم العثور على عرض لهذه المهمة.",
+   "bidLoadError": "فشل في تحميل معلومات العرض.",
+   "taskDataError": "بيانات المهمة غير محملة بشكل صحيح.",
+   "taskInfoError": "معلومات المهمة غير متوفرة.",
+   "withdrawBid": "سحب العرض",
+   "withdrawConfirm": "هل أنت متأكد من سحب هذا العرض؟",
+   "withdraw": "سحب",
+   "withdrawSuccess": "تم سحب العرض بنجاح.",
+   "withdrawError": "فشل في سحب العرض.",
+   "editBid": "تعديل العرض",
+   "success": "نجح",
+   "taskTitleFallback": "عنوان المهمة",
+   "clientFallback": "العميل",
+   "characters": "حرف",
+   "emptyBidSent": {
+     "title": "لا توجد عروض مرسلة",
+     "subtitle": "ابدأ في تقديم العروض على المهام لتراها هنا!"
+   },
+   "emptyActive": {
+     "title": "لا توجد مهام نشطة",
+     "subtitle": "عندما يقبل العملاء عروضك، ستظهر المهام النشطة هنا."
+   },
+   "emptyPrevious": {
+     "title": "لا توجد مهام سابقة",
+     "subtitle": "المهام المكتملة والملغاة ستظهر هنا."
+   },
+   "emptyDefault": {
+     "title": "لا توجد مهام هنا",
+     "subtitle": "ستظهر المهام هنا عند توفرها."
+   }
   },
    "taskerNotifications": {
      "title": "الإشعارات",

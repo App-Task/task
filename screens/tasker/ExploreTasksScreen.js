@@ -364,15 +364,19 @@ export default function ExploreTasksScreen({ navigation }) {
     <View style={{ flex: 1 }}>
       <ScrollView 
         style={styles.container}
-        contentContainerStyle={filteredTasks.length === 0 ? styles.emptyScrollContainer : undefined}
+        contentContainerStyle={filteredTasks.length === 0 ? styles.emptyScrollContainer : { paddingBottom: 40 }}
         refreshControl={
           <RefreshControl 
             refreshing={refreshing} 
             onRefresh={handleRefresh}
-            tintColor="#215432"
-            colors={["#215432"]}
+            tintColor="#000000"
+            colors={["#000000"]}
+            progressBackgroundColor="#ffffff"
+            progressViewOffset={60}
           />
         }
+        showsVerticalScrollIndicator={false}
+        alwaysBounceVertical={true}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -399,7 +403,7 @@ export default function ExploreTasksScreen({ navigation }) {
 
         {/* Task Cards */}
         {loading ? (
-          <ActivityIndicator size="large" color="#215433" style={styles.loading} />
+          <ActivityIndicator size="large" color="#000000" style={styles.loading} />
         ) : filteredTasks.length === 0 ? (
           <EmptyState 
             title="No Tasks Available" 

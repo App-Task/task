@@ -7,7 +7,8 @@ import {
   I18nManager,
   StyleSheet,
   ActivityIndicator,
-  TextInput, // ✅ Add this
+  TextInput,
+  RefreshControl,
 } from "react-native";
 
 import { useTranslation } from "react-i18next";
@@ -115,7 +116,7 @@ export default function MessagesScreen({ navigation }) {
 
 
       {loading && conversations.length === 0 ? (
-        <ActivityIndicator size="large" color="#215433" style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color="#000000" style={{ marginTop: 40 }} />
       ) : conversations.length === 0 ? (
         <EmptyState 
           title="No Messages Yet" 
@@ -130,8 +131,15 @@ export default function MessagesScreen({ navigation }) {
   renderItem={renderItem}
   contentContainerStyle={{ paddingBottom: 40 }}
   showsVerticalScrollIndicator={false}
-  refreshing={refreshing}          // ✅ enable pull-down indicator
-  onRefresh={() => fetchConversations(true)} // 👈 explicitly mark as refresh
+  refreshControl={
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={() => fetchConversations(true)}
+      tintColor="#000000"
+      colors={["#000000"]}
+      progressBackgroundColor="#ffffff"
+    />
+  }
 />
 
 
