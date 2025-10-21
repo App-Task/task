@@ -17,6 +17,7 @@ import { getToken } from "../../services/authStorage";
 import { fetchCurrentUser } from "../../services/auth";
 import { useFocusEffect } from "@react-navigation/native";
 import EmptyState from "../../components/EmptyState";
+import VerificationPopup from "../../components/VerificationPopup";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function ExploreTasksScreen({ navigation }) {
@@ -28,6 +29,7 @@ export default function ExploreTasksScreen({ navigation }) {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [showVerificationPopup, setShowVerificationPopup] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedTasks, setExpandedTasks] = useState(new Set());
@@ -241,7 +243,17 @@ export default function ExploreTasksScreen({ navigation }) {
           style={styles.bidButton}
           onPress={(e) => {
             e.stopPropagation(); // Prevent card navigation when pressing Bid button
-            navigation.navigate("TaskerTaskDetails", { task });
+            console.log("Bid button pressed, currentUser:", currentUser);
+            console.log("isVerified:", currentUser?.isVerified);
+            // Temporarily force show popup for testing
+            setShowVerificationPopup(true);
+            // if (currentUser && !currentUser.isVerified) {
+            //   console.log("Showing verification popup");
+            //   setShowVerificationPopup(true);
+            // } else {
+            //   console.log("Navigating to task details");
+            //   navigation.navigate("TaskerTaskDetails", { task });
+            // }
           }}
         >
           <Text style={styles.bidButtonText}>Bid on Task</Text>
@@ -355,53 +367,61 @@ export default function ExploreTasksScreen({ navigation }) {
   );
 
   return (
-    <ScrollView 
-      style={styles.container}
-      contentContainerStyle={filteredTasks.length === 0 ? styles.emptyScrollContainer : undefined}
-      refreshControl={
-        <RefreshControl 
-          refreshing={refreshing} 
-          onRefresh={handleRefresh}
-          tintColor="#215432"
-          colors={["#215432"]}
-        />
-      }
-    >
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Text style={styles.greeting}>Hi {currentUser?.name || "Tariq"},</Text>
-          <Text style={styles.welcomeText}>Welcome to TASK!</Text>
-        </View>
-        <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-          <View style={styles.notificationIconContainer}>
-            <Ionicons name="notifications-outline" size={24} color="#215433" />
-            {(unreadMessages > 0 || unreadNotifications > 0) && <View style={styles.headerNotificationDot} />}
+    <View style={{ flex: 1 }}>
+      <ScrollView 
+        style={styles.container}
+        contentContainerStyle={filteredTasks.length === 0 ? styles.emptyScrollContainer : undefined}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={handleRefresh}
+            tintColor="#215432"
+            colors={["#215432"]}
+          />
+        }
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <Text style={styles.greeting}>Hi {currentUser?.name || "Tariq"},</Text>
+            <Text style={styles.welcomeText}>Welcome to TASK!</Text>
           </View>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+            <View style={styles.notificationIconContainer}>
+              <Ionicons name="notifications-outline" size={24} color="#215433" />
+              {(unreadMessages > 0 || unreadNotifications > 0) && <View style={styles.headerNotificationDot} />}
+            </View>
+          </TouchableOpacity>
+        </View>
 
-      {/* Verification or Messages Card */}
-      {!currentUser?.isVerified ? renderVerificationCard() : renderUnreadMessagesCard()}
+        {/* Verification or Messages Card */}
+        {!currentUser?.isVerified ? renderVerificationCard() : renderUnreadMessagesCard()}
 
-      {/* Waiting on Task Card */}
-      {renderWaitingOnTaskCard()}
+        {/* Waiting on Task Card */}
+        {renderWaitingOnTaskCard()}
 
-      {/* Search Section */}
-      {renderSearchSection()}
+        {/* Search Section */}
+        {renderSearchSection()}
 
-      {/* Task Cards */}
-      {loading ? (
-        <ActivityIndicator size="large" color="#215433" style={styles.loading} />
-      ) : filteredTasks.length === 0 ? (
-        <EmptyState 
-          title="No Tasks Available" 
-          subtitle="No tasks match your current filters. Try adjusting your search or filters to find more tasks."
-        />
-      ) : (
-        filteredTasks.map((task, index) => renderTaskCard(task, index))
-      )}
-    </ScrollView>
+        {/* Task Cards */}
+        {loading ? (
+          <ActivityIndicator size="large" color="#215433" style={styles.loading} />
+        ) : filteredTasks.length === 0 ? (
+          <EmptyState 
+            title="No Tasks Available" 
+            subtitle="No tasks match your current filters. Try adjusting your search or filters to find more tasks."
+          />
+        ) : (
+          filteredTasks.map((task, index) => renderTaskCard(task, index))
+        )}
+      </ScrollView>
+
+      {/* Verification Popup */}
+      <VerificationPopup
+        visible={showVerificationPopup}
+        onClose={() => setShowVerificationPopup(false)}
+      />
+    </View>
   );
 }
 

@@ -1371,7 +1371,7 @@ const styles = StyleSheet.create({
       backgroundColor: "#ffffff",
       borderWidth: 1,
       borderColor: "#215432", // App's green border
-      borderRadius: 8,
+      borderRadius: 25,
       paddingVertical: 12,
       alignItems: "center",
       justifyContent: "center",

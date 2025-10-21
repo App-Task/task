@@ -143,6 +143,7 @@ export default function PostTaskPage2() {
   // Open the map picker
   const openMapPicker = async () => {
     try {
+      // Prepare tempRegion and tempCoords BEFORE opening modal
       if (coords) {
         setTempCoords(coords);
         setTempRegion({
@@ -176,6 +177,9 @@ export default function PostTaskPage2() {
           });
         }
       }
+      
+      // Wait a tick to ensure state is updated before showing modal
+      await new Promise(resolve => setTimeout(resolve, 100));
       setMapVisible(true);
     } catch (e) {
       console.log("openMapPicker error", e);
@@ -832,10 +836,10 @@ const styles = StyleSheet.create({
   // Map modal styles
   mapModalContainer: {
     flex: 1,
-    backgroundColor: "rgba(248, 246, 247)",
+    backgroundColor: "rgba(248, 246, 247, 1)",
   },
   mapHeaderContainer: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247, 1)",
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
     paddingBottom: 16,
@@ -876,7 +880,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "rgba(248, 246, 247, 1)",
   },
   mapLoadingText: {
     fontSize: 16,
@@ -888,7 +892,7 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 20,
     paddingBottom: 24,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(248, 246, 247, 1)",
     borderTopWidth: 1,
     borderTopColor: "#f0f0f0",
     shadowColor: "#000",

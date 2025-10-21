@@ -17,6 +17,7 @@ import { fetchCurrentUser } from "../../services/auth";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import EmptyIllustration from "../../components/EmptyIllustration";
+import VerificationPopup from "../../components/VerificationPopup";
 
 export default function TaskerTaskDetailsScreen({ route }) {
   const { task: initialTask } = route.params;
@@ -29,6 +30,7 @@ export default function TaskerTaskDetailsScreen({ route }) {
   const [loadingBid, setLoadingBid] = useState(true);
   const [coords, setCoords] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [showVerificationPopup, setShowVerificationPopup] = useState(false);
 
   const isBiddingAllowed = task.status === "Pending";
 
@@ -280,10 +282,14 @@ export default function TaskerTaskDetailsScreen({ route }) {
         <TouchableOpacity
           style={[
             styles.submitButton,
-            (!isVerified || !isBiddingAllowed) && styles.submitButtonDisabled
+            !isBiddingAllowed && styles.submitButtonDisabled
           ]}
           onPress={() => {
             if (isBiddingAllowed) {
+              if (!isVerified) {
+                setShowVerificationPopup(true);
+                return;
+              }
               if (existingBid) {
                 navigation.navigate("EditBid", { task, existingBid });
               } else {
@@ -291,7 +297,7 @@ export default function TaskerTaskDetailsScreen({ route }) {
               }
             }
           }}
-          disabled={false}
+          disabled={!isBiddingAllowed}
         >
           <Text style={styles.submitButtonText}>
             {!isBiddingAllowed
@@ -320,6 +326,12 @@ export default function TaskerTaskDetailsScreen({ route }) {
           />
         </View>
       )}
+
+      {/* Verification Popup */}
+      <VerificationPopup
+        visible={showVerificationPopup}
+        onClose={() => setShowVerificationPopup(false)}
+      />
     </SafeAreaView>
   );
 }
