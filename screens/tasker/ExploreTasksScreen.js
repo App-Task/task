@@ -10,6 +10,8 @@ import {
   Alert,
   RefreshControl,
   TextInput,
+  Platform,
+  StatusBar,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -437,7 +439,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingTop: 80,
+    paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight || 0) + 20 : 80,
     paddingBottom: 20,
   },
   headerLeft: {

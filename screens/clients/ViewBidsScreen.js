@@ -7,15 +7,17 @@ import {
   Dimensions,
   Alert,
   StyleSheet,
-  SafeAreaView,
   Image,
+  Platform,
+  StatusBar,
+  ActivityIndicator,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
-import { ActivityIndicator } from "react-native";
 import EmptyState from "../../components/EmptyState";
 
 const { width } = Dimensions.get("window");

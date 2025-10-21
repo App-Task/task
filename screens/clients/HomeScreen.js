@@ -7,6 +7,8 @@ import {
   I18nManager,
   Alert,
   ScrollView,
+  Platform,
+  StatusBar,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import * as SecureStore from "expo-secure-store";
@@ -167,7 +169,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    paddingTop: 80,
+    paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight || 0) + 20 : 80,
     paddingHorizontal: 24,
     paddingBottom: 20,
   },
