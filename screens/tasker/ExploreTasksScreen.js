@@ -243,17 +243,11 @@ export default function ExploreTasksScreen({ navigation }) {
           style={styles.bidButton}
           onPress={(e) => {
             e.stopPropagation(); // Prevent card navigation when pressing Bid button
-            console.log("Bid button pressed, currentUser:", currentUser);
-            console.log("isVerified:", currentUser?.isVerified);
-            // Temporarily force show popup for testing
-            setShowVerificationPopup(true);
-            // if (currentUser && !currentUser.isVerified) {
-            //   console.log("Showing verification popup");
-            //   setShowVerificationPopup(true);
-            // } else {
-            //   console.log("Navigating to task details");
-            //   navigation.navigate("TaskerTaskDetails", { task });
-            // }
+            if (currentUser && !currentUser.isVerified) {
+              setShowVerificationPopup(true);
+            } else {
+              navigation.navigate("TaskerTaskDetails", { task });
+            }
           }}
         >
           <Text style={styles.bidButtonText}>Bid on Task</Text>
