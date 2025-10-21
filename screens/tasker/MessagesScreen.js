@@ -42,8 +42,13 @@ export default function TaskerMessagesScreen({ navigation }) {
       const sorted = res.data.sort(
         (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
       );
+      
+      // Remove duplicates based on otherUserId
+      const uniqueConversations = sorted.filter((conversation, index, self) =>
+        index === self.findIndex((c) => c.otherUserId === conversation.otherUserId)
+      );
   
-      setConversations(sorted);
+      setConversations(uniqueConversations);
     } catch (err) {
       console.error("Failed to load conversations:", err.message);
     } finally {
@@ -133,7 +138,7 @@ export default function TaskerMessagesScreen({ navigation }) {
           data={conversations.filter((c) =>
             c.name?.toLowerCase().includes(searchQuery.toLowerCase())
           )}
-          keyExtractor={(item) => item.otherUserId}
+          keyExtractor={(item, index) => item.otherUserId || `conversation-${index}`}
           renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
@@ -178,6 +183,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
   },
   name: {
     fontFamily: "InterBold",
