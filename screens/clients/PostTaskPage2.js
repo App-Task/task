@@ -220,11 +220,11 @@ export default function PostTaskPage2() {
     }
   
     Alert.alert(
-      t("clientPostTask.uploadChoiceTitle", { defaultValue: "Choose Image Source" }),
-      t("clientPostTask.uploadChoiceMsg", { defaultValue: "How would you like to upload the image?" }),
+      t("clientPostTask.page2.uploadChoiceTitle"),
+      t("clientPostTask.page2.uploadChoiceMsg"),
       [
         {
-          text: t("clientPostTask.takePhoto", { defaultValue: "Take Photo" }),
+          text: t("clientPostTask.page2.takePhoto"),
           onPress: async () => {
             const { status } = await ImagePicker.requestCameraPermissionsAsync();
             if (status !== "granted") {
@@ -243,7 +243,7 @@ export default function PostTaskPage2() {
           },
         },
         {
-          text: t("clientPostTask.chooseFromLibrary", { defaultValue: "Choose from Library" }),
+          text: t("clientPostTask.page2.chooseFromLibrary"),
           onPress: async () => {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== "granted") {
@@ -263,7 +263,7 @@ export default function PostTaskPage2() {
           },
         },
         {
-          text: t("clientPostTask.cancel", { defaultValue: "Cancel" }),
+          text: t("clientPostTask.cancel"),
           style: "cancel",
         },
       ]
@@ -456,7 +456,7 @@ export default function PostTaskPage2() {
         {imageUploading && (
           <View style={styles.loadingOverlay}>
             <View style={styles.loadingBox}>
-              <Text style={styles.loadingText}>Uploading image...</Text>
+              <Text style={styles.loadingText}>{t("clientPostTask.page2.uploadingImage")}</Text>
             </View>
           </View>
         )}
@@ -491,11 +491,11 @@ export default function PostTaskPage2() {
                     color="#215432"
                   />
                 </TouchableOpacity>
-                <Text style={styles.modalHeader}>Select Task Location</Text>
+                <Text style={styles.modalHeader}>{t("clientPostTask.page2.selectTaskLocation")}</Text>
                 <View style={{ width: 40 }} />
               </View>
               <Text style={styles.modalHeaderSubtitle}>
-                Tap on the map to select your task location
+                {t("clientPostTask.page2.mapInstructions")}
               </Text>
             </View>
 
@@ -521,16 +521,16 @@ export default function PostTaskPage2() {
               </MapView>
             ) : (
               <View style={styles.mapLoadingContainer}>
-                <Text style={styles.mapLoadingText}>Loading map...</Text>
+                <Text style={styles.mapLoadingText}>{t("clientPostTask.page2.loadingMap")}</Text>
               </View>
             )}
 
             <View style={styles.mapFooter}>
               <TouchableOpacity style={[styles.mapBtn, styles.mapCancel]} onPress={() => setMapVisible(false)}>
-                <Text style={styles.mapBtnText}>Cancel</Text>
+                <Text style={styles.mapBtnText}>{t("clientPostTask.cancel")}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.mapBtn, styles.mapConfirm]} onPress={confirmMapLocation}>
-                <Text style={[styles.mapBtnText, { color: "#fff" }]}>Confirm Location</Text>
+                <Text style={[styles.mapBtnText, { color: "#fff" }]}>{t("clientPostTask.page2.confirmLocation")}</Text>
               </TouchableOpacity>
             </View>
           </SafeAreaView>

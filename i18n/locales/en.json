@@ -270,7 +270,16 @@
       "descriptionTooShort": "Task description must be at least 25 characters long.",
       "pleaseAddAddress": "Please add a task address",
       "maxCharacters100": "Maximum 100 characters",
-      "maxCharacters150": "Maximum 150 characters"
+      "maxCharacters150": "Maximum 150 characters",
+      "uploadChoiceTitle": "Choose Image Source",
+      "uploadChoiceMsg": "How would you like to upload the image?",
+      "takePhoto": "Take Photo",
+      "chooseFromLibrary": "Choose from Library",
+      "uploadingImage": "Uploading image...",
+      "selectTaskLocation": "Select Task Location",
+      "mapInstructions": "Tap on the map to select your task location",
+      "loadingMap": "Loading map...",
+      "confirmLocation": "Confirm Location"
     },
     "page3": {
       "title": "Post a Task",

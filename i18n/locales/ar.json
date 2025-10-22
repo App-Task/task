@@ -284,7 +284,16 @@
        "descriptionTooShort": "وصف المهمة يجب أن يكون 25 حرفًا على الأقل.",
        "pleaseAddAddress": "يرجى إضافة عنوان المهمة",
        "maxCharacters100": "100 حرف كحد أقصى",
-       "maxCharacters150": "150 حرف كحد أقصى"
+       "maxCharacters150": "150 حرف كحد أقصى",
+       "uploadChoiceTitle": "اختر مصدر الصورة",
+       "uploadChoiceMsg": "كيف تريد رفع الصورة؟",
+       "takePhoto": "التقاط صورة",
+       "chooseFromLibrary": "اختيار من المكتبة",
+       "uploadingImage": "جاري رفع الصورة...",
+       "selectTaskLocation": "اختر موقع المهمة",
+       "mapInstructions": "اضغط على الخريطة لاختيار موقع مهمتك",
+       "loadingMap": "جاري تحميل الخريطة...",
+       "confirmLocation": "تأكيد الموقع"
      },
      "page3": {
        "title": "نشر مهمة",
