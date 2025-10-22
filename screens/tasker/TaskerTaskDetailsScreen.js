@@ -167,7 +167,7 @@ export default function TaskerTaskDetailsScreen({ route }) {
 
       {/* Fixed Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Task details</Text>
+        <Text style={styles.headerTitle}>{t("taskerTaskDetails.title")}</Text>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -183,9 +183,9 @@ export default function TaskerTaskDetailsScreen({ route }) {
         {/* Task Overview */}
         <View style={styles.taskOverview}>
           <View style={styles.taskTitleRow}>
-            <Text style={styles.taskTitle}>{task.title || "Task Title"}</Text>
+            <Text style={styles.taskTitle}>{task.title || t("common.taskTitle")}</Text>
             <View style={[styles.statusBadge, { backgroundColor: "#FFB74D" }]}>
-              <Text style={styles.statusText}>In Progress</Text>
+              <Text style={styles.statusText}>{t("taskerTaskDetails.inProgress")}</Text>
             </View>
           </View>
         </View>
@@ -197,12 +197,12 @@ export default function TaskerTaskDetailsScreen({ route }) {
         <View style={styles.taskDetailLayout}>
           <View style={styles.taskMeta}>
             <View style={styles.metaRow}>
-              <Text style={styles.metaLabel}>Posted on</Text>
+              <Text style={styles.metaLabel}>{t("taskerTaskDetails.postedOn")}</Text>
               <Text style={styles.metaValue}>{formatDate(task.createdAt)}</Text>
             </View>
             <View style={styles.metaRowRight}>
-              <Text style={styles.metaLabelRight}>BUDGET</Text>
-              <Text style={styles.metaValueRight}>{task.budget || "22"} BHD</Text>
+              <Text style={styles.metaLabelRight}>{t("taskerTaskDetails.budget")}</Text>
+              <Text style={styles.metaValueRight}>{task.budget || "22"} {t("common.currency")}</Text>
             </View>
           </View>
         </View>
@@ -212,9 +212,9 @@ export default function TaskerTaskDetailsScreen({ route }) {
 
         {/* Description */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Description</Text>
+          <Text style={styles.sectionTitle}>{t("taskerTaskDetails.description")}</Text>
           <Text style={styles.descriptionText}>
-            {task.description || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when"}
+            {task.description || t("taskerTaskDetails.defaultDescription")}
           </Text>
         </View>
 
@@ -225,9 +225,9 @@ export default function TaskerTaskDetailsScreen({ route }) {
         {task.images && task.images.length > 0 && (
           <>
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Images</Text>
+              <Text style={styles.sectionTitle}>{t("taskerTaskDetails.images")}</Text>
               <View style={styles.imageContainer}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.imagesRow}>
                   {task.images.map((uri, index) => (
                     <TouchableOpacity
                       key={index}
@@ -237,7 +237,7 @@ export default function TaskerTaskDetailsScreen({ route }) {
                       <Image source={{ uri }} style={styles.taskImage} />
                     </TouchableOpacity>
                   ))}
-                </ScrollView>
+                </View>
               </View>
             </View>
             {/* Divider */}
@@ -247,7 +247,7 @@ export default function TaskerTaskDetailsScreen({ route }) {
 
         {/* Location */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Location</Text>
+          <Text style={styles.sectionTitle}>{t("taskerTaskDetails.location")}</Text>
           {coords ? (
             <View style={styles.mapPlaceholder}>
               <MapView
@@ -277,7 +277,7 @@ export default function TaskerTaskDetailsScreen({ route }) {
       {/* Fixed Bottom Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Place a Bid on the Task, Clients will then select a Tasker, Which could be you :)
+          {t("taskerTaskDetails.footerText")}
         </Text>
         <TouchableOpacity
           style={[
@@ -301,10 +301,10 @@ export default function TaskerTaskDetailsScreen({ route }) {
         >
           <Text style={styles.submitButtonText}>
             {!isBiddingAllowed
-              ? "Bidding Closed"
+              ? t("taskerTaskDetails.biddingClosed")
               : existingBid
-              ? "Update Bid"
-              : "Place a bid"}
+              ? t("taskerTaskDetails.updateBid")
+              : t("taskerTaskDetails.placeBid")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -379,17 +379,18 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   taskTitleRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
+    gap: 12,
   },
   taskTitle: {
     flex: 1,
     fontFamily: "InterBold",
     fontSize: 28,
     color: "#215432",
-    marginRight: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   statusBadge: {
     paddingVertical: 6,
@@ -400,43 +401,46 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontFamily: "InterBold",
     fontSize: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   taskMeta: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
   metaRow: {
     flex: 1,
-    alignItems: "flex-start",
+    alignItems: I18nManager.isRTL ? "flex-end" : "flex-start",
   },
   metaRowRight: {
     flex: 1,
-    alignItems: "flex-end",
+    alignItems: I18nManager.isRTL ? "flex-start" : "flex-end",
   },
   metaLabelRight: {
     fontFamily: "Inter",
     fontSize: 14,
     color: "#666",
     marginBottom: 4,
-    textAlign: "right",
+    textAlign: I18nManager.isRTL ? "left" : "right",
   },
   metaValueRight: {
     fontFamily: "InterBold",
     fontSize: 20,
     color: "#215433",
-    textAlign: "right",
+    textAlign: I18nManager.isRTL ? "left" : "right",
   },
   metaLabel: {
     fontFamily: "Inter",
     fontSize: 14,
     color: "#666",
     marginBottom: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   metaValue: {
     fontFamily: "InterBold",
     fontSize: 20,
     color: "#215433",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   divider: {
     height: 1,
@@ -453,26 +457,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666666",
     marginBottom: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   descriptionText: {
     fontFamily: "Inter",
     fontSize: 14,
     color: "#666",
     lineHeight: 22,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   imageContainer: {
     marginTop: 8,
   },
   imagesRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    gap: 12,
   },
   imagePlaceholder: {
     width: 80,
     height: 80,
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
-    marginRight: 12,
     justifyContent: "center",
     alignItems: "center",
   },

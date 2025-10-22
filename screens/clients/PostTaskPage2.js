@@ -78,9 +78,9 @@ export default function PostTaskPage2() {
       setAddressError(true);
       hasError = true;
       if (errorMessage) {
-        errorMessage += "\n\n" + "Please add a task address";
+        errorMessage += "\n\n" + t("clientPostTask.page2.pleaseAddAddress");
       } else {
-        errorMessage = "Please add a task address";
+        errorMessage = t("clientPostTask.page2.pleaseAddAddress");
       }
     } else {
       setAddressError(false);
@@ -342,7 +342,7 @@ export default function PostTaskPage2() {
               <Text style={I18nManager.isRTL ? styles.requirementRTL : styles.requirement}>
                 {title.length < 10 
                   ? `Min ${10 - title.length} more characters`
-                  : "Maximum 100 characters"
+                  : t("clientPostTask.page2.maxCharacters100")
                 }
               </Text>
             </View>
@@ -370,7 +370,7 @@ export default function PostTaskPage2() {
               <Text style={I18nManager.isRTL ? styles.requirementRTL : styles.requirement}>
                 {description.length < 25 
                   ? `Min ${25 - description.length} more characters`
-                  : "Maximum 150 characters"
+                  : t("clientPostTask.page2.maxCharacters150")
                 }
               </Text>
             </View>

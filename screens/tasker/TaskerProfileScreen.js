@@ -201,11 +201,11 @@ export default function TaskerProfileScreen({ route, navigation }) {
       setIsReporting(false);
       setShowReportModal(false);
       setReportReason("");
-      Alert.alert("Report Submitted", "Thank you for your report. We will review it shortly.");
+      Alert.alert(t("common.reportSubmitted"), t("common.reportThankYou"));
     } catch (err) {
       setIsReporting(false);
       console.error("❌ Report error:", err.message);
-      Alert.alert("Error", "Failed to submit report. Please try again.");
+      Alert.alert(t("common.errorTitle"), t("common.reportError"));
     }
   };
 
@@ -259,7 +259,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
             onPress={() => setActiveTab("details")}
           >
             <Text style={[styles.tabText, activeTab === "details" && styles.activeTabText]}>
-              Task Details
+              {t("taskerProfile.taskDetails")}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -267,7 +267,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
             onPress={() => setActiveTab("profile")}
           >
             <Text style={[styles.tabText, activeTab === "profile" && styles.activeTabText]}>
-              Tasker's Profile
+              {t("taskerProfile.taskerProfile")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -291,13 +291,13 @@ export default function TaskerProfileScreen({ route, navigation }) {
           <Text style={styles.name}>{tasker.name}</Text>
 
           <Text style={styles.profileDetails}>
-                {tasker.location || "Bahrain"}
+                {tasker.location || t("taskerProfile.defaultLocation")}
           </Text>
 
           {/* About section moved here */}
           <Text style={styles.aboutTitle}>
-                <Text style={styles.aboutBold}>About: </Text>
-                {tasker.about || "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using"}
+                <Text style={styles.aboutBold}>{t("taskerProfile.about")}: </Text>
+                {tasker.about || t("taskerProfile.defaultAbout")}
           </Text>
         </View>
 
@@ -306,16 +306,16 @@ export default function TaskerProfileScreen({ route, navigation }) {
           style={styles.reportButton}
           onPress={() => setShowReportModal(true)}
         >
-          <Text style={styles.reportButtonText}>Report User</Text>
+          <Text style={styles.reportButtonText}>{t("common.reportUser")}</Text>
         </TouchableOpacity>
 
         {/* Reviews Section */}
         <View style={styles.reviewsSection}>
           {/* Reviews Header */}
           <View style={styles.reviewsHeader}>
-                <Text style={styles.reviewsTitle}>Reviews</Text>
+                <Text style={styles.reviewsTitle}>{t("taskerProfile.reviews")}</Text>
             <Text style={styles.reviewsAvg}>
-                  Avg Rating: {avg}
+                  {t("taskerProfile.avgRating")}: {avg}
             </Text>
           </View>
 
@@ -325,14 +325,14 @@ export default function TaskerProfileScreen({ route, navigation }) {
           {/* Reviews */}
           {reviewData.reviews.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text style={styles.noReviewsTitle}>No Reviews Yet</Text>
-              <Text style={styles.noReviewsSubtitle}>This Tasker hasn't been rated yet</Text>
+              <Text style={styles.noReviewsTitle}>{t("taskerProfile.noReviewsYet")}</Text>
+              <Text style={styles.noReviewsSubtitle}>{t("taskerProfile.noReviewsSubtitle")}</Text>
             </View>
           ) : (
             reviewData.reviews.map((rev, idx) => (
                   <View key={idx} style={styles.reviewCard}>
                   <Text style={styles.reviewTaskTitle}>
-                    {rev.taskId?.title || rev.taskTitle || "Task Title"}
+                    {rev.taskId?.title || rev.taskTitle || t("common.taskTitle")}
                   </Text>
                   
                   <View style={styles.reviewStarsContainer}>
@@ -356,7 +356,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
                     </View>
 
                     <Text style={styles.reviewComment}>
-                      {rev.comment || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when"}
+                      {rev.comment || t("taskerProfile.defaultComment")}
                     </Text>
                   </View>
                 ))
@@ -375,9 +375,9 @@ export default function TaskerProfileScreen({ route, navigation }) {
             {/* Task Overview */}
             <View style={styles.taskOverview}>
               <View style={styles.taskTitleRow}>
-                <Text style={styles.taskTitle}>{taskData?.title || "Task Title"}</Text>
+                <Text style={styles.taskTitle}>{taskData?.title || t("common.taskTitle")}</Text>
                 <View style={[styles.statusBadge, { backgroundColor: getStatusColor(taskData?.status) }]}>
-                  <Text style={styles.statusText}>{taskData?.status}</Text>
+                  <Text style={styles.statusText}>{t(`clientMyTasks.${taskData?.status?.toLowerCase()}`)}</Text>
                 </View>
               </View>
             </View>
@@ -389,12 +389,12 @@ export default function TaskerProfileScreen({ route, navigation }) {
             <View style={styles.taskDetailLayout}>
               <View style={styles.taskMeta}>
                 <View style={styles.metaRow}>
-                  <Text style={styles.metaLabel}>Posted on</Text>
+                  <Text style={styles.metaLabel}>{t("taskerProfile.postedOn")}</Text>
                   <Text style={styles.metaValue}>{formatDate(taskData?.createdAt)}</Text>
                 </View>
                 <View style={styles.metaRowRight}>
-                  <Text style={styles.metaLabelRight}>BUDGET</Text>
-                  <Text style={styles.metaValueRight}>{taskData?.budget || "0"} BHD</Text>
+                  <Text style={styles.metaLabelRight}>{t("taskerProfile.budget")}</Text>
+                  <Text style={styles.metaValueRight}>{taskData?.budget || "0"} {t("common.currency")}</Text>
                 </View>
               </View>
             </View>
@@ -404,9 +404,9 @@ export default function TaskerProfileScreen({ route, navigation }) {
 
             {/* Description */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Description</Text>
+              <Text style={styles.sectionTitle}>{t("taskerProfile.description")}</Text>
               <Text style={styles.descriptionText}>
-                {taskData?.description || "No description provided"}
+                {taskData?.description || t("taskerProfile.noDescription")}
               </Text>
             </View>
 
@@ -417,9 +417,9 @@ export default function TaskerProfileScreen({ route, navigation }) {
             {taskData?.images && taskData.images.length > 0 && (
               <>
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Images</Text>
+                  <Text style={styles.sectionTitle}>{t("taskerProfile.images")}</Text>
                   <View style={styles.imageContainer}>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    <View style={styles.imagesRow}>
                       {taskData.images.map((uri, index) => (
                         <TouchableOpacity
                           key={index}
@@ -429,7 +429,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
                           <Image source={{ uri }} style={styles.taskImage} />
                         </TouchableOpacity>
                       ))}
-                    </ScrollView>
+                    </View>
                   </View>
                 </View>
                 {/* Divider */}
@@ -439,7 +439,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
 
             {/* Location */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Location</Text>
+              <Text style={styles.sectionTitle}>{t("taskerProfile.location")}</Text>
               {coords ? (
                 <View style={styles.mapPlaceholder}>
                   <MapView
@@ -471,7 +471,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
                       style={styles.editButton}
                       onPress={() => navigation.navigate("EditTask", { task: taskData })}
                     >
-                      <Text style={styles.editButtonText}>Edit Task</Text>
+                      <Text style={styles.editButtonText}>{t("taskerProfile.editTask")}</Text>
                     </TouchableOpacity>
                   )}
                   <TouchableOpacity
@@ -482,7 +482,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
                     {canceling ? (
                       <ActivityIndicator color="#fff" size="small" />
                     ) : (
-                      <Text style={styles.cancelButtonText}>Cancel Task</Text>
+                      <Text style={styles.cancelButtonText}>{t("taskerProfile.cancelTask")}</Text>
                     )}
                   </TouchableOpacity>
                 </>
@@ -532,7 +532,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
                   {completing ? (
                     <ActivityIndicator color="#fff" size="small" />
                   ) : (
-                    <Text style={styles.completeButtonText}>Mark as Complete</Text>
+                    <Text style={styles.completeButtonText}>{t("taskerProfile.markAsComplete")}</Text>
                   )}
                 </TouchableOpacity>
           )}
@@ -563,18 +563,18 @@ export default function TaskerProfileScreen({ route, navigation }) {
           {isReporting ? (
             <View style={styles.modalContent}>
               <ActivityIndicator size="large" color="#000000" style={{ marginBottom: 10 }} />
-              <Text style={styles.modalText}>Submitting report...</Text>
+              <Text style={styles.modalText}>{t("common.submittingReport")}</Text>
             </View>
           ) : (
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Report Tasker</Text>
+              <Text style={styles.modalTitle}>{t("common.reportTasker")}</Text>
               <Text style={styles.modalSubtitle}>
-                Please describe the issue with this tasker:
+                {t("common.reportDescription")}
               </Text>
               
               <TextInput
                 style={styles.reportInput}
-                placeholder="Describe the issue..."
+                placeholder={t("common.reportPlaceholder")}
                 multiline
                 numberOfLines={4}
                 value={reportReason}
@@ -596,7 +596,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
                     setReportReason("");
                   }}
                 >
-                  <Text style={styles.modalCancelText}>Cancel</Text>
+                  <Text style={styles.modalCancelText}>{t("common.cancel")}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -607,7 +607,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
                   onPress={submitReport}
                   disabled={!reportReason.trim()}
                 >
-                  <Text style={styles.modalSubmitText}>Submit</Text>
+                  <Text style={styles.modalSubmitText}>{t("common.submit")}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -641,7 +641,7 @@ const styles = StyleSheet.create({
 
   // Navigation tabs
   tabContainer: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     backgroundColor: "#E5E5E5",
     borderRadius: 25,
     padding: 3,
@@ -662,6 +662,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Inter",
     color: "#666",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   activeTabText: {
     color: "#fff",
@@ -708,7 +709,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: "InterBold",
     color: "#215432",
-    textAlign: "left",
+    textAlign: I18nManager.isRTL ? "right" : "left",
     marginBottom: 8,
   },
   profileDetails: {
@@ -758,19 +759,21 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   reviewsHeader: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     marginBottom: 16,
   },
   reviewsTitle: { 
     fontFamily: "InterBold", 
     fontSize: 16, 
-    color: "#215432" 
+    color: "#215432",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   reviewsAvg: { 
     fontFamily: "InterBold", 
     fontSize: 14, 
-    color: "#215432" 
+    color: "#215432",
+    textAlign: I18nManager.isRTL ? "left" : "right",
   },
   reviewsDivider: {
     height: 1,
@@ -806,22 +809,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#215432",
     marginBottom: 8,
-    textAlign: "left",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   reviewStarsContainer: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     marginBottom: 8,
   },
   reviewStar: {
-    marginRight: 2,
+    marginRight: I18nManager.isRTL ? 0 : 2,
+    marginLeft: I18nManager.isRTL ? 2 : 0,
   },
   reviewComment: { 
     fontFamily: "Inter", 
     fontSize: 13, 
     color: "#616161",
     lineHeight: 18,
-    textAlign: "left",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   reviewDivider: {
     height: 1,
@@ -925,16 +929,17 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   taskTitleRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: 12,
   },
   taskTitle: {
     flex: 1,
     fontFamily: "InterBold",
     fontSize: 28,
     color: "#215432",
-    marginRight: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   statusBadge: {
     paddingVertical: 6,
@@ -945,47 +950,50 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontFamily: "InterBold",
     fontSize: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   taskDetailLayout: {
     paddingHorizontal: 20,
     paddingVertical: 20,
   },
   taskMeta: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
   metaRow: {
     flex: 1,
-    alignItems: "flex-start",
+    alignItems: I18nManager.isRTL ? "flex-end" : "flex-start",
   },
   metaRowRight: {
     flex: 1,
-    alignItems: "flex-end",
+    alignItems: I18nManager.isRTL ? "flex-start" : "flex-end",
   },
   metaLabel: {
     fontFamily: "Inter",
     fontSize: 14,
     color: "#666",
     marginBottom: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   metaValue: {
     fontFamily: "InterBold",
     fontSize: 20,
     color: "#215433",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   metaLabelRight: {
     fontFamily: "Inter",
     fontSize: 14,
     color: "#666",
     marginBottom: 4,
-    textAlign: "right",
+    textAlign: I18nManager.isRTL ? "left" : "right",
   },
   metaValueRight: {
     fontFamily: "InterBold",
     fontSize: 20,
     color: "#215433",
-    textAlign: "right",
+    textAlign: I18nManager.isRTL ? "left" : "right",
   },
   section: {
     paddingHorizontal: 20,
@@ -996,22 +1004,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666666",
     marginBottom: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   descriptionText: {
     fontFamily: "Inter",
     fontSize: 14,
     color: "#666",
     lineHeight: 22,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   imageContainer: {
     marginTop: 8,
+  },
+  imagesRow: {
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    gap: 12,
   },
   imagePlaceholder: {
     width: 80,
     height: 80,
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
-    marginRight: 12,
     justifyContent: "center",
     alignItems: "center",
   },

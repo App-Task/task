@@ -66,7 +66,7 @@ export default function PostTaskPage3() {
       const taskData = {
         title,
         description,
-        location: address || "Address not specified",
+        location: address || t("clientPostTask.page3.addressNotSpecified"),
         budget: parseFloat(budget),
         category: category?.id || "other",
         images,
@@ -112,12 +112,12 @@ export default function PostTaskPage3() {
           <View style={styles.successIconContainer}>
             <Ionicons name="checkmark" size={60} color="#215432" />
           </View>
-          <Text style={styles.successTitle}>Task Posted</Text>
+          <Text style={styles.successTitle}>{t("clientPostTask.page3.successTitle")}</Text>
           <Text style={styles.successDescription}>
-            Your Task has been successfully posted
+            {t("clientPostTask.page3.successDescription")}
           </Text>
           <TouchableOpacity style={styles.successButton} onPress={handleSuccessDone}>
-            <Text style={styles.successButtonText}>Done</Text>
+            <Text style={styles.successButtonText}>{t("clientPostTask.page3.done")}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

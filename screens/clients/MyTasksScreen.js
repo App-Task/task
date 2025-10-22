@@ -26,8 +26,15 @@ import EmptyState from "../../components/EmptyState";
 const { width } = Dimensions.get("window");
 
 export default function MyTasksScreen({ navigation, route }) {
-
   const { t } = useTranslation();
+  
+  // Status constants for consistency
+  const STATUS = {
+    PENDING: "Pending",
+    STARTED: "Started", 
+    COMPLETED: "Completed",
+    CANCELLED: "Cancelled"
+  };
 
   // Custom star rating component using Ionicons
   const CustomStarRating = ({ rating, onChange, starSize = 32, color = "#FFD700" }) => {
@@ -110,14 +117,14 @@ export default function MyTasksScreen({ navigation, route }) {
     );
   };
 
-  const [activeTab, setActiveTab] = useState("Pending");
-  const [previousSubTab, setPreviousSubTab] = useState("Completed");
+  const [activeTab, setActiveTab] = useState(STATUS.PENDING);
+  const [previousSubTab, setPreviousSubTab] = useState(STATUS.COMPLETED);
 
   const [groupedTasks, setGroupedTasks] = useState({
-    Pending: [],
-    Started: [],
-    Completed: [],
-    Cancelled: [],
+    [STATUS.PENDING]: [],
+    [STATUS.STARTED]: [],
+    [STATUS.COMPLETED]: [],
+    [STATUS.CANCELLED]: [],
   });
   
   const [loading, setLoading] = useState(true);
@@ -149,18 +156,23 @@ export default function MyTasksScreen({ navigation, route }) {
           const res = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
           const allTasks = await res.json();
       
-          const grouped = { Pending: [], Started: [], Completed: [], Cancelled: [] };
+          const grouped = { 
+            [STATUS.PENDING]: [], 
+            [STATUS.STARTED]: [], 
+            [STATUS.COMPLETED]: [], 
+            [STATUS.CANCELLED]: [] 
+          };
 
 allTasks.forEach((task) => {
   const normalizedStatus = (task.status || "").toLowerCase();
   if (normalizedStatus === "pending") {
-    grouped.Pending.push(task);
+    grouped[STATUS.PENDING].push(task);
   } else if (normalizedStatus === "started") {
-    grouped.Started.push(task);
+    grouped[STATUS.STARTED].push(task);
   } else if (normalizedStatus === "completed") {
-    grouped.Completed.push(task);
+    grouped[STATUS.COMPLETED].push(task);
   } else if (normalizedStatus === "cancelled") {
-    grouped.Cancelled.push(task);
+    grouped[STATUS.CANCELLED].push(task);
   }
 });
 
@@ -168,7 +180,7 @@ allTasks.forEach((task) => {
           setGroupedTasks(grouped);
       
           if (route?.params?.refreshTasks) {
-            setActiveTab(route.params.targetTab || "Pending");
+            setActiveTab(route.params.targetTab || STATUS.PENDING);
           
             if (route.params.targetTab === "Previous" && route.params.subTab) {
               setPreviousSubTab(route.params.subTab); // ✅ set inner tab
@@ -184,7 +196,7 @@ allTasks.forEach((task) => {
           
       
           // Handle review popup
-          for (let task of grouped.Completed) {
+          for (let task of grouped[STATUS.COMPLETED]) {
             const check = await fetch(`https://task-kq94.onrender.com/api/reviews/task/${task._id}`);
             const review = await check.json();
             if (!review || (Array.isArray(review) && review.length === 0)) {
@@ -345,7 +357,7 @@ allTasks.forEach((task) => {
           </Text>
           
           {/* Report Icon for Started Tab */}
-          {activeTab === "Started" && item.taskerId && (
+          {activeTab === STATUS.STARTED && item.taskerId && (
             <TouchableOpacity
               style={styles.reportIcon}
               onPress={(e) => {
@@ -374,6 +386,7 @@ allTasks.forEach((task) => {
           fontFamily: "InterBold",
           color: "#27a567",
           marginTop: 4,
+          textAlign: I18nManager.isRTL ? "right" : "left",
         }}
       >
         {t("clientMyTasks.completed")}
@@ -385,6 +398,7 @@ allTasks.forEach((task) => {
           fontFamily: "InterBold",
           color: "#c00",
           marginTop: 4,
+          textAlign: I18nManager.isRTL ? "right" : "left",
         }}
       >
         {item.cancelledBy === userId ? t("clientMyTasks.cancelledByYou") : t("clientMyTasks.cancelledByTasker")}
@@ -394,32 +408,24 @@ allTasks.forEach((task) => {
 )}
 
   
-        {/* ✅ Cancelled By Info */}
-        {activeTab === "Cancelled" && item.cancelledBy && (
-          <Text
-            style={{ fontFamily: "Inter", color: "#c00", marginTop: 8 }}
-          >
-            {item.cancelledBy === userId ? t("clientMyTasks.cancelledByYou") : t("clientMyTasks.cancelledByTasker")}
-          </Text>
-        )}
   
         {/* ✅ View Details Hint */}
         <Text style={styles.viewDetails}>{t("clientMyTasks.viewTaskDetails")}</Text>
 
         {/* ✅ Pending Tab - View Bids Button */}
-        {activeTab === "Pending" && (
+        {activeTab === STATUS.PENDING && (
           <TouchableOpacity
             style={styles.viewBidsBtn}
             onPress={() => navigation.navigate("TaskDetails", { task: item, showOffersTab: true })}
           >
             <Text style={styles.viewBidsText}>
-              {t("clientMyTasks.viewBids", "View Bids")} ({item.bidCount || 0} {item.bidCount === 1 ? 'bid' : 'bids'} received)
+              {t("clientMyTasks.viewBids")} ({item.bidCount || 0} {item.bidCount === 1 ? t("clientMyTasks.bid") : t("clientMyTasks.bids")} {t("clientMyTasks.received")})
             </Text>
           </TouchableOpacity>
         )}
 
         {/* ✅ Started Tab - Chat, Mark as Done, Cancel Buttons */}
-        {activeTab === "Started" && item.taskerId && (
+        {activeTab === STATUS.STARTED && item.taskerId && (
           <View style={styles.buttonsRow}>
             {/* Chat Button */}
             <TouchableOpacity
@@ -455,17 +461,22 @@ allTasks.forEach((task) => {
                           const userId = await SecureStore.getItemAsync("userId");
                           const res2 = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
                           const allTasks = await res2.json();
-                          const grouped = { Pending: [], Started: [], Completed: [], Cancelled: [] };
+                          const grouped = { 
+                            [STATUS.PENDING]: [], 
+                            [STATUS.STARTED]: [], 
+                            [STATUS.COMPLETED]: [], 
+                            [STATUS.CANCELLED]: [] 
+                          };
                           allTasks.forEach((task) => {
                             const normalizedStatus = (task.status || "").toLowerCase();
                             if (normalizedStatus === "pending") {
-                              grouped.Pending.push(task);
+                              grouped[STATUS.PENDING].push(task);
                             } else if (normalizedStatus === "started") {
-                              grouped.Started.push(task);
+                              grouped[STATUS.STARTED].push(task);
                             } else if (normalizedStatus === "completed") {
-                              grouped.Completed.push(task);
+                              grouped[STATUS.COMPLETED].push(task);
                             } else if (normalizedStatus === "cancelled") {
-                              grouped.Cancelled.push(task);
+                              grouped[STATUS.CANCELLED].push(task);
                             }
                           });
                           setGroupedTasks(grouped);
@@ -519,17 +530,22 @@ allTasks.forEach((task) => {
                           // Refresh the tasks list
                           const res2 = await fetch(`https://task-kq94.onrender.com/api/tasks/user/${userId}`);
                           const allTasks = await res2.json();
-                          const grouped = { Pending: [], Started: [], Completed: [], Cancelled: [] };
+                          const grouped = { 
+                            [STATUS.PENDING]: [], 
+                            [STATUS.STARTED]: [], 
+                            [STATUS.COMPLETED]: [], 
+                            [STATUS.CANCELLED]: [] 
+                          };
                           allTasks.forEach((task) => {
                             const normalizedStatus = (task.status || "").toLowerCase();
                             if (normalizedStatus === "pending") {
-                              grouped.Pending.push(task);
+                              grouped[STATUS.PENDING].push(task);
                             } else if (normalizedStatus === "started") {
-                              grouped.Started.push(task);
+                              grouped[STATUS.STARTED].push(task);
                             } else if (normalizedStatus === "completed") {
-                              grouped.Completed.push(task);
+                              grouped[STATUS.COMPLETED].push(task);
                             } else if (normalizedStatus === "cancelled") {
-                              grouped.Cancelled.push(task);
+                              grouped[STATUS.CANCELLED].push(task);
                             }
                           });
                           setGroupedTasks(grouped);
@@ -561,7 +577,7 @@ allTasks.forEach((task) => {
         )}
   
         {/* ✅ View Profile & Report Buttons for Pending, Cancelled */}
-        {["Pending", "Cancelled"].includes(activeTab) &&
+        {(activeTab === STATUS.PENDING || (activeTab === "Previous" && previousSubTab === STATUS.CANCELLED)) &&
           item.taskerId && (
             <View style={styles.buttonsRow}>
               {/* View Profile */}
@@ -764,14 +780,18 @@ allTasks.forEach((task) => {
 
       {/* Tabs */}
       <View style={styles.tabs}>
-      {["Pending", "Started", "Previous"].map((tabKey) => (
+      {[
+        { key: STATUS.PENDING, label: t("clientMyTasks.pending") },
+        { key: STATUS.STARTED, label: t("clientMyTasks.started") },
+        { key: "Previous", label: t("clientMyTasks.previous") }
+      ].map((tab) => (
   <TouchableOpacity
-    key={tabKey}
-    style={[styles.tab, activeTab === tabKey && styles.activeTab]}
-    onPress={() => setActiveTab(tabKey)}
+    key={tab.key}
+    style={[styles.tab, activeTab === tab.key && styles.activeTab]}
+    onPress={() => setActiveTab(tab.key)}
   >
-    <Text style={[styles.tabText, activeTab === tabKey && styles.activeTabText]}>
-      {t(`clientMyTasks.${tabKey.toLowerCase()}`, tabKey)}
+    <Text style={[styles.tabText, activeTab === tab.key && styles.activeTabText]}>
+      {tab.label}
     </Text>
   </TouchableOpacity>
 ))}
@@ -791,14 +811,17 @@ allTasks.forEach((task) => {
   <View>
     {/* Sub Tabs */}
     <View style={styles.subTabs}>
-      {["Completed", "Cancelled"].map((tab) => (
+      {[
+        { key: STATUS.COMPLETED, label: t("clientMyTasks.completed") },
+        { key: STATUS.CANCELLED, label: t("clientMyTasks.cancelled") }
+      ].map((tab) => (
         <TouchableOpacity
-          key={tab}
-          style={[styles.subTab, previousSubTab === tab && styles.activeSubTab]}
-          onPress={() => setPreviousSubTab(tab)}
+          key={tab.key}
+          style={[styles.subTab, previousSubTab === tab.key && styles.activeSubTab]}
+          onPress={() => setPreviousSubTab(tab.key)}
         >
-          <Text style={[styles.subTabText, previousSubTab === tab && styles.activeSubTabText]}>
-            {t(`clientMyTasks.${tab.toLowerCase()}`, tab)}
+          <Text style={[styles.subTabText, previousSubTab === tab.key && styles.activeSubTabText]}>
+            {tab.label}
           </Text>
         </TouchableOpacity>
       ))}
@@ -820,8 +843,8 @@ allTasks.forEach((task) => {
       }
       ListEmptyComponent={
         <EmptyState 
-          title={`No ${t(`clientMyTasks.${previousSubTab.toLowerCase()}`)} Tasks`}
-          subtitle={`You don't have any ${t(`clientMyTasks.${previousSubTab.toLowerCase()}`).toLowerCase()} tasks yet.`}
+          title={t("common.tasksStatus", { status: t(`clientMyTasks.${previousSubTab.toLowerCase()}`) })}
+          subtitle={t("common.noTasksYet", { status: t(`clientMyTasks.${previousSubTab.toLowerCase()}`).toLowerCase() })}
         />
       }
       contentContainerStyle={[
@@ -847,8 +870,8 @@ allTasks.forEach((task) => {
         }
         ListEmptyComponent={
           <EmptyState 
-            title={`No ${t(`clientMyTasks.${activeTab.toLowerCase()}`)} Tasks`}
-            subtitle={`You don't have any ${t(`clientMyTasks.${activeTab.toLowerCase()}`).toLowerCase()} tasks yet.`}
+            title={t("common.tasksStatus", { status: t(`clientMyTasks.${activeTab.toLowerCase()}`) })}
+            subtitle={t("common.noTasksYet", { status: t(`clientMyTasks.${activeTab.toLowerCase()}`).toLowerCase() })}
           />
         }
         contentContainerStyle={[
@@ -1052,6 +1075,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 8,           // ✅ proper spacing from previous content
     textDecorationLine: "underline", // ✅ underlined
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
 
   buttonsRow: {

@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   header: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   headerNotificationDot: {
     position: "absolute",
     top: -2,
-    right: -2,
+    [I18nManager.isRTL ? "left" : "right"]: -2,
     width: 8,
     height: 8,
     borderRadius: 4,
@@ -462,11 +462,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: "#215433",
     marginBottom: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   welcomeText: {
     fontFamily: "Inter",
     fontSize: 16,
     color: "#666",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   verificationCard: {
     backgroundColor: "#fff",
@@ -477,7 +479,7 @@ const styles = StyleSheet.create({
     borderColor: "#000000",
   },
   verificationContent: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     padding: 16,
   },
@@ -486,7 +488,9 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 16,
     color: "#215433",
-    marginLeft: 12,
+    marginLeft: I18nManager.isRTL ? 0 : 12,
+    marginRight: I18nManager.isRTL ? 12 : 0,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   messagesCard: {
     backgroundColor: "#fff",
@@ -497,7 +501,7 @@ const styles = StyleSheet.create({
     borderColor: "#000000",
   },
   messagesContent: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     padding: 16,
   },
@@ -518,7 +522,9 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 16,
     color: "#215433",
-    marginLeft: 12,
+    marginLeft: I18nManager.isRTL ? 0 : 12,
+    marginRight: I18nManager.isRTL ? 12 : 0,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   waitingCard: {
     backgroundColor: "#fff",
@@ -534,7 +540,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#414141",
     marginBottom: 12,
-    textAlign: "left",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   waitingDescription: {
     fontFamily: "Inter",
@@ -542,7 +548,7 @@ const styles = StyleSheet.create({
     color: "#414141",
     marginBottom: 16,
     lineHeight: 20,
-    textAlign: "left",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   bidSentButton: {
     backgroundColor: "#e8f4ec",
@@ -587,6 +593,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: "#666",
     marginBottom: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   searchInput: {
     backgroundColor: "#fff",
@@ -598,12 +605,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Inter",
     marginBottom: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   filterLabel: {
     fontFamily: "Inter",
     fontSize: 14,
     color: "#666",
     marginBottom: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   filterContainer: {
     paddingRight: 20,
@@ -669,15 +678,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
     marginBottom: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   taskTags: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     marginBottom: 12,
     gap: 8,
     alignItems: "center",
   },
   tag: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     backgroundColor: "#f0f0f0",
     borderRadius: 16,
@@ -688,10 +698,11 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 12,
     color: "#215433",
-    marginLeft: 4,
+    marginLeft: I18nManager.isRTL ? 0 : 4,
+    marginRight: I18nManager.isRTL ? 4 : 0,
   },
   budgetTag: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     backgroundColor: "#f0f0f0",
     borderRadius: 16,

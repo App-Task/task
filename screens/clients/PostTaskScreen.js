@@ -760,7 +760,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: "#ffffff", // ✅ white text
     marginBottom: 30,
-    textAlign: "left",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   
   formSection: {
@@ -1038,7 +1038,7 @@ const styles = StyleSheet.create({
     marginTop: -2,
   },
   mapFooter: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     gap: 12,
     padding: 16,
     backgroundColor: "#fff",
@@ -1083,7 +1083,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   modalHeaderRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,

@@ -179,16 +179,16 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
     }
   };
 
-  const openInGoogleMaps = async (lat, lng, labelRaw = "Task Location") => {
+  const openInGoogleMaps = async (lat, lng, labelRaw = t("common.taskLocation")) => {
     try {
-      const label = encodeURIComponent(labelRaw || "Task Location");
+      const label = encodeURIComponent(labelRaw || t("common.taskLocation"));
       const appUrl = `comgooglemaps://?q=${lat},${lng}(${label})&center=${lat},${lng}&zoom=14`;
       const canOpenApp = await Linking.canOpenURL(appUrl);
       if (canOpenApp) return Linking.openURL(appUrl);
       const webUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
       await Linking.openURL(webUrl);
     } catch {
-      Alert.alert("Error", "Could not open Google Maps on this device.");
+      Alert.alert(t("common.errorTitle"), t("common.mapError"));
     }
   };
 
@@ -251,7 +251,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
       Alert.alert(
         t("clientViewBids.acceptedTitle"),
         t("clientViewBids.acceptedMessage", {
-          name: bid.taskerId?.name || "Tasker",
+          name: bid.taskerId?.name || t("clientViewBids.taskerFallbackName"),
         }),
         [
           {
@@ -273,7 +273,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
   };
 
   const handleChat = (bid) => {
-    const name = bid.taskerId?.name || "Tasker";
+    const name = bid.taskerId?.name || t("clientViewBids.taskerFallbackName");
     const otherUserId = bid.taskerId?._id;
     console.log("💬 Navigating to Chat with:", { name, otherUserId });
     navigation.navigate("Chat", { name, otherUserId });
@@ -325,11 +325,11 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
       setShowReportModal(false);
       setReportReason("");
       setReportBid(null);
-      Alert.alert("Report Submitted", "Thank you for your report. We will review it shortly.");
+      Alert.alert(t("common.reportSubmitted"), t("common.reportThankYou"));
     } catch (err) {
       setIsReporting(false);
       console.error("❌ Report error:", err.message);
-      Alert.alert("Error", "Failed to submit report. Please try again.");
+      Alert.alert(t("common.errorTitle"), t("common.reportError"));
     }
   };
 
@@ -377,14 +377,14 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
             style={styles.actionButton}
             onPress={() => handleViewProfile(item)}
           >
-            <Text style={styles.actionButtonText}>View Profile</Text>
+            <Text style={styles.actionButtonText}>{t("clientViewBids.viewProfile")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() => handleChat(item)}
           >
-            <Text style={styles.actionButtonText}>Chat</Text>
+            <Text style={styles.actionButtonText}>{t("clientViewBids.chat")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -408,10 +408,10 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
               (isThisAccepted || alreadyPicked) && styles.disabledButtonText
             ]}>
               {isThisAccepted
-                ? "Accepted"
+                ? t("clientViewBids.accepted")
                 : alreadyPicked
-                ? "Already Selected"
-                : "Accept"}
+                ? t("clientViewBids.alreadySelected")
+                : t("clientViewBids.accept")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -469,7 +469,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                 onPress={() => setActiveTab("details")}
               >
                 <Text style={[styles.tabText, activeTab === "details" ? styles.activeTabText : null]}>
-                  Task Details
+                  {t("clientTaskDetails.taskDetails")}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -483,7 +483,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                 }}
               >
                 <Text style={[styles.tabText, activeTab === "profile" ? styles.activeTabText : null]}>
-                  Tasker Profile
+                  {t("clientTaskDetails.taskerProfile")}
                 </Text>
               </TouchableOpacity>
             </>
@@ -495,7 +495,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                 onPress={() => setActiveTab("details")}
               >
                 <Text style={[styles.tabText, activeTab === "details" ? styles.activeTabText : null]}>
-                  Task Details
+                  {t("clientTaskDetails.taskDetails")}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -503,7 +503,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                 onPress={() => setActiveTab("offers")}
               >
                 <Text style={[styles.tabText, activeTab === "offers" ? styles.activeTabText : null]}>
-                  Offers
+                  {t("clientViewBids.title")}
                 </Text>
               </TouchableOpacity>
             </>
@@ -532,9 +532,9 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
             {/* Task Overview */}
             <View style={styles.taskOverview}>
               <View style={styles.taskTitleRow}>
-                <Text style={styles.taskTitle}>{task.title || "Task Title"}</Text>
+                <Text style={styles.taskTitle}>{task.title || t("common.taskTitle")}</Text>
                 <View style={[styles.statusBadge, { backgroundColor: getStatusColor(task.status) }]}>
-                  <Text style={styles.statusText}>{task.status}</Text>
+                  <Text style={styles.statusText}>{t(`clientMyTasks.${task.status?.toLowerCase()}`)}</Text>
                 </View>
               </View>
             </View>
@@ -546,12 +546,12 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
             <View style={styles.taskDetailLayout}>
               <View style={styles.taskMeta}>
                 <View style={styles.metaRow}>
-                  <Text style={styles.metaLabel}>Posted on</Text>
+                  <Text style={styles.metaLabel}>{t("clientTaskDetails.postedOn")}</Text>
                   <Text style={styles.metaValue}>{formatDate(task.createdAt)}</Text>
                 </View>
                 <View style={styles.metaRowRight}>
-                  <Text style={styles.metaLabelRight}>BUDGET</Text>
-                  <Text style={styles.metaValueRight}>{task.budget || "0"} BHD</Text>
+                  <Text style={styles.metaLabelRight}>{t("clientTaskDetails.budget")}</Text>
+                  <Text style={styles.metaValueRight}>{task.budget || "0"} {t("common.currency")}</Text>
                 </View>
               </View>
             </View>
@@ -561,9 +561,9 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
 
             {/* Description */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Description</Text>
+              <Text style={styles.sectionTitle}>{t("clientTaskDetails.description")}</Text>
               <Text style={styles.descriptionText}>
-                {task.description || "No description provided"}
+                {task.description || t("clientTaskDetails.noDescription")}
               </Text>
             </View>
 
@@ -574,7 +574,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
             {task.images && task.images.length > 0 && (
               <>
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Images</Text>
+                  <Text style={styles.sectionTitle}>{t("clientTaskDetails.images")}</Text>
                   <View style={styles.imageContainer}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                       {task.images.map((uri, index) => (
@@ -596,7 +596,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
 
             {/* Location */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Location</Text>
+              <Text style={styles.sectionTitle}>{t("clientTaskDetails.location")}</Text>
               {coords ? (
                 <View style={styles.mapPlaceholder}>
                   <MapView
@@ -628,7 +628,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                       style={styles.editButton}
                       onPress={() => navigation.navigate("EditTask", { task })}
                     >
-                      <Text style={styles.editButtonText}>Edit Task</Text>
+                      <Text style={styles.editButtonText}>{t("clientTaskDetails.editTask")}</Text>
                     </TouchableOpacity>
                   )}
                   <TouchableOpacity
@@ -639,7 +639,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                     {canceling ? (
                       <ActivityIndicator color="#fff" size="small" />
                     ) : (
-                      <Text style={styles.cancelButtonText}>Cancel Task</Text>
+                      <Text style={styles.cancelButtonText}>{t("clientTaskDetails.cancelTask")}</Text>
                     )}
                   </TouchableOpacity>
                 </>
@@ -685,7 +685,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                   {completing ? (
                     <ActivityIndicator color="#fff" size="small" />
                   ) : (
-                    <Text style={styles.completeButtonText}>Mark as Complete</Text>
+                    <Text style={styles.completeButtonText}>{t("clientTaskDetails.markAsComplete")}</Text>
                   )}
                 </TouchableOpacity>
               )}
@@ -766,7 +766,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                   style={styles.reportButton}
                   onPress={() => setShowReportModal(true)}
                 >
-                  <Text style={styles.reportButtonText}>Report User</Text>
+                  <Text style={styles.reportButtonText}>{t("common.reportUser")}</Text>
                 </TouchableOpacity>
 
                 {/* Reviews Section */}
@@ -784,15 +784,15 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                   {/* Reviews */}
                   {taskerReviewData.reviews.length === 0 ? (
                     <View style={styles.emptyContainer}>
-                      <Text style={styles.noReviewsTitle}>No Reviews Yet</Text>
-                      <Text style={styles.noReviewsSubtitle}>This Tasker hasn't been rated yet</Text>
+                      <Text style={styles.noReviewsTitle}>{t("taskerProfile.noReviewsYet")}</Text>
+                      <Text style={styles.noReviewsSubtitle}>{t("taskerProfile.noReviewsSubtitle")}</Text>
                     </View>
                   ) : (
                     taskerReviewData.reviews.map((rev, idx) => (
                       <React.Fragment key={idx}>
                         <View style={styles.reviewCard}>
                           <Text style={styles.reviewTaskTitle}>
-                            {rev.taskId?.title || rev.taskTitle || "Task Title"}
+                            {rev.taskId?.title || rev.taskTitle || t("common.taskTitle")}
                           </Text>
                           
                           <View style={styles.reviewStarsContainer}>
@@ -822,7 +822,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
             ) : (
               <View style={styles.profileLoadingContainer}>
                 <ActivityIndicator size="large" color="#000000" />
-                <Text style={styles.profileLoadingText}>Loading tasker profile...</Text>
+                <Text style={styles.profileLoadingText}>{t("taskerProfile.loadingProfile")}</Text>
               </View>
             )}
           </>
@@ -867,18 +867,18 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
           {isReporting ? (
             <View style={styles.modalContent}>
               <ActivityIndicator size="large" color="#000000" style={{ marginBottom: 10 }} />
-              <Text style={styles.modalText}>Submitting report...</Text>
+              <Text style={styles.modalText}>{t("common.submittingReport")}</Text>
             </View>
           ) : (
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Report Tasker</Text>
+              <Text style={styles.modalTitle}>{t("common.reportTasker")}</Text>
               <Text style={styles.modalSubtitle}>
-                Please describe the issue with this tasker:
+                {t("common.reportDescription")}
               </Text>
               
               <TextInput
                 style={styles.reportInput}
-                placeholder="Describe the issue..."
+                placeholder={t("common.reportPlaceholder")}
                 multiline
                 numberOfLines={4}
                 value={reportReason}
@@ -901,7 +901,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                     setReportBid(null);
                   }}
                 >
-                  <Text style={styles.modalCancelText}>Cancel</Text>
+                  <Text style={styles.modalCancelText}>{t("common.cancel")}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -912,7 +912,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                   onPress={submitReport}
                   disabled={!reportReason.trim()}
                 >
-                  <Text style={styles.modalSubmitText}>Submit</Text>
+                  <Text style={styles.modalSubmitText}>{t("common.submit")}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -935,7 +935,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   headerRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 20,
@@ -949,7 +949,7 @@ const styles = StyleSheet.create({
   },
   
   tabContainer: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     backgroundColor: "#E5E5E5",
     borderRadius: 25,
     padding: 3,
@@ -969,6 +969,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Inter",
     color: "#666",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   activeTabText: {
     color: "#fff",
@@ -989,23 +990,25 @@ const styles = StyleSheet.create({
       paddingHorizontal: 0,
       paddingVertical: 20,
     },
-    taskTitleRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
-    taskTitle: {
-      flex: 1,
-      fontFamily: "InterBold",
-      fontSize: 28,
-      color: "#215432",
-      marginRight: 12,
-    },
-    taskMeta: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-    },
+  taskTitleRow: {
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  taskTitle: {
+    flex: 1,
+    fontFamily: "InterBold",
+    fontSize: 28,
+    color: "#215432",
+    marginRight: I18nManager.isRTL ? 0 : 12,
+    marginLeft: I18nManager.isRTL ? 12 : 0,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
+  taskMeta: {
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
     metaRow: {
       flex: 1,
       alignItems: "flex-start",
@@ -1027,17 +1030,19 @@ const styles = StyleSheet.create({
       color: "#215433",
       textAlign: "right",
     },
-    metaLabel: {
-      fontFamily: "Inter",
-      fontSize: 14,
-      color: "#666",
-      marginBottom: 4,
-    },
-    metaValue: {
-      fontFamily: "InterBold",
-      fontSize: 20,
-      color: "#215433",
-    },
+  metaLabel: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
+  metaValue: {
+    fontFamily: "InterBold",
+    fontSize: 20,
+    color: "#215433",
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
     divider: {
       height: 2,
       backgroundColor: "#e0e0e0",
@@ -1048,18 +1053,20 @@ const styles = StyleSheet.create({
       paddingHorizontal: 20,
       paddingVertical: 20,
     },
-    sectionTitle: {
-      fontFamily: "InterBold",
-      fontSize: 16,
-      color: "#666666",
-      marginBottom: 12,
-    },
-    descriptionText: {
-      fontFamily: "Inter",
-      fontSize: 14,
-      color: "#666",
-      lineHeight: 22,
-    },
+  sectionTitle: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#666666",
+    marginBottom: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
+  descriptionText: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    lineHeight: 22,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
     imageContainer: {
       marginTop: 8,
     },
@@ -1160,6 +1167,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontFamily: "InterBold",
     fontSize: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
 
   // Info section
@@ -1359,7 +1367,7 @@ const styles = StyleSheet.create({
       elevation: 5,
     },
     taskerHeader: {
-      flexDirection: "row",
+      flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
       justifyContent: "space-between",
       alignItems: "center",
       backgroundColor: "#215432", // App's green color
@@ -1372,6 +1380,7 @@ const styles = StyleSheet.create({
       fontSize: 18,
       fontFamily: "InterBold",
       color: "#ffffff",
+      textAlign: I18nManager.isRTL ? "right" : "left",
     },
     reportIcon: {
       padding: 4,
@@ -1385,6 +1394,7 @@ const styles = StyleSheet.create({
       fontFamily: "Inter",
       color: "#666",
       marginBottom: 12,
+      textAlign: I18nManager.isRTL ? "right" : "left",
     },
     priceAmount: {
       fontFamily: "InterBold",
@@ -1395,9 +1405,10 @@ const styles = StyleSheet.create({
       fontFamily: "Inter",
       color: "#666",
       lineHeight: 20,
+      textAlign: I18nManager.isRTL ? "right" : "left",
     },
     buttonsRow: {
-      flexDirection: "row",
+      flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
       backgroundColor: "#f5f5f5", // Light gray background
       paddingHorizontal: 16,
       paddingVertical: 16,
@@ -1417,6 +1428,7 @@ const styles = StyleSheet.create({
       fontFamily: "Inter",
       fontSize: 14,
       color: "#333",
+      textAlign: "center",
     },
     disabledButtonText: {
       color: "#999",

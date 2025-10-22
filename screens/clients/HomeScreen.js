@@ -77,21 +77,43 @@ export default function ClientHomeScreen() {
     <View style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <View style={styles.greetingContainer}>
-          <Text style={styles.greeting}>Hi {userName || "Tariq"},</Text>
-          <Text style={styles.subtitle}>Welcome to TASK!</Text>
-        </View>
-        
-        {/* Notifications Icon */}
-        <TouchableOpacity 
-          style={styles.notificationIcon}
-          onPress={() => navigation.navigate("Notifications")}
-        >
-          <View style={styles.notificationIconContainer}>
-            <Ionicons name="notifications-outline" size={24} color="#000" />
-            {(unreadMessages > 0 || unreadNotifications > 0) && <View style={styles.headerNotificationDot} />}
-          </View>
-        </TouchableOpacity>
+        {I18nManager.isRTL ? (
+          <>
+            {/* Notifications Icon - Left side in RTL */}
+            <TouchableOpacity 
+              style={styles.notificationIcon}
+              onPress={() => navigation.navigate("Notifications")}
+            >
+              <View style={styles.notificationIconContainer}>
+                <Ionicons name="notifications-outline" size={24} color="#000" />
+                {(unreadMessages > 0 || unreadNotifications > 0) && <View style={styles.headerNotificationDot} />}
+              </View>
+            </TouchableOpacity>
+            
+            <View style={styles.greetingContainer}>
+              <Text style={styles.greeting}>{t("clientHome.greeting", { name: userName || t("clientHome.defaultName") })}</Text>
+              <Text style={styles.subtitle}>{t("clientHome.subtitle")}</Text>
+            </View>
+          </>
+        ) : (
+          <>
+            <View style={styles.greetingContainer}>
+              <Text style={styles.greeting}>{t("clientHome.greeting", { name: userName || t("clientHome.defaultName") })}</Text>
+              <Text style={styles.subtitle}>{t("clientHome.subtitle")}</Text>
+            </View>
+            
+            {/* Notifications Icon - Right side in LTR */}
+            <TouchableOpacity 
+              style={styles.notificationIcon}
+              onPress={() => navigation.navigate("Notifications")}
+            >
+              <View style={styles.notificationIconContainer}>
+                <Ionicons name="notifications-outline" size={24} color="#000" />
+                {(unreadMessages > 0 || unreadNotifications > 0) && <View style={styles.headerNotificationDot} />}
+              </View>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -112,47 +134,51 @@ export default function ClientHomeScreen() {
               )}
             </View>
             <Text style={styles.messagesText}>
-              {unreadMessages > 0 ? `${unreadMessages} unread messages` : "0 unread messages"}
+              {t("clientHome.messages", { count: unreadMessages })}
             </Text>
-            <Ionicons name="chevron-forward" size={20} color="#333" />
+            <Ionicons 
+              name={I18nManager.isRTL ? "chevron-back" : "chevron-forward"} 
+              size={20} 
+              color="#333" 
+            />
           </View>
         </TouchableOpacity>
 
         {/* Need something done? Section */}
         <View style={styles.actionCard}>
-          <Text style={styles.cardTitle}>Need something done?</Text>
+          <Text style={styles.cardTitle}>{t("clientHome.needSomethingDone")}</Text>
           <Text style={styles.cardDescription}>
-            Have something on your to-do list? Post a task and let Taskers handle it reliably with competitive offers
+            {t("clientHome.needSomethingDoneDesc")}
           </Text>
           <TouchableOpacity 
             style={styles.postTaskButton}
             onPress={() => navigation.navigate("ClientHome", { screen: "Post" })}
           >
-            <Text style={styles.postTaskButtonText}>Post a Task</Text>
+            <Text style={styles.postTaskButtonText}>{t("clientHome.postTaskBtn")}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Waiting on a Task? Section */}
         <View style={styles.actionCard}>
-          <Text style={styles.cardTitle}>Waiting on a Task?</Text>
+          <Text style={styles.cardTitle}>{t("clientHome.waitingOnTask")}</Text>
           <Text style={styles.cardDescription}>
-            Waiting for Taskers to bid on your tasks? Check Pending tasks for updates
+            {t("clientHome.waitingOnTaskDesc")}
           </Text>
           <TouchableOpacity 
             style={styles.pendingButton}
             onPress={() => navigateToTasksTab("Pending")}
           >
-            <Text style={styles.pendingButtonText}>Pending Tasks</Text>
+            <Text style={styles.pendingButtonText}>{t("clientHome.pendingTasks")}</Text>
           </TouchableOpacity>
           
           <Text style={styles.cardDescription}>
-            Tasks underway? Tap to check their progress
+            {t("clientHome.tasksUnderway")}
           </Text>
           <TouchableOpacity 
             style={styles.progressButton}
             onPress={() => navigateToTasksTab("Started")}
           >
-            <Text style={styles.progressButtonText}>In Progress Tasks</Text>
+            <Text style={styles.progressButtonText}>{t("clientHome.inProgressTasks")}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -166,12 +192,13 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(248, 246, 247)",
   },
   header: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
     paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight || 0) + 20 : 80,
     paddingHorizontal: 24,
     paddingBottom: 20,
+    marginHorizontal: 0,
   },
   greetingContainer: {
     flex: 1,
@@ -181,11 +208,13 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     color: "#215433",
     marginBottom: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   subtitle: {
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   notificationIcon: {
     padding: 8,
@@ -196,7 +225,7 @@ const styles = StyleSheet.create({
   headerNotificationDot: {
     position: "absolute",
     top: -2,
-    right: -2,
+    [I18nManager.isRTL ? "left" : "right"]: -2,
     width: 8,
     height: 8,
     borderRadius: 4,
@@ -204,23 +233,23 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
   },
   messagesCard: {
     backgroundColor: "#ffffff",
     borderRadius: 12,
     borderWidth: 2,
     borderColor: "#215433",
+    marginHorizontal: 24,
     marginBottom: 20,
     padding: 16,
   },
   messagesContent: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
+    gap: 12,
   },
   messageIconContainer: {
     position: "relative",
-    marginRight: 12,
   },
   messageIcon: {
     width: 40,
@@ -233,7 +262,7 @@ const styles = StyleSheet.create({
   messageBadge: {
     position: "absolute",
     top: -2,
-    right: -2,
+    [I18nManager.isRTL ? "left" : "right"]: -2,
     backgroundColor: "#FF0000",
     borderRadius: 10,
     minWidth: 20,
@@ -253,11 +282,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   actionCard: {
     backgroundColor: "#ffffff",
     borderRadius: 12,
     padding: 20,
+    marginHorizontal: 24,
     marginBottom: 20,
     shadowColor: "#000",
     shadowOpacity: 0.05,
@@ -270,6 +301,7 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     color: "#333",
     marginBottom: 8,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   cardDescription: {
     fontSize: 14,
@@ -277,6 +309,7 @@ const styles = StyleSheet.create({
     color: "#666",
     lineHeight: 20,
     marginBottom: 16,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   postTaskButton: {
     backgroundColor: "#215433",

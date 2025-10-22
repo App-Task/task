@@ -12,6 +12,7 @@ import {
   Modal,
   Platform,
   StatusBar,
+  I18nManager,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -93,29 +94,29 @@ export default function EditTaskScreen({ route, navigation }) {
 
     if (!title || title.trim().length < 10) {
       hasError = true;
-      errorMessage = "Title must be at least 10 characters long";
+      errorMessage = t("clientEditTask.titleTooShort");
     }
 
     if (!description || description.trim().length < 25) {
       hasError = true;
       if (errorMessage) {
-        errorMessage += "\n\nDescription must be at least 25 characters long";
+        errorMessage += "\n\n" + t("clientEditTask.descriptionTooShort");
       } else {
-        errorMessage = "Description must be at least 25 characters long";
+        errorMessage = t("clientEditTask.descriptionTooShort");
       }
     }
 
     if (!budget.trim()) {
       hasError = true;
       if (errorMessage) {
-        errorMessage += "\n\nPlease enter a budget";
+        errorMessage += "\n\n" + t("clientEditTask.pleaseEnterBudget");
       } else {
-        errorMessage = "Please enter a budget";
+        errorMessage = t("clientEditTask.pleaseEnterBudget");
       }
     }
 
     if (hasError) {
-      Alert.alert("Validation Error", errorMessage);
+      Alert.alert(t("clientEditTask.validationError"), errorMessage);
       return;
     }
 
@@ -135,7 +136,7 @@ export default function EditTaskScreen({ route, navigation }) {
       navigation.navigate("TaskUpdatedSuccess");
     } catch (error) {
       console.log("Update error:", error);
-      Alert.alert("Error", "Failed to update task. Please try again.");
+      Alert.alert(t("common.errorTitle"), t("clientEditTask.updateError"));
     } finally {
       setLoading(false);
     }
@@ -161,7 +162,7 @@ export default function EditTaskScreen({ route, navigation }) {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("Permission denied", "Location permission is required");
+        Alert.alert(t("clientEditTask.permissionDenied"), t("clientEditTask.locationPermissionRequired"));
         return;
       }
 
@@ -180,7 +181,7 @@ export default function EditTaskScreen({ route, navigation }) {
         });
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to get location");
+      Alert.alert(t("common.errorTitle"), t("clientEditTask.locationError"));
     }
   };
 
@@ -213,7 +214,7 @@ export default function EditTaskScreen({ route, navigation }) {
       }
     } catch (e) {
       console.log("openMapPicker error", e);
-      Alert.alert("Error", "Failed to open map picker");
+      Alert.alert(t("common.errorTitle"), t("clientEditTask.mapPickerError"));
     }
   };
 
@@ -252,7 +253,7 @@ export default function EditTaskScreen({ route, navigation }) {
           >
             <Ionicons name="arrow-back" size={24} color="#215432" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Edit Task</Text>
+          <Text style={styles.headerTitle}>{t("clientEditTask.title")}</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -263,13 +264,13 @@ export default function EditTaskScreen({ route, navigation }) {
         <View style={styles.formContainer}>
           {/* Category */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Category</Text>
+            <Text style={styles.fieldLabel}>{t("clientEditTask.category")}</Text>
             <TouchableOpacity
               style={styles.categoryBtn}
               onPress={() => setShowCategoryModal(true)}
             >
               <Text style={[styles.categoryText, !category && styles.placeholderText]}>
-                {category || "Select Category"}
+                {category || t("clientEditTask.selectCategory")}
               </Text>
               <Ionicons name="chevron-down" size={20} color="#999" />
             </TouchableOpacity>
@@ -278,11 +279,11 @@ export default function EditTaskScreen({ route, navigation }) {
           {/* Task Title */}
           <View style={styles.fieldContainer}>
             <View style={styles.labelRow}>
-              <Text style={styles.fieldLabel}>Task Title</Text>
+              <Text style={styles.fieldLabel}>{t("clientEditTask.taskTitle")}</Text>
               <Text style={styles.charLimit}>
                 {title.length < 10 
-                  ? `Min ${10 - title.length} more characters`
-                  : "Maximum 100 characters"
+                  ? t("clientEditTask.minCharacters", { count: 10 - title.length })
+                  : t("clientEditTask.maxCharacters100")
                 }
               </Text>
             </View>
@@ -292,7 +293,7 @@ export default function EditTaskScreen({ route, navigation }) {
               onChangeText={(text) => {
                 if (text.length <= 100) setTitle(text);
               }}
-              placeholder="What do you need done?"
+              placeholder={t("clientEditTask.taskTitlePlaceholder")}
               placeholderTextColor="#999"
               maxLength={100}
             />
@@ -301,11 +302,11 @@ export default function EditTaskScreen({ route, navigation }) {
           {/* Description */}
           <View style={styles.fieldContainer}>
             <View style={styles.labelRow}>
-              <Text style={styles.fieldLabel}>Describe your Task</Text>
+              <Text style={styles.fieldLabel}>{t("clientEditTask.describeTask")}</Text>
               <Text style={styles.charLimit}>
                 {description.length < 25 
-                  ? `Min ${25 - description.length} more characters`
-                  : "Maximum 150 characters"
+                  ? t("clientEditTask.minCharacters", { count: 25 - description.length })
+                  : t("clientEditTask.maxCharacters150")
                 }
               </Text>
             </View>
@@ -316,7 +317,7 @@ export default function EditTaskScreen({ route, navigation }) {
                 onChangeText={(text) => {
                   if (text.length <= 150) setDescription(text);
                 }}
-                placeholder="Add a more detailed description of the task you want done"
+                placeholder={t("clientEditTask.describeTaskPlaceholder")}
                 placeholderTextColor="#999"
                 multiline
                 maxLength={150}
@@ -325,7 +326,7 @@ export default function EditTaskScreen({ route, navigation }) {
               <View style={styles.textAreaSeparator} />
               <TouchableOpacity style={styles.addMediaBtn} onPress={pickImage}>
                 <Ionicons name="add" size={20} color="#999" />
-                <Text style={styles.addMediaText}>Add Images/Videos</Text>
+                <Text style={styles.addMediaText}>{t("clientEditTask.addImagesVideos")}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -333,7 +334,7 @@ export default function EditTaskScreen({ route, navigation }) {
           {/* Image Gallery */}
           {images && images.length > 0 && (
             <View style={styles.imageGalleryContainer}>
-              <Text style={styles.galleryTitle}>Selected Images</Text>
+              <Text style={styles.galleryTitle}>{t("clientEditTask.selectedImages")}</Text>
               <ScrollView 
                 horizontal 
                 showsHorizontalScrollIndicator={false} 
@@ -356,13 +357,13 @@ export default function EditTaskScreen({ route, navigation }) {
 
           {/* Task Address */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Task Address</Text>
+            <Text style={styles.fieldLabel}>{t("clientEditTask.taskAddress")}</Text>
             <TouchableOpacity style={styles.addressBtn} onPress={openMapPicker}>
               <View style={styles.addressBtnContent}>
                 <View style={styles.addIcon}>
                   <Ionicons name="location" size={16} color="#fff" />
                 </View>
-                <Text style={styles.addressBtnText}>Select Location on Map</Text>
+                <Text style={styles.addressBtnText}>{t("clientEditTask.selectLocationOnMap")}</Text>
               </View>
             </TouchableOpacity>
             {address ? (
@@ -384,7 +385,7 @@ export default function EditTaskScreen({ route, navigation }) {
                   <Marker coordinate={coords} />
                 </MapView>
                 <TouchableOpacity style={styles.editLocationButton} onPress={openMapPicker}>
-                  <Text style={styles.editLocationText}>Edit Location on Map</Text>
+                  <Text style={styles.editLocationText}>{t("clientEditTask.editLocationOnMap")}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -392,13 +393,13 @@ export default function EditTaskScreen({ route, navigation }) {
 
           {/* Budget */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Budget</Text>
+            <Text style={styles.fieldLabel}>{t("clientEditTask.budget")}</Text>
             <View style={styles.budgetContainer}>
               <TextInput
                 style={styles.budgetInput}
                 value={budget}
                 onChangeText={setBudget}
-                placeholder="Your Budget"
+                placeholder={t("clientEditTask.budgetPlaceholder")}
                 placeholderTextColor="#999"
                 keyboardType="numeric"
               />
@@ -414,7 +415,7 @@ export default function EditTaskScreen({ route, navigation }) {
           disabled={loading}
         >
           <Text style={styles.confirmBtnText}>
-            {loading ? "Updating..." : "Confirm Changes"}
+            {loading ? t("clientEditTask.updating") : t("clientEditTask.confirmChanges")}
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -429,7 +430,7 @@ export default function EditTaskScreen({ route, navigation }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Category</Text>
+              <Text style={styles.modalTitle}>{t("clientEditTask.selectCategory")}</Text>
               <TouchableOpacity
                 style={styles.closeBtn}
                 onPress={() => setShowCategoryModal(false)}
@@ -481,12 +482,12 @@ export default function EditTaskScreen({ route, navigation }) {
             >
               <Ionicons name="arrow-back" size={24} color="#215432" />
             </TouchableOpacity>
-            <Text style={styles.mapHeaderTitle}>Select Task Location</Text>
+            <Text style={styles.mapHeaderTitle}>{t("clientEditTask.selectTaskLocation")}</Text>
             <View style={{ width: 24 }} />
           </View>
 
           <Text style={styles.mapHeaderSubtitle}>
-            Tap on the map to select the exact location for your task
+            {t("clientEditTask.mapInstructions")}
           </Text>
 
           {tempRegion && (
@@ -513,10 +514,10 @@ export default function EditTaskScreen({ route, navigation }) {
 
           <View style={styles.mapFooter}>
             <TouchableOpacity style={[styles.mapBtn, styles.mapCancel]} onPress={() => setMapVisible(false)}>
-              <Text style={styles.mapBtnText}>Cancel</Text>
+              <Text style={styles.mapBtnText}>{t("common.cancel")}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.mapBtn, styles.mapConfirm]} onPress={confirmMapLocation}>
-              <Text style={[styles.mapBtnText, { color: "#fff" }]}>Confirm Location</Text>
+              <Text style={[styles.mapBtnText, { color: "#fff" }]}>{t("clientEditTask.confirmLocation")}</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -535,7 +536,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
   header: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -551,6 +552,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "InterBold",
     color: "#333",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   placeholder: {
     width: 40,
@@ -572,9 +574,10 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     color: "#215432",
     marginBottom: 8,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   labelRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 8,
@@ -583,6 +586,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666",
     fontFamily: "Inter",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   inputField: {
     borderWidth: 1,
@@ -593,6 +597,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Inter",
     backgroundColor: "#fff",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   categoryBtn: {
     borderWidth: 1,
@@ -600,7 +605,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#fff",
@@ -609,6 +614,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   placeholderText: {
     color: "#999",
@@ -626,6 +632,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     minHeight: 100,
     maxHeight: 120,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   textAreaSeparator: {
     height: 1,
@@ -633,7 +640,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   addMediaBtn: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -642,7 +649,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#999",
     fontFamily: "Inter",
-    marginLeft: 8,
+    marginLeft: I18nManager.isRTL ? 0 : 8,
+    marginRight: I18nManager.isRTL ? 8 : 0,
   },
   // Image Gallery styles
   imageGalleryContainer: {
@@ -653,13 +661,15 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     color: "#215432",
     marginBottom: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   imageGallery: {
     flexDirection: "row",
   },
   imageContainer: {
     position: "relative",
-    marginRight: 12,
+    marginRight: I18nManager.isRTL ? 0 : 12,
+    marginLeft: I18nManager.isRTL ? 12 : 0,
   },
   galleryImage: {
     width: 80,
@@ -691,7 +701,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   addressBtnContent: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
   },
   addIcon: {
@@ -701,18 +711,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#215432",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12,
+    marginRight: I18nManager.isRTL ? 0 : 12,
+    marginLeft: I18nManager.isRTL ? 12 : 0,
   },
   addressBtnText: {
     fontSize: 16,
     color: "#215432",
     fontFamily: "InterBold",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   addressText: {
     fontSize: 14,
     color: "#666",
     fontFamily: "Inter",
     marginTop: 8,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   // Map preview styles
   mapPreview: {
@@ -737,7 +750,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   budgetContainer: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#E0E0E0",
@@ -750,6 +763,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     fontFamily: "Inter",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   currency: {
     fontSize: 16,
@@ -757,6 +771,7 @@ const styles = StyleSheet.create({
     color: "#333",
     paddingHorizontal: 16,
     paddingVertical: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   confirmBtn: {
     backgroundColor: "#215432",
@@ -770,6 +785,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "InterBold",
     color: "#fff",
+    textAlign: "center",
   },
   // Modal styles
   modalOverlay: {
@@ -784,7 +800,7 @@ const styles = StyleSheet.create({
     maxHeight: "70%",
   },
   modalHeader: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
@@ -796,6 +812,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "InterBold",
     color: "#333",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   closeBtn: {
     width: 32,
@@ -809,7 +826,7 @@ const styles = StyleSheet.create({
     maxHeight: 400,
   },
   categoryItem: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
@@ -824,6 +841,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   selectedCategoryItemText: {
     color: "#215432",
@@ -835,7 +853,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   mapHeader: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -854,6 +872,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "InterBold",
     color: "#215432",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   mapHeaderSubtitle: {
     fontSize: 14,
@@ -861,9 +880,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 16,
     backgroundColor: "#fff",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   mapFooter: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     gap: 12,
     padding: 20,
     paddingBottom: 30,
@@ -888,5 +908,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "InterBold",
     color: "#215432",
+    textAlign: "center",
   },
 });
