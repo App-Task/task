@@ -1140,7 +1140,40 @@
      "cancelTask": "إلغاء المهمة",
      "markAsComplete": "تحديد كمكتملة",
      "loadError": "فشل في تحميل ملف مقدم الخدمة."
+   },
+   "taskerExplore": {
+     "greeting": "مرحباً {{name}}،",
+     "welcomeText": "مرحباً بك في TASK!",
+     "pendingVerification": "انتظار التحقق من المستندات",
+     "unreadMessages": "{{count}} رسالة غير مقروءة",
+     "waitingOnTask": "تنتظر مهمة؟",
+     "waitingDescription": "تنتظر أن يقبل العملاء عروضك، إذا لم يفعلوا بعد ستتمكن من رؤيتها في",
+     "bidSent": "العروض المرسلة",
+     "activeDescription": "ولكن إذا قبلوا ستجدها في",
+     "active": "النشطة",
+     "searchForTasks": "البحث عن المهام",
+     "searchPlaceholder": "البحث في المهام...",
+     "filterBy": "تصفية حسب...",
+     "clear": "مسح",
+     "nearestToYou": "الأقرب إليك",
+     "cleaning": "التنظيف",
+     "shoppingDelivery": "التسوق والتوصيل",
+     "handyman": "أعمال الصيانة",
+     "moving": "النقل",
+     "ikeaAssembly": "تركيب ايكيا",
+     "yardworkServices": "خدمات الحديقة",
+     "dogWalking": "مشي الكلاب",
+     "other": "أخرى",
+     "clientBudget": "ميزانية العميل: {{budget}}د.ب",
+     "readMore": "اقرأ المزيد...",
+     "readLess": "اقرأ أقل",
+     "bidOnTask": "عرض على المهمة",
+     "noTasksAvailable": "لا توجد مهام متاحة",
+     "noTasksSubtitle": "لا توجد مهام تطابق المرشحات الحالية. جرب تعديل البحث أو المرشحات للعثور على المزيد من المهام.",
+     "loadingTasks": "جاري تحميل المهام...",
+     "taskTitle": "عنوان المهمة",
+     "taskDescription": "إنها حقيقة راسخة منذ فترة طويلة أن القارئ سوف يصرف انتباهه عن المحتوى المقروء للصفحة عندما إنها حقيقة راسخة منذ فترة طويلة أن القارئ"
    }
-   }
+}
   
   

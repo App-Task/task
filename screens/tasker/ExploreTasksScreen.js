@@ -37,15 +37,15 @@ export default function ExploreTasksScreen({ navigation }) {
   const [expandedTasks, setExpandedTasks] = useState(new Set());
 
   const filterOptions = [
-    { id: "nearest", label: "Nearest to you", icon: "location-outline" },
-    { id: "cleaning", label: "Cleaning", icon: "water-outline" },
-    { id: "shopping", label: "Shopping & delivery", icon: "bag-outline" },
-    { id: "handyman", label: "Handyman", icon: "hammer-outline" },
-    { id: "moving", label: "Moving", icon: "car-outline" },
-    { id: "ikea", label: "IKEA assembly", icon: "build-outline" },
-    { id: "yardwork", label: "Yardwork Services", icon: "leaf-outline" },
-    { id: "dogwalking", label: "Dog Walking", icon: "walk-outline" },
-    { id: "other", label: "Other", icon: "ellipsis-horizontal-outline" },
+    { id: "nearest", label: t("taskerExplore.nearestToYou"), icon: "location-outline" },
+    { id: "cleaning", label: t("taskerExplore.cleaning"), icon: "water-outline" },
+    { id: "shopping", label: t("taskerExplore.shoppingDelivery"), icon: "bag-outline" },
+    { id: "handyman", label: t("taskerExplore.handyman"), icon: "hammer-outline" },
+    { id: "moving", label: t("taskerExplore.moving"), icon: "car-outline" },
+    { id: "ikea", label: t("taskerExplore.ikeaAssembly"), icon: "build-outline" },
+    { id: "yardwork", label: t("taskerExplore.yardworkServices"), icon: "leaf-outline" },
+    { id: "dogwalking", label: t("taskerExplore.dogWalking"), icon: "walk-outline" },
+    { id: "other", label: t("taskerExplore.other"), icon: "ellipsis-horizontal-outline" },
   ];
 
   const fetchUnreadMessages = async () => {
@@ -196,7 +196,7 @@ export default function ExploreTasksScreen({ navigation }) {
   const renderTaskCard = (task, index) => {
     const taskId = task._id || index;
     const isExpanded = expandedTasks.has(taskId);
-    const description = task.description || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader";
+    const description = task.description || t("taskerExplore.taskDescription");
     const shouldTruncate = description.length > 100;
     const displayDescription = isExpanded || !shouldTruncate ? description : `${description.substring(0, 100)}...`;
 
@@ -207,7 +207,7 @@ export default function ExploreTasksScreen({ navigation }) {
         onPress={() => navigation.navigate("TaskerTaskDetails", { task })}
         activeOpacity={0.7}
       >
-        <Text style={styles.taskTitle}>{task.title || "Task Title"}</Text>
+        <Text style={styles.taskTitle}>{task.title || t("taskerExplore.taskTitle")}</Text>
         
         <View style={styles.taskTags}>
           <View style={styles.tag}>
@@ -216,10 +216,10 @@ export default function ExploreTasksScreen({ navigation }) {
               size={16} 
               color="#215433" 
             />
-            <Text style={styles.tagText}>{task.category || "Other"}</Text>
+            <Text style={styles.tagText}>{task.category || t("taskerExplore.other")}</Text>
           </View>
           <View style={styles.budgetTag}>
-            <Text style={styles.budgetText}>Client Budget: {task.budget || "5"}BHD</Text>
+            <Text style={styles.budgetText}>{t("taskerExplore.clientBudget", { budget: task.budget || "5" })}</Text>
           </View>
         </View>
 
@@ -235,7 +235,7 @@ export default function ExploreTasksScreen({ navigation }) {
               }}
             >
               <Text style={styles.readMoreLink}>
-                {isExpanded ? "Read Less" : "Read More..."}
+                {isExpanded ? t("taskerExplore.readLess") : t("taskerExplore.readMore")}
               </Text>
             </TouchableOpacity>
           )}
@@ -252,7 +252,7 @@ export default function ExploreTasksScreen({ navigation }) {
             }
           }}
         >
-          <Text style={styles.bidButtonText}>Bid on Task</Text>
+          <Text style={styles.bidButtonText}>{t("taskerExplore.bidOnTask")}</Text>
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -262,8 +262,12 @@ export default function ExploreTasksScreen({ navigation }) {
     <View style={styles.verificationCard}>
       <View style={styles.verificationContent}>
         <Ionicons name="hourglass-outline" size={24} color="#215433" />
-        <Text style={styles.verificationText}>Pending document verification</Text>
-        <Ionicons name="chevron-forward-outline" size={20} color="#215433" />
+        <Text style={styles.verificationText}>{t("taskerExplore.pendingVerification")}</Text>
+        <Ionicons 
+          name={I18nManager.isRTL ? "chevron-back-outline" : "chevron-forward-outline"} 
+          size={20} 
+          color="#215433" 
+        />
       </View>
     </View>
   );
@@ -279,45 +283,50 @@ export default function ExploreTasksScreen({ navigation }) {
           <Ionicons name="chatbubble-outline" size={24} color="#215433" />
           {unreadMessages > 0 && <View style={styles.notificationDot} />}
         </View>
-        <Text style={styles.messagesText}>{unreadMessages} unread messages</Text>
-        <Ionicons name="chevron-forward-outline" size={20} color="#215433" />
+        <Text style={styles.messagesText}>{t("taskerExplore.unreadMessages", { count: unreadMessages })}</Text>
+        <Ionicons 
+          name={I18nManager.isRTL ? "chevron-back-outline" : "chevron-forward-outline"} 
+          size={20} 
+          color="#215433" 
+        />
       </View>
     </TouchableOpacity>
   );
 
   const renderWaitingOnTaskCard = () => (
     <View style={styles.waitingCard}>
-      <Text style={styles.waitingTitle}>Waiting on a Task?</Text>
+      <Text style={styles.waitingTitle}>{t("taskerExplore.waitingOnTask")}</Text>
       <Text style={styles.waitingDescription}>
-        Waiting for clients to accept your bids, if they still haven't you'll be able to see it in
+        {t("taskerExplore.waitingDescription")}
       </Text>
       <TouchableOpacity 
         style={styles.bidSentButton}
         onPress={() => navigation.navigate("MyTasks", { targetTab: "bidSent" })}
       >
-        <Text style={styles.bidSentButtonText}>Bid Sent</Text>
+        <Text style={styles.bidSentButtonText}>{t("taskerExplore.bidSent")}</Text>
       </TouchableOpacity>
-      <Text style={styles.activeDescription}>But if they have you'll find it in</Text>
+      <Text style={styles.activeDescription}>{t("taskerExplore.activeDescription")}</Text>
       <TouchableOpacity 
         style={styles.activeButton}
         onPress={() => navigation.navigate("MyTasks", { targetTab: "active" })}
       >
-        <Text style={styles.activeButtonText}>Active</Text>
+        <Text style={styles.activeButtonText}>{t("taskerExplore.active")}</Text>
       </TouchableOpacity>
     </View>
   );
 
   const renderSearchSection = () => (
     <View style={styles.searchSection}>
-      <Text style={styles.searchTitle}>Search for Tasks</Text>
+      <Text style={styles.searchTitle}>{t("taskerExplore.searchForTasks")}</Text>
       <TextInput
         style={styles.searchInput}
-        placeholder="Search tasks..."
+        placeholder={t("taskerExplore.searchPlaceholder")}
         placeholderTextColor="#666"
         value={searchQuery}
         onChangeText={setSearchQuery}
+        textAlign={I18nManager.isRTL ? "right" : "left"}
       />
-      <Text style={styles.filterLabel}>Filter by...</Text>
+      <Text style={styles.filterLabel}>{t("taskerExplore.filterBy")}</Text>
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
@@ -353,7 +362,7 @@ export default function ExploreTasksScreen({ navigation }) {
             onPress={() => setSelectedFilter(null)}
           >
             <Ionicons name="close-outline" size={16} color="#666" />
-            <Text style={styles.clearFilterText}>Clear</Text>
+            <Text style={styles.clearFilterText}>{t("taskerExplore.clear")}</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -383,8 +392,8 @@ export default function ExploreTasksScreen({ navigation }) {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.greeting}>Hi {currentUser?.name || "Tariq"},</Text>
-            <Text style={styles.welcomeText}>Welcome to TASK!</Text>
+            <Text style={styles.greeting}>{t("taskerExplore.greeting", { name: currentUser?.name || "Tariq" })}</Text>
+            <Text style={styles.welcomeText}>{t("taskerExplore.welcomeText")}</Text>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
             <View style={styles.notificationIconContainer}>
@@ -408,8 +417,8 @@ export default function ExploreTasksScreen({ navigation }) {
           <ActivityIndicator size="large" color="#000000" style={styles.loading} />
         ) : filteredTasks.length === 0 ? (
           <EmptyState 
-            title="No Tasks Available" 
-            subtitle="No tasks match your current filters. Try adjusting your search or filters to find more tasks."
+            title={t("taskerExplore.noTasksAvailable")} 
+            subtitle={t("taskerExplore.noTasksSubtitle")}
           />
         ) : (
           filteredTasks.map((task, index) => renderTaskCard(task, index))
@@ -569,7 +578,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#414141",
     marginBottom: 16,
-    textAlign: "left",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   activeButton: {
     backgroundColor: "#215433",
@@ -623,7 +632,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   filterChip: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     backgroundColor: "#fff",
     borderWidth: 1,
@@ -631,7 +640,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    marginRight: 8,
+    marginRight: I18nManager.isRTL ? 0 : 8,
+    marginLeft: I18nManager.isRTL ? 8 : 0,
   },
   filterChipActive: {
     backgroundColor: "#215433",
@@ -641,7 +651,8 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 14,
     color: "#215433",
-    marginLeft: 6,
+    marginLeft: I18nManager.isRTL ? 0 : 6,
+    marginRight: I18nManager.isRTL ? 6 : 0,
   },
   filterChipTextActive: {
     color: "#fff",
@@ -654,7 +665,8 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 14,
     color: "#666",
-    marginLeft: 6,
+    marginLeft: I18nManager.isRTL ? 0 : 6,
+    marginRight: I18nManager.isRTL ? 6 : 0,
   },
   taskCard: {
     backgroundColor: "#fff",
@@ -722,6 +734,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     lineHeight: 20,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   readMoreLink: {
     color: "#0066cc",
@@ -729,6 +742,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 14,
     marginTop: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   bidButton: {
     backgroundColor: "#215433",
