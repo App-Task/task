@@ -93,7 +93,7 @@ export default function TaskerMessagesScreen({ navigation }) {
         <View style={styles.row}>
   <View style={styles.avatar} /> 
   <View style={{ flex: 1 }}>
-    <Text style={styles.name}>{item.name || "Unnamed User"}</Text>
+    <Text style={styles.name}>{item.name || t("taskerMessages.unnamedUser")}</Text>
 
             <Text style={styles.message} numberOfLines={1}>
               {item.lastMessage}
@@ -115,11 +115,11 @@ export default function TaskerMessagesScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Messages</Text>
+      <Text style={styles.title}>{t("taskerMessages.title")}</Text>
       <View style={styles.searchBar}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search"
+          placeholder={t("taskerMessages.searchPlaceholder")}
           placeholderTextColor="#777"
           value={searchQuery}
           onChangeText={(text) => setSearchQuery(text)}
@@ -130,8 +130,8 @@ export default function TaskerMessagesScreen({ navigation }) {
         <ActivityIndicator size="large" color="#214730" style={{ marginTop: 40 }} />
       ) : conversations.length === 0 ? (
         <EmptyState 
-          title="No Messages Yet" 
-          subtitle="Start conversations with clients by bidding on their tasks!"
+          title={t("taskerMessages.emptyTitle")} 
+          subtitle={t("taskerMessages.emptySubtitle")}
         />
       ) : (
         <FlatList
@@ -169,10 +169,10 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: "#214730",
     marginBottom: 20,
-    textAlign: "left",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   card: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     paddingVertical: 16,
     paddingHorizontal: 0,
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   },
   
   row: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     flex: 1,
   },
@@ -203,12 +203,13 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 12,
     color: "#999",
-    textAlign: "right",
+    textAlign: I18nManager.isRTL ? "left" : "right",
     marginBottom: 6,
   },
   rightSide: {
-    alignItems: "flex-end",
-    marginLeft: 10,
+    alignItems: I18nManager.isRTL ? "flex-start" : "flex-end",
+    marginLeft: I18nManager.isRTL ? 0 : 10,
+    marginRight: I18nManager.isRTL ? 10 : 0,
   },
   unreadBadge: {
     backgroundColor: "#215433",
@@ -320,7 +321,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: "#c1ff72", // lime green
-    marginRight: 10,
+    marginRight: I18nManager.isRTL ? 0 : 10,
+    marginLeft: I18nManager.isRTL ? 10 : 0,
   },
 
   searchBar: {
@@ -334,6 +336,7 @@ const styles = StyleSheet.create({
     color: "#000",
     fontFamily: "Inter",
     fontSize: 14,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   
 

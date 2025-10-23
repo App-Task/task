@@ -63,7 +63,10 @@ export default function MyReviewsScreen({ navigation }) {
         name={index < rating ? "star" : "star-outline"}
         size={20}
         color="#215433"
-        style={{ marginRight: 2 }}
+        style={{ 
+          marginRight: I18nManager.isRTL ? 0 : 2,
+          marginLeft: I18nManager.isRTL ? 2 : 0
+        }}
       />
     ));
   };
@@ -71,14 +74,14 @@ export default function MyReviewsScreen({ navigation }) {
   const renderReviewItem = ({ item }) => (
     <View>
       <View style={styles.reviewItem}>
-        <Text style={styles.taskTitle}>{item.taskId?.title || "Task Title"}</Text>
+        <Text style={styles.taskTitle}>{item.taskId?.title || t("taskerReviews.taskTitle")}</Text>
         
         <View style={styles.starsContainer}>
           {renderStars(item.rating || 0)}
         </View>
         
         <Text style={styles.reviewText}>
-          {item.comment || "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when"}
+          {item.comment || t("taskerReviews.defaultComment")}
         </Text>
       </View>
       {/* Divider after each review */}
@@ -104,10 +107,10 @@ export default function MyReviewsScreen({ navigation }) {
 
       {/* Title Section */}
       <View style={styles.titleSection}>
-        <Text style={styles.mainTitle}>My Reviews</Text>
+        <Text style={styles.mainTitle}>{t("taskerReviews.myReviews")}</Text>
         <View style={styles.subtitleRow}>
-          <Text style={styles.subtitle}>Reviews</Text>
-          <Text style={styles.avgRating}>Avg Rating: {averageRating}</Text>
+          <Text style={styles.subtitle}>{t("taskerReviews.reviews")}</Text>
+          <Text style={styles.avgRating}>{t("taskerReviews.avgRating")}: {averageRating}</Text>
         </View>
         {/* Divider */}
         <View style={styles.divider} />
@@ -123,8 +126,8 @@ export default function MyReviewsScreen({ navigation }) {
       ) : reviews.length === 0 ? (
         <View style={styles.emptyStateContainer}>
           <EmptyState 
-            title="No Reviews Yet" 
-            subtitle="Start completing tasks to receive reviews from clients!"
+            title={t("taskerReviews.emptyTitle")} 
+            subtitle={t("taskerReviews.emptySubtitle")}
           />
         </View>
       ) : (
@@ -171,9 +174,10 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: "#215433",
     marginBottom: 8,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   subtitleRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
@@ -181,11 +185,13 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 16,
     color: "#215433",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   avgRating: {
     fontFamily: "InterBold",
     fontSize: 16,
     color: "#215433",
+    textAlign: I18nManager.isRTL ? "left" : "right",
   },
   divider: {
     height: 1,
@@ -205,9 +211,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#215433",
     marginBottom: 8,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   starsContainer: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     marginBottom: 8,
   },
   reviewText: {
@@ -215,6 +222,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     lineHeight: 20,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   separator: {
     height: 1,

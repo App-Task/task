@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   TextInput,
   RefreshControl,
+  I18nManager,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -394,7 +395,7 @@ export default function TaskerMyTasksScreen() {
   const renderTaskCard = ({ item }) => (
     <View style={styles.card}>
       {/* Date and Time with Report Icon */}
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+      <View style={{ flexDirection: I18nManager.isRTL ? "row-reverse" : "row", justifyContent: "space-between", alignItems: "center" }}>
         <Text style={styles.dateText}>
           {new Date(item.createdAt).toLocaleDateString("en-GB", {
             day: "2-digit",
@@ -439,6 +440,7 @@ export default function TaskerMyTasksScreen() {
                 color: "#27a567",
                 marginTop: 4,
                 marginBottom: 8,
+                textAlign: I18nManager.isRTL ? "right" : "left",
               }}
             >
               {t("taskerMyTasks.statusTypes.completed")}
@@ -451,6 +453,7 @@ export default function TaskerMyTasksScreen() {
                 color: "#c00",
                 marginTop: 4,
                 marginBottom: 8,
+                textAlign: I18nManager.isRTL ? "right" : "left",
               }}
             >
               {t("taskerMyTasks.statusTypes.cancelled")}
@@ -627,6 +630,7 @@ export default function TaskerMyTasksScreen() {
                   fontSize: 14,
                   color: "#333",
                   textAlignVertical: "top",
+                  textAlign: I18nManager.isRTL ? "right" : "left",
                   height: 80,
                 }}
                 multiline
@@ -637,7 +641,7 @@ export default function TaskerMyTasksScreen() {
                 {reportReason.length}/300 {t("taskerMyTasks.characters")}
               </Text>
 
-              <View style={{ flexDirection: "row", gap: 12 }}>
+              <View style={{ flexDirection: I18nManager.isRTL ? "row-reverse" : "row", gap: 12 }}>
                 <TouchableOpacity
                   style={{
                     flex: 1,
@@ -689,7 +693,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   segmentedControl: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     backgroundColor: "#E0E0E0",
     borderRadius: 25,
     padding: 4,
@@ -709,6 +713,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 14,
     color: "#616161",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   activeSegmentText: {
     fontFamily: "InterBold",
@@ -842,6 +847,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#999",
     marginBottom: 8,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   participantsIcon: {
     position: "absolute",
@@ -857,6 +863,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     marginBottom: 8,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   viewDetailsLink: {
     fontFamily: "Inter",
@@ -864,9 +871,10 @@ const styles = StyleSheet.create({
     color: "#999",
     textDecorationLine: "underline",
     marginBottom: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   actionButtons: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     gap: 12,
   },
   actionButton: {
