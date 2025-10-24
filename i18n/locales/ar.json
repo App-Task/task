@@ -502,7 +502,8 @@
     "cameraDeniedMsg": "إذن الكاميرا مطلوب لالتقاط صورة.",
     "libraryDeniedMsg": "إذن مكتبة الصور مطلوب لاختيار صورة.",
     "deleteConfirmTitle": "حذف المستند؟",
-    "deleteConfirmMessage": "هل أنت متأكد من أنك تريد حذف هذا المستند؟"
+    "deleteConfirmMessage": "هل أنت متأكد من أنك تريد حذف هذا المستند؟",
+    "cprRequirement": "⚠️ مهم: بطاقة الهوية (CPR) مطلوبة - يرجى رفع الوجه الأمامي والخلفي للتحقق."
   },
   "taskerEditProfile": {
     "title": "تعديل الملف الشخصي",

@@ -589,7 +589,8 @@
     "cameraDeniedMsg": "Camera permission is required to take a photo.",
     "libraryDeniedMsg": "Photo library permission is required to pick a photo.",
     "deleteConfirmTitle": "Delete document?",
-    "deleteConfirmMessage": "Are you sure you want to delete this document?"
+    "deleteConfirmMessage": "Are you sure you want to delete this document?",
+    "cprRequirement": "⚠️ IMPORTANT: CPR (Civil ID) is required - please upload both FRONT and BACK sides for verification."
   },
   "taskerEditProfile": {
     "title": "Edit Profile",

@@ -344,13 +344,13 @@ allTasks.forEach((task) => {
         {/* ✅ Date Row with Report Icon */}
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <Text style={styles.cardDate}>
-            {new Date(item.createdAt).toLocaleDateString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
+            {new Date(item.createdAt).toLocaleDateString("en-GB", {
               day: "2-digit",
               month: "short",
               year: "numeric",
             })}{" "}
             •{" "}
-            {new Date(item.createdAt).toLocaleTimeString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
+            {new Date(item.createdAt).toLocaleTimeString("en-GB", {
               hour: "2-digit",
               minute: "2-digit",
             })}

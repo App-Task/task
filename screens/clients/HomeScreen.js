@@ -237,8 +237,6 @@ const styles = StyleSheet.create({
   messagesCard: {
     backgroundColor: "#ffffff",
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#000000",
     marginHorizontal: 24,
     marginBottom: 20,
     padding: 16,
@@ -287,8 +285,6 @@ const styles = StyleSheet.create({
   actionCard: {
     backgroundColor: "#ffffff",
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#000000",
     padding: 20,
     marginHorizontal: 24,
     marginBottom: 20,

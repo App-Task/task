@@ -484,8 +484,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#000000",
   },
   verificationContent: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
@@ -506,8 +504,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#000000",
   },
   messagesContent: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
@@ -540,8 +536,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#000000",
     padding: 16,
   },
   waitingTitle: {
@@ -673,8 +667,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 16,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#000000",
     padding: 16,
     elevation: 2,
     shadowColor: "#000",

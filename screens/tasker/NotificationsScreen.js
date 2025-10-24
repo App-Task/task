@@ -156,7 +156,7 @@ export default function TaskerNotificationsScreen({ navigation, setUnreadNotific
       </Text>
   
       <Text style={styles.time}>
-        {new Date(item.createdAt).toLocaleString(I18nManager.isRTL ? "ar-SA" : "en-GB", {
+        {new Date(item.createdAt).toLocaleString("en-GB", {
           hour: "2-digit",
           minute: "2-digit",
           day: "numeric",

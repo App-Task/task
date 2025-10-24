@@ -289,6 +289,7 @@ export default function DocumentsScreen({ navigation, route }) {
       {/* Title + description */}
       <Text style={styles.finalTitle}>{t("taskerDocuments.finalTitle")}</Text>
       <Text style={styles.finalDesc}>{t("taskerDocuments.finalDesc")}</Text>
+      <Text style={styles.cprRequirement}>{t("taskerDocuments.cprRequirement")}</Text>
 
       {/* Document List */}
       {documents.length > 0 ? (
@@ -475,5 +476,19 @@ const styles = StyleSheet.create({
     color: "#999",
     marginTop: 8,
     textAlign: "center",
+  },
+  cprRequirement: {
+    fontFamily: "InterBold",
+    fontSize: 16,
+    color: "#215433",
+    lineHeight: 22,
+    marginBottom: 20,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+    backgroundColor: "#e8f4ec",
+    padding: 12,
+    borderRadius: 8,
+    borderLeftWidth: I18nManager.isRTL ? 0 : 4,
+    borderRightWidth: I18nManager.isRTL ? 4 : 0,
+    borderColor: "#215433",
   },
 });
