@@ -12,6 +12,7 @@ import MainNavigator from "./navigation/MainNavigator";
 import Toast from "react-native-toast-message";
 import i18n from "./i18n/config";
 import { useTranslation } from "react-i18next";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 
 SplashScreen.preventAutoHideAsync();
@@ -30,25 +31,24 @@ export default function App() {
     const ensureLayoutForLanguage = async (lang: string) => {
       const desiredRTL = lang === "ar";
       const isRTLNow = I18nManager.isRTL;
+      
+      // Always allow RTL support
       I18nManager.allowRTL(true);
       I18nManager.swapLeftAndRightInRTL(true);
 
-      if (desiredRTL !== isRTLNow) {
-        const reloaded = (await SecureStore.getItemAsync("rtlReloaded")) === "true";
-        if (!reloaded) {
-          await SecureStore.setItemAsync("rtlReloaded", "true");
-          I18nManager.forceRTL(desiredRTL);
-          await SecureStore.setItemAsync("appRTL", JSON.stringify(desiredRTL));
-          await Updates.reloadAsync();
-          return false; // not ready yet, will reload
-        }
-        // Already reloaded once; avoid loop. Ask user to restart manually if still mismatched.
+      // Save the desired RTL state
+      await SecureStore.setItemAsync("appRTL", JSON.stringify(desiredRTL));
+      
+      // Only apply RTL if it matches the current state to avoid crashes
+      if (desiredRTL === isRTLNow) {
+        // Clear any reload flags since we're in sync
+        await SecureStore.deleteItemAsync("rtlReloaded");
         return true;
       } else {
-        // Clear the reload guard once things match
-        await SecureStore.deleteItemAsync("rtlReloaded");
-        await SecureStore.setItemAsync("appRTL", JSON.stringify(desiredRTL));
-        return true;
+        // RTL state doesn't match, but don't force it to prevent crashes
+        // The user will see the language change, and RTL will be applied on next restart
+        console.log(`RTL state mismatch (desired: ${desiredRTL}, current: ${isRTLNow}). Will apply on next restart.`);
+        return true; // Allow the app to continue without crashing
       }
     };
 
@@ -74,30 +74,8 @@ export default function App() {
     initLanguageAndLayout();
   }, []);
 
-  useEffect(() => {
-    const handleLanguageChange = async (lng: string) => {
-      try {
-        await SecureStore.setItemAsync("appLanguage", lng);
-        await SecureStore.deleteItemAsync("rtlReloaded"); // allow one controlled reload if needed
-        const desiredRTL = lng === "ar";
-        const isRTLNow = I18nManager.isRTL;
-        I18nManager.allowRTL(true);
-        I18nManager.swapLeftAndRightInRTL(true);
-        if (desiredRTL !== isRTLNow) {
-          I18nManager.forceRTL(desiredRTL);
-          await SecureStore.setItemAsync("appRTL", JSON.stringify(desiredRTL));
-          await Updates.reloadAsync();
-        }
-      } catch (e) {
-        // no-op
-      }
-    };
-
-    i18n.on("languageChanged", handleLanguageChange);
-    return () => {
-      i18n.off("languageChanged", handleLanguageChange as any);
-    };
-  }, []);
+  // Removed the language change handler that was causing restarts
+  // Language changes are now handled entirely by LanguageContext
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded && appReady) {
@@ -110,14 +88,16 @@ export default function App() {
   const isRTL = i18next.language === "ar";
 
   return (
-    <View style={{ flex: 1, backgroundColor: "rgba(248, 246, 247)", writingDirection: isRTL ? "rtl" : "ltr", direction: isRTL ? "rtl" : "ltr" }} onLayout={onLayoutRootView}>
-      {/* ✅ Global status bar */}
-      <StatusBar style="dark" backgroundColor="rgba(248, 246, 247)" />
-      <NavigationContainer key={isRTL ? "rtl" : "ltr"}>
-        <MainNavigator />
-      </NavigationContainer>
-      <Toast />
-    </View>
+    <LanguageProvider>
+      <View style={{ flex: 1, backgroundColor: "rgba(248, 246, 247)", writingDirection: isRTL ? "rtl" : "ltr", direction: isRTL ? "rtl" : "ltr" }} onLayout={onLayoutRootView}>
+        {/* ✅ Global status bar */}
+        <StatusBar style="dark" backgroundColor="rgba(248, 246, 247)" />
+        <NavigationContainer>
+          <MainNavigator />
+        </NavigationContainer>
+        <Toast />
+      </View>
+    </LanguageProvider>
   );
   
 }

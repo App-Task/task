@@ -20,14 +20,15 @@ import { useTranslation } from "react-i18next";
 import i18n from "i18next";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
-import { updateNotificationLanguage } from "../../services/notificationService";
+import { useLanguage } from "../../contexts/LanguageContext";
+import LanguageToggle from "../../components/LanguageToggle";
 
 const { width } = Dimensions.get("window");
 
 export default function WelcomeScreen({ navigation }) {
   const [ready, setReady] = useState(false);
-  const [switchingLanguage, setSwitchingLanguage] = useState(false);
   const { t } = useTranslation();
+  const { toggleLanguage, isChangingLanguage } = useLanguage();
 
   useEffect(() => {
     const preload = async () => {
@@ -55,35 +56,6 @@ export default function WelcomeScreen({ navigation }) {
     }
   };
 
-  const toggleLanguage = async () => {
-    setSwitchingLanguage(true);
-    
-    try {
-      const newLang = i18n.language === "en" ? "ar" : "en";
-      const isRTL = newLang === "ar";
-
-      // Update existing notifications to new language
-      await updateNotificationLanguage(newLang);
-
-      await SecureStore.setItemAsync("appLanguage", newLang);
-      await SecureStore.setItemAsync("appRTL", JSON.stringify(isRTL));
-      await i18n.changeLanguage(newLang);
-
-      Toast.show({
-        type: "success",
-        text1: newLang === "en" ? t("language.changedEn") : t("language.changedAr"),
-        position: "bottom",
-        visibilityTime: 2000,
-      });
-
-      if (I18nManager.isRTL !== isRTL) {
-        I18nManager.forceRTL(isRTL);
-        await Updates.reloadAsync();
-      }
-    } finally {
-      setSwitchingLanguage(false);
-    }
-  };
 
   if (!ready) {
     return (
@@ -107,14 +79,7 @@ export default function WelcomeScreen({ navigation }) {
 
 
 
-        <TouchableOpacity onPress={toggleLanguage} style={styles.langSwitch}>
-          <View style={styles.langBadge}>
-            <Ionicons name="globe-outline" size={18} color="#213729" style={{ marginRight: 6 }} />
-            <Text style={styles.langSwitchText}>
-              {i18n.language === "en" ? "العربية" : "English"}
-            </Text>
-          </View>
-        </TouchableOpacity>
+        <LanguageToggle style={styles.langSwitch} />
 
         <View style={styles.sectionsContainer}>
           <TouchableOpacity
@@ -138,7 +103,7 @@ export default function WelcomeScreen({ navigation }) {
       </View>
 
       {/* Language switching loading popup */}
-      {switchingLanguage && (
+      {isChangingLanguage && (
         <View style={styles.loadingOverlay}>
           <View style={styles.loadingBox}>
             <ActivityIndicator size="large" color="#213729" />

@@ -13,13 +13,13 @@ import {
   Keyboard,
   ScrollView,
   Image,
+  I18nManager,
   RefreshControl,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import Modal from "react-native-modal";
-import { I18nManager } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import EmptyState from "../../components/EmptyState";
 

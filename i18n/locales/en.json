@@ -497,7 +497,6 @@
     "markCompletedError": "Could not mark the task as completed.",
     "editNotAllowed": "You can't edit this task because a tasker has already placed a bid.",
     "taskDetails": "Task Details",
-    "taskerProfile": "Tasker Profile",
     "postedOn": "Posted on",
     "budget": "BUDGET",
     "noDescription": "No description provided",
@@ -917,6 +916,7 @@
   ,
   "common": {
     "errorTitle": "Error",
+    "error": "Error",
     "errorGeneric": "Something went wrong. Please try again.",
     "ok": "OK",
     "continue": "Continue",
