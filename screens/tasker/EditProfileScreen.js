@@ -503,7 +503,7 @@ const getTranslatedSkills = () => {
               }}
             />
             <Text style={styles.characterCount}>
-              {about.length}/150 characters
+              {about.length}/150 {t("common.characters")}
             </Text>
           </View>
 

@@ -642,6 +642,8 @@
     "taskTitleFallback": "عنوان المهمة",
     "clientFallback": "العميل",
     "characters": "حرف",
+    "maxCharacters100": "100 حرف كحد أقصى",
+    "maxCharacters350": "350 حرف كحد أقصى",
     "emptyBidSent": {
       "title": "لا توجد عروض مرسلة",
       "subtitle": "ابدأ في تقديم العروض على المهام لتراها هنا!"
@@ -929,7 +931,8 @@
     "deleteFailed": "فشل الحذف",
     "deleteFailedMessage": "لا يمكن حذف المستند. يرجى المحاولة مرة أخرى.",
     "passwordResetSuccessTitle": "تم إعادة تعيين كلمة المرور بنجاح",
-    "passwordResetSuccessMessage": "تم إعادة تعيين كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة."
+    "passwordResetSuccessMessage": "تم إعادة تعيين كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.",
+    "characters": "حرف"
   },
   "taskerCompleteProfile": {
     "title": "أكمل ملفك الشخصي",

@@ -110,7 +110,7 @@ export default function EditBidScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Bid offer</Text>
-              <Text style={styles.characterLimit}>Maximum 100 Characters</Text>
+              <Text style={styles.characterLimit}>{t("taskerMyTasks.maxCharacters100")}</Text>
             </View>
             <TextInput
               style={styles.input}
@@ -127,7 +127,7 @@ export default function EditBidScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Message</Text>
-              <Text style={styles.characterLimit}>Maximum 350 Characters</Text>
+              <Text style={styles.characterLimit}>{t("taskerMyTasks.maxCharacters350")}</Text>
             </View>
             <TextInput
               style={[styles.input, styles.messageInput]}

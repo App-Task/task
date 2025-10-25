@@ -889,7 +889,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
               />
               
               <Text style={styles.characterCount}>
-                {reportReason.length}/300 characters
+                {reportReason.length}/300 {t("common.characters")}
               </Text>
 
               <View style={styles.modalButtons}>

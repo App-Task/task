@@ -341,7 +341,7 @@ export default function PostTaskPage2() {
               <Text style={I18nManager.isRTL ? styles.labelRTL : styles.label}>{t("clientPostTask.page2.taskTitle")}</Text>
               <Text style={I18nManager.isRTL ? styles.requirementRTL : styles.requirement}>
                 {title.length < 10 
-                  ? `Min ${10 - title.length} more characters`
+                  ? t("clientEditTask.minCharacters", { count: 10 - title.length })
                   : t("clientPostTask.page2.maxCharacters100")
                 }
               </Text>
@@ -369,7 +369,7 @@ export default function PostTaskPage2() {
               <Text style={I18nManager.isRTL ? styles.labelRTL : styles.label}>{t("clientPostTask.page2.describeTask")}</Text>
               <Text style={I18nManager.isRTL ? styles.requirementRTL : styles.requirement}>
                 {description.length < 25 
-                  ? `Min ${25 - description.length} more characters`
+                  ? t("clientEditTask.minCharacters", { count: 25 - description.length })
                   : t("clientPostTask.page2.maxCharacters150")
                 }
               </Text>

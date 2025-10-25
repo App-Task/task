@@ -713,6 +713,8 @@
   "taskTitleFallback": "Task Title",
   "clientFallback": "Client",
   "characters": "characters",
+  "maxCharacters100": "Maximum 100 characters",
+  "maxCharacters350": "Maximum 350 characters",
   "emptyBidSent": {
     "title": "No Bids Sent",
     "subtitle": "Start bidding on tasks to see them here!"
@@ -1024,7 +1026,8 @@
     "passwordResetSuccessTitle": "Password Reset Success",
     "passwordResetSuccessMessage": "Your password has been reset successfully. You can now log in with your new password.",
     "ok": "OK",
-    "continue": "Continue"
+    "continue": "Continue",
+    "characters": "characters"
   },
   "taskerCompleteProfile": {
     "title": "Complete Your Profile",

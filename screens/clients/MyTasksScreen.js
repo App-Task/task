@@ -734,7 +734,7 @@ allTasks.forEach((task) => {
               />
 
               <Text style={{ fontFamily: "Inter", fontSize: 12, color: "#999", marginBottom: 20 }}>
-                {reportReason.length}/300 characters
+                {reportReason.length}/300 {t("common.characters")}
               </Text>
 
               <View style={{ flexDirection: "row", gap: 12 }}>
