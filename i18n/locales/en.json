@@ -962,7 +962,7 @@
     "bids": "bids",
     "received": "received",
     "noTasksYet": "You don't have any {{status}} tasks yet.",
-    "tasksStatus": "Tasks {{status}} No",
+    "tasksStatus": "No {{status}} Tasks",
     "currency": "BHD",
     "couldNotGetLocation": "Could not get your current location.",
     "couldNotOpenMapPicker": "Could not open map picker.",

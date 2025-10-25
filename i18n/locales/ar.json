@@ -879,7 +879,7 @@
     "bids": "عروض",
     "received": "مستلمة",
     "noTasksYet": "ليس لديك أي مهام {{status}} بعد.",
-    "tasksStatus": "مهام {{status}} لا",
+    "tasksStatus": "لا توجد مهام {{status}}",
     "currency": "د.ب",
     "couldNotGetLocation": "لا يمكن الحصول على موقعك الحالي.",
     "couldNotOpenMapPicker": "لا يمكن فتح منتقي الخريطة.",
