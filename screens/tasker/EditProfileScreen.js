@@ -57,7 +57,56 @@ const [showGenderDropdown, setShowGenderDropdown] = useState(false);
 const [showLocationDropdown, setShowLocationDropdown] = useState(false);
 const [showSkillsDropdown, setShowSkillsDropdown] = useState(false);
 
-// Predefined skills list (same as CompleteTaskerProfileScreen)
+// Helper function to translate skill names
+const getSkillTranslation = (skill) => {
+  const skillMap = {
+    "Handyman": t("clientPostTask.categories.handyman"),
+    "Moving": t("clientPostTask.categories.moving"),
+    "IKEA Assembly": t("clientPostTask.categories.furniture"),
+    "Cleaning": t("clientPostTask.categories.cleaning"),
+    "Shopping & Delivery": t("clientPostTask.categories.shopping"),
+    "Yardwork Services": t("clientPostTask.categories.yardwork"),
+    "Dog Walking": t("clientPostTask.categories.dogWalking"),
+    "Other": t("clientPostTask.categories.other"),
+  };
+  
+  let translated = skillMap[skill] || skill;
+  
+  // Fallback if translation returned the key itself
+  if (translated.startsWith("clientPostTask.categories.")) {
+    const fallbackMap = {
+      "Handyman": i18n.language === "ar" ? "أعمال الصيانة" : "Handyman",
+      "Moving": i18n.language === "ar" ? "النقل" : "Moving",
+      "IKEA Assembly": i18n.language === "ar" ? "تركيب الأثاث" : "Furniture Assembly",
+      "Cleaning": i18n.language === "ar" ? "التنظيف" : "Cleaning",
+      "Shopping & Delivery": i18n.language === "ar" ? "التسوق والتوصيل" : "Shopping & Delivery",
+      "Yardwork Services": i18n.language === "ar" ? "أعمال الحديقة" : "Yardwork Services",
+      "Dog Walking": i18n.language === "ar" ? "تمشية الكلاب" : "Dog Walking",
+      "Other": i18n.language === "ar" ? "أخرى" : "Other",
+    };
+    return fallbackMap[skill] || skill;
+  }
+  
+  return translated;
+};
+
+// Helper function to reverse lookup - find English skill name from translated name
+const getEnglishSkillName = (translatedSkill) => {
+  const reverseMap = {
+    [t("clientPostTask.categories.handyman")]: "Handyman",
+    [t("clientPostTask.categories.moving")]: "Moving",
+    [t("clientPostTask.categories.furniture")]: "IKEA Assembly",
+    [t("clientPostTask.categories.cleaning")]: "Cleaning",
+    [t("clientPostTask.categories.shopping")]: "Shopping & Delivery",
+    [t("clientPostTask.categories.yardwork")]: "Yardwork Services",
+    [t("clientPostTask.categories.dogWalking")]: "Dog Walking",
+    [t("clientPostTask.categories.other")]: "Other",
+  };
+  
+  return reverseMap[translatedSkill] || translatedSkill;
+};
+
+// Predefined skills list (English names for backend)
 const availableSkills = [
   "Handyman",
   "Moving",
@@ -68,6 +117,11 @@ const availableSkills = [
   "Dog Walking",
   "Other"
 ];
+
+// Get translated skills for display
+const getTranslatedSkills = () => {
+  return availableSkills.map(skill => getSkillTranslation(skill));
+};
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -227,23 +281,21 @@ const availableSkills = [
           contentInset={{ bottom: 50 }}
           style={{ flex: 1 }}
         >
-          {/* ✅ Top Back Button */}
-          <View style={styles.headerRow}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-    <Ionicons
-      name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-      size={24}
-      color="#215433"
-    />
+          {/* ✅ Top Back Button and Title */}
+          <View style={styles.headerContainer}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons
+                name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+                size={24}
+                color="#215433"
+              />
+            </TouchableOpacity>
 
-
-      </TouchableOpacity>
-
-      <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>
-    </View>
+            <Text style={styles.header}>{t("taskerEditProfile.title")}</Text>
+          </View>
 
 
     <Text style={{ fontSize: 16, fontWeight: "bold", color: "#215433", marginBottom: 20, textAlign: I18nManager.isRTL ? "right" : "left" }}>
@@ -355,7 +407,7 @@ const availableSkills = [
               onPress={() => setShowSkillsDropdown(!showSkillsDropdown)}
             >
               <Text style={{ color: selectedSkills.length > 0 ? "#333" : "#999" }}>
-                {selectedSkills.length > 0 ? selectedSkills.join(", ") : "Select Skills"}
+                {selectedSkills.length > 0 ? selectedSkills.map(s => getSkillTranslation(s)).join(", ") : "Select Skills"}
               </Text>
             </TouchableOpacity>
 
@@ -364,7 +416,7 @@ const availableSkills = [
               <View style={styles.selectedSkillsContainer}>
                 {selectedSkills.map((skill, index) => (
                   <View key={index} style={styles.selectedSkillItem}>
-                    <Text style={styles.selectedSkillText}>{skill}</Text>
+                    <Text style={styles.selectedSkillText}>{getSkillTranslation(skill)}</Text>
                     <TouchableOpacity
                       style={styles.removeSkillButton}
                       onPress={() => {
@@ -412,7 +464,7 @@ const availableSkills = [
                         styles.dropdownText,
                         selectedSkills.includes(skill) && styles.dropdownTextSelected
                       ]}>
-                        {skill}
+                        {getSkillTranslation(skill)}
                       </Text>
                       {selectedSkills.includes(skill) && (
                         <View style={styles.selectedIndicator}>
@@ -475,12 +527,11 @@ const styles = StyleSheet.create({
     flexGrow: 1, // Changed from flex: 1 to flexGrow: 1 for proper scrolling
   },
 
-  headerRow: {
-    position: "relative",
+  headerContainer: {
+    flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
     marginBottom: 30,
-    height: 40,
+    gap: 8,
   },
 
   backButton: {
@@ -488,9 +539,8 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     alignItems: "center",
+    alignSelf: I18nManager.isRTL ? "flex-end" : "flex-start",
   },
-  
-  
 
   header: {
     fontFamily: "InterBold",
@@ -537,7 +587,7 @@ const styles = StyleSheet.create({
   },
 
   phoneContainer: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     width: "100%",
     backgroundColor: "#f8f9fa",
     borderRadius: 12,
@@ -551,8 +601,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 10,
     backgroundColor: "#e0e0e0",
-    borderRightWidth: 1,
-    borderRightColor: "#ccc",
+    ...(I18nManager.isRTL ? { borderLeftWidth: 1, borderLeftColor: "#ccc" } : { borderRightWidth: 1, borderRightColor: "#ccc" }),
   },
   
   phoneInput: {
@@ -562,6 +611,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   
   dropdown: {
@@ -583,9 +633,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#f1f3f4",
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: 8,
   },
 
   dropdownText: {
@@ -593,6 +644,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     color: "#333",
     flex: 1,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
 
   dropdownItemSelected: {
@@ -616,29 +668,28 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#e9ecef",
+    gap: 8,
   },
 
   selectedSkillItem: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     backgroundColor: "#215433",
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    marginRight: 8,
-    marginBottom: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
+    gap: 6,
   },
 
   selectedSkillText: {
     color: "#ffffff",
     fontFamily: "InterMedium",
     fontSize: 14,
-    marginRight: 6,
   },
 
   removeSkillButton: {

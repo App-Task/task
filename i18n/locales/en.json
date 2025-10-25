@@ -60,7 +60,10 @@
   "privacy": "Privacy Policy",
   "and": "and",
   "termsRequiredTitle": "Terms Required",
-  "termsRequiredMessage": "You must accept the Terms and Privacy Policy to continue."
+  "termsRequiredMessage": "You must accept the Terms and Privacy Policy to continue.",
+  "passwordRequirement1": "Password should have at least one number",
+  "passwordRequirement2": "Password should have at least one capital letter",
+  "registering": "Registering..."
 
   },
   "TaskBottomNav": {
@@ -243,6 +246,7 @@
         "shoppingDesc": "Get groceries, essentials, or packages picked up and delivered straight to your door.",
         "pet": "Pet Services",
         "petDesc": "Find caring helpers for pet sitting, walking, feeding, and more.",
+        "dogWalking": "Dog Walking",
         "moving": "Moving",
         "movingDesc": "Hire trusted movers to pack, load, and transport your belongings safely.",
         "furniture": "Furniture Assembly",
@@ -1025,10 +1029,14 @@
   "taskerCompleteProfile": {
     "title": "Complete Your Profile",
     "subText": "For security and better matching with clients, you must complete your profile before continuing.",
+    "personalInformation": "Personal Information",
+    "skillsAndExpertise": "Skills & Expertise",
+    "aboutYou": "About You",
     "namePlaceholder": "Full Name",
     "phonePlaceholder": "Phone Number",
     "selectGender": "Select Gender",
     "selectLocation": "Select Location",
+    "selectSkills": "Select Skills",
     "genderMale": "Male",
     "genderFemale": "Female",
     "locationBahrain": "Bahrain",
@@ -1042,7 +1050,8 @@
     "invalidPhoneTitle": "Invalid Phone Number",
     "invalidPhoneMessage": "Phone number must be 8 to 15 digits and contain only numbers.",
     "completedTitle": "Profile Completed",
-    "completedMessage": "Your profile has been set up successfully."
+    "completedMessage": "Your profile has been set up successfully.",
+    "characters": "characters"
   },
   "clientViewBids": {
     "title": "Task Bids",

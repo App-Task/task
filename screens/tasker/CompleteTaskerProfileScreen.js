@@ -16,6 +16,7 @@ import {
 } from "react-native";
 
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { getToken } from "../../services/authStorage";
 import { useNavigation } from "@react-navigation/native";
@@ -27,6 +28,7 @@ const { width } = Dimensions.get("window");
 export default function CompleteTaskerProfileScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation();
+  const isRTL = i18n.language === "ar";
 
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
@@ -40,6 +42,39 @@ export default function CompleteTaskerProfileScreen() {
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [showSkillsDropdown, setShowSkillsDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Helper function to translate skill names
+  const getSkillTranslation = (skill) => {
+    const skillMap = {
+      "Handyman": t("clientPostTask.categories.handyman"),
+      "Moving": t("clientPostTask.categories.moving"),
+      "IKEA Assembly": t("clientPostTask.categories.furniture"),
+      "Cleaning": t("clientPostTask.categories.cleaning"),
+      "Shopping & Delivery": t("clientPostTask.categories.shopping"),
+      "Yardwork Services": t("clientPostTask.categories.yardwork"),
+      "Dog Walking": t("clientPostTask.categories.dogWalking"),
+      "Other": t("clientPostTask.categories.other"),
+    };
+    
+    let translated = skillMap[skill] || skill;
+    
+    // Fallback if translation returned the key itself
+    if (translated.startsWith("clientPostTask.categories.")) {
+      const fallbackMap = {
+        "Handyman": i18n.language === "ar" ? "أعمال الصيانة" : "Handyman",
+        "Moving": i18n.language === "ar" ? "النقل" : "Moving",
+        "IKEA Assembly": i18n.language === "ar" ? "تركيب الأثاث" : "Furniture Assembly",
+        "Cleaning": i18n.language === "ar" ? "التنظيف" : "Cleaning",
+        "Shopping & Delivery": i18n.language === "ar" ? "التسوق والتوصيل" : "Shopping & Delivery",
+        "Yardwork Services": i18n.language === "ar" ? "أعمال الحديقة" : "Yardwork Services",
+        "Dog Walking": i18n.language === "ar" ? "تمشية الكلاب" : "Dog Walking",
+        "Other": i18n.language === "ar" ? "أخرى" : "Other",
+      };
+      return fallbackMap[skill] || skill;
+    }
+    
+    return translated;
+  };
 
   // Predefined skills list
   const availableSkills = [
@@ -295,7 +330,7 @@ export default function CompleteTaskerProfileScreen() {
 
         {/* Personal Information Section */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Personal Information</Text>
+          <Text style={styles.sectionTitle}>{t("taskerCompleteProfile.personalInformation")}</Text>
         </View>
 
         {/* Each field wrapped with onLayout to store its Y */}
@@ -323,8 +358,8 @@ export default function CompleteTaskerProfileScreen() {
             style={styles.input}
             onPress={() => setShowGenderDropdown(!showGenderDropdown)}
           >
-            <Text style={{ color: gender ? "#333" : "#999" }}>
-              {gender || "Select Gender"}
+            <Text style={{ color: gender ? "#333" : "#999", textAlign: I18nManager.isRTL ? "right" : "left" }}>
+              {gender || t("taskerCompleteProfile.selectGender")}
             </Text>
           </TouchableOpacity>
 
@@ -354,8 +389,8 @@ export default function CompleteTaskerProfileScreen() {
             style={styles.input}
             onPress={() => setShowLocationDropdown(!showLocationDropdown)}
           >
-            <Text style={{ color: location ? "#333" : "#999" }}>
-              {location || "Select Location"}
+            <Text style={{ color: location ? "#333" : "#999", textAlign: I18nManager.isRTL ? "right" : "left" }}>
+              {location || t("taskerCompleteProfile.selectLocation")}
             </Text>
           </TouchableOpacity>
 
@@ -379,7 +414,7 @@ export default function CompleteTaskerProfileScreen() {
 
         {/* Skills Section */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Skills & Expertise</Text>
+          <Text style={styles.sectionTitle}>{t("taskerCompleteProfile.skillsAndExpertise")}</Text>
         </View>
 
         <View
@@ -392,8 +427,8 @@ export default function CompleteTaskerProfileScreen() {
             style={styles.input}
             onPress={() => setShowSkillsDropdown(!showSkillsDropdown)}
           >
-            <Text style={{ color: selectedSkills.length > 0 ? "#333" : "#999" }}>
-              {selectedSkills.length > 0 ? selectedSkills.join(", ") : "Select Skills"}
+            <Text style={{ color: selectedSkills.length > 0 ? "#333" : "#999", textAlign: I18nManager.isRTL ? "right" : "left" }}>
+              {selectedSkills.length > 0 ? selectedSkills.map(s => getSkillTranslation(s)).join(", ") : t("taskerCompleteProfile.selectSkills")}
             </Text>
           </TouchableOpacity>
 
@@ -402,7 +437,7 @@ export default function CompleteTaskerProfileScreen() {
             <View style={styles.selectedSkillsContainer}>
               {selectedSkills.map((skill, index) => (
                 <View key={index} style={styles.selectedSkillItem}>
-                  <Text style={styles.selectedSkillText}>{skill}</Text>
+                  <Text style={styles.selectedSkillText}>{getSkillTranslation(skill)}</Text>
                   <TouchableOpacity
                     style={styles.removeSkillButton}
                     onPress={() => {
@@ -448,7 +483,7 @@ export default function CompleteTaskerProfileScreen() {
                       styles.dropdownText,
                       selectedSkills.includes(skill) && styles.dropdownTextSelected
                     ]}>
-                      {skill}
+                      {getSkillTranslation(skill)}
                     </Text>
                     {selectedSkills.includes(skill) && (
                       <View style={styles.selectedIndicator}>
@@ -464,7 +499,7 @@ export default function CompleteTaskerProfileScreen() {
 
         {/* About Section */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>About You</Text>
+          <Text style={styles.sectionTitle}>{t("taskerCompleteProfile.aboutYou")}</Text>
         </View>
 
         <View
@@ -474,12 +509,11 @@ export default function CompleteTaskerProfileScreen() {
           style={{ marginBottom: 20 }}
         >
           <TextInput
-            style={[styles.input, styles.textarea]}
+            style={[styles.input, styles.textarea, { textAlign: isRTL ? "right" : "left" }]}
             value={about}
             onChangeText={setAbout}
             onFocus={() => scrollToKey("about")}
             placeholder={t("taskerCompleteProfile.aboutPlaceholder")}
-            textAlign={I18nManager.isRTL ? "right" : "left"}
             textAlignVertical="top"
             placeholderTextColor="#999"
             multiline
@@ -488,7 +522,7 @@ export default function CompleteTaskerProfileScreen() {
             blurOnSubmit={true}
           />
           <Text style={styles.characterCount}>
-            {about.length}/150 characters
+            {about.length}/150 {t("taskerCompleteProfile.characters")}
           </Text>
         </View>
 
@@ -604,10 +638,12 @@ const styles = StyleSheet.create({
     color: "#333",
     borderWidth: 1,
     borderColor: "#e9ecef",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   textarea: {
     minHeight: 120,
     textAlignVertical: "top",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   button: {
     backgroundColor: "#215433",
@@ -647,6 +683,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#f1f3f4",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
   },
   dropdownItemSelected: {
     backgroundColor: "#f0f9eb", // Light green background for selected items
@@ -657,6 +697,8 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 16,
     color: "#333",
+    flex: 1,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   dropdownTextSelected: {
     color: "#215433", // Dark green for selected text
@@ -672,27 +714,26 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#e9ecef",
+    gap: 8,
   },
   selectedSkillItem: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     backgroundColor: "#215433",
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    marginRight: 8,
-    marginBottom: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
+    gap: 6,
   },
   selectedSkillText: {
     color: "#ffffff",
     fontFamily: "InterMedium",
     fontSize: 14,
-    marginRight: 6,
   },
   removeSkillButton: {
     width: 20,
@@ -732,7 +773,7 @@ const styles = StyleSheet.create({
   characterCount: {
     fontSize: 14,
     color: "#999",
-    textAlign: "right",
+    textAlign: I18nManager.isRTL ? "left" : "right",
     paddingHorizontal: 20,
     paddingTop: 8,
     fontFamily: "Inter",

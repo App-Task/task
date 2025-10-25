@@ -12,6 +12,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  I18nManager,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
@@ -134,28 +135,27 @@ navigation.reset({
       style={styles.wrapper}
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <View style={styles.topBar}>
+        <View style={[styles.topBar, { alignItems: I18nManager.isRTL ? "flex-end" : "flex-start" }]}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Ionicons name="arrow-back" size={24} color="#215432" />
+            <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#215432" />
           </TouchableOpacity>
         </View>
 
         
 
-        <Text style={styles.title}>{t("register.title")}</Text>
+        <Text style={[styles.title, { textAlign: I18nManager.isRTL ? "right" : "left" }]}>{t("register.title")}</Text>
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
           placeholder={t("register.fullName")}
           placeholderTextColor="#999"
           value={name}
           onChangeText={setName}
-          maxLength={55} // 👈 Add this line
-
+          maxLength={55}
         />
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
           placeholder={t("register.email")}
           placeholderTextColor="#999"
           value={email}
@@ -164,14 +164,14 @@ navigation.reset({
           autoCapitalize="none"
         />
 
-<View style={styles.phoneContainer}>
-  <View style={styles.countryPickerWrapper}>
+<View style={[styles.phoneContainer, { flexDirection: I18nManager.isRTL ? "row-reverse" : "row" }]}>
+  <View style={[styles.countryPickerWrapper, I18nManager.isRTL ? { borderLeftWidth: 1, borderLeftColor: "#ccc" } : { borderRightWidth: 1, borderRightColor: "#ccc" }]}>
   <CountryPicker
   countryCode={countryCode}
   withFilter
   withFlag
   withCallingCodeButton
-  withCountryNameButton={false} // ❌ hides the country name
+  withCountryNameButton={false}
   withEmoji
   onSelect={(selectedCountry) => {
     setCountryCode(selectedCountry.cca2);
@@ -181,7 +181,7 @@ navigation.reset({
 
   </View>
   <TextInput
-    style={styles.phoneInput}
+    style={[styles.phoneInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
     value={phone}
     onChangeText={setPhone}
     keyboardType="phone-pad"
@@ -193,9 +193,9 @@ navigation.reset({
 
 
 
-        <View style={styles.passwordContainer}>
+        <View style={[styles.passwordContainer, { flexDirection: I18nManager.isRTL ? "row-reverse" : "row" }]}>
           <TextInput
-            style={styles.passwordInput}
+            style={[styles.passwordInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
             placeholder={t("register.password")}
             placeholderTextColor="#999"
             secureTextEntry={secure1}
@@ -210,9 +210,9 @@ navigation.reset({
           </TouchableOpacity>
         </View>
 
-        <View style={styles.passwordContainer}>
+        <View style={[styles.passwordContainer, { flexDirection: I18nManager.isRTL ? "row-reverse" : "row" }]}>
           <TextInput
-            style={styles.passwordInput}
+            style={[styles.passwordInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
             placeholder={t("register.confirmPassword")}
             placeholderTextColor="#999"
             secureTextEntry={secure2}
@@ -227,9 +227,9 @@ navigation.reset({
           </TouchableOpacity>
         </View>
 
-        <View style={{ alignSelf: "flex-start", marginBottom: 15 }}>
-  <Text style={styles.requirement}>• Password should have at least one number</Text>
-  <Text style={styles.requirement}>• Password should have at least one capital letter</Text>
+        <View style={{ alignSelf: I18nManager.isRTL ? "flex-end" : "flex-start", marginBottom: 15 }}>
+  <Text style={[styles.requirement, { textAlign: I18nManager.isRTL ? "right" : "left" }]}>• {t("register.passwordRequirement1")}</Text>
+  <Text style={[styles.requirement, { textAlign: I18nManager.isRTL ? "right" : "left" }]}>• {t("register.passwordRequirement2")}</Text>
 </View>
 
 <Text style={styles.termsText}>
@@ -412,8 +412,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 10,
     backgroundColor: "#e0e0e0",
-    borderRightWidth: 1,
-    borderRightColor: "#ccc",
   },
 
   termsContainer: {

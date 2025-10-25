@@ -56,7 +56,10 @@
     "termsRequiredTitle": "الموافقة مطلوبة",
     "termsRequiredMessage": "يجب الموافقة على الشروط وسياسة الخصوصية للمتابعة.",
     "mismatchTitle": "عدم تطابق",
-    "passwordMismatch": "كلمات المرور غير متطابقة"
+    "passwordMismatch": "كلمات المرور غير متطابقة",
+    "passwordRequirement1": "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل",
+    "passwordRequirement2": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل",
+    "registering": "جاري التسجيل..."
   },
   "TaskBottomNav": {
     "explore": "ابحث",
@@ -226,6 +229,7 @@
         "shoppingDesc": "احصل على البقالة أو الضروريات أو الطرود واستلامها وتوصيلها مباشرة إلى باب منزلك.",
         "pet": "خدمات الحيوانات الأليفة",
         "petDesc": "اعثر على مساعدين مهتمين لرعاية الحيوانات الأليفة والمشي والتغذية والمزيد.",
+        "dogWalking": "تمشية الكلاب",
         "moving": "النقل",
         "movingDesc": "استأجر عمال نقل موثوقين لتعبئة وتحميل ونقل ممتلكاتك بأمان.",
         "furniture": "تركيب الأثاث",
@@ -930,10 +934,14 @@
   "taskerCompleteProfile": {
     "title": "أكمل ملفك الشخصي",
     "subText": "لأمان أفضل وتطابق أدق مع العملاء، يجب عليك إكمال ملفك الشخصي قبل المتابعة.",
+    "personalInformation": "المعلومات الشخصية",
+    "skillsAndExpertise": "المهارات والخبرات",
+    "aboutYou": "نبذة عنك",
     "namePlaceholder": "الاسم الكامل",
     "phonePlaceholder": "رقم الجوال",
     "selectGender": "اختر الجنس",
     "selectLocation": "اختر الموقع",
+    "selectSkills": "اختر المهارات",
     "genderMale": "ذكر",
     "genderFemale": "أنثى",
     "locationBahrain": "البحرين",
@@ -947,7 +955,8 @@
     "invalidPhoneTitle": "رقم هاتف غير صالح",
     "invalidPhoneMessage": "يجب أن يكون رقم الهاتف بين 8 و15 رقماً ويحتوي على أرقام فقط.",
     "completedTitle": "تم اكتمال الملف",
-    "completedMessage": "تم إعداد ملفك الشخصي بنجاح."
+    "completedMessage": "تم إعداد ملفك الشخصي بنجاح.",
+    "characters": "حرف"
   },
   "taskerProfile": {
     "taskDetails": "تفاصيل المهمة",
