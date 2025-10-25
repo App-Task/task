@@ -273,6 +273,7 @@
       "titleTooShort": "Task title must be at least 10 characters long.",
       "descriptionTooShort": "Task description must be at least 25 characters long.",
       "pleaseAddAddress": "Please add a task address",
+      "minCharacters": "Min {{count}} more characters",
       "maxCharacters100": "Maximum 100 characters",
       "maxCharacters150": "Maximum 150 characters",
       "uploadChoiceTitle": "Choose Image Source",

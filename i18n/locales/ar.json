@@ -256,6 +256,7 @@
       "titleTooShort": "عنوان المهمة يجب أن يكون 10 أحرف على الأقل.",
       "descriptionTooShort": "وصف المهمة يجب أن يكون 25 حرفًا على الأقل.",
       "pleaseAddAddress": "يرجى إضافة عنوان المهمة",
+      "minCharacters": "{{count}} أحرف إضافية على الأقل",
       "maxCharacters100": "100 حرف كحد أقصى",
       "maxCharacters150": "150 حرف كحد أقصى",
       "uploadChoiceTitle": "اختر مصدر الصورة",
