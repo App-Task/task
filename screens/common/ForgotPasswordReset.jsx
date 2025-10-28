@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  I18nManager,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { resetPassword } from "../../services/auth";
@@ -35,8 +36,8 @@ export default function ForgotPasswordReset({ navigation, route }) {
     const strongPw = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!strongPw.test(newPassword)) {
       return Alert.alert(
-        "Weak Password",
-        "Password must include at least 8 characters, one uppercase letter, and one number."
+        t("forgotPassword.weakPassword"),
+        t("forgotPassword.passwordRequirements")
       );
     }
 
@@ -66,38 +67,37 @@ export default function ForgotPasswordReset({ navigation, route }) {
   return (
     <View style={styles.wrapper}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-        <Ionicons name="arrow-back" size={24} color="#215432" />
+        <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#215432" />
       </TouchableOpacity>
 
-      <Text style={styles.title}>Reset your password</Text>
+      <Text style={styles.title}>{t("forgotPassword.resetTitle")}</Text>
       <Text style={styles.subtitle}>
-        Enter the 6-digit code sent to your email and create a new password.
+        {t("forgotPassword.resetSubtitle")}
       </Text>
 
-      <Text style={styles.label}>Email address</Text>
+      <Text style={styles.label}>{t("forgotPassword.emailAddress")}</Text>
       <TextInput
-  style={[styles.input, styles.disabledInput]}
-  value={email}
-  editable={false}
-  selectTextOnFocus={false}
-/>
+        style={[styles.input, styles.disabledInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+        value={email}
+        editable={false}
+        selectTextOnFocus={false}
+      />
 
-
-      <Text style={styles.label}>6-digit reset code</Text>
+      <Text style={styles.label}>{t("forgotPassword.resetCode")}</Text>
       <TextInput
-        style={styles.input}
-        placeholder="e.g. 123456"
+        style={[styles.input, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+        placeholder={t("forgotPassword.codePlaceholder")}
         value={code}
         onChangeText={setCode}
         keyboardType="number-pad"
         maxLength={6}
       />
 
-      <Text style={styles.label}>New password</Text>
-      <View style={styles.passwordContainer}>
+      <Text style={styles.label}>{t("forgotPassword.newPassword")}</Text>
+      <View style={[styles.passwordContainer, { flexDirection: I18nManager.isRTL ? "row-reverse" : "row" }]}>
         <TextInput
-          style={styles.passwordInput}
-          placeholder="Must include capital letter & number"
+          style={[styles.passwordInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+          placeholder={t("forgotPassword.passwordPlaceholder")}
           secureTextEntry={!showNewPassword}
           value={newPassword}
           onChangeText={setNewPassword}
@@ -114,11 +114,11 @@ export default function ForgotPasswordReset({ navigation, route }) {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.label}>Confirm new password</Text>
-      <View style={styles.passwordContainer}>
+      <Text style={styles.label}>{t("forgotPassword.confirmPassword")}</Text>
+      <View style={[styles.passwordContainer, { flexDirection: I18nManager.isRTL ? "row-reverse" : "row" }]}>
         <TextInput
-          style={styles.passwordInput}
-          placeholder="Repeat your new password"
+          style={[styles.passwordInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+          placeholder={t("forgotPassword.confirmPlaceholder")}
           secureTextEntry={!showConfirmPassword}
           value={confirmPassword}
           onChangeText={setConfirmPassword}
@@ -137,7 +137,7 @@ export default function ForgotPasswordReset({ navigation, route }) {
 
       <TouchableOpacity style={styles.button} onPress={handleReset} disabled={loading}>
         <Text style={styles.buttonText}>
-          {loading ? "Updating..." : "Reset Password"}
+          {loading ? t("forgotPassword.updating") : t("forgotPassword.resetButton")}
         </Text>
       </TouchableOpacity>
     </View>

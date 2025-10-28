@@ -8,9 +8,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
+import { I18nManager } from "react-native";
 
 export default function BidUpdatedSuccessScreen() {
   const navigation = useNavigation();
+  const { t } = useTranslation();
 
   const handleDone = () => {
     // Navigate back to the task details or task list
@@ -25,9 +28,9 @@ export default function BidUpdatedSuccessScreen() {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color="#215432" />
+          <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#215432" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Edit Bid</Text>
+        <Text style={styles.headerTitle}>{t("taskerBidUpdate.headerTitle")}</Text>
       </View>
 
       {/* Progress Bar */}
@@ -47,14 +50,14 @@ export default function BidUpdatedSuccessScreen() {
         </View>
 
         {/* Success Message */}
-        <Text style={styles.successTitle}>Bid Updated</Text>
+        <Text style={styles.successTitle}>{t("taskerBidUpdate.successTitle")}</Text>
         <Text style={styles.successMessage}>
-          Your bid has been updated, you'll be able to view its status in My Tasks
+          {t("taskerBidUpdate.successMessage")}
         </Text>
 
         {/* Done Button */}
         <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
-          <Text style={styles.doneButtonText}>Done</Text>
+          <Text style={styles.doneButtonText}>{t("taskerBidUpdate.done")}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -82,6 +85,7 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 18,
     color: "#333",
+    marginLeft: 8,
   },
   progressContainer: {
     paddingHorizontal: 20,
@@ -158,9 +162,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 30,
     alignItems: "center",
-    minWidth: 280,
-    alignSelf: "stretch",
-    marginHorizontal: 40,
+    alignSelf: "center",
   },
   doneButtonText: {
     fontFamily: "InterBold",

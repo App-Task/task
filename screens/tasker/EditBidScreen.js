@@ -9,17 +9,20 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  I18nManager,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
 import { fetchCurrentUser } from "../../services/auth";
+import { useTranslation } from "react-i18next";
 
 export default function EditBidScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { task, existingBid } = route.params || {};
+  const { t } = useTranslation();
 
   const [bidAmount, setBidAmount] = useState("");
   const [message, setMessage] = useState("");
@@ -94,9 +97,9 @@ export default function EditBidScreen() {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Ionicons name="arrow-back" size={24} color="#215432" />
+            <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#215432" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Edit Bid</Text>
+          <Text style={styles.headerTitle}>{t("taskerEditBid.headerTitle")}</Text>
         </View>
 
         {/* Progress Bar */}
@@ -109,12 +112,12 @@ export default function EditBidScreen() {
           {/* Bid Offer Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Bid offer</Text>
+              <Text style={styles.sectionTitle}>{t("taskerEditBid.bidOffer")}</Text>
               <Text style={styles.characterLimit}>{t("taskerMyTasks.maxCharacters100")}</Text>
             </View>
             <TextInput
-              style={styles.input}
-              placeholder="How much can you do it for (BHD)"
+              style={[styles.input, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+              placeholder={t("taskerEditBid.amountPlaceholder", { currency: "BHD" })}
               placeholderTextColor="#999"
               value={bidAmount}
               onChangeText={setBidAmount}
@@ -126,12 +129,12 @@ export default function EditBidScreen() {
           {/* Message Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Message</Text>
+              <Text style={styles.sectionTitle}>{t("taskerEditBid.messageTitle")}</Text>
               <Text style={styles.characterLimit}>{t("taskerMyTasks.maxCharacters350")}</Text>
             </View>
             <TextInput
-              style={[styles.input, styles.messageInput]}
-              placeholder="Send a message along with the bid to the client..."
+              style={[styles.input, styles.messageInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+              placeholder={t("taskerEditBid.messagePlaceholder")}
               placeholderTextColor="#999"
               value={message}
               onChangeText={setMessage}
@@ -151,7 +154,7 @@ export default function EditBidScreen() {
             disabled={submitting}
           >
             <Text style={styles.submitButtonText}>
-              {submitting ? "Updating..." : "Update bid"}
+              {submitting ? t("taskerEditBid.updating") : t("taskerEditBid.update")}
             </Text>
           </TouchableOpacity>
         </View>

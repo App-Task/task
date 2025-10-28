@@ -1002,5 +1002,56 @@
     "bank": "الحساب المصرفي",
     "payments": "مدفوعاتي",
     "settings": "الإعدادات"
+  },
+  "taskerBidUpdate": {
+    "headerTitle": "تعديل العرض",
+    "successTitle": "تم تحديث العرض",
+    "successMessage": "تم تحديث عرضك، ستتمكن من رؤية حالته في مهامي",
+    "done": "تم"
+  },
+  "taskerSendBid": {
+    "headerTitle": "إرسال عرض",
+    "bidOffer": "قيمة العرض",
+    "amountPlaceholder": "بكم يمكنك تنفيذها ({{currency}})",
+    "messageTitle": "رسالة",
+    "messagePlaceholder": "أرسل رسالة مع العرض إلى العميل...",
+    "submit": "إرسال العرض",
+    "submitting": "جارٍ الإرسال..."
+  },
+  "taskerBidSent": {
+    "successTitle": "تم إرسال العرض",
+    "successMessage": "تم إرسال عرضك، ستتمكن من رؤية حالته في مهامي",
+    "done": "تم",
+    "saving": "جارٍ الحفظ..."
+  },
+  "taskerEditBid": {
+    "headerTitle": "تعديل العرض",
+    "bidOffer": "قيمة العرض",
+    "amountPlaceholder": "بكم يمكنك تنفيذها ({{currency}})",
+    "messageTitle": "رسالة",
+    "messagePlaceholder": "أرسل رسالة مع العرض إلى العميل...",
+    "update": "تحديث العرض",
+    "updating": "جارٍ التحديث..."
+  },
+  "forgotPassword": {
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "enterEmail": "أدخل عنوان بريدك الإلكتروني",
+    "sendResetCode": "إرسال رمز إعادة التعيين",
+    "sending": "جارٍ الإرسال...",
+    "requestReceived": "تم استلام الطلب",
+    "resetCodeSent": "تم إرسال رمز إعادة التعيين المكون من 6 أرقام إلى بريدك الإلكتروني.",
+    "resetTitle": "إعادة تعيين كلمة المرور",
+    "resetSubtitle": "أدخل الرمز المكون من 6 أرقام المرسل إلى بريدك الإلكتروني وأنشئ كلمة مرور جديدة.",
+    "emailAddress": "عنوان البريد الإلكتروني",
+    "resetCode": "رمز إعادة التعيين المكون من 6 أرقام",
+    "codePlaceholder": "مثال: 123456",
+    "newPassword": "كلمة المرور الجديدة",
+    "passwordPlaceholder": "يجب أن تحتوي على حرف كبير ورقم",
+    "confirmPassword": "تأكيد كلمة المرور الجديدة",
+    "confirmPlaceholder": "كرر كلمة المرور الجديدة",
+    "resetButton": "إعادة تعيين كلمة المرور",
+    "updating": "جارٍ التحديث...",
+    "weakPassword": "كلمة مرور ضعيفة",
+    "passwordRequirements": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل وحرف كبير واحد ورقم واحد."
   }
 }

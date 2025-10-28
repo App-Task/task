@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  I18nManager,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { forgotPassword } from "../../services/auth";
@@ -41,13 +42,13 @@ export default function ForgotPasswordRequest({ navigation, route }) {
   return (
     <View style={styles.wrapper}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-        <Ionicons name="arrow-back" size={28} color="#215433" />
+        <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={28} color="#215433" />
       </TouchableOpacity>
 
       <Text style={styles.title}>{t("forgotPassword.resetPassword")}</Text>
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
         placeholder={t("forgotPassword.enterEmail")}
         placeholderTextColor="#999"
         value={email}

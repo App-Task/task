@@ -5,44 +5,39 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  I18nManager,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 export default function BidSentSuccessScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { task, bidData } = route.params || {};
   const [saving, setSaving] = useState(false);
+  const { t } = useTranslation();
 
   const handleDone = async () => {
     if (!bidData) {
-      // If no bid data, just navigate back
       navigation.navigate("TaskerHome");
       return;
     }
 
     try {
       setSaving(true);
-      
-      // Save the bid when Done is pressed
       await axios.post("https://task-kq94.onrender.com/api/bids", bidData);
-      
       setSaving(false);
-      
-      // Navigate back to the task details or task list
       navigation.navigate("TaskerHome");
-      
     } catch (error) {
       setSaving(false);
       console.error("❌ Error saving bid:", error);
-      
       if (error.response?.status === 409) {
-        Alert.alert("Bid Already Exists", "You have already submitted a bid for this task.");
+        Alert.alert(t("common.error"), t("taskerMyTasks.bidExists"));
       } else {
-        Alert.alert("Error", "Failed to save bid. Please try again.");
+        Alert.alert(t("common.error"), t("taskerMyTasks.saveBidError"));
       }
     }
   };
@@ -51,7 +46,13 @@ export default function BidSentSuccessScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Send a bid</Text>
+        <Text style={styles.headerTitle}>{t("taskerSendBid.headerTitle")}</Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#215432" />
+        </TouchableOpacity>
       </View>
 
       {/* Progress Bar */}
@@ -70,9 +71,9 @@ export default function BidSentSuccessScreen() {
         </View>
 
         {/* Success Message */}
-        <Text style={styles.successTitle}>Bid Sent</Text>
+        <Text style={styles.successTitle}>{t("taskerBidSent.successTitle")}</Text>
         <Text style={styles.successMessage}>
-          Your bid has been sent, you'll be able to view its status in My Tasks
+          {t("taskerBidSent.successMessage")}
         </Text>
 
         {/* Done Button */}
@@ -82,7 +83,7 @@ export default function BidSentSuccessScreen() {
           disabled={saving}
         >
           <Text style={styles.doneButtonText}>
-            {saving ? "Saving..." : "Done"}
+            {saving ? t("taskerBidSent.saving") : t("taskerBidSent.done")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -96,9 +97,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   header: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
   },

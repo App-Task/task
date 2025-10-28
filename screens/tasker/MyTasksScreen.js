@@ -525,6 +525,8 @@ export default function TaskerMyTasksScreen() {
                 styles.segmentText,
                 activeTab === "bidSent" && styles.activeSegmentText,
               ]}
+              numberOfLines={1}
+              ellipsizeMode="clip"
             >
               {t("taskerMyTasks.bidSent")}
             </Text>
@@ -542,6 +544,8 @@ export default function TaskerMyTasksScreen() {
                 styles.segmentText,
                 activeTab === "active" && styles.activeSegmentText,
               ]}
+              numberOfLines={1}
+              ellipsizeMode="clip"
             >
               {t("taskerMyTasks.active")}
             </Text>
@@ -559,6 +563,8 @@ export default function TaskerMyTasksScreen() {
                 styles.segmentText,
                 activeTab === "previous" && styles.activeSegmentText,
               ]}
+              numberOfLines={1}
+              ellipsizeMode="clip"
             >
               {t("taskerMyTasks.previous")}
             </Text>
@@ -713,7 +719,8 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 14,
     color: "#616161",
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    textAlign: "center",
+    lineHeight: 16,
   },
   activeSegmentText: {
     fontFamily: "InterBold",

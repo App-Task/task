@@ -1132,6 +1132,57 @@
     "payments": "My Payments",
     "settings": "Settings"
   },
+  "taskerBidUpdate": {
+    "headerTitle": "Edit Bid",
+    "successTitle": "Bid Updated",
+    "successMessage": "Your bid has been updated, you'll be able to view its status in My Tasks",
+    "done": "Done"
+  },
+  "taskerSendBid": {
+    "headerTitle": "Send a bid",
+    "bidOffer": "Bid offer",
+    "amountPlaceholder": "How much can you do it for ({{currency}})",
+    "messageTitle": "Message",
+    "messagePlaceholder": "Send a message along with the bid to the client...",
+    "submit": "Submit bid",
+    "submitting": "Submitting..."
+  },
+  "taskerBidSent": {
+    "successTitle": "Bid Sent",
+    "successMessage": "Your bid has been sent, you'll be able to view its status in My Tasks",
+    "done": "Done",
+    "saving": "Saving..."
+  },
+  "taskerEditBid": {
+    "headerTitle": "Edit Bid",
+    "bidOffer": "Bid offer",
+    "amountPlaceholder": "How much can you do it for ({{currency}})",
+    "messageTitle": "Message",
+    "messagePlaceholder": "Send a message along with the bid to the client...",
+    "update": "Update bid",
+    "updating": "Updating..."
+  },
+  "forgotPassword": {
+    "resetPassword": "Reset your password",
+    "enterEmail": "Enter your email address",
+    "sendResetCode": "Send Reset Code",
+    "sending": "Sending...",
+    "requestReceived": "Request Received",
+    "resetCodeSent": "A 6-digit reset code has been sent to your email.",
+    "resetTitle": "Reset your password",
+    "resetSubtitle": "Enter the 6-digit code sent to your email and create a new password.",
+    "emailAddress": "Email address",
+    "resetCode": "6-digit reset code",
+    "codePlaceholder": "e.g. 123456",
+    "newPassword": "New password",
+    "passwordPlaceholder": "Must include capital letter & number",
+    "confirmPassword": "Confirm new password",
+    "confirmPlaceholder": "Repeat your new password",
+    "resetButton": "Reset Password",
+    "updating": "Updating...",
+    "weakPassword": "Weak Password",
+    "passwordRequirements": "Password must include at least 8 characters, one uppercase letter, and one number."
+  },
   "taskerExplore": {
     "greeting": "Hi {{name}},",
     "welcomeText": "Welcome to TASK!",
