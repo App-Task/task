@@ -41,28 +41,20 @@ export default function TaskerChatScreen({ navigation, route }) {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: name,
       headerShown: true,
-      headerStyle: {
-        backgroundColor: "#ffffff",
-        borderBottomWidth: 1,
-        borderBottomColor: "#eee",
-        elevation: 0,
-        shadowOpacity: 0,
-      },
-      headerTitleStyle: {
-        fontFamily: "InterBold",
-        fontSize: 18,
-        color: "#215433",
-      },
-      headerTintColor: "#215433",
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={() => alert(t("clientChat.reported"))}
-          style={{ marginRight: 16 }}
-        >
-          <Ionicons name="alert-circle-outline" size={24} color="#215433" />
-        </TouchableOpacity>
+      header: () => (
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ zIndex: 1 }}>
+            <Ionicons name="arrow-back" size={24} color="#215433" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{name}</Text>
+          <TouchableOpacity
+            onPress={() => alert(t("clientChat.reported"))}
+            style={{ marginLeft: 8, zIndex: 1 }}
+          >
+            <Ionicons name="alert-circle-outline" size={24} color="#215433" />
+          </TouchableOpacity>
+        </View>
       ),
     });
   }, [navigation, name]);
@@ -318,6 +310,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    backgroundColor: "#ffffff",
+    direction: "ltr",
+    position: "relative",
+  },
+  headerTitle: {
+    fontFamily: "InterBold",
+    fontSize: 18,
+    color: "#215433",
+    position: "absolute",
+    left: 0,
+    right: 0,
+    textAlign: "center",
   },
   chatBox: {
     padding: 20,
