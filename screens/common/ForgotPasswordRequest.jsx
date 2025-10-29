@@ -42,7 +42,7 @@ export default function ForgotPasswordRequest({ navigation, route }) {
   return (
     <View style={styles.wrapper}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-        <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={28} color="#215433" />
+        <Ionicons name={"arrow-back"} size={28} color="#215433" />
       </TouchableOpacity>
 
       <Text style={styles.title}>{t("forgotPassword.resetPassword")}</Text>

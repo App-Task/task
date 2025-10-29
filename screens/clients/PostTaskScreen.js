@@ -695,7 +695,7 @@ if (errorFlag) {
     <View style={styles.modalHeaderRow}>
       <TouchableOpacity onPress={() => setMapVisible(false)} style={styles.modalBackBtn}>
         <Ionicons
-          name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+          name={"arrow-back"}
           size={24}
           color="#215433"
         />

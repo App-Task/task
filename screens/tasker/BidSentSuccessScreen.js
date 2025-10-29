@@ -51,7 +51,7 @@ export default function BidSentSuccessScreen() {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#215432" />
+          <Ionicons name={"arrow-back"} size={24} color="#215432" />
         </TouchableOpacity>
       </View>
 

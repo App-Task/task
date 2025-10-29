@@ -153,7 +153,7 @@ export default function NotificationsScreen() {
 <View style={styles.header}>
   <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
     <Ionicons
-      name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+      name={"arrow-back"}
       size={24}
       color="#215433"
     />
@@ -237,6 +237,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 30,
+    direction: "ltr",
   },
   backBtn: {
     padding: 4,

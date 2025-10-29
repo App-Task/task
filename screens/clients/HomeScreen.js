@@ -137,7 +137,7 @@ export default function ClientHomeScreen() {
               {t("clientHome.messages", { count: unreadMessages })}
             </Text>
             <Ionicons 
-              name={I18nManager.isRTL ? "chevron-back" : "chevron-forward"} 
+              name="chevron-back" 
               size={20} 
               color="#333" 
             />

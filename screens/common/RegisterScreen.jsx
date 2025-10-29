@@ -137,7 +137,7 @@ navigation.reset({
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={[styles.topBar, { alignItems: I18nManager.isRTL ? "flex-end" : "flex-start" }]}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Ionicons name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#215432" />
+            <Ionicons name={"arrow-back"} size={24} color="#215432" />
           </TouchableOpacity>
         </View>
 

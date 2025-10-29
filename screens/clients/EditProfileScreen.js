@@ -111,7 +111,7 @@ export default function EditProfileScreen({ navigation }) {
           <View style={styles.header}>
             <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
               <Ionicons
-                name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+                name={"arrow-back"}
                 size={24}
                 color="#215433"
               />
@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingTop: 20,
     marginBottom: 30,
+    direction: "ltr",
   },
   backBtn: {
     width: 40,

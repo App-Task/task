@@ -222,12 +222,12 @@ export default function ChatScreen({ route, navigation }) {
   };return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#215433" />
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {t("clientChat.chatWith", { name })}
         </Text>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#215433" />
+        </TouchableOpacity>
       </View>
       <KeyboardAvoidingView
   style={styles.flex}
@@ -320,6 +320,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     gap: 12,
     paddingVertical: 16,
     paddingHorizontal: 20,

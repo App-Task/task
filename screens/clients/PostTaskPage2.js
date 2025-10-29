@@ -18,6 +18,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -31,6 +32,7 @@ export default function PostTaskPage2() {
   const route = useRoute();
   const { t } = useTranslation();
   const { category } = route.params || {};
+  const isRTL = i18n.language === "ar";
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -317,7 +319,7 @@ export default function PostTaskPage2() {
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
             <Ionicons
-              name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+              name={"arrow-back"}
               size={24}
               color="#215432"
             />
@@ -349,7 +351,8 @@ export default function PostTaskPage2() {
             <TextInput
               style={[
                 styles.input,
-                titleError && styles.inputError
+                titleError && styles.inputError,
+                isRTL ? { textAlign: "right", writingDirection: "rtl" } : { textAlign: "left" }
               ]}
               placeholder={t("clientPostTask.page2.taskTitlePlaceholder")}
               placeholderTextColor="#999"
@@ -359,7 +362,6 @@ export default function PostTaskPage2() {
                 setTitle(text);
                 setTitleError(false);
               }}
-              textAlign={I18nManager.isRTL ? "right" : "left"}
             />
           </View>
 
@@ -378,7 +380,8 @@ export default function PostTaskPage2() {
               <TextInput
                 style={[
                   styles.textArea,
-                  descError && styles.inputError
+                  descError && styles.inputError,
+                  isRTL ? { textAlign: "right", writingDirection: "rtl" } : { textAlign: "left" }
                 ]}
                 placeholder={t("clientPostTask.page2.describeTaskPlaceholder")}
                 placeholderTextColor="#999"
@@ -390,7 +393,6 @@ export default function PostTaskPage2() {
                 }}
                 multiline
                 textAlignVertical="top"
-                textAlign={I18nManager.isRTL ? "right" : "left"}
               />
             </View>
             
@@ -486,7 +488,7 @@ export default function PostTaskPage2() {
               <View style={styles.modalHeaderRow}>
                 <TouchableOpacity onPress={() => setMapVisible(false)} style={styles.modalBackBtn}>
                   <Ionicons
-                    name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+                    name={"arrow-back"}
                     size={24}
                     color="#215432"
                   />
@@ -547,11 +549,12 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(248, 246, 247)",
   },
   header: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
+    direction: "ltr",
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
   },
@@ -845,12 +848,13 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   modalHeaderRow: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 12,
+    direction: "ltr",
   },
   modalBackBtn: {
     width: 40,

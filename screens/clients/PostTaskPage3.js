@@ -132,7 +132,7 @@ export default function PostTaskPage3() {
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
             <Ionicons
-              name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+              name={"arrow-back"}
               size={24}
               color="#215432"
             />
@@ -213,11 +213,12 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(248, 246, 247)",
   },
   header: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
+    direction: "ltr",
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
   },

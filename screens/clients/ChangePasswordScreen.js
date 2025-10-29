@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
@@ -20,6 +21,7 @@ const { width } = Dimensions.get("window");
 
 export default function ChangePasswordScreen({ navigation }) {
   const { t } = useTranslation();
+  const isRTL = i18n.language === "ar";
 
   const [oldPass, setOldPass] = useState("");
   const [newPass, setNewPass] = useState("");
@@ -83,7 +85,7 @@ if (!strongPasswordRegex.test(newPass)) {
           onPress={() => navigation.goBack()}
         >
           <Ionicons
-            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+            name={"arrow-back"}
             size={24}
             color="#215433"
           />
@@ -101,7 +103,7 @@ if (!strongPasswordRegex.test(newPass)) {
           secureTextEntry={secure1}
           value={oldPass}
           onChangeText={setOldPass}
-          textAlign={I18nManager.isRTL ? "right" : "left"}
+          textAlign={isRTL ? "right" : "left"}
         />
         <TouchableOpacity
           style={styles.eye}
@@ -119,7 +121,7 @@ if (!strongPasswordRegex.test(newPass)) {
           secureTextEntry={secure2}
           value={newPass}
           onChangeText={setNewPass}
-          textAlign={I18nManager.isRTL ? "right" : "left"}
+          textAlign={isRTL ? "right" : "left"}
         />
         <TouchableOpacity
           style={styles.eye}
@@ -137,7 +139,7 @@ if (!strongPasswordRegex.test(newPass)) {
           secureTextEntry={secure3}
           value={confirmPass}
           onChangeText={setConfirmPass}
-          textAlign={I18nManager.isRTL ? "right" : "left"}
+          textAlign={isRTL ? "right" : "left"}
         />
         <TouchableOpacity
           style={styles.eye}
@@ -166,6 +168,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 30,
+    direction: "ltr",
   },
   backBtn: {
     padding: 4,
@@ -180,6 +183,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: "#f2f2f2",
     borderRadius: 12,
     marginBottom: 16,
@@ -193,7 +197,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   eye: {
-    paddingLeft: 10,
+    marginLeft: 10,
   },
   button: {
     backgroundColor: "#215433",

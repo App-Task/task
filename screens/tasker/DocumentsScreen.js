@@ -279,7 +279,7 @@ export default function DocumentsScreen({ navigation, route }) {
           style={styles.backBtn}
         >
           <Ionicons
-            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+            name={"arrow-back"}
             size={30}
             color="#215433"
           />

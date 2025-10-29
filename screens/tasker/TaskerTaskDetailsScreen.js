@@ -158,7 +158,7 @@ export default function TaskerTaskDetailsScreen({ route }) {
           onPress={() => navigation.goBack()}
         >
           <Ionicons
-            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+            name={"arrow-back"}
             size={24}
             color="#215432"
           />
