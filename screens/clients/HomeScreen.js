@@ -11,6 +11,7 @@ import {
   StatusBar,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
@@ -23,6 +24,7 @@ import { getToken } from "../../services/authStorage";
 export default function ClientHomeScreen() {
   const navigation = useNavigation();
   const { t } = useTranslation();
+  const isRTL = i18n.language === "ar";
   const unreadCount = useUnreadNotifications();
   const [userName, setUserName] = useState("");
   const [unreadMessages, setUnreadMessages] = useState(0);
@@ -137,7 +139,7 @@ export default function ClientHomeScreen() {
               {t("clientHome.messages", { count: unreadMessages })}
             </Text>
             <Ionicons 
-              name="chevron-back" 
+              name="chevron-forward" 
               size={20} 
               color="#333" 
             />
@@ -242,9 +244,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   messagesContent: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    direction: "ltr",
   },
   messageIconContainer: {
     position: "relative",

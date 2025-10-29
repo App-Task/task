@@ -8,8 +8,10 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  I18nManager,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { removeToken } from "../../services/authStorage";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -24,6 +26,7 @@ const { width } = Dimensions.get("window");
 
 export default function ProfileScreen({ navigation }) {
   const { t } = useTranslation();
+  const isRTL = i18n.language === "ar";
   const unreadCount = useUnreadNotifications();
   const [user, setUser] = useState({ name: "", email: "", profileImage: null });
   const [profileImage, setProfileImage] = useState(null);
@@ -193,11 +196,11 @@ export default function ProfileScreen({ navigation }) {
       <View style={styles.buttonGroup}>
         <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("EditProfile")}>
           <Text style={styles.rowText}>{t("clientProfile.editProfile")}</Text>
-          <Ionicons name="chevron-back" size={20} color="#999" />
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("ChangePassword")}>
           <Text style={styles.rowText}>{t("clientProfile.changePassword")}</Text>
-          <Ionicons name="chevron-back" size={20} color="#999" />
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
         <TouchableOpacity 
@@ -205,14 +208,14 @@ export default function ProfileScreen({ navigation }) {
           onPress={() => navigation.navigate("AboutUs")}
         >
           <Text style={styles.rowText}>{t("clientProfile.aboutUs")}</Text>
-          <Ionicons name="chevron-back" size={20} color="#999" />
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
         <TouchableOpacity
   style={styles.rowItem}
   onPress={() => navigation.navigate("PrivacyPolicy")}
 >
   <Text style={styles.rowText}>{t("clientProfile.privacyPolicy")}</Text>
-          <Ionicons name="chevron-back" size={20} color="#999" />
+          <Ionicons name="chevron-forward" size={20} color="#999" />
 </TouchableOpacity>
 
         <TouchableOpacity
@@ -220,7 +223,7 @@ export default function ProfileScreen({ navigation }) {
   onPress={() => navigation.navigate("TermsAndConditions")}
 >
   <Text style={styles.rowText}>{t("clientProfile.terms")}</Text>
-          <Ionicons name="chevron-back" size={20} color="#999" />
+          <Ionicons name="chevron-forward" size={20} color="#999" />
 </TouchableOpacity>
 
 <TouchableOpacity
@@ -234,7 +237,7 @@ export default function ProfileScreen({ navigation }) {
   }}
 >
   <Text style={styles.rowText}>{t("clientProfile.contactAdmin")}</Text>
-          <Ionicons name="chevron-back" size={20} color="#999" />
+          <Ionicons name="chevron-forward" size={20} color="#999" />
 </TouchableOpacity>
 
 
@@ -322,6 +325,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     borderRadius: 10,
     marginBottom: 10,
+    direction: "ltr",
   },
   rowText: {
     fontFamily: "Inter",

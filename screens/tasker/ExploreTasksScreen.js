@@ -25,6 +25,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function ExploreTasksScreen({ navigation }) {
   const { t } = useTranslation();
+  const isRTL = i18n.language === "ar";
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
@@ -346,7 +347,7 @@ export default function ExploreTasksScreen({ navigation }) {
         <Ionicons name="hourglass-outline" size={24} color="#215433" />
         <Text style={styles.verificationText}>{t("taskerExplore.pendingVerification")}</Text>
         <Ionicons 
-          name="chevron-back-outline" 
+          name="chevron-forward-outline" 
           size={20} 
           color="#215433" 
         />
@@ -367,7 +368,7 @@ export default function ExploreTasksScreen({ navigation }) {
         </View>
         <Text style={styles.messagesText}>{t("taskerExplore.unreadMessages", { count: unreadMessages })}</Text>
         <Ionicons 
-          name="chevron-back-outline" 
+          name="chevron-forward-outline" 
           size={20} 
           color="#215433" 
         />
@@ -569,9 +570,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   verificationContent: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     padding: 16,
+    direction: "ltr",
   },
   verificationText: {
     flex: 1,
@@ -589,9 +591,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   messagesContent: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     padding: 16,
+    direction: "ltr",
   },
   chatIconContainer: {
     position: "relative",
