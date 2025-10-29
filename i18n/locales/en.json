@@ -108,22 +108,6 @@
     "save": "Save Changes",
     "updated": "Profile updated successfully"
   },
-  "clientEditTask": {
-    "heading": "Edit Task",
-    "titlePlaceholder": "Enter task title (max 15 chars)",
-    "descriptionPlaceholder": "Describe the task (max 150 chars)",
-    "pricePlaceholder": "Enter your budget",
-    "save": "Save Changes",
-    "missingTitle": "Incomplete",
-    "missingFields": "Please fill all the fields to continue.",
-    "updatedTitle": "Task Updated",
-    "updatedMessage": "Your task has been successfully updated.",
-    "placeholders": {
-      "title": "Enter task title (max 15 chars)",
-      "description": "Describe the task (max 150 chars)",
-      "price": "Enter your budget ({{currency}})"
-    }
-  },
   "clientHome": {
     "greeting": "Hi {{name}},",
     "defaultName": "Tariq",
@@ -299,9 +283,10 @@
       "addressNotSpecified": "Address not specified",
       "successTitle": "Task Posted",
       "successDescription": "Your Task has been successfully posted",
-    "done": "Done"
+      "done": "Done"
+    }
   },
-  "clientEditTask": {
+  "clientEditTask1": {
     "title": "Edit Task",
     "category": "Category",
     "selectCategory": "Select Category",
@@ -347,59 +332,6 @@
     "biddingClosed": "Bidding Closed",
     "updateBid": "Update Bid",
     "placeBid": "Place a bid"
-  },
-  "addressFields": {
-      "houseNumber": "House/Building Number",
-      "streetName": "Street Name",
-      "city": "City",
-      "state": "State/Province (Optional)",
-      "zipCode": "ZIP/Postal Code (Optional)"
-    },
-  "addressSectionTitle": "Address Details",
-    "budgetSectionTitle": "Budget",
-    "successTitle": "Task Posted",
-    "successMessage": "Your task has been successfully posted.",
-   "categories": {
-    "handyman": "Handyman",
-    "moving": "Moving",
-    "ikea assembly": "IKEA assembly",
-    "cleaning": "Cleaning",
-    "shopping & delivery": "Shopping & Delivery",
-    "yardwork services": "Yardwork Services",
-    "dog walking": "Dog Walking",
-    "other": "Other",
-    "uploadChoiceTitle": "Choose Image Source",
-"uploadChoiceMsg": "How would you like to upload the image?",
-"takePhoto": "Take Photo",
-"chooseFromLibrary": "Choose from Library"
-
-  },
-    "postingNow": "Posting...",
-    "uploadingImage": "Uploading image...",
-    "useCurrentLocation": "Use Current Location",
-    "selectOnMap": "Select on Map",
-    "editLocation": "Edit Location",
-    "locating": "Locating...",
-    "permissionNeeded": "Permission needed",
-    "locationPermissionMessage": "Location access is required to pin your task.",
-    "mapPermissionMessage": "Location access is required to set your pin.",
-    "errorTitle": "Error",
-    "locationError": "Couldn't get your location. Try again.",
-    "mapError": "Couldn't open the map.",
-    "userNotLoggedIn": "User not logged in. Please sign in again.",
-    "uploadFailed": "Upload failed",
-    "uploadFailedMessage": "Could not upload image. Try again.",
-    "postError": "Could not post task. Try again.",
-    "permissionDenied": "Permission denied",
-    "cameraPermissionMessage": "Camera access is required to take a photo.",
-    "libraryPermissionMessage": "Library access is required.",
-    "ok": "OK",
-    "selectTaskLocation": "Select Task Location",
-    "mapInstructions": "Tap on the map to place your pin, or drag the existing pin",
-    "cancel": "Cancel",
-    "confirmLocation": "Confirm Location"
-
-
   },
   "clientProfile": {
     "editProfile": "Edit Profile",
@@ -1077,20 +1009,6 @@
     "accepted": "Accepted",
     "alreadySelected": "Already Selected"
   },
-"clientEditTask": {
-    "heading": "Edit Task",
-    "loadError": "Failed to load task details. Please try again.",
-    "missingTitle": "Missing Information",
-    "missingFields": "Please fill in all the required fields before saving.",
-    "updateError": "Failed to update the task. Please try again.",
-    "save": "Save Changes",
-    "placeholders": {
-      "title": "Task name",
-      "description": "Description",
-      "location": "Address",
-      "price": "Price ({{currency}})"
-    }
-  },
   "taskerProfile": {
     "taskDetails": "Task Details",
     "taskerProfile": "Tasker's Profile",
@@ -1237,5 +1155,38 @@
     "successTitle": "Task Updated",
     "successMessage": "Your Task has been Updated, you'll be able to view its status in My Tasks",
     "done": "Done"
+  },
+  "clientEditTask1": {
+    "title": "Edit Task",
+    "category": "Category",
+    "selectCategory": "Select Category",
+    "taskTitle": "Task Title",
+    "taskTitlePlaceholder": "What do you need done?",
+    "minCharacters": "Min {{count}} more characters",
+    "maxCharacters100": "Maximum 100 characters",
+    "maxCharacters150": "Maximum 150 characters",
+    "describeTask": "Describe your Task",
+    "describeTaskPlaceholder": "Add a more detailed description of the task you want done",
+    "addImagesVideos": "Add Images/Videos",
+    "selectedImages": "Selected Images",
+    "taskAddress": "Task Address",
+    "selectLocationOnMap": "Select Location on Map",
+    "editLocationOnMap": "Edit Location on Map",
+    "budget": "Budget",
+    "budgetPlaceholder": "Your Budget",
+    "updating": "Updating...",
+    "confirmChanges": "Confirm Changes",
+    "selectTaskLocation": "Select Task Location",
+    "mapInstructions": "Tap on the map to select the exact location for your task",
+    "confirmLocation": "Confirm Location",
+    "titleTooShort": "Title must be at least 10 characters long",
+    "descriptionTooShort": "Description must be at least 25 characters long",
+    "pleaseEnterBudget": "Please enter a budget",
+    "validationError": "Validation Error",
+    "updateError": "Failed to update task. Please try again.",
+    "permissionDenied": "Permission denied",
+    "locationPermissionRequired": "Location permission is required",
+    "locationError": "Failed to get location",
+    "mapPickerError": "Failed to open map picker"
   }
 }

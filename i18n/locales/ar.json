@@ -94,7 +94,7 @@
     "save": "حفظ التغييرات",
     "updated": "تم تحديث الملف الشخصي بنجاح"
   },
-  "clientEditTask": {
+  "clientEditTask1": {
     "title": "تعديل المهمة",
     "category": "الفئة",
     "selectCategory": "اختر الفئة",
@@ -302,39 +302,6 @@
       "successTitle": "تم نشر المهمة",
       "successDescription": "تم نشر مهمتك بنجاح",
       "done": "تم"
-    },
-    "clientEditTask": {
-      "title": "تعديل المهمة",
-      "category": "الفئة",
-      "selectCategory": "اختر الفئة",
-      "taskTitle": "عنوان المهمة",
-      "taskTitlePlaceholder": "ماذا تحتاج أن يتم عمله؟",
-      "minCharacters": "{{count}} أحرف إضافية على الأقل",
-      "maxCharacters100": "100 حرف كحد أقصى",
-      "maxCharacters150": "150 حرف كحد أقصى",
-      "describeTask": "صف مهمتك",
-      "describeTaskPlaceholder": "أضف وصفًا أكثر تفصيلاً للمهمة التي تريد إنجازها",
-      "addImagesVideos": "إضافة صور/فيديوهات",
-      "selectedImages": "الصور المحددة",
-      "taskAddress": "عنوان المهمة",
-      "selectLocationOnMap": "اختر الموقع على الخريطة",
-      "editLocationOnMap": "تعديل الموقع على الخريطة",
-      "budget": "الميزانية",
-      "budgetPlaceholder": "ميزانيتك",
-      "updating": "جاري التحديث...",
-      "confirmChanges": "تأكيد التغييرات",
-      "selectTaskLocation": "اختر موقع المهمة",
-      "mapInstructions": "اضغط على الخريطة لاختيار الموقع الدقيق لمهمتك",
-      "confirmLocation": "تأكيد الموقع",
-      "titleTooShort": "عنوان المهمة يجب أن يكون 10 أحرف على الأقل",
-      "descriptionTooShort": "وصف المهمة يجب أن يكون 25 حرفًا على الأقل",
-      "pleaseEnterBudget": "يرجى إدخال الميزانية",
-      "validationError": "خطأ في التحقق",
-      "updateError": "فشل في تحديث المهمة. يرجى المحاولة مرة أخرى.",
-      "permissionDenied": "تم رفض الإذن",
-      "locationPermissionRequired": "مطلوب إذن الموقع",
-      "locationError": "فشل في الحصول على الموقع",
-      "mapPickerError": "فشل في فتح منتقي الخريطة"
     },
     "taskerTaskDetails": {
       "title": "تفاصيل المهمة",

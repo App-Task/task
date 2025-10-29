@@ -97,29 +97,29 @@ export default function EditTaskScreen({ route, navigation }) {
 
     if (!title || title.trim().length < 10) {
       hasError = true;
-      errorMessage = t("clientEditTask.titleTooShort");
+      errorMessage = t("clientEditTask1.titleTooShort");
     }
 
     if (!description || description.trim().length < 25) {
       hasError = true;
       if (errorMessage) {
-        errorMessage += "\n\n" + t("clientEditTask.descriptionTooShort");
+        errorMessage += "\n\n" + t("clientEditTask1.descriptionTooShort");
       } else {
-        errorMessage = t("clientEditTask.descriptionTooShort");
+        errorMessage = t("clientEditTask1.descriptionTooShort");
       }
     }
 
     if (!budget.trim()) {
       hasError = true;
       if (errorMessage) {
-        errorMessage += "\n\n" + t("clientEditTask.pleaseEnterBudget");
+        errorMessage += "\n\n" + t("clientEditTask1.pleaseEnterBudget");
       } else {
-        errorMessage = t("clientEditTask.pleaseEnterBudget");
+        errorMessage = t("clientEditTask1.pleaseEnterBudget");
       }
     }
 
     if (hasError) {
-      Alert.alert(t("clientEditTask.validationError"), errorMessage);
+      Alert.alert(t("clientEditTask1.validationError"), errorMessage);
       return;
     }
 
@@ -139,7 +139,7 @@ export default function EditTaskScreen({ route, navigation }) {
       navigation.navigate("TaskUpdatedSuccess");
     } catch (error) {
       console.log("Update error:", error);
-      Alert.alert(t("common.errorTitle"), t("clientEditTask.updateError"));
+      Alert.alert(t("common.errorTitle"), t("clientEditTask1.updateError"));
     } finally {
       setLoading(false);
     }
@@ -165,7 +165,7 @@ export default function EditTaskScreen({ route, navigation }) {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert(t("clientEditTask.permissionDenied"), t("clientEditTask.locationPermissionRequired"));
+        Alert.alert(t("clientEditTask1.permissionDenied"), t("clientEditTask1.locationPermissionRequired"));
         return;
       }
 
@@ -184,7 +184,7 @@ export default function EditTaskScreen({ route, navigation }) {
         });
       }
     } catch (error) {
-      Alert.alert(t("common.errorTitle"), t("clientEditTask.locationError"));
+      Alert.alert(t("common.errorTitle"), t("clientEditTask1.locationError"));
     }
   };
 
@@ -217,7 +217,7 @@ export default function EditTaskScreen({ route, navigation }) {
       }
     } catch (e) {
       console.log("openMapPicker error", e);
-      Alert.alert(t("common.errorTitle"), t("clientEditTask.mapPickerError"));
+      Alert.alert(t("common.errorTitle"), t("clientEditTask1.mapPickerError"));
     }
   };
 
@@ -256,7 +256,7 @@ export default function EditTaskScreen({ route, navigation }) {
           >
             <Ionicons name="arrow-back" size={24} color="#215432" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t("clientEditTask.title")}</Text>
+          <Text style={styles.headerTitle}>{t("clientEditTask1.title")}</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -267,13 +267,13 @@ export default function EditTaskScreen({ route, navigation }) {
         <View style={styles.formContainer}>
           {/* Category */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>{t("clientEditTask.category")}</Text>
+            <Text style={styles.fieldLabel}>{t("clientEditTask1.category")}</Text>
             <TouchableOpacity
               style={styles.categoryBtn}
               onPress={() => setShowCategoryModal(true)}
             >
               <Text style={[styles.categoryText, !category && styles.placeholderText]}>
-                {category || t("clientEditTask.selectCategory")}
+                {category || t("clientEditTask1.selectCategory")}
               </Text>
               <Ionicons name="chevron-down" size={20} color="#999" />
             </TouchableOpacity>
@@ -282,11 +282,11 @@ export default function EditTaskScreen({ route, navigation }) {
           {/* Task Title */}
           <View style={styles.fieldContainer}>
             <View style={styles.labelRow}>
-              <Text style={styles.fieldLabel}>{t("clientEditTask.taskTitle")}</Text>
+              <Text style={styles.fieldLabel}>{t("clientEditTask1.taskTitle")}</Text>
               <Text style={styles.charLimit}>
                 {title.length < 10 
-                  ? t("clientEditTask.minCharacters", { count: 10 - title.length })
-                  : t("clientEditTask.maxCharacters100")
+                  ? t("clientEditTask1.minCharacters", { count: 10 - title.length })
+                  : t("clientEditTask1.maxCharacters100")
                 }
               </Text>
             </View>
@@ -296,7 +296,7 @@ export default function EditTaskScreen({ route, navigation }) {
               onChangeText={(text) => {
                 if (text.length <= 100) setTitle(text);
               }}
-              placeholder={t("clientEditTask.taskTitlePlaceholder")}
+              placeholder={t("clientEditTask1.taskTitlePlaceholder")}
               placeholderTextColor="#999"
               maxLength={100}
               textAlign={isRTL ? "right" : "left"}
@@ -306,11 +306,11 @@ export default function EditTaskScreen({ route, navigation }) {
           {/* Description */}
           <View style={styles.fieldContainer}>
             <View style={styles.labelRow}>
-              <Text style={styles.fieldLabel}>{t("clientEditTask.describeTask")}</Text>
+              <Text style={styles.fieldLabel}>{t("clientEditTask1.describeTask")}</Text>
               <Text style={styles.charLimit}>
                 {description.length < 25 
-                  ? t("clientEditTask.minCharacters", { count: 25 - description.length })
-                  : t("clientEditTask.maxCharacters150")
+                  ? t("clientEditTask1.minCharacters", { count: 25 - description.length })
+                  : t("clientEditTask1.maxCharacters150")
                 }
               </Text>
             </View>
@@ -321,7 +321,7 @@ export default function EditTaskScreen({ route, navigation }) {
                 onChangeText={(text) => {
                   if (text.length <= 150) setDescription(text);
                 }}
-                placeholder={t("clientEditTask.describeTaskPlaceholder")}
+                placeholder={t("clientEditTask1.describeTaskPlaceholder")}
                 placeholderTextColor="#999"
                 multiline
                 maxLength={150}
@@ -331,7 +331,7 @@ export default function EditTaskScreen({ route, navigation }) {
               <View style={styles.textAreaSeparator} />
               <TouchableOpacity style={styles.addMediaBtn} onPress={pickImage}>
                 <Ionicons name="add" size={20} color="#999" />
-                <Text style={styles.addMediaText}>{t("clientEditTask.addImagesVideos")}</Text>
+                <Text style={styles.addMediaText}>{t("clientEditTask1.addImagesVideos")}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -339,7 +339,7 @@ export default function EditTaskScreen({ route, navigation }) {
           {/* Image Gallery */}
           {images && images.length > 0 && (
             <View style={styles.imageGalleryContainer}>
-              <Text style={styles.galleryTitle}>{t("clientEditTask.selectedImages")}</Text>
+              <Text style={styles.galleryTitle}>{t("clientEditTask1.selectedImages")}</Text>
               <ScrollView 
                 horizontal 
                 showsHorizontalScrollIndicator={false} 
@@ -362,13 +362,13 @@ export default function EditTaskScreen({ route, navigation }) {
 
           {/* Task Address */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>{t("clientEditTask.taskAddress")}</Text>
+            <Text style={styles.fieldLabel}>{t("clientEditTask1.taskAddress")}</Text>
             <TouchableOpacity style={styles.addressBtn} onPress={openMapPicker}>
               <View style={styles.addressBtnContent}>
                 <View style={styles.addIcon}>
                   <Ionicons name="location" size={16} color="#fff" />
                 </View>
-                <Text style={styles.addressBtnText}>{t("clientEditTask.selectLocationOnMap")}</Text>
+                <Text style={styles.addressBtnText}>{t("clientEditTask1.selectLocationOnMap")}</Text>
               </View>
             </TouchableOpacity>
             {address ? (
@@ -390,7 +390,7 @@ export default function EditTaskScreen({ route, navigation }) {
                   <Marker coordinate={coords} />
                 </MapView>
                 <TouchableOpacity style={styles.editLocationButton} onPress={openMapPicker}>
-                  <Text style={styles.editLocationText}>{t("clientEditTask.editLocationOnMap")}</Text>
+                  <Text style={styles.editLocationText}>{t("clientEditTask1.editLocationOnMap")}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -398,13 +398,13 @@ export default function EditTaskScreen({ route, navigation }) {
 
           {/* Budget */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>{t("clientEditTask.budget")}</Text>
+            <Text style={styles.fieldLabel}>{t("clientEditTask1.budget")}</Text>
             <View style={styles.budgetContainer}>
               <TextInput
                 style={styles.budgetInput}
                 value={budget}
                 onChangeText={setBudget}
-                placeholder={t("clientEditTask.budgetPlaceholder")}
+                placeholder={t("clientEditTask1.budgetPlaceholder")}
                 placeholderTextColor="#999"
                 keyboardType="numeric"
                 textAlign={isRTL ? "right" : "left"}
@@ -421,7 +421,7 @@ export default function EditTaskScreen({ route, navigation }) {
           disabled={loading}
         >
           <Text style={styles.confirmBtnText}>
-            {loading ? t("clientEditTask.updating") : t("clientEditTask.confirmChanges")}
+            {loading ? t("clientEditTask1.updating") : t("clientEditTask1.confirmChanges")}
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -436,7 +436,7 @@ export default function EditTaskScreen({ route, navigation }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t("clientEditTask.selectCategory")}</Text>
+              <Text style={styles.modalTitle}>{t("clientEditTask1.selectCategory")}</Text>
               <TouchableOpacity
                 style={styles.closeBtn}
                 onPress={() => setShowCategoryModal(false)}
@@ -488,12 +488,12 @@ export default function EditTaskScreen({ route, navigation }) {
             >
               <Ionicons name="arrow-back" size={24} color="#215432" />
             </TouchableOpacity>
-            <Text style={styles.mapHeaderTitle}>{t("clientEditTask.selectTaskLocation")}</Text>
+            <Text style={styles.mapHeaderTitle}>{t("clientEditTask1.selectTaskLocation")}</Text>
             <View style={{ width: 24 }} />
           </View>
 
           <Text style={styles.mapHeaderSubtitle}>
-            {t("clientEditTask.mapInstructions")}
+            {t("clientEditTask1.mapInstructions")}
           </Text>
 
           {tempRegion && (
@@ -523,7 +523,7 @@ export default function EditTaskScreen({ route, navigation }) {
               <Text style={styles.mapBtnText}>{t("common.cancel")}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.mapBtn, styles.mapConfirm]} onPress={confirmMapLocation}>
-              <Text style={[styles.mapBtnText, { color: "#fff" }]}>{t("clientEditTask.confirmLocation")}</Text>
+              <Text style={[styles.mapBtnText, { color: "#fff" }]}>{t("clientEditTask1.confirmLocation")}</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
