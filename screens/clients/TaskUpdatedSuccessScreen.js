@@ -6,11 +6,15 @@ import {
   StyleSheet,
   Platform,
   StatusBar,
+  I18nManager,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 export default function TaskUpdatedSuccessScreen({ navigation }) {
+  const { t } = useTranslation();
+  
   const handleDone = () => {
     // Navigate back to the task details or home screen
     navigation.navigate("ClientHome", {
@@ -23,7 +27,9 @@ export default function TaskUpdatedSuccessScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Edit Task</Text>
+        <View style={{ flex: 1 }} />
+        <Text style={styles.headerTitle}>{t("taskUpdatedSuccess.headerTitle")}</Text>
+        <View style={{ flex: 1 }} />
         <View style={styles.headerLine} />
       </View>
 
@@ -38,9 +44,9 @@ export default function TaskUpdatedSuccessScreen({ navigation }) {
 
         {/* Success Text */}
         <View style={styles.textContainer}>
-          <Text style={styles.successTitle}>Task Updated</Text>
+          <Text style={styles.successTitle}>{t("taskUpdatedSuccess.successTitle")}</Text>
           <Text style={styles.successMessage}>
-            Your Task has been Updated, you'll be able to view its status in My Tasks
+            {t("taskUpdatedSuccess.successMessage")}
           </Text>
         </View>
       </View>
@@ -48,7 +54,7 @@ export default function TaskUpdatedSuccessScreen({ navigation }) {
       {/* Done Button */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
-          <Text style={styles.doneButtonText}>Done</Text>
+          <Text style={styles.doneButtonText}>{t("taskUpdatedSuccess.done")}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -69,6 +75,8 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     color: "#333333",
     marginBottom: 10,
+    textAlign: "center",
+    flex: 1,
   },
   headerLine: {
     height: 1,

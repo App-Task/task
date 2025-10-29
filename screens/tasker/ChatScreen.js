@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { getToken } from "../../services/authStorage";
@@ -35,6 +36,8 @@ export default function TaskerChatScreen({ navigation, route }) {
   const [sending, setSending] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [viewingImage, setViewingImage] = useState(null);
+  
+  const isRTL = i18n.language === "ar";
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -260,20 +263,20 @@ export default function TaskerChatScreen({ navigation, route }) {
         </TouchableOpacity>
       </View>
     )}
-    <View style={styles.inputRow}>
+    <View style={[styles.inputRow, isRTL ? { flexDirection: "row-reverse" } : {}]}>
       <TouchableOpacity style={styles.attachButton} onPress={pickImage}>
         <Ionicons name="image-outline" size={24} color="#215433" />
       </TouchableOpacity>
       <TextInput
         value={message}
         onChangeText={setMessage}
-        style={styles.input}
+        style={[styles.input, isRTL ? { textAlign: "right", writingDirection: "rtl" } : { textAlign: "left" }]}
         placeholder={t("clientChat.placeholder")}
         placeholderTextColor="#aaa"
-        textAlign={I18nManager.isRTL ? "right" : "left"}
+        placeholderTextAlign={isRTL ? "right" : "left"}
       />
       <TouchableOpacity
-        style={[styles.sendButton, sending && { backgroundColor: "#888" }]}
+        style={[styles.sendButton, isRTL ? { marginRight: 10 } : { marginLeft: 10 }, sending && { backgroundColor: "#888" }]}
         onPress={sendMessage}
         disabled={sending}
       >
@@ -394,7 +397,6 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   sendButton: {
-    marginLeft: 10,
     backgroundColor: "#215433",
     padding: 10,
     borderRadius: 30,
@@ -411,7 +413,6 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
   attachButton: {
-    marginRight: 10,
     padding: 8,
   },
   imagePreviewContainer: {

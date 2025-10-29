@@ -1231,5 +1231,11 @@
     "defaultComment": "It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when It is a long established fact that a reader will be distracted by the readable content of a page when",
     "emptyTitle": "No Reviews Yet",
     "emptySubtitle": "Start completing tasks to receive reviews from clients!"
+  },
+  "taskUpdatedSuccess": {
+    "headerTitle": "Edit Task",
+    "successTitle": "Task Updated",
+    "successMessage": "Your Task has been Updated, you'll be able to view its status in My Tasks",
+    "done": "Done"
   }
 }

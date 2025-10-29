@@ -346,7 +346,7 @@ export default function ExploreTasksScreen({ navigation }) {
         <Ionicons name="hourglass-outline" size={24} color="#215433" />
         <Text style={styles.verificationText}>{t("taskerExplore.pendingVerification")}</Text>
         <Ionicons 
-          name={I18nManager.isRTL ? "chevron-back-outline" : "chevron-forward-outline"} 
+          name="chevron-back-outline" 
           size={20} 
           color="#215433" 
         />
@@ -367,7 +367,7 @@ export default function ExploreTasksScreen({ navigation }) {
         </View>
         <Text style={styles.messagesText}>{t("taskerExplore.unreadMessages", { count: unreadMessages })}</Text>
         <Ionicons 
-          name={I18nManager.isRTL ? "chevron-back-outline" : "chevron-forward-outline"} 
+          name="chevron-back-outline" 
           size={20} 
           color="#215433" 
         />
@@ -473,16 +473,17 @@ export default function ExploreTasksScreen({ navigation }) {
       >
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.greeting}>{t("taskerExplore.greeting", { name: currentUser?.name || "Tariq" })}</Text>
-            <Text style={styles.welcomeText}>{t("taskerExplore.welcomeText")}</Text>
-          </View>
           <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
             <View style={styles.notificationIconContainer}>
               <Ionicons name="notifications-outline" size={24} color="#215433" />
               {(unreadMessages > 0 || unreadNotifications > 0) && <View style={styles.headerNotificationDot} />}
             </View>
           </TouchableOpacity>
+          <View style={{ width: 24 }} />
+          <View style={styles.headerLeft}>
+            <Text style={styles.greeting}>{t("taskerExplore.greeting", { name: currentUser?.name || "Tariq" })}</Text>
+            <Text style={styles.welcomeText}>{t("taskerExplore.welcomeText")}</Text>
+          </View>
         </View>
 
         {/* Verification or Messages Card */}
@@ -526,9 +527,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   header: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    justifyContent: "space-between",
+    flexDirection: "row-reverse",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight || 0) + 20 : 80,
     paddingBottom: 20,

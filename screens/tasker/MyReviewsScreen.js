@@ -161,6 +161,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 10,
+    direction: "ltr",
   },
   backButton: {
     padding: 4,

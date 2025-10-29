@@ -17,6 +17,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
 import { fetchCurrentUser } from "../../services/auth";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 
 export default function EditBidScreen() {
   const navigation = useNavigation();
@@ -27,6 +28,8 @@ export default function EditBidScreen() {
   const [bidAmount, setBidAmount] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  
+  const isRTL = i18n.language === "ar";
 
   useEffect(() => {
     if (existingBid) {
@@ -116,7 +119,7 @@ export default function EditBidScreen() {
               <Text style={styles.characterLimit}>{t("taskerMyTasks.maxCharacters100")}</Text>
             </View>
             <TextInput
-              style={[styles.input, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+              style={[styles.input, { textAlign: isRTL ? "right" : "left" }]}
               placeholder={t("taskerEditBid.amountPlaceholder", { currency: "BHD" })}
               placeholderTextColor="#999"
               value={bidAmount}
@@ -133,7 +136,7 @@ export default function EditBidScreen() {
               <Text style={styles.characterLimit}>{t("taskerMyTasks.maxCharacters350")}</Text>
             </View>
             <TextInput
-              style={[styles.input, styles.messageInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+              style={[styles.input, styles.messageInput, { textAlign: isRTL ? "right" : "left" }]}
               placeholder={t("taskerEditBid.messagePlaceholder")}
               placeholderTextColor="#999"
               value={message}
@@ -173,6 +176,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 16,
+    direction: "ltr",
   },
   backButton: {
     width: 40,

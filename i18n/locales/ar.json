@@ -95,18 +95,37 @@
     "updated": "تم تحديث الملف الشخصي بنجاح"
   },
   "clientEditTask": {
-    "heading": "تعديل المهمة",
-    "loadError": "فشل في تحميل تفاصيل المهمة. يرجى المحاولة مرة أخرى.",
-    "missingTitle": "معلومات ناقصة",
-    "missingFields": "يرجى ملء جميع الحقول المطلوبة قبل الحفظ.",
+    "title": "تعديل المهمة",
+    "category": "الفئة",
+    "selectCategory": "اختر الفئة",
+    "taskTitle": "عنوان المهمة",
+    "taskTitlePlaceholder": "ماذا تحتاج أن يتم؟",
+    "minCharacters": "الحد الأدنى {{count}} حروف إضافية",
+    "maxCharacters100": "الحد الأقصى 100 حرف",
+    "maxCharacters150": "الحد الأقصى 150 حرف",
+    "describeTask": "اشرح مهمتك",
+    "describeTaskPlaceholder": "أضف وصفاً أكثر تفصيلاً للمهمة التي تريد إنجازها",
+    "addImagesVideos": "إضافة صور/فيديو",
+    "selectedImages": "الصور المحددة",
+    "taskAddress": "عنوان المهمة",
+    "selectLocationOnMap": "اختر الموقع على الخريطة",
+    "editLocationOnMap": "تحرير الموقع على الخريطة",
+    "budget": "الميزانية",
+    "budgetPlaceholder": "ميزانيتك",
+    "updating": "جاري التحديث...",
+    "confirmChanges": "تأكيد التغييرات",
+    "selectTaskLocation": "اختر موقع المهمة",
+    "mapInstructions": "اضغط على الخريطة لاختيار الموقع الدقيق لمهمتك",
+    "confirmLocation": "تأكيد الموقع",
+    "titleTooShort": "يجب أن يكون العنوان 10 أحرف على الأقل",
+    "descriptionTooShort": "يجب أن يكون الوصف 25 حرفاً على الأقل",
+    "pleaseEnterBudget": "يرجى إدخال ميزانية",
+    "validationError": "خطأ في التحقق",
     "updateError": "فشل في تحديث المهمة. يرجى المحاولة مرة أخرى.",
-    "save": "حفظ التغييرات",
-    "placeholders": {
-      "title": "اسم المهمة",
-      "description": "الوصف",
-      "location": "العنوان",
-      "price": "السعر ({{currency}})"
-    }
+    "permissionDenied": "تم رفض الإذن",
+    "locationPermissionRequired": "إذن الموقع مطلوب",
+    "locationError": "فشل في الحصول على الموقع",
+    "mapPickerError": "فشل في فتح منتقي الخريطة"
   },
   "clientHome": {
     "greeting": "مرحبًا {{name}}،",
@@ -1053,5 +1072,11 @@
     "updating": "جارٍ التحديث...",
     "weakPassword": "كلمة مرور ضعيفة",
     "passwordRequirements": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل وحرف كبير واحد ورقم واحد."
+  },
+  "taskUpdatedSuccess": {
+    "headerTitle": "تعديل المهمة",
+    "successTitle": "تم تحديث المهمة",
+    "successMessage": "تم تحديث مهمتك، ستتمكن من رؤية حالتها في مهامي",
+    "done": "تم"
   }
 }

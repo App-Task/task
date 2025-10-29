@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import * as SecureStore from "expo-secure-store";
@@ -53,6 +54,8 @@ export default function EditTaskScreen({ route, navigation }) {
   const [images, setImages] = useState(task.images || []);
   const [loading, setLoading] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+  
+  const isRTL = i18n.language === "ar";
   
   // Location states
   const [coords, setCoords] = useState(null);
@@ -296,6 +299,7 @@ export default function EditTaskScreen({ route, navigation }) {
               placeholder={t("clientEditTask.taskTitlePlaceholder")}
               placeholderTextColor="#999"
               maxLength={100}
+              textAlign={isRTL ? "right" : "left"}
             />
           </View>
 
@@ -322,6 +326,7 @@ export default function EditTaskScreen({ route, navigation }) {
                 multiline
                 maxLength={150}
                 textAlignVertical="top"
+                textAlign={isRTL ? "right" : "left"}
               />
               <View style={styles.textAreaSeparator} />
               <TouchableOpacity style={styles.addMediaBtn} onPress={pickImage}>
@@ -402,6 +407,7 @@ export default function EditTaskScreen({ route, navigation }) {
                 placeholder={t("clientEditTask.budgetPlaceholder")}
                 placeholderTextColor="#999"
                 keyboardType="numeric"
+                textAlign={isRTL ? "right" : "left"}
               />
               <Text style={styles.currency}>BHD</Text>
             </View>
@@ -536,11 +542,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
   header: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
+    direction: "ltr",
   },
   backBtn: {
     width: 40,
@@ -853,7 +860,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   mapHeader: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -861,6 +868,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#E0E0E0",
+    direction: "ltr",
   },
   mapBackBtn: {
     width: 40,

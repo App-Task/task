@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 10,
     marginBottom: 6,
-    alignSelf: I18nManager.isRTL ? "flex-end" : "flex-start",
+    direction: "ltr",
   },
 
   // Navigation tabs

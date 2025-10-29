@@ -12,6 +12,7 @@ import {
 } from "react-native";
 
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
 import EmptyState from "../../components/EmptyState";
@@ -23,6 +24,8 @@ export default function MessagesScreen({ navigation }) {
   const [loading, setLoading] = useState(true);      // ✅ NEW
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  const isRTL = i18n.language === "ar";
 
 
   const fetchConversations = async (fromRefresh = false) => {
@@ -116,6 +119,7 @@ export default function MessagesScreen({ navigation }) {
     placeholderTextColor="#777"
     value={searchQuery}
     onChangeText={(text) => setSearchQuery(text)}
+    textAlign={isRTL ? "right" : "left"}
   />
 </View>
 

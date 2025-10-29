@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
+    direction: "ltr",
   },
   headerTitle: {
     fontFamily: "InterBold",

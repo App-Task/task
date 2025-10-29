@@ -939,6 +939,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 20,
+    direction: "ltr",
   },
   
   backBtn: {

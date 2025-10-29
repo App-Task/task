@@ -11,12 +11,15 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { forgotPassword } from "../../services/auth";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 
 export default function ForgotPasswordRequest({ navigation, route }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const role = route?.params?.role || "client";
   const { t } = useTranslation();
+  
+  const isRTL = i18n.language === "ar";
 
   // Debug logging
   console.log(`🔍 ForgotPasswordRequest mounted with role: ${role}`);
@@ -41,14 +44,16 @@ export default function ForgotPasswordRequest({ navigation, route }) {
 
   return (
     <View style={styles.wrapper}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-        <Ionicons name={"arrow-back"} size={28} color="#215433" />
-      </TouchableOpacity>
-
-      <Text style={styles.title}>{t("forgotPassword.resetPassword")}</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <Ionicons name={"arrow-back"} size={28} color="#215433" />
+        </TouchableOpacity>
+        <Text style={styles.title}>{t("forgotPassword.resetPassword")}</Text>
+        <View style={{ width: 40 }} />
+      </View>
 
       <TextInput
-        style={[styles.input, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+        style={[styles.input, { textAlign: isRTL ? "right" : "left" }]}
         placeholder={t("forgotPassword.enterEmail")}
         placeholderTextColor="#999"
         value={email}
@@ -73,14 +78,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingTop: 60,
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 30,
+    direction: "ltr",
+  },
   backBtn: {
-    marginBottom: 20,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: 22,
     fontFamily: "InterBold",
     color: "#215432",
-    marginBottom: 30,
+    textAlign: "center",
+    flex: 1,
   },
   input: {
     backgroundColor: "#f2f2f2",

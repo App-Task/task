@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import { registerUser, loginUser } from "../../services/auth";
 import * as SecureStore from "expo-secure-store";
 import { storeToken } from "../../services/authStorage";
@@ -39,6 +40,8 @@ export default function RegisterScreen({ navigation, route }) {
   const [secure1, setSecure1] = useState(true);
   const [secure2, setSecure2] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
+  
+  const isRTL = i18n.language === "ar";
 
 
 
@@ -146,7 +149,7 @@ navigation.reset({
         <Text style={[styles.title, { textAlign: I18nManager.isRTL ? "right" : "left" }]}>{t("register.title")}</Text>
 
         <TextInput
-          style={[styles.input, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+          style={[styles.input, { textAlign: isRTL ? "right" : "left" }]}
           placeholder={t("register.fullName")}
           placeholderTextColor="#999"
           value={name}
@@ -155,7 +158,7 @@ navigation.reset({
         />
 
         <TextInput
-          style={[styles.input, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+          style={[styles.input, { textAlign: isRTL ? "right" : "left" }]}
           placeholder={t("register.email")}
           placeholderTextColor="#999"
           value={email}
@@ -181,7 +184,7 @@ navigation.reset({
 
   </View>
   <TextInput
-    style={[styles.phoneInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+    style={[styles.phoneInput, { textAlign: isRTL ? "right" : "left" }]}
     value={phone}
     onChangeText={setPhone}
     keyboardType="phone-pad"
@@ -195,7 +198,7 @@ navigation.reset({
 
         <View style={[styles.passwordContainer, { flexDirection: I18nManager.isRTL ? "row-reverse" : "row" }]}>
           <TextInput
-            style={[styles.passwordInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+            style={[styles.passwordInput, { textAlign: isRTL ? "right" : "left" }]}
             placeholder={t("register.password")}
             placeholderTextColor="#999"
             secureTextEntry={secure1}
@@ -212,7 +215,7 @@ navigation.reset({
 
         <View style={[styles.passwordContainer, { flexDirection: I18nManager.isRTL ? "row-reverse" : "row" }]}>
           <TextInput
-            style={[styles.passwordInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+            style={[styles.passwordInput, { textAlign: isRTL ? "right" : "left" }]}
             placeholder={t("register.confirmPassword")}
             placeholderTextColor="#999"
             secureTextEntry={secure2}
@@ -288,6 +291,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "flex-start",
     marginBottom: 40,
+    direction: "ltr",
   },
   backBtn: {
     width: 40,

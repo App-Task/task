@@ -11,6 +11,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import axios from "axios";
 import { getToken } from "../../services/authStorage";
 import { useFocusEffect } from "@react-navigation/native";
@@ -22,6 +23,8 @@ export default function TaskerMessagesScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  const isRTL = i18n.language === "ar";
 
 
 
@@ -123,6 +126,7 @@ export default function TaskerMessagesScreen({ navigation }) {
           placeholderTextColor="#777"
           value={searchQuery}
           onChangeText={(text) => setSearchQuery(text)}
+          textAlign={isRTL ? "right" : "left"}
         />
       </View>
 

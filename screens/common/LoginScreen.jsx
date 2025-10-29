@@ -10,9 +10,11 @@ import {
   Platform,
   ScrollView,
   Alert,
+  I18nManager,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import { loginUser } from "../../services/auth";
 import { storeToken } from "../../services/authStorage";
 import * as SecureStore from "expo-secure-store";
@@ -29,6 +31,8 @@ export default function LoginScreen({ navigation, route }) {
   const [password, setPassword] = useState("");
   const [secure, setSecure] = useState(true);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  
+  const isRTL = i18n.language === "ar";
 
 
   const handleLogin = async () => {
@@ -152,6 +156,7 @@ export default function LoginScreen({ navigation, route }) {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
+          textAlign={isRTL ? "right" : "left"}
         />
 
         <View style={styles.passwordContainer}>
@@ -162,6 +167,7 @@ export default function LoginScreen({ navigation, route }) {
             secureTextEntry={secure}
             value={password}
             onChangeText={setPassword}
+            textAlign={isRTL ? "right" : "left"}
           />
           <TouchableOpacity onPress={() => setSecure(!secure)} style={styles.eyeWrapper}>
             <Ionicons name={secure ? "eye-off" : "eye"} size={20} color="#999" />
@@ -214,6 +220,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "flex-start",
     marginBottom: 40,
+    direction: "ltr",
   },
   backBtn: {
     width: 40,
@@ -242,7 +249,7 @@ const styles = StyleSheet.create({
   },
   passwordContainer: {
     width: "100%",
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     backgroundColor: "#f2f2f2",
     borderRadius: 8,
@@ -255,6 +262,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Inter",
     color: "#333",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   eyeWrapper: {
     paddingHorizontal: 12,

@@ -11,6 +11,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { resetPassword } from "../../services/auth";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 
 export default function ForgotPasswordReset({ navigation, route }) {
   const emailFromRoute = route?.params?.email || "";
@@ -23,6 +24,8 @@ export default function ForgotPasswordReset({ navigation, route }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
+  
+  const isRTL = i18n.language === "ar";
 
   const handleReset = async () => {
     if (!code.trim() || !newPassword.trim() || !confirmPassword.trim()) {
@@ -66,18 +69,21 @@ export default function ForgotPasswordReset({ navigation, route }) {
 
   return (
     <View style={styles.wrapper}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-        <Ionicons name={"arrow-back"} size={24} color="#215432" />
-      </TouchableOpacity>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <Ionicons name={"arrow-back"} size={24} color="#215432" />
+        </TouchableOpacity>
+        <Text style={styles.title}>{t("forgotPassword.resetTitle")}</Text>
+        <View style={{ width: 40 }} />
+      </View>
 
-      <Text style={styles.title}>{t("forgotPassword.resetTitle")}</Text>
       <Text style={styles.subtitle}>
         {t("forgotPassword.resetSubtitle")}
       </Text>
 
       <Text style={styles.label}>{t("forgotPassword.emailAddress")}</Text>
       <TextInput
-        style={[styles.input, styles.disabledInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+        style={[styles.input, styles.disabledInput, { textAlign: isRTL ? "right" : "left" }]}
         value={email}
         editable={false}
         selectTextOnFocus={false}
@@ -85,7 +91,7 @@ export default function ForgotPasswordReset({ navigation, route }) {
 
       <Text style={styles.label}>{t("forgotPassword.resetCode")}</Text>
       <TextInput
-        style={[styles.input, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+        style={[styles.input, { textAlign: isRTL ? "right" : "left" }]}
         placeholder={t("forgotPassword.codePlaceholder")}
         value={code}
         onChangeText={setCode}
@@ -96,7 +102,7 @@ export default function ForgotPasswordReset({ navigation, route }) {
       <Text style={styles.label}>{t("forgotPassword.newPassword")}</Text>
       <View style={[styles.passwordContainer, { flexDirection: I18nManager.isRTL ? "row-reverse" : "row" }]}>
         <TextInput
-          style={[styles.passwordInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+          style={[styles.passwordInput, { textAlign: isRTL ? "right" : "left" }]}
           placeholder={t("forgotPassword.passwordPlaceholder")}
           secureTextEntry={!showNewPassword}
           value={newPassword}
@@ -117,7 +123,7 @@ export default function ForgotPasswordReset({ navigation, route }) {
       <Text style={styles.label}>{t("forgotPassword.confirmPassword")}</Text>
       <View style={[styles.passwordContainer, { flexDirection: I18nManager.isRTL ? "row-reverse" : "row" }]}>
         <TextInput
-          style={[styles.passwordInput, { textAlign: I18nManager.isRTL ? "right" : "left" }]}
+          style={[styles.passwordInput, { textAlign: isRTL ? "right" : "left" }]}
           placeholder={t("forgotPassword.confirmPlaceholder")}
           secureTextEntry={!showConfirmPassword}
           value={confirmPassword}
@@ -151,18 +157,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingTop: 60,
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+    direction: "ltr",
+  },
   backBtn: {
     width: 40,
     height: 40,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
   },
   title: {
     fontSize: 22,
     fontFamily: "InterBold",
     color: "#215432",
-    marginBottom: 10,
+    textAlign: "center",
+    flex: 1,
   },
   subtitle: {
     fontSize: 14,

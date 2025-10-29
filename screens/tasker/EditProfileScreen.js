@@ -532,6 +532,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 30,
     gap: 8,
+    direction: "ltr",
   },
 
   backButton: {
