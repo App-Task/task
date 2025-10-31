@@ -38,62 +38,68 @@ export default function ExploreTasksScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedTasks, setExpandedTasks] = useState(new Set());
 
-  // Helper function to get category translation
-  const getCategoryLabel = (categoryKey) => {
-    const categoryMap = {
-      "nearest": "nearestToYou",
-      "cleaning": "cleaning",
-      "shopping": "shopping",
-      "handyman": "handyman",
-      "moving": "moving",
-      "ikea": "furniture",
-      "yardwork": "yardwork",
-      "dogwalking": "dogWalking",
-      "other": "other",
-    };
-    
-    const translationKeys = {
-      "nearestToYou": t("taskerExplore.nearestToYou"),
-      "cleaning": t("clientPostTask.categories.cleaning"),
-      "shopping": t("clientPostTask.categories.shopping"),
-      "handyman": t("clientPostTask.categories.handyman"),
-      "moving": t("clientPostTask.categories.moving"),
-      "furniture": t("clientPostTask.categories.furniture"),
-      "yardwork": t("clientPostTask.categories.yardwork"),
-      "dogWalking": t("clientPostTask.categories.dogWalking"),
-      "other": t("clientPostTask.categories.other"),
-    };
-    
-    const key = categoryMap[categoryKey];
-    let translated = translationKeys[key];
-    
-    // Check if translation failed and returned the key
-    const expectedKey = categoryKey === "nearest" ? "taskerExplore.nearestToYou" : `clientPostTask.categories.${key}`;
-    if (translated === expectedKey) {
-      // Fallback to hardcoded values
-      const fallbackMap = {
-        "furniture": i18n.language === "ar" ? "تركيب الأثاث" : "Furniture Assembly",
-        "shopping": i18n.language === "ar" ? "التسوق والتوصيل" : "Shopping & Delivery",
-        "yardwork": i18n.language === "ar" ? "أعمال الحديقة" : "Yardwork Services",
-        "dogWalking": i18n.language === "ar" ? "تمشية الكلاب" : "Dog Walking",
-      };
-      return fallbackMap[key] || translated;
-    }
-    
-    return translated;
+  // Single source of truth for all categories
+  const categoryConfig = {
+    "Cleaning": { icon: "water-outline", translationKey: "clientPostTask.categories.cleaning" },
+    "Shopping & Delivery": { icon: "bag-outline", translationKey: "clientPostTask.categories.shopping" },
+    "Handyman": { icon: "construct-outline", translationKey: "clientPostTask.categories.handyman" },
+    "Moving": { icon: "car-outline", translationKey: "clientPostTask.categories.moving" },
+    "IKEA assembly": { icon: "bed-outline", translationKey: "clientPostTask.categories.furniture" },
+    "Yardwork Services": { icon: "leaf-outline", translationKey: "clientPostTask.categories.yardwork" },
+    "Dog Walking": { icon: "paw-outline", translationKey: "clientPostTask.categories.dogWalking" },
+    "Other": { icon: "ellipsis-horizontal-outline", translationKey: "clientPostTask.categories.other" },
   };
 
   const filterOptions = [
-    { id: "nearest", label: getCategoryLabel("nearest"), icon: "location-outline" },
-    { id: "cleaning", label: getCategoryLabel("cleaning"), icon: "water-outline" },
-    { id: "shopping", label: getCategoryLabel("shopping"), icon: "bag-outline" },
-    { id: "handyman", label: getCategoryLabel("handyman"), icon: "hammer-outline" },
-    { id: "moving", label: getCategoryLabel("moving"), icon: "car-outline" },
-    { id: "ikea", label: getCategoryLabel("ikea"), icon: "build-outline" },
-    { id: "yardwork", label: getCategoryLabel("yardwork"), icon: "leaf-outline" },
-    { id: "dogwalking", label: getCategoryLabel("dogwalking"), icon: "walk-outline" },
-    { id: "other", label: getCategoryLabel("other"), icon: "ellipsis-horizontal-outline" },
+    { id: "nearest", label: t("taskerExplore.nearestToYou"), icon: "location-outline" },
+    { id: "cleaning", label: t("clientPostTask.categories.cleaning"), icon: "water-outline" },
+    { id: "shopping", label: t("clientPostTask.categories.shopping"), icon: "bag-outline" },
+    { id: "handyman", label: t("clientPostTask.categories.handyman"), icon: "construct-outline" },
+    { id: "moving", label: t("clientPostTask.categories.moving"), icon: "car-outline" },
+    { id: "ikea", label: t("clientPostTask.categories.furniture"), icon: "bed-outline" },
+    { id: "yardwork", label: t("clientPostTask.categories.yardwork"), icon: "leaf-outline" },
+    { id: "dogwalking", label: t("clientPostTask.categories.dogWalking"), icon: "paw-outline" },
+    { id: "other", label: t("clientPostTask.categories.other"), icon: "ellipsis-horizontal-outline" },
   ];
+
+  const getCategoryConfig = (category) => {
+    // Normalize input
+    const normalized = category || "Other";
+    
+    // Check exact match
+    if (categoryConfig[normalized]) {
+      return categoryConfig[normalized];
+    }
+    
+    // Check case-insensitive match
+    const normalizedLower = normalized.toLowerCase();
+    for (const [key, config] of Object.entries(categoryConfig)) {
+      if (key.toLowerCase() === normalizedLower) {
+        return config;
+      }
+    }
+    
+    // Handle aliases/variants
+    const aliasMap = {
+      "pet": "Dog Walking",
+      "pet services": "Dog Walking",
+      "furniture assembly": "IKEA assembly",
+      "furniture": "IKEA assembly",
+      "yardwork": "Yardwork Services",
+      "shopping": "Shopping & Delivery",
+      "cleaning": "Cleaning",
+      "handyman": "Handyman",
+      "moving": "Moving",
+      "other": "Other"
+    };
+    
+    if (aliasMap[normalizedLower]) {
+      return categoryConfig[aliasMap[normalizedLower]];
+    }
+    
+    // Return default for "Other"
+    return categoryConfig["Other"];
+  };
 
   const fetchUnreadMessages = async () => {
     try {
@@ -209,61 +215,13 @@ export default function ExploreTasksScreen({ navigation }) {
   }, [selectedFilter, searchQuery, tasks]);
 
   const getCategoryIcon = (category) => {
-    const iconMap = {
-      "Cleaning": "water-outline",
-      "cleaning": "water-outline",
-      "Shopping & Delivery": "bag-outline",
-      "shopping": "bag-outline",
-      "Handyman": "hammer-outline",
-      "handyman": "hammer-outline",
-      "Moving": "car-outline",
-      "moving": "car-outline",
-      "IKEA assembly": "build-outline",
-      "ikea assembly": "build-outline",
-      "Yardwork Services": "leaf-outline",
-      "yardwork services": "leaf-outline",
-      "Dog Walking": "walk-outline",
-      "dog walking": "walk-outline",
-      "Other": "ellipsis-horizontal-outline",
-      "other": "ellipsis-horizontal-outline"
-    };
-    return iconMap[category] || "ellipsis-horizontal-outline";
+    const config = getCategoryConfig(category);
+    return config.icon;
   };
 
   const getCategoryTranslation = (category) => {
-    if (!category) return t("clientPostTask.categories.other");
-    
-    const categoryLower = category.toLowerCase();
-    
-    // Map database categories to translation keys
-    const categoryMap = {
-      "cleaning": "cleaning",
-      "shopping & delivery": "shopping",
-      "handyman": "handyman",
-      "moving": "moving",
-      "ikea assembly": "furniture",
-      "yardwork services": "yardwork",
-      "dog walking": "dogWalking",
-      "other": "other"
-    };
-    
-    const categoryKey = categoryMap[categoryLower];
-    if (categoryKey) {
-      const translationKey = `clientPostTask.categories.${categoryKey}`;
-      const translated = t(translationKey);
-      
-      // If translation returns the key itself, it means the key wasn't found
-      if (translated === translationKey) {
-        console.warn(`Translation key not found: ${translationKey}`);
-        // Fallback to direct lookup in translation object
-        return categoryKey === "furniture" ? (i18n.language === "ar" ? "تركيب الأثاث" : "Furniture Assembly") :
-               categoryKey === "shopping" ? (i18n.language === "ar" ? "التسوق والتوصيل" : "Shopping & Delivery") :
-               category;
-      }
-      
-      return translated;
-    }
-    return category;
+    const config = getCategoryConfig(category);
+    return t(config.translationKey);
   };
 
   const toggleTaskExpansion = (taskId) => {
@@ -407,7 +365,7 @@ export default function ExploreTasksScreen({ navigation }) {
         placeholderTextColor="#666"
         value={searchQuery}
         onChangeText={setSearchQuery}
-        textAlign={I18nManager.isRTL ? "right" : "left"}
+        textAlign={isRTL ? "right" : "left"}
       />
       <Text style={styles.filterLabel}>{t("taskerExplore.filterBy")}</Text>
       <ScrollView 

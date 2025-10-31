@@ -148,7 +148,7 @@
   },
   "clientMyTasks": {
   "pending": "Pending",
-    "started": "In Progress",
+    "started": "Progress",
     "completed": "Completed",
     "cancelled": "Cancelled",
       "previous": "Previous",
@@ -217,6 +217,16 @@
     "limitMsg": "You can upload a maximum of 3 images.",
     "missingTitle": "Missing Information",
     "fillAllFields": "Please fill out all required fields.",
+    "categories": {
+      "cleaning": "Cleaning",
+      "shopping": "Shopping & Delivery",
+      "handyman": "Handyman",
+      "moving": "Moving",
+      "furniture": "Furniture Assembly",
+      "yardwork": "Yardwork Services",
+      "dogWalking": "Dog Walking",
+      "other": "Other"
+    },
     "page1": {
       "title": "Post a Task",
       "selectCategory": "Select a Category",
@@ -554,36 +564,6 @@
     "updateFailedMessage": "Failed to update profile.",
     "generalErrorMessage": "Something went wrong. Please try again."
   },
-  "taskerExplore": {
-    "header": "Explore Tasks",
-    "sortNearest": "Sort by nearest"
-,"nearest": "Nearest",
-    "location": "Location",
-    "price": "Price",
-    "bids": "Bids",
-    "viewDetails": "View Details",
-    "noTasks": "No tasks available right now",
-    "greeting": "Hi {{name}},",
-  "subGreeting": "Let's find some tasks to do!",
-  "searchPlaceholder": "Search by job title...",
-  "posted": "Posted",
-  "viewDetails": "View Details",
-  "clearFilter": "Clear Filter",
-  "verifyPending": "Your documents still need to be verified (this may take up to 48 hours),",
-  "contactUs": "Contact us",
-  "incompleteProfile": "To find jobs you must complete your profile.",
-  "finishProfile": "Press here to finish your profile",
-  "jobTypes": {
-    "handyman": "Handyman",
-    "moving": "Moving",
-    "ikea assembly": "IKEA assembly",
-    "cleaning": "Cleaning",
-    "shopping & delivery": "Shopping & Delivery",
-    "yardwork services": "Yardwork Services",
-    "dog walking": "Dog Walking",
-    "other": "Other"
-  }
-  },
   "taskerMessages": {
     "title": "Messages",
     "empty": "No messages yet",
@@ -897,7 +877,7 @@
     "bids": "bids",
     "received": "received",
     "noTasksYet": "You don't have any {{status}} tasks yet.",
-    "tasksStatus": "No {{status}} Tasks",
+    "tasksStatus": "No Tasks in {{status}}",
     "currency": "BHD",
     "couldNotGetLocation": "Could not get your current location.",
     "couldNotOpenMapPicker": "Could not open map picker.",

@@ -235,6 +235,16 @@
     "limitMsg": "يمكنك تحميل 3 صور كحد أقصى.",
     "missingTitle": "معلومات ناقصة",
     "fillAllFields": "يرجى ملء جميع الحقول المطلوبة.",
+    "categories": {
+      "cleaning": "التنظيف",
+      "shopping": "التسوق والتوصيل",
+      "handyman": "أعمال الصيانة",
+      "moving": "النقل",
+      "furniture": "تركيب الأثاث",
+      "yardwork": "أعمال الحديقة",
+      "dogWalking": "تمشية الكلاب",
+      "other": "أخرى"
+    },
     "page1": {
       "title": "نشر مهمة",
       "selectCategory": "اختر الفئة",
@@ -328,16 +338,6 @@
     "budgetSectionTitle": "الميزانية",
     "successTitle": "تم النشر",
     "successMessage": "تم نشر المهمة بنجاح.",
-    "categories": {
-      "handyman": "أعمال الصيانة",
-      "moving": "النقل",
-      "ikea assembly": "تركيب أثاث إيكيا",
-      "cleaning": "التنظيف",
-      "shopping & delivery": "التسوق والتوصيل",
-      "yardwork services": "أعمال الحديقة",
-      "dog walking": "تمشية الكلاب",
-      "other": "أخرى"
-    },
     "postingNow": "جاري النشر...",
     "uploadingImage": "جارٍ تحميل الصورة...",
     "useCurrentLocation": "استخدام الموقع الحالي",
@@ -868,7 +868,7 @@
     "bids": "عروض",
     "received": "مستلمة",
     "noTasksYet": "ليس لديك أي مهام {{status}} بعد.",
-    "tasksStatus": "لا توجد مهام {{status}}",
+    "tasksStatus": "لا توجد مهام في {{status}}",
     "currency": "د.ب",
     "couldNotGetLocation": "لا يمكن الحصول على موقعك الحالي.",
     "couldNotOpenMapPicker": "لا يمكن فتح منتقي الخريطة.",
