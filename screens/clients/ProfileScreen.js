@@ -195,35 +195,80 @@ export default function ProfileScreen({ navigation }) {
 
       <View style={styles.buttonGroup}>
         <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("EditProfile")}>
-          <Text style={styles.rowText}>{t("clientProfile.editProfile")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
+          {isRTL ? (
+            <>
+              <Ionicons name="chevron-back" size={20} color="#999" />
+              <Text style={styles.rowText}>{t("clientProfile.editProfile")}</Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.rowText}>{t("clientProfile.editProfile")}</Text>
+              <Ionicons name="chevron-forward" size={20} color="#999" />
+            </>
+          )}
         </TouchableOpacity>
         <TouchableOpacity style={styles.rowItem} onPress={() => navigation.navigate("ChangePassword")}>
-          <Text style={styles.rowText}>{t("clientProfile.changePassword")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
+          {isRTL ? (
+            <>
+              <Ionicons name="chevron-back" size={20} color="#999" />
+              <Text style={styles.rowText}>{t("clientProfile.changePassword")}</Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.rowText}>{t("clientProfile.changePassword")}</Text>
+              <Ionicons name="chevron-forward" size={20} color="#999" />
+            </>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={styles.rowItem}
           onPress={() => navigation.navigate("AboutUs")}
         >
-          <Text style={styles.rowText}>{t("clientProfile.aboutUs")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
+          {isRTL ? (
+            <>
+              <Ionicons name="chevron-back" size={20} color="#999" />
+              <Text style={styles.rowText}>{t("clientProfile.aboutUs")}</Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.rowText}>{t("clientProfile.aboutUs")}</Text>
+              <Ionicons name="chevron-forward" size={20} color="#999" />
+            </>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
   style={styles.rowItem}
   onPress={() => navigation.navigate("PrivacyPolicy")}
 >
-  <Text style={styles.rowText}>{t("clientProfile.privacyPolicy")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
+  {isRTL ? (
+    <>
+      <Ionicons name="chevron-back" size={20} color="#999" />
+      <Text style={styles.rowText}>{t("clientProfile.privacyPolicy")}</Text>
+    </>
+  ) : (
+    <>
+      <Text style={styles.rowText}>{t("clientProfile.privacyPolicy")}</Text>
+      <Ionicons name="chevron-forward" size={20} color="#999" />
+    </>
+  )}
 </TouchableOpacity>
 
         <TouchableOpacity
   style={styles.rowItem}
   onPress={() => navigation.navigate("TermsAndConditions")}
 >
-  <Text style={styles.rowText}>{t("clientProfile.terms")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
+  {isRTL ? (
+    <>
+      <Ionicons name="chevron-back" size={20} color="#999" />
+      <Text style={styles.rowText}>{t("clientProfile.terms")}</Text>
+    </>
+  ) : (
+    <>
+      <Text style={styles.rowText}>{t("clientProfile.terms")}</Text>
+      <Ionicons name="chevron-forward" size={20} color="#999" />
+    </>
+  )}
 </TouchableOpacity>
 
 <TouchableOpacity
@@ -236,8 +281,17 @@ export default function ProfileScreen({ navigation }) {
             });
   }}
 >
-  <Text style={styles.rowText}>{t("clientProfile.contactAdmin")}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
+  {isRTL ? (
+    <>
+      <Ionicons name="chevron-back" size={20} color="#999" />
+      <Text style={styles.rowText}>{t("clientProfile.contactAdmin")}</Text>
+    </>
+  ) : (
+    <>
+      <Text style={styles.rowText}>{t("clientProfile.contactAdmin")}</Text>
+      <Ionicons name="chevron-forward" size={20} color="#999" />
+    </>
+  )}
 </TouchableOpacity>
 
 
@@ -248,8 +302,17 @@ export default function ProfileScreen({ navigation }) {
         
 
         <TouchableOpacity style={[styles.rowItem, styles.logoutRow]} onPress={handleLogout}>
-          <Text style={[styles.rowText, styles.logoutText]}>{t("clientProfile.logout")}</Text>
-          <Ionicons name="log-out-outline" size={20} color="#215433" />
+          {isRTL ? (
+            <>
+              <Ionicons name="log-out-outline" size={20} color="#215433" />
+              <Text style={[styles.rowText, styles.logoutText]}>{t("clientProfile.logout")}</Text>
+            </>
+          ) : (
+            <>
+              <Text style={[styles.rowText, styles.logoutText]}>{t("clientProfile.logout")}</Text>
+              <Ionicons name="log-out-outline" size={20} color="#215433" />
+            </>
+          )}
         </TouchableOpacity>
       </View>
     </ScrollView>

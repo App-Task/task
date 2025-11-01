@@ -302,12 +302,14 @@ export default function ExploreTasksScreen({ navigation }) {
   const renderVerificationCard = () => (
     <View style={styles.verificationCard}>
       <View style={styles.verificationContent}>
-        <Ionicons name="hourglass-outline" size={24} color="#215433" />
-        <Text style={styles.verificationText}>{t("taskerExplore.pendingVerification")}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+          <Ionicons name="hourglass-outline" size={24} color="#215433" />
+          <Text style={styles.verificationText}>{t("taskerExplore.pendingVerification")}</Text>
+        </View>
         <Ionicons 
-          name="chevron-forward-outline" 
+          name={isRTL ? "chevron-back" : "chevron-forward"} 
           size={20} 
-          color="#215433" 
+          color="#333" 
         />
       </View>
     </View>
@@ -320,16 +322,51 @@ export default function ExploreTasksScreen({ navigation }) {
       activeOpacity={0.7}
     >
       <View style={styles.messagesContent}>
-        <View style={styles.chatIconContainer}>
-          <Ionicons name="chatbubble-outline" size={24} color="#215433" />
-          {unreadMessages > 0 && <View style={styles.notificationDot} />}
-        </View>
-        <Text style={styles.messagesText}>{t("taskerExplore.unreadMessages", { count: unreadMessages })}</Text>
-        <Ionicons 
-          name="chevron-forward-outline" 
-          size={20} 
-          color="#215433" 
-        />
+        {isRTL ? (
+          <>
+            <View style={styles.messageIconTextContainer}>
+              <View style={styles.messageIconContainer}>
+                <View style={styles.messageIcon}>
+                  <Ionicons name="chatbubbles-outline" size={20} color="#fff" />
+                </View>
+                {unreadMessages > 0 && (
+                  <View style={styles.messageBadge}>
+                    <Text style={styles.messageBadgeText}>{unreadMessages}</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.messagesText}>
+                {t("taskerExplore.unreadMessages", { count: unreadMessages })}
+              </Text>
+            </View>
+            <Ionicons 
+              name="chevron-back" 
+              size={20} 
+              color="#333" 
+            />
+          </>
+        ) : (
+          <>
+            <View style={styles.messageIconContainer}>
+              <View style={styles.messageIcon}>
+                <Ionicons name="chatbubbles-outline" size={20} color="#fff" />
+              </View>
+              {unreadMessages > 0 && (
+                <View style={styles.messageBadge}>
+                  <Text style={styles.messageBadgeText}>{unreadMessages}</Text>
+                </View>
+              )}
+            </View>
+            <Text style={styles.messagesText}>
+              {t("taskerExplore.unreadMessages", { count: unreadMessages })}
+            </Text>
+            <Ionicons 
+              name="chevron-forward" 
+              size={20} 
+              color="#333" 
+            />
+          </>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -526,12 +563,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 12,
+    padding: 16,
   },
   verificationContent: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
-    direction: "ltr",
+    justifyContent: "space-between",
   },
   verificationText: {
     flex: 1,
@@ -547,32 +584,54 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 12,
+    padding: 16,
   },
   messagesContent: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
-    direction: "ltr",
+    justifyContent: "space-between",
+    gap: 12,
   },
-  chatIconContainer: {
+  messageIconTextContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    gap: 12,
+  },
+  messageIconContainer: {
     position: "relative",
   },
-  notificationDot: {
+  messageIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#215433",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  messageBadge: {
     position: "absolute",
     top: -2,
-    right: -2,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#ff4444",
+    [I18nManager.isRTL ? "left" : "right"]: -2,
+    backgroundColor: "#FF0000",
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#ffffff",
+  },
+  messageBadgeText: {
+    color: "#ffffff",
+    fontSize: 12,
+    fontFamily: "InterBold",
   },
   messagesText: {
     flex: 1,
-    fontFamily: "Inter",
     fontSize: 16,
-    color: "#215433",
-    marginLeft: I18nManager.isRTL ? 0 : 12,
-    marginRight: I18nManager.isRTL ? 12 : 0,
+    fontFamily: "Inter",
+    color: "#333",
     textAlign: I18nManager.isRTL ? "right" : "left",
   },
   waitingCard: {

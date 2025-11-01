@@ -27,24 +27,35 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
 
-// Available services from PostTaskScreen
-const AVAILABLE_SERVICES = [
-  "Cleaning",
-  "Moving",
-  "Handyman",
-  "Delivery",
-  "Pet Care",
-  "Tutoring",
-  "Photography",
-  "Event Planning",
-  "Gardening",
-  "Computer Help",
-  "Other"
-];
-
 export default function EditTaskScreen({ route, navigation }) {
   const { t } = useTranslation();
   const { task } = route.params;
+  
+  // Available services - using standardized category names
+  const AVAILABLE_SERVICES = [
+    "Cleaning",
+    "Shopping & Delivery",
+    "Handyman",
+    "Moving",
+    "IKEA assembly",
+    "Yardwork Services",
+    "Dog Walking",
+    "Other"
+  ];
+  
+  const getCategoryTranslation = (category) => {
+    const config = {
+      "Cleaning": t("clientPostTask.categories.cleaning"),
+      "Shopping & Delivery": t("clientPostTask.categories.shopping"),
+      "Handyman": t("clientPostTask.categories.handyman"),
+      "Moving": t("clientPostTask.categories.moving"),
+      "IKEA assembly": t("clientPostTask.categories.furniture"),
+      "Yardwork Services": t("clientPostTask.categories.yardwork"),
+      "Dog Walking": t("clientPostTask.categories.dogWalking"),
+      "Other": t("clientPostTask.categories.other"),
+    };
+    return config[category] || category;
+  };
 
   const [category, setCategory] = useState(task.category || "");
   const [title, setTitle] = useState(task.title || "");
@@ -273,7 +284,7 @@ export default function EditTaskScreen({ route, navigation }) {
               onPress={() => setShowCategoryModal(true)}
             >
               <Text style={[styles.categoryText, !category && styles.placeholderText]}>
-                {category || t("clientEditTask1.selectCategory")}
+                {category ? getCategoryTranslation(category) : t("clientEditTask1.selectCategory")}
               </Text>
               <Ionicons name="chevron-down" size={20} color="#999" />
             </TouchableOpacity>
@@ -461,7 +472,7 @@ export default function EditTaskScreen({ route, navigation }) {
                     styles.categoryItemText,
                     category === service && styles.selectedCategoryItemText
                   ]}>
-                    {service}
+                    {getCategoryTranslation(service)}
                   </Text>
                   {category === service && (
                     <Ionicons name="checkmark" size={20} color="#215432" />

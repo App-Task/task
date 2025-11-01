@@ -125,24 +125,51 @@ export default function ClientHomeScreen() {
           onPress={() => navigation.navigate("Messages")}
         >
           <View style={styles.messagesContent}>
-            <View style={styles.messageIconContainer}>
-              <View style={styles.messageIcon}>
-                <Ionicons name="chatbubbles-outline" size={20} color="#fff" />
-              </View>
-              {unreadMessages > 0 && (
-                <View style={styles.messageBadge}>
-                  <Text style={styles.messageBadgeText}>{unreadMessages}</Text>
+            {isRTL ? (
+              <>
+                <View style={styles.messageIconTextContainer}>
+                  <View style={styles.messageIconContainer}>
+                    <View style={styles.messageIcon}>
+                      <Ionicons name="chatbubbles-outline" size={20} color="#fff" />
+                    </View>
+                    {unreadMessages > 0 && (
+                      <View style={styles.messageBadge}>
+                        <Text style={styles.messageBadgeText}>{unreadMessages}</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.messagesText}>
+                    {t("clientHome.messages", { count: unreadMessages })}
+                  </Text>
                 </View>
-              )}
-            </View>
-            <Text style={styles.messagesText}>
-              {t("clientHome.messages", { count: unreadMessages })}
-            </Text>
-            <Ionicons 
-              name="chevron-forward" 
-              size={20} 
-              color="#333" 
-            />
+                <Ionicons 
+                  name="chevron-back" 
+                  size={20} 
+                  color="#333" 
+                />
+              </>
+            ) : (
+              <>
+                <View style={styles.messageIconContainer}>
+                  <View style={styles.messageIcon}>
+                    <Ionicons name="chatbubbles-outline" size={20} color="#fff" />
+                  </View>
+                  {unreadMessages > 0 && (
+                    <View style={styles.messageBadge}>
+                      <Text style={styles.messageBadgeText}>{unreadMessages}</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={styles.messagesText}>
+                  {t("clientHome.messages", { count: unreadMessages })}
+                </Text>
+                <Ionicons 
+                  name="chevron-forward" 
+                  size={20} 
+                  color="#333" 
+                />
+              </>
+            )}
           </View>
         </TouchableOpacity>
 
@@ -246,8 +273,14 @@ const styles = StyleSheet.create({
   messagesContent: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     gap: 12,
-    direction: "ltr",
+  },
+  messageIconTextContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    gap: 12,
   },
   messageIconContainer: {
     position: "relative",

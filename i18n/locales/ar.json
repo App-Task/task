@@ -167,7 +167,7 @@
   },
   "clientMyTasks": {
     "pending": "قيد الانتظار",
-    "started": "التنفيذ",
+    "started": "قيد التنفيذ",
     "completed": "مكتمل",
     "cancelled": "ملغي",
     "previous": "المهام السابقة",
