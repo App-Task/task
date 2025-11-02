@@ -19,6 +19,20 @@ import { fetchCurrentUser } from "../../services/auth";
 import { useTranslation } from "react-i18next";
 import i18n from "i18next";
 
+// Helper function to convert Arabic numerals to Western numerals
+const convertToWesternNumerals = (str) => {
+  const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  const westernNumerals = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  
+  let result = '';
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    const index = arabicNumerals.indexOf(char);
+    result += index !== -1 ? westernNumerals[index] : char;
+  }
+  return result;
+};
+
 export default function SendBidScreen() {
   const navigation = useNavigation();
   const route = useRoute();
@@ -47,7 +61,10 @@ export default function SendBidScreen() {
       return;
     }
 
-    if (Number(bidAmount) < 0.1) {
+    // Convert Arabic numerals to Western numerals before validation
+    const westernBidAmount = convertToWesternNumerals(bidAmount);
+    
+    if (Number(westernBidAmount) < 0.1) {
       Alert.alert("Invalid Bid", "Please enter a valid bid amount.");
       return;
     }
@@ -74,7 +91,7 @@ export default function SendBidScreen() {
         bidData: {
           taskId: task._id,
           taskerId: user._id,
-          amount: Number(bidAmount),
+          amount: Number(westernBidAmount),
           message: message.trim(),
         }
       });

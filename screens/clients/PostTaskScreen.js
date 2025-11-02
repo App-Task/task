@@ -35,6 +35,21 @@ import MapView, { Marker } from "react-native-maps";
 
 
 const { width, height } = Dimensions.get("window");
+
+// Helper function to convert Arabic numerals to Western numerals
+const convertToWesternNumerals = (str) => {
+  const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  const westernNumerals = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  
+  let result = '';
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    const index = arabicNumerals.indexOf(char);
+    result += index !== -1 ? westernNumerals[index] : char;
+  }
+  return result;
+};
+
 const rawCategories = [
   "Handyman",
   "Moving",
@@ -256,11 +271,14 @@ if (errorFlag) {
         .filter(Boolean)
         .join(", ");
   
+      // Convert Arabic numerals to Western numerals before parsing
+      const westernBudget = convertToWesternNumerals(budget);
+  
       const taskData = {
         title,
         description,
         location: fullLocation, // human-readable string shown in input
-        budget: parseFloat(budget),
+        budget: parseFloat(westernBudget),
         category: selectedCategory,
         images,
         userId,

@@ -21,6 +21,20 @@ import * as SecureStore from "expo-secure-store";
 
 const { width, height } = Dimensions.get("window");
 
+// Helper function to convert Arabic numerals to Western numerals
+const convertToWesternNumerals = (str) => {
+  const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  const westernNumerals = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  
+  let result = '';
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    const index = arabicNumerals.indexOf(char);
+    result += index !== -1 ? westernNumerals[index] : char;
+  }
+  return result;
+};
+
 export default function PostTaskPage3() {
   const navigation = useNavigation();
   const route = useRoute();
@@ -41,7 +55,10 @@ export default function PostTaskPage3() {
   };
 
   const handlePostTask = async () => {
-    if (!budget || isNaN(parseFloat(budget)) || parseFloat(budget) <= 0) {
+    // Convert Arabic numerals to Western numerals before validation
+    const westernBudget = convertToWesternNumerals(budget);
+    
+    if (!budget || isNaN(parseFloat(westernBudget)) || parseFloat(westernBudget) <= 0) {
       setBudgetError(true);
       Alert.alert(
         t("clientPostTask.missingTitle"),
@@ -67,7 +84,7 @@ export default function PostTaskPage3() {
         title,
         description,
         location: address || t("clientPostTask.page3.addressNotSpecified"),
-        budget: parseFloat(budget),
+        budget: parseFloat(westernBudget),
         category: category?.id || "other",
         images,
         userId,

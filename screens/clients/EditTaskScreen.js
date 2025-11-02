@@ -27,6 +27,20 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
 
+// Helper function to convert Arabic numerals to Western numerals
+const convertToWesternNumerals = (str) => {
+  const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  const westernNumerals = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  
+  let result = '';
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    const index = arabicNumerals.indexOf(char);
+    result += index !== -1 ? westernNumerals[index] : char;
+  }
+  return result;
+};
+
 export default function EditTaskScreen({ route, navigation }) {
   const { t } = useTranslation();
   const { task } = route.params;
@@ -136,12 +150,15 @@ export default function EditTaskScreen({ route, navigation }) {
 
     setLoading(true);
     try {
+      // Convert Arabic numerals to Western numerals before parsing
+      const westernBudget = convertToWesternNumerals(budget);
+      
       // Use the existing service method
       await updateTaskById(task._id, {
         category,
         title: title.trim(),
         description: description.trim(),
-        budget: parseFloat(budget),
+        budget: parseFloat(westernBudget),
         location: address,
         coordinates: coords,
         images,
