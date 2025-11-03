@@ -111,13 +111,27 @@ export default function SendBidScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name={"arrow-back"} size={24} color="#215432" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t("taskerSendBid.headerTitle")}</Text>
+          {isRTL ? (
+            <>
+              <Text style={styles.headerTitle}>{t("taskerSendBid.headerTitle")}</Text>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <Ionicons name={"arrow-back"} size={24} color="#215432" />
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <Ionicons name={"arrow-back"} size={24} color="#215432" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>{t("taskerSendBid.headerTitle")}</Text>
+            </>
+          )}
         </View>
 
         {/* Progress Bar */}
@@ -188,9 +202,9 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    direction: "ltr",
   },
   backButton: {
     width: 40,
@@ -202,6 +216,7 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 18,
     color: "#333",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   progressContainer: {
     flexDirection: "row",

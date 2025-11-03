@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import { getToken } from "../../services/authStorage";
 
 export default function BidSentSuccessScreen() {
   const navigation = useNavigation();
@@ -28,7 +29,10 @@ export default function BidSentSuccessScreen() {
 
     try {
       setSaving(true);
-      await axios.post("https://task-kq94.onrender.com/api/bids", bidData);
+      const token = await getToken();
+      await axios.post("https://task-kq94.onrender.com/api/bids", bidData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setSaving(false);
       navigation.navigate("TaskerHome");
     } catch (error) {
@@ -46,13 +50,28 @@ export default function BidSentSuccessScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t("taskerSendBid.headerTitle")}</Text>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name={"arrow-back"} size={24} color="#215432" />
-        </TouchableOpacity>
+        {I18nManager.isRTL ? (
+          <>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name={"arrow-back"} size={24} color="#215432" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>{t("taskerSendBid.headerTitle")}</Text>
+            <View style={{ width: 40 }} />
+          </>
+        ) : (
+          <>
+            <Text style={styles.headerTitle}>{t("taskerSendBid.headerTitle")}</Text>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name={"arrow-back"} size={24} color="#215432" />
+            </TouchableOpacity>
+          </>
+        )}
       </View>
 
       {/* Progress Bar */}
@@ -97,12 +116,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   header: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    direction: "ltr",
   },
   headerTitle: {
     fontFamily: "InterBold",
