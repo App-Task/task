@@ -79,7 +79,7 @@ export default function ExploreTasksScreen({ navigation }) {
       }
     }
     
-    // Handle aliases/variants
+    // Handle English aliases/variants
     const aliasMap = {
       "pet": "Dog Walking",
       "pet services": "Dog Walking",
@@ -87,9 +87,11 @@ export default function ExploreTasksScreen({ navigation }) {
       "furniture": "IKEA assembly",
       "yardwork": "Yardwork Services",
       "shopping": "Shopping & Delivery",
+      "shopping & delivery": "Shopping & Delivery",
       "cleaning": "Cleaning",
       "handyman": "Handyman",
       "moving": "Moving",
+      "dog walking": "Dog Walking",
       "other": "Other"
     };
     
@@ -97,8 +99,84 @@ export default function ExploreTasksScreen({ navigation }) {
       return categoryConfig[aliasMap[normalizedLower]];
     }
     
+    // Handle Arabic category names (if categories are stored in Arabic in the database)
+    const arabicAliasMap = {
+      "التنظيف": "Cleaning",
+      "التسوق والتوصيل": "Shopping & Delivery",
+      "أعمال الصيانة": "Handyman",
+      "النقل": "Moving",
+      "تركيب الأثاث": "IKEA assembly",
+      "أعمال الحديقة": "Yardwork Services",
+      "تمشية الكلاب": "Dog Walking",
+      "خدمات الحيوانات الأليفة": "Dog Walking",
+      "أخرى": "Other"
+    };
+    
+    if (arabicAliasMap[normalized]) {
+      return categoryConfig[arabicAliasMap[normalized]];
+    }
+    
     // Return default for "Other"
     return categoryConfig["Other"];
+  };
+
+  // Get the normalized categoryConfig key for a given category string
+  const getNormalizedCategoryKey = (category) => {
+    const normalized = (category || "").trim();
+    if (!normalized) return "Other";
+    
+    // Check exact match
+    if (categoryConfig[normalized]) {
+      return normalized;
+    }
+    
+    // Check case-insensitive match
+    const normalizedLower = normalized.toLowerCase();
+    for (const key of Object.keys(categoryConfig)) {
+      if (key.toLowerCase() === normalizedLower) {
+        return key;
+      }
+    }
+    
+    // Handle English aliases/variants
+    const aliasMap = {
+      "pet": "Dog Walking",
+      "pet services": "Dog Walking",
+      "furniture assembly": "IKEA assembly",
+      "furniture": "IKEA assembly",
+      "yardwork": "Yardwork Services",
+      "shopping": "Shopping & Delivery",
+      "shopping & delivery": "Shopping & Delivery",
+      "cleaning": "Cleaning",
+      "handyman": "Handyman",
+      "moving": "Moving",
+      "dog walking": "Dog Walking",
+      "other": "Other"
+    };
+    
+    if (aliasMap[normalizedLower]) {
+      return aliasMap[normalizedLower];
+    }
+    
+    // Handle Arabic category names (if categories are stored in Arabic in the database)
+    const arabicAliasMap = {
+      "التنظيف": "Cleaning",
+      "التسوق والتوصيل": "Shopping & Delivery",
+      "أعمال الصيانة": "Handyman",
+      "النقل": "Moving",
+      "تركيب الأثاث": "IKEA assembly",
+      "أعمال الحديقة": "Yardwork Services",
+      "تمشية الكلاب": "Dog Walking",
+      "خدمات الحيوانات الأليفة": "Dog Walking",
+      "أخرى": "Other"
+    };
+    
+    if (arabicAliasMap[normalized]) {
+      return arabicAliasMap[normalized];
+    }
+    
+    // Return default for "Other"
+    return "Other";
   };
 
   const fetchUnreadMessages = async () => {
@@ -191,7 +269,8 @@ export default function ExploreTasksScreen({ navigation }) {
     
     // Apply category filter
     if (selectedFilter && selectedFilter !== "nearest") {
-      const categoryMap = {
+      // Map filter IDs to their corresponding category names from categoryConfig
+      const filterToCategoryMap = {
         cleaning: "Cleaning",
         shopping: "Shopping & Delivery", 
         handyman: "Handyman",
@@ -202,11 +281,18 @@ export default function ExploreTasksScreen({ navigation }) {
         other: "Other"
       };
       
-      const category = categoryMap[selectedFilter];
-      if (category) {
+      const selectedCategoryName = filterToCategoryMap[selectedFilter];
+      if (selectedCategoryName) {
+        // Normalize the selected category to get the categoryConfig key
+        const selectedNormalizedKey = getNormalizedCategoryKey(selectedCategoryName);
+        
         filtered = filtered.filter(task => {
           const taskCategory = task.category || "";
-          return taskCategory.toLowerCase() === category.toLowerCase();
+          // Normalize the task category to get the categoryConfig key
+          const taskNormalizedKey = getNormalizedCategoryKey(taskCategory);
+          
+          // Compare the normalized keys - they should match if they're the same category
+          return selectedNormalizedKey === taskNormalizedKey;
         });
       }
     }
