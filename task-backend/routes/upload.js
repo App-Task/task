@@ -14,7 +14,19 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const upload = multer({ storage });
+const imageFileFilter = (req, file, cb) => {
+  const allowed = ["image/jpeg", "image/png", "image/jpg"];
+  if (!allowed.includes(file.mimetype)) {
+    return cb(new Error("Only JPG/PNG images are allowed"));
+  }
+  cb(null, true);
+};
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: imageFileFilter,
+});
 
 // ✅ New storage for profile images
 const profileStorage = new CloudinaryStorage({
@@ -25,7 +37,11 @@ const profileStorage = new CloudinaryStorage({
   },
 });
 
-const uploadProfile = multer({ storage: profileStorage });
+const uploadProfile = multer({
+  storage: profileStorage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: imageFileFilter,
+});
 
 
 // Route: POST /api/upload

@@ -5,7 +5,7 @@ const Message = require("../models/Message");
 const User = require("../models/User");
 const Notification = require("../models/Notification");
 
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
+const { getJwtSecret } = require("../utils/jwt");
 
 // ✅ Extract and verify JWT
 const verifyToken = (req) => {
@@ -14,7 +14,7 @@ const verifyToken = (req) => {
 
   const token = authHeader.split(" ")[1];
   try {
-    return jwt.verify(token, JWT_SECRET);
+    return jwt.verify(token, getJwtSecret());
   } catch {
     return null;
   }

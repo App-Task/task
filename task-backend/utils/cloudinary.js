@@ -1,9 +1,24 @@
 const cloudinary = require("cloudinary").v2;
 
+// Ensure env vars are loaded (in case this file is required before server.js)
+require("dotenv").config();
+
+const {
+  CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET,
+} = process.env;
+
+if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
+  console.warn(
+    "⚠️ Cloudinary env vars missing. Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET"
+  );
+}
+
 cloudinary.config({
-  cloud_name: "dvxz4nfnx", // ✅ new cloud name
-  api_key: "176487835777454", // ✅ new API key
-  api_secret: "tHPj_n_gEPHUnhfMot9H0TO3LvU" // ✅ new secret
+  cloud_name: CLOUDINARY_CLOUD_NAME,
+  api_key:     CLOUDINARY_API_KEY,
+  api_secret:  CLOUDINARY_API_SECRET,
 });
 
 module.exports = cloudinary;

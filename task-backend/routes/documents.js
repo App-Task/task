@@ -26,7 +26,24 @@ const cloudStorage = new CloudinaryStorage({
 
 
 
-const uploadCloud = multer({ storage: cloudStorage });
+const allowedDocMime = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+]);
+
+const docFileFilter = (req, file, cb) => {
+  if (!allowedDocMime.has(file.mimetype)) {
+    return cb(new Error("Only PDF/JPG/PNG files are allowed"));
+  }
+  cb(null, true);
+};
+
+const uploadCloud = multer({
+  storage: cloudStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: docFileFilter,
+});
 
 router.post("/upload-file", uploadCloud.single("file"), async (req, res) => {
   try {

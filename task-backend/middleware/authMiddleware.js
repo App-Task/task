@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = process.env.JWT_SECRET || "dev_secret_key";
+const { getJwtSecret } = require("../utils/jwt");
 
 // ✅ Middleware to verify JWT token from Authorization header
 const verifyTokenMiddleware = (req, res, next) => {
@@ -12,7 +12,7 @@ const verifyTokenMiddleware = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, getJwtSecret());
     req.user = decoded; // attach decoded info to req.user
     next();
   } catch (err) {

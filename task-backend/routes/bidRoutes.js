@@ -5,7 +5,7 @@ const Bid = require("../models/Bid");
 const Task = require("../models/Task");
 const Notification = require("../models/Notification"); // ✅ for creating notifications
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret"; // replace with your actual secret if needed
+const { getJwtSecret } = require("../utils/jwt");
 const { verifyTokenMiddleware } = require("../middleware/authMiddleware");
 
 
@@ -15,7 +15,7 @@ const verifyToken = (req) => {
 
   const token = authHeader.split(" ")[1];
   try {
-    return jwt.verify(token, JWT_SECRET);
+    return jwt.verify(token, getJwtSecret());
   } catch {
     return null;
   }
