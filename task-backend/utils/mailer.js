@@ -1,5 +1,6 @@
 const { Resend } = require("resend");
-const resend = new Resend(process.env.RESEND_API_KEY);
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
 async function sendResetCodeEmail({ to, code }) {
   const from = process.env.EMAIL_FROM || "TaskBH <noreply@taskbh.com>";
@@ -13,6 +14,10 @@ async function sendResetCodeEmail({ to, code }) {
     </div>
   `;
 
+  if (!resend) {
+    console.warn("⚠️ RESEND_API_KEY is missing; skipping email send to", to);
+    return;
+  }
   await resend.emails.send({ from, to, subject, html });
 }
 

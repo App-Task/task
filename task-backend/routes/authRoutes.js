@@ -6,6 +6,7 @@ const User = require("../models/User");
 const { register, login } = require("../controllers/authController");
 const crypto = require("crypto");
 const { sendResetCodeEmail } = require("../utils/mailer"); // ⬅️ you'll create this file (already sent to you)
+const logger = require("../utils/logger");
 
 function hashCode(email, code) {
   return crypto.createHash("sha256").update(`${email.toLowerCase()}:${code}`).digest("hex");
@@ -67,7 +68,7 @@ router.put("/change-password", async (req, res) => {
 
     res.json({ msg: "Password updated successfully" });
   } catch (err) {
-    console.error("❌ Error updating password:", err.message);
+    logger.error("❌ Error updating password:", err.message);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -144,7 +145,7 @@ if ("profileImage" in req.body) user.profileImage = profileImage;
     
     
   } catch (err) {
-    console.error("❌ Error updating profile:", err.message);
+    logger.error("❌ Error updating profile:", err.message);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -179,7 +180,7 @@ router.post("/forgot-password", async (req, res) => {
   try {
     await sendResetCodeEmail({ to: email, code });
   } catch (err) {
-    console.error("Resend error:", err.message);
+    logger.error("Resend error:", err.message);
   }
 
   return res.status(200).json(genericMsg);
@@ -206,10 +207,10 @@ router.post("/reset-password", async (req, res) => {
 
   // If role is provided, validate that the user has the correct role
   const query = role ? { email: email.toLowerCase(), role: role.toLowerCase() } : { email: email.toLowerCase() };
-  console.log(`🔍 Reset password query:`, query);
+  logger.info("🔍 Reset password query");
   
   const user = await User.findOne(query);
-  console.log(`🔍 User found:`, user ? { id: user._id, email: user.email, role: user.role } : 'Not found');
+  logger.info("🔍 User found:", user ? { id: user._id, role: user.role } : "Not found");
   
   if (!user) {
     return res.status(400).json({ msg: "User not found with the specified email and role." });

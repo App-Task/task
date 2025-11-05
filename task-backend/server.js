@@ -108,3 +108,21 @@ app.listen(PORT, "0.0.0.0", () =>
 
 const uploadRoutes = require("./routes/upload");
 app.use("/api/upload", uploadRoutes);
+
+// ===== Retention job for notifications =====
+try {
+  const Notification = require("./models/Notification");
+  const days = Number(process.env.RETENTION_NOTIFICATIONS_DAYS || 90);
+  const ms = days * 24 * 60 * 60 * 1000;
+  setInterval(async () => {
+    const cutoff = new Date(Date.now() - ms);
+    try {
+      const res = await Notification.deleteMany({ createdAt: { $lt: cutoff } });
+      if (res?.deletedCount) {
+        console.log(`🧹 Deleted ${res.deletedCount} old notifications (> ${days}d)`);
+      }
+    } catch (e) {
+      console.error("Retention job error:", e.message);
+    }
+  }, 24 * 60 * 60 * 1000); // daily
+} catch (_) {}

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const logger = require("../utils/logger");
 const multer = require("multer");
 const mongoose = require("mongoose");
 const User = require("../models/User");
@@ -47,10 +48,10 @@ const uploadCloud = multer({
 
 router.post("/upload-file", uploadCloud.single("file"), async (req, res) => {
   try {
-    console.log("📥 Cloudinary Upload: /api/documents/upload-file");
+    logger.info("📥 Cloudinary Upload: /api/documents/upload-file");
 
     const { userId } = req.body;
-    console.log("📦 req.file =", req.file);
+    logger.info("📦 req.file present");
 
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
     if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).json({ error: "Invalid userId" });
@@ -78,14 +79,14 @@ router.post("/upload-file", uploadCloud.single("file"), async (req, res) => {
     user.isVerified = false;
     await user.save();
 
-    console.log("✅ File uploaded to Cloudinary and user updated.");
+    logger.info("✅ File uploaded to Cloudinary and user updated.");
     res.status(200).json({
       msg: "Uploaded to Cloudinary",
       path: finalUrl,
       resourceType: req.file.resource_type,
     });
   } catch (err) {
-    console.error("❌ Upload error:", err.stack || err.message);
+    logger.error("❌ Upload error:", err.stack || err.message);
     res.status(500).json({ error: "Upload failed" });
   }
 });
@@ -110,10 +111,10 @@ router.delete("/delete/:userId", async (req, res) => {
 
     await user.save();
 
-    console.log(`🗑️ Document '${fileName}' removed from user ${user.email}`);
+    logger.info("🗑️ Document removed from user", { userId: user._id });
     res.json({ msg: "Document deleted successfully" });
   } catch (err) {
-    console.error("❌ Delete error:", err.stack || err.message);
+    logger.error("❌ Delete error:", err.stack || err.message);
     res.status(500).json({ error: "Deletion failed" });
   }
 });
@@ -144,7 +145,7 @@ console.log("🧾 documentUrl:", req.body.documentUrl);
 
     res.json({ msg: "Document saved", documents: user.documents });
   } catch (err) {
-    console.error("❌ Update route error:", err.stack || err.message);
+    logger.error("❌ Update route error:", err.stack || err.message);
     res.status(500).json({ error: "Update failed" });
   }
 });
