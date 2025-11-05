@@ -3,7 +3,7 @@ const { getJwtSecret } = require("../utils/jwt");
 const User = require("../models/User");
 
 // ✅ Middleware to verify JWT token from Authorization header
-const verifyTokenMiddleware = (req, res, next) => {
+const verifyTokenMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
