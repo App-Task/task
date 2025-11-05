@@ -6,6 +6,7 @@ const User = require("../models/User");
 const Notification = require("../models/Notification");
 
 const { getJwtSecret } = require("../utils/jwt");
+const { validate, sendMessageSchema } = require("../utils/validation");
 
 // ✅ Extract and verify JWT
 const verifyToken = (req) => {
@@ -95,7 +96,7 @@ for (const convo of latestMessages) {
 });
 
 // ✅ POST /api/messages — send a message and notify receiver
-router.post("/", async (req, res) => {
+router.post("/", validate(sendMessageSchema), async (req, res) => {
   const decoded = verifyToken(req);
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
 

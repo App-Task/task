@@ -7,6 +7,7 @@ const Notification = require("../models/Notification"); // ✅ for creating noti
 const jwt = require("jsonwebtoken");
 const { getJwtSecret } = require("../utils/jwt");
 const { verifyTokenMiddleware } = require("../middleware/authMiddleware");
+const { validate, createBidSchema, updateBidSchema } = require("../utils/validation");
 
 
 const verifyToken = (req) => {
@@ -23,7 +24,7 @@ const verifyToken = (req) => {
 
 
 // ✅ POST /api/bids — tasker submits a bid and notifies client
-router.post("/", async (req, res) => {
+router.post("/", validate(createBidSchema), async (req, res) => {
   try {
     const { taskId, taskerId, amount, message } = req.body;
 
@@ -169,7 +170,7 @@ router.get("/tasker/:taskerId", async (req, res) => {
 });
 
 // ✅ PATCH /api/bids/:bidId — update a bid
-router.patch("/:bidId", async (req, res) => {
+router.patch("/:bidId", validate(updateBidSchema), async (req, res) => {
   try {
     const { bidId } = req.params;
     const { amount, message } = req.body;

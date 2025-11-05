@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const logger = require("../utils/logger");
+const { validate, uploadDocumentSchema } = require("../utils/validation");
 const multer = require("multer");
 const mongoose = require("mongoose");
 const User = require("../models/User");
@@ -46,7 +47,7 @@ const uploadCloud = multer({
   fileFilter: docFileFilter,
 });
 
-router.post("/upload-file", uploadCloud.single("file"), async (req, res) => {
+router.post("/upload-file", uploadCloud.single("file"), validate(uploadDocumentSchema), async (req, res) => {
   try {
     logger.info("📥 Cloudinary Upload: /api/documents/upload-file");
 

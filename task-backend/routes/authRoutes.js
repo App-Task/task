@@ -7,6 +7,7 @@ const { register, login } = require("../controllers/authController");
 const crypto = require("crypto");
 const { sendResetCodeEmail } = require("../utils/mailer"); // ⬅️ you'll create this file (already sent to you)
 const logger = require("../utils/logger");
+const { validate, registerSchema, loginSchema, changePasswordSchema, updateProfileSchema, forgotPasswordSchema, resetPasswordSchema } = require("../utils/validation");
 
 function hashCode(email, code) {
   return crypto.createHash("sha256").update(`${email.toLowerCase()}:${code}`).digest("hex");
@@ -14,10 +15,10 @@ function hashCode(email, code) {
 
 
 // Register endpoint
-router.post("/register", register);
+router.post("/register", validate(registerSchema), register);
 
 // Login endpoint
-router.post("/login", login);
+router.post("/login", validate(loginSchema), login);
 
 // Get authenticated user info
 router.get("/me", async (req, res) => {
@@ -42,7 +43,7 @@ router.get("/me", async (req, res) => {
 });
 
 // ✅ Change password route
-router.put("/change-password", async (req, res) => {
+router.put("/change-password", validate(changePasswordSchema), async (req, res) => {
   const rawToken = req.header("Authorization");
   if (!rawToken) return res.status(401).json({ msg: "No token provided" });
 
@@ -64,6 +65,7 @@ router.put("/change-password", async (req, res) => {
     const hashed = await bcrypt.hash(newPassword, salt);
 
     user.password = hashed;
+    user.passwordChangedAt = new Date();
     await user.save();
 
     res.json({ msg: "Password updated successfully" });
@@ -74,7 +76,7 @@ router.put("/change-password", async (req, res) => {
 });
 
 // ✅ Update profile route (name, email, and profileImage)
-router.put("/me", async (req, res) => {
+router.put("/me", validate(updateProfileSchema), async (req, res) => {
   const rawToken = req.header("Authorization");
   if (!rawToken) return res.status(401).json({ msg: "No token provided" });
 
@@ -152,7 +154,7 @@ if ("profileImage" in req.body) user.profileImage = profileImage;
 
 
 // ✅ Forgot Password - Send 6-digit code
-router.post("/forgot-password", async (req, res) => {
+router.post("/forgot-password", validate(forgotPasswordSchema), async (req, res) => {
   const { email, role } = req.body;
   const genericMsg = { msg: "If this email exists, we sent a reset code." };
 
@@ -187,7 +189,7 @@ router.post("/forgot-password", async (req, res) => {
 });
 
 // ✅ Reset Password - Confirm code and set new password
-router.post("/reset-password", async (req, res) => {
+router.post("/reset-password", validate(resetPasswordSchema), async (req, res) => {
   const { email, code, newPassword, role } = req.body;
   const genericError = { msg: "Invalid code or it has expired." };
 

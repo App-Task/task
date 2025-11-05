@@ -42,6 +42,8 @@ passwordResetLastSentAt: { type: Date },
       enum: ["pending", "accepted", "declined"],
       default: "pending",
     },
+  // ✅ Invalidate old tokens when password changes
+  passwordChangedAt: { type: Date },
   },
   { timestamps: true }
 
