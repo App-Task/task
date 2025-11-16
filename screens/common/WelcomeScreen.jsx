@@ -10,7 +10,10 @@ import {
   Alert,
   I18nManager,
   Platform,
+  StatusBar,
+  ScrollView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Asset } from "expo-asset";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
@@ -67,40 +70,50 @@ export default function WelcomeScreen({ navigation }) {
 
   return (
     <>
-      <View style={styles.container}>
-        <Image
-          source={i18n.language === "ar" ? require("../../assets/images/22.png") : require("../../assets/images/21.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <StatusBar barStyle="dark-content" backgroundColor="rgba(248, 246, 247)" />
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.container}>
+            <View style={styles.logoContainer}>
+              <Image
+                source={i18n.language === "ar" ? require("../../assets/images/22.png") : require("../../assets/images/21.png")}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
 
-        <Text style={styles.tagline}>{t("tagline")}</Text>
+            <Text style={styles.tagline}>{t("tagline")}</Text>
 
+            <LanguageToggle style={styles.langSwitch} />
 
+            <View style={styles.sectionsContainer}>
+              <TouchableOpacity
+                style={styles.sectionCard}
+                onPress={() => navigation.navigate("Login", { role: "client" })}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="person-outline" size={36} color="#215432" />
+                <Text style={styles.sectionTitle}>{t("role.client")}</Text>
+                <Text style={styles.sectionDesc}>{t("clientDescription")}</Text>
+              </TouchableOpacity>
 
-
-        <LanguageToggle style={styles.langSwitch} />
-
-        <View style={styles.sectionsContainer}>
-          <TouchableOpacity
-            style={styles.sectionCard}
-            onPress={() => navigation.navigate("Login", { role: "client" })}
-          >
-            <Ionicons name="person-outline" size={36} color="#215432" />
-            <Text style={styles.sectionTitle}>{t("role.client")}</Text>
-            <Text style={styles.sectionDesc}>{t("clientDescription")}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.sectionCard}
-            onPress={() => navigation.navigate("Login", { role: "tasker" })}
-          >
-            <Ionicons name="construct-outline" size={36} color="#215432" />
-            <Text style={styles.sectionTitle}>{t("role.tasker")}</Text>
-            <Text style={styles.sectionDesc}>{t("taskerDescription")}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+              <TouchableOpacity
+                style={styles.sectionCard}
+                onPress={() => navigation.navigate("Login", { role: "tasker" })}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="construct-outline" size={36} color="#215432" />
+                <Text style={styles.sectionTitle}>{t("role.tasker")}</Text>
+                <Text style={styles.sectionDesc}>{t("taskerDescription")}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
 
       {/* Language switching loading popup */}
       {isChangingLanguage && (
@@ -124,18 +137,39 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "rgba(248, 246, 247)",
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: Platform.OS === "android" ? 20 : 0,
+  },
   container: {
     flex: 1,
     backgroundColor: "rgba(248, 246, 247)",
     alignItems: "center",
     justifyContent: "flex-start",
     paddingHorizontal: 30,
-    paddingTop: 20,
+    paddingTop: Platform.OS === "android" ? 20 : 40,
+    minHeight: "100%",
+  },
+  logoContainer: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: Platform.OS === "android" ? 10 : 0,
+    marginBottom: Platform.OS === "android" ? -60 : -80,
+    overflow: "hidden",
   },
   logo: {
-    width: width * 1.2, // smaller logo like in design
-    height: width * 1.2,
-    marginBottom: -200,
+    width: width * 0.9,
+    height: width * 0.9,
+    maxWidth: 300,
+    maxHeight: 300,
   },
   
   title: {
@@ -146,7 +180,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   langSwitch: {
-    marginBottom: 30,
+    marginBottom: Platform.OS === "android" ? 25 : 30,
     borderRadius: 30,
     backgroundColor: "#f2f2f2",
     paddingHorizontal: 18,
@@ -165,7 +199,9 @@ const styles = StyleSheet.create({
   },
   sectionsContainer: {
     width: "100%",
-    gap: 20,
+    gap: Platform.OS === "android" ? 16 : 20,
+    marginTop: Platform.OS === "android" ? 10 : 0,
+    paddingBottom: Platform.OS === "android" ? 20 : 0,
   },
   sectionCard: {
     backgroundColor: "#f2f2f2",
@@ -198,7 +234,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#215432",
     textAlign: "center",
-    marginBottom: 30,
+    marginTop: Platform.OS === "android" ? 80 : 60,
+    marginBottom: Platform.OS === "android" ? 20 : 30,
+    paddingHorizontal: 10,
   },
   loadingOverlay: {
     position: "absolute",

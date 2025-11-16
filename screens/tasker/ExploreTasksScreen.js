@@ -331,7 +331,13 @@ export default function ExploreTasksScreen({ navigation }) {
       <TouchableOpacity 
         key={taskId} 
         style={styles.taskCard}
-        onPress={() => navigation.navigate("TaskerTaskDetails", { task })}
+        onPress={() => {
+          if (!task || !task._id) {
+            Alert.alert(t("common.errorTitle") || "Error", t("taskerExplore.taskNotFound") || "Task information is missing. Please try again.");
+            return;
+          }
+          navigation.navigate("TaskerTaskDetails", { task });
+        }}
         activeOpacity={0.7}
       >
         <Text style={styles.taskTitle}>{task.title || t("taskerExplore.taskTitle")}</Text>
@@ -343,10 +349,22 @@ export default function ExploreTasksScreen({ navigation }) {
               size={16} 
               color="#215433" 
             />
-            <Text style={styles.tagText}>{getCategoryTranslation(task.category)}</Text>
+            <Text 
+              style={styles.tagText}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {getCategoryTranslation(task.category)}
+            </Text>
           </View>
           <View style={styles.budgetTag}>
-            <Text style={styles.budgetText}>{t("taskerExplore.clientBudget", { budget: task.budget || "5" })}</Text>
+            <Text 
+              style={styles.budgetText}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {t("taskerExplore.clientBudget", { budget: task.budget || "5" })}
+            </Text>
           </View>
         </View>
 
@@ -372,6 +390,10 @@ export default function ExploreTasksScreen({ navigation }) {
           style={styles.bidButton}
           onPress={(e) => {
             e.stopPropagation(); // Prevent card navigation when pressing Bid button
+            if (!task || !task._id) {
+              Alert.alert(t("common.errorTitle") || "Error", t("taskerExplore.taskNotFound") || "Task information is missing. Please try again.");
+              return;
+            }
             if (currentUser && !currentUser.isVerified) {
               setShowVerificationPopup(true);
             } else {
@@ -878,6 +900,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     gap: 8,
     alignItems: "center",
+    flexWrap: Platform.OS === "android" ? "wrap" : "nowrap",
   },
   tag: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
@@ -886,6 +909,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 4,
     paddingHorizontal: 8,
+    flexShrink: Platform.OS === "android" ? 1 : 0,
+    maxWidth: Platform.OS === "android" ? "48%" : "100%",
+    minWidth: 0,
   },
   tagText: {
     fontFamily: "Inter",
@@ -893,6 +919,7 @@ const styles = StyleSheet.create({
     color: "#215433",
     marginLeft: I18nManager.isRTL ? 0 : 4,
     marginRight: I18nManager.isRTL ? 4 : 0,
+    flexShrink: 1,
   },
   budgetTag: {
     flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
@@ -901,6 +928,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 4,
     paddingHorizontal: 8,
+    flexShrink: Platform.OS === "android" ? 1 : 0,
+    maxWidth: Platform.OS === "android" ? "48%" : "100%",
+    minWidth: 0,
   },
   budgetText: {
     fontFamily: "Inter",

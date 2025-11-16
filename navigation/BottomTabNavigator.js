@@ -4,6 +4,8 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { getToken } from "../services/authStorage";
 import { useFocusEffect } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Platform } from "react-native";
 
 
 import ClientHomeScreen from "../screens/clients/HomeScreen";
@@ -19,6 +21,7 @@ const Tab = createBottomTabNavigator();
 export default function BottomTabNavigator() {
   const { t } = useTranslation();
   const [unreadCount, setUnreadCount] = useState(0);
+  const insets = useSafeAreaInsets();
 
   const fetchUnreadMessages = async () => {
     try {
@@ -40,6 +43,11 @@ export default function BottomTabNavigator() {
     }, [])
   );
 
+  // Calculate bottom padding for Android to account for system navigation bar
+  const bottomPadding = Platform.OS === "android" 
+    ? Math.max(insets.bottom, 10) 
+    : 10;
+
   return (
     <Tab.Navigator
 
@@ -50,8 +58,9 @@ export default function BottomTabNavigator() {
         tabBarStyle: {
           backgroundColor: "#ffffff",
           borderTopColor: "#eee",
-          height: 70,
-          paddingBottom: 10,
+          height: Platform.OS === "android" ? 70 + insets.bottom : 70,
+          paddingBottom: bottomPadding,
+          paddingTop: 5,
         },
         tabBarIcon: ({ color }) => {
           let icon;

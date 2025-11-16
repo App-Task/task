@@ -20,8 +20,8 @@ import EmptyIllustration from "../../components/EmptyIllustration";
 import VerificationPopup from "../../components/VerificationPopup";
 
 export default function TaskerTaskDetailsScreen({ route }) {
-  const { task: initialTask } = route.params;
-  const [task, setTask] = useState(initialTask);
+  const { task: initialTask } = route.params || {};
+  const [task, setTask] = useState(initialTask || null);
   const { t } = useTranslation();
   const navigation = useNavigation();
 
@@ -32,17 +32,27 @@ export default function TaskerTaskDetailsScreen({ route }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [showVerificationPopup, setShowVerificationPopup] = useState(false);
 
-  const isBiddingAllowed = task.status === "Pending";
+  const isBiddingAllowed = task?.status === "Pending";
 
   useEffect(() => {
     let isMounted = true;
     const init = async () => {
       try {
+        if (!task?._id) {
+          if (isMounted) setLoadingBid(false);
+          return;
+        }
+
         const user = await fetchCurrentUser();
-        if (isMounted) setIsVerified(user.isVerified);
+        if (!user?._id) {
+          if (isMounted) setLoadingBid(false);
+          return;
+        }
+
+        if (isMounted) setIsVerified(user.isVerified || false);
 
         const res = await axios.get(`https://task-kq94.onrender.com/api/bids/tasker/${user._id}`);
-        const bids = res.data;
+        const bids = res.data || [];
         const foundBid = bids.find(
           (b) => b.taskId?._id === task._id || b.taskId === task._id
         );
@@ -60,21 +70,29 @@ export default function TaskerTaskDetailsScreen({ route }) {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [task?._id]);
 
   useEffect(() => {
     const fetchFullTask = async () => {
       try {
+        if (!initialTask?._id) {
+          console.error("❌ No task ID provided");
+          return;
+        }
         const res = await axios.get(
           `https://task-kq94.onrender.com/api/tasks/${initialTask._id}`
         );
-        setTask(res.data);
+        if (res.data) {
+          setTask(res.data);
+        }
       } catch (err) {
         console.error("❌ Failed to fetch full task:", err.message);
       }
     };
-    fetchFullTask();
-  }, []);
+    if (initialTask?._id) {
+      fetchFullTask();
+    }
+  }, [initialTask?._id]);
 
   // Get task coordinates
   useEffect(() => {
@@ -141,13 +159,46 @@ export default function TaskerTaskDetailsScreen({ route }) {
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric"
-    });
+    if (!dateString) return t("taskerTaskDetails.dateNotAvailable") || "N/A";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return t("taskerTaskDetails.dateNotAvailable") || "N/A";
+      return date.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      });
+    } catch (e) {
+      return t("taskerTaskDetails.dateNotAvailable") || "N/A";
+    }
   };
+
+  // If no task data, show error and allow going back
+  if (!task) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.backButtonContainer}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons
+              name={"arrow-back"}
+              size={24}
+              color="#215432"
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.errorContainer}>
+          <EmptyIllustration />
+          <Text style={styles.errorText}>{t("common.errorTitle")}</Text>
+          <Text style={styles.errorSubtext}>
+            {t("taskerTaskDetails.taskNotFound") || "Task information is missing. Please try again."}
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -259,6 +310,13 @@ export default function TaskerTaskDetailsScreen({ route }) {
                   longitudeDelta: 0.01,
                 }}
                 pointerEvents="none"
+                onMapReady={() => {
+                  console.log("Map ready");
+                }}
+                onError={(error) => {
+                  console.error("MapView error:", error);
+                  // Don't show alert for read-only map, just log the error
+                }}
               >
                 <Marker coordinate={coords} />
               </MapView>
@@ -583,5 +641,25 @@ const styles = StyleSheet.create({
   fullScreenImage: {
     width: "90%",
     height: "80%",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  errorText: {
+    fontFamily: "InterBold",
+    fontSize: 20,
+    color: "#215432",
+    marginTop: 20,
+    textAlign: "center",
+  },
+  errorSubtext: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    color: "#666",
+    marginTop: 8,
+    textAlign: "center",
   },
 });

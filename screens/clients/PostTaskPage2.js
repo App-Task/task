@@ -157,23 +157,44 @@ export default function PostTaskPage2() {
       } else {
         // If no coords yet, try to get current location
         try {
-          const pos = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced,
-          });
-          const { latitude, longitude } = pos.coords;
-          setTempCoords({ latitude, longitude });
-          setTempRegion({
-            latitude,
-            longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          });
+          // First check and request permissions
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== "granted") {
+            Alert.alert(
+              t("common.permissionNeeded"),
+              t("common.locationPermissionRequired")
+            );
+            // Use default location (Bahrain) if permission denied
+            const defaultCoords = { latitude: 26.0667, longitude: 50.5577 };
+            setTempCoords(defaultCoords);
+            setTempRegion({
+              latitude: defaultCoords.latitude,
+              longitude: defaultCoords.longitude,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            });
+          } else {
+            // Permission granted, get current location
+            const pos = await Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.Balanced,
+            });
+            const { latitude, longitude } = pos.coords;
+            setTempCoords({ latitude, longitude });
+            setTempRegion({
+              latitude,
+              longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            });
+          }
         } catch (e) {
           // If location fetch fails, use default location (Bahrain)
           console.log("Location fetch error, using default", e);
+          const defaultCoords = { latitude: 26.0667, longitude: 50.5577 };
+          setTempCoords(defaultCoords);
           setTempRegion({
-            latitude: 26.0667,
-            longitude: 50.5577,
+            latitude: defaultCoords.latitude,
+            longitude: defaultCoords.longitude,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           });
@@ -186,6 +207,8 @@ export default function PostTaskPage2() {
     } catch (e) {
       console.log("openMapPicker error", e);
       Alert.alert(t("clientPostTask.errorTitle"), t("clientPostTask.mapError"));
+      // Don't open modal if there's an error
+      setMapVisible(false);
     }
   };
 
@@ -502,25 +525,49 @@ export default function PostTaskPage2() {
             </View>
 
             {tempRegion ? (
-              <MapView
-                style={styles.map}
-                initialRegion={tempRegion}
-                onPress={(e) => {
-                  const { latitude, longitude } = e.nativeEvent.coordinate;
-                  setTempCoords({ latitude, longitude });
-                }}
-              >
-                {tempCoords && (
-                  <Marker
-                    coordinate={tempCoords}
-                    draggable
-                    onDragEnd={(e) => {
-                      const { latitude, longitude } = e.nativeEvent.coordinate;
-                      setTempCoords({ latitude, longitude });
-                    }}
-                  />
-                )}
-              </MapView>
+              <View style={styles.mapContainer}>
+                <MapView
+                  style={styles.map}
+                  initialRegion={tempRegion}
+                  onPress={(e) => {
+                    try {
+                      if (e?.nativeEvent?.coordinate) {
+                        const { latitude, longitude } = e.nativeEvent.coordinate;
+                        setTempCoords({ latitude, longitude });
+                      }
+                    } catch (err) {
+                      console.error("Map press error:", err);
+                    }
+                  }}
+                  onMapReady={() => {
+                    console.log("Map ready");
+                  }}
+                  onError={(error) => {
+                    console.error("MapView error:", error);
+                    Alert.alert(
+                      t("common.errorTitle") || "Error",
+                      t("clientPostTask.mapError") || "Map failed to load. Please try again."
+                    );
+                  }}
+                >
+                  {tempCoords && (
+                    <Marker
+                      coordinate={tempCoords}
+                      draggable
+                      onDragEnd={(e) => {
+                        try {
+                          if (e?.nativeEvent?.coordinate) {
+                            const { latitude, longitude } = e.nativeEvent.coordinate;
+                            setTempCoords({ latitude, longitude });
+                          }
+                        } catch (err) {
+                          console.error("Marker drag error:", err);
+                        }
+                      }}
+                    />
+                  )}
+                </MapView>
+              </View>
             ) : (
               <View style={styles.mapLoadingContainer}>
                 <Text style={styles.mapLoadingText}>{t("clientPostTask.page2.loadingMap")}</Text>
@@ -877,8 +924,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 4,
   },
+  mapContainer: {
+    flex: 1,
+    overflow: "hidden",
+  },
   map: {
     flex: 1,
+    width: "100%",
+    height: "100%",
   },
   mapLoadingContainer: {
     flex: 1,

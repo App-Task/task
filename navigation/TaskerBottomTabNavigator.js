@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { getToken } from "../services/authStorage";
 import { useFocusEffect } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Platform } from "react-native";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,6 +25,7 @@ const Tab = createBottomTabNavigator();
 export default function TaskBottomNav() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadNotifications, setUnreadNotifications] = useState(0); // ✅ ADD THIS BACK
+  const insets = useSafeAreaInsets();
   
   
 
@@ -68,9 +71,10 @@ useEffect(() => {
   fetchUnreadNotifications(); // ✅ runs once immediately on login
 }, []);
 
-
-  
-  
+  // Calculate bottom padding for Android to account for system navigation bar
+  const bottomPadding = Platform.OS === "android" 
+    ? Math.max(insets.bottom, 10) 
+    : 10;
 
   return (
     <Tab.Navigator
@@ -81,8 +85,9 @@ useEffect(() => {
         tabBarStyle: {
           backgroundColor: "#ffffff",
           borderTopColor: "#eee",
-          height: 70,
-          paddingBottom: 10,
+          height: Platform.OS === "android" ? 70 + insets.bottom : 70,
+          paddingBottom: bottomPadding,
+          paddingTop: 5,
         },
         tabBarIcon: ({ color }) => {
           let icon;
