@@ -390,14 +390,48 @@ export default function ExploreTasksScreen({ navigation }) {
           style={styles.bidButton}
           onPress={(e) => {
             e.stopPropagation(); // Prevent card navigation when pressing Bid button
-            if (!task || !task._id) {
-              Alert.alert(t("common.errorTitle") || "Error", t("taskerExplore.taskNotFound") || "Task information is missing. Please try again.");
-              return;
-            }
-            if (currentUser && !currentUser.isVerified) {
-              setShowVerificationPopup(true);
-            } else {
-              navigation.navigate("TaskerTaskDetails", { task });
+            try {
+              if (!task || !task._id) {
+                Alert.alert(t("common.errorTitle") || "Error", t("taskerExplore.taskNotFound") || "Task information is missing. Please try again.");
+                return;
+              }
+              
+              // On Android, ensure task object is properly serialized
+              const taskToNavigate = Platform.OS === "android" 
+                ? {
+                    _id: task._id,
+                    title: task.title || "",
+                    description: task.description || "",
+                    budget: task.budget || 0,
+                    category: task.category || "",
+                    status: task.status || "Pending",
+                    location: task.location || "",
+                    latitude: task.latitude || null,
+                    longitude: task.longitude || null,
+                    images: task.images || [],
+                    createdAt: task.createdAt || new Date().toISOString(),
+                    userId: task.userId || null,
+                  }
+                : task;
+
+              if (currentUser && !currentUser.isVerified) {
+                setShowVerificationPopup(true);
+              } else {
+                // Add small delay on Android to ensure navigation state is ready
+                if (Platform.OS === "android") {
+                  setTimeout(() => {
+                    navigation.navigate("TaskerTaskDetails", { task: taskToNavigate });
+                  }, 100);
+                } else {
+                  navigation.navigate("TaskerTaskDetails", { task: taskToNavigate });
+                }
+              }
+            } catch (error) {
+              console.error("Bid button navigation error:", error);
+              Alert.alert(
+                t("common.errorTitle") || "Error",
+                t("taskerExplore.taskNotFound") || "Failed to open task details. Please try again."
+              );
             }
           }}
         >

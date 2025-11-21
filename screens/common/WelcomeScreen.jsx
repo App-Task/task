@@ -35,7 +35,7 @@ export default function WelcomeScreen({ navigation }) {
 
   useEffect(() => {
     const preload = async () => {
-      await Asset.loadAsync(require("../../assets/images/21.png"));
+      await Asset.loadAsync(require("../../assets/images/2.png"));
       await Asset.loadAsync(require("../../assets/images/22.png"));
       await requestPermissions();
       setReady(true);
@@ -71,47 +71,47 @@ export default function WelcomeScreen({ navigation }) {
   return (
     <>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <StatusBar barStyle="dark-content" backgroundColor="rgba(248, 246, 247)" />
+        <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
         <ScrollView 
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.container}>
+      <View style={styles.container}>
             <View style={styles.logoContainer}>
-              <Image
-                source={i18n.language === "ar" ? require("../../assets/images/22.png") : require("../../assets/images/21.png")}
-                style={styles.logo}
-                resizeMode="contain"
-              />
+        <Image
+                source={i18n.language === "ar" ? require("../../assets/images/22.png") : require("../../assets/images/2.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
             </View>
 
-            <Text style={styles.tagline}>{t("tagline")}</Text>
+        <Text style={styles.tagline}>{t("tagline")}</Text>
 
-            <LanguageToggle style={styles.langSwitch} />
+        <LanguageToggle style={styles.langSwitch} />
 
-            <View style={styles.sectionsContainer}>
-              <TouchableOpacity
-                style={styles.sectionCard}
-                onPress={() => navigation.navigate("Login", { role: "client" })}
+        <View style={styles.sectionsContainer}>
+          <TouchableOpacity
+            style={styles.sectionCard}
+            onPress={() => navigation.navigate("Login", { role: "client" })}
                 activeOpacity={0.7}
-              >
-                <Ionicons name="person-outline" size={36} color="#215432" />
-                <Text style={styles.sectionTitle}>{t("role.client")}</Text>
-                <Text style={styles.sectionDesc}>{t("clientDescription")}</Text>
-              </TouchableOpacity>
+          >
+            <Ionicons name="person-outline" size={36} color="#215432" />
+            <Text style={styles.sectionTitle}>{t("role.client")}</Text>
+            <Text style={styles.sectionDesc}>{t("clientDescription")}</Text>
+          </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.sectionCard}
-                onPress={() => navigation.navigate("Login", { role: "tasker" })}
+          <TouchableOpacity
+            style={styles.sectionCard}
+            onPress={() => navigation.navigate("Login", { role: "tasker" })}
                 activeOpacity={0.7}
-              >
-                <Ionicons name="construct-outline" size={36} color="#215432" />
-                <Text style={styles.sectionTitle}>{t("role.tasker")}</Text>
-                <Text style={styles.sectionDesc}>{t("taskerDescription")}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          >
+            <Ionicons name="construct-outline" size={36} color="#215432" />
+            <Text style={styles.sectionTitle}>{t("role.tasker")}</Text>
+            <Text style={styles.sectionDesc}>{t("taskerDescription")}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
         </ScrollView>
       </SafeAreaView>
 
@@ -133,13 +133,13 @@ export default function WelcomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    backgroundColor: "rgba(248, 246, 247)",
+    backgroundColor: "#ffffff",
     justifyContent: "center",
     alignItems: "center",
   },
   safeArea: {
     flex: 1,
-    backgroundColor: "rgba(248, 246, 247)",
+    backgroundColor: "#ffffff",
   },
   scrollView: {
     flex: 1,
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "rgba(248, 246, 247)",
+    backgroundColor: "#ffffff",
     alignItems: "center",
     justifyContent: "flex-start",
     paddingHorizontal: 30,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: Platform.OS === "android" ? 10 : 0,
-    marginBottom: Platform.OS === "android" ? -60 : -80,
+    marginBottom: Platform.OS === "android" ? -40 : -50,
     overflow: "hidden",
   },
   logo: {
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#215432",
     textAlign: "center",
-    marginTop: Platform.OS === "android" ? 80 : 60,
+    marginTop: Platform.OS === "android" ? 5 : 5,
     marginBottom: Platform.OS === "android" ? 20 : 30,
     paddingHorizontal: 10,
   },
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   loadingBox: {
-    backgroundColor: "rgba(248, 246, 247)",
+    backgroundColor: "#ffffff",
     borderRadius: 16,
     padding: 30,
     alignItems: "center",

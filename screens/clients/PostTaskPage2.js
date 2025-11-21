@@ -142,18 +142,29 @@ export default function PostTaskPage2() {
     getCurrentLocation();
   }, []);
 
+  // Validate coordinates for MapView (Android requires valid coordinates)
+  const validateCoordinates = (lat, lng) => {
+    if (typeof lat !== "number" || typeof lng !== "number") return false;
+    if (isNaN(lat) || isNaN(lng)) return false;
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return false;
+    return true;
+  };
+
   // Open the map picker
   const openMapPicker = async () => {
     try {
+      let validRegion = null;
+      let validCoords = null;
+
       // Prepare tempRegion and tempCoords BEFORE opening modal
-      if (coords) {
-        setTempCoords(coords);
-        setTempRegion({
+      if (coords && validateCoordinates(coords.latitude, coords.longitude)) {
+        validCoords = { latitude: coords.latitude, longitude: coords.longitude };
+        validRegion = {
           latitude: coords.latitude,
           longitude: coords.longitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
-        });
+        };
       } else {
         // If no coords yet, try to get current location
         try {
@@ -165,44 +176,56 @@ export default function PostTaskPage2() {
               t("common.locationPermissionRequired")
             );
             // Use default location (Bahrain) if permission denied
-            const defaultCoords = { latitude: 26.0667, longitude: 50.5577 };
-            setTempCoords(defaultCoords);
-            setTempRegion({
-              latitude: defaultCoords.latitude,
-              longitude: defaultCoords.longitude,
+            validCoords = { latitude: 26.0667, longitude: 50.5577 };
+            validRegion = {
+              latitude: 26.0667,
+              longitude: 50.5577,
               latitudeDelta: 0.05,
               longitudeDelta: 0.05,
-            });
+            };
           } else {
             // Permission granted, get current location
             const pos = await Location.getCurrentPositionAsync({
               accuracy: Location.Accuracy.Balanced,
+              timeout: 10000,
             });
             const { latitude, longitude } = pos.coords;
-            setTempCoords({ latitude, longitude });
-            setTempRegion({
-              latitude,
-              longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            });
+            if (validateCoordinates(latitude, longitude)) {
+              validCoords = { latitude, longitude };
+              validRegion = {
+                latitude,
+                longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              };
+            } else {
+              throw new Error("Invalid coordinates received");
+            }
           }
         } catch (e) {
           // If location fetch fails, use default location (Bahrain)
           console.log("Location fetch error, using default", e);
-          const defaultCoords = { latitude: 26.0667, longitude: 50.5577 };
-          setTempCoords(defaultCoords);
-          setTempRegion({
-            latitude: defaultCoords.latitude,
-            longitude: defaultCoords.longitude,
+          validCoords = { latitude: 26.0667, longitude: 50.5577 };
+          validRegion = {
+            latitude: 26.0667,
+            longitude: 50.5577,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
-          });
+          };
         }
       }
+
+      // Ensure we have valid region before proceeding
+      if (!validRegion || !validateCoordinates(validRegion.latitude, validRegion.longitude)) {
+        throw new Error("Invalid map region");
+      }
+
+      // Set state
+      setTempCoords(validCoords);
+      setTempRegion(validRegion);
       
-      // Wait a tick to ensure state is updated before showing modal
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait longer on Android to ensure state is fully updated before showing modal
+      await new Promise(resolve => setTimeout(resolve, Platform.OS === "android" ? 300 : 100));
       setMapVisible(true);
     } catch (e) {
       console.log("openMapPicker error", e);
@@ -524,16 +547,23 @@ export default function PostTaskPage2() {
               </Text>
             </View>
 
-            {tempRegion ? (
+            {tempRegion && 
+             typeof tempRegion.latitude === "number" && 
+             !isNaN(tempRegion.latitude) &&
+             typeof tempRegion.longitude === "number" && 
+             !isNaN(tempRegion.longitude) ? (
               <View style={styles.mapContainer}>
                 <MapView
                   style={styles.map}
                   initialRegion={tempRegion}
+                  region={tempRegion}
                   onPress={(e) => {
                     try {
                       if (e?.nativeEvent?.coordinate) {
                         const { latitude, longitude } = e.nativeEvent.coordinate;
-                        setTempCoords({ latitude, longitude });
+                        if (validateCoordinates(latitude, longitude)) {
+                          setTempCoords({ latitude, longitude });
+                        }
                       }
                     } catch (err) {
                       console.error("Map press error:", err);
@@ -544,13 +574,18 @@ export default function PostTaskPage2() {
                   }}
                   onError={(error) => {
                     console.error("MapView error:", error);
+                    if (Platform.OS === "android") {
+                      // On Android, close modal on error to prevent crash
+                      setMapVisible(false);
+                    }
                     Alert.alert(
                       t("common.errorTitle") || "Error",
                       t("clientPostTask.mapError") || "Map failed to load. Please try again."
                     );
                   }}
                 >
-                  {tempCoords && (
+                  {tempCoords && 
+                   validateCoordinates(tempCoords.latitude, tempCoords.longitude) && (
                     <Marker
                       coordinate={tempCoords}
                       draggable
@@ -558,7 +593,9 @@ export default function PostTaskPage2() {
                         try {
                           if (e?.nativeEvent?.coordinate) {
                             const { latitude, longitude } = e.nativeEvent.coordinate;
-                            setTempCoords({ latitude, longitude });
+                            if (validateCoordinates(latitude, longitude)) {
+                              setTempCoords({ latitude, longitude });
+                            }
                           }
                         } catch (err) {
                           console.error("Marker drag error:", err);
@@ -984,3 +1021,4 @@ const styles = StyleSheet.create({
     color: "#333333",
   },
 });
+
