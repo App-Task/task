@@ -60,7 +60,10 @@
     },
     "runtimeVersion": "1.0.0",
     "updates": {
-      "url": "https://u.expo.dev/02016b9f-21ea-402a-987c-c3691146d194"
+      "url": "https://u.expo.dev/02016b9f-21ea-402a-987c-c3691146d194",
+      "enabled": true,
+      "checkAutomatically": "ON_ERROR_RECOVERY",
+      "fallbackToCacheTimeout": 0
     },
     "sdkVersion": "54.0.0"
   }

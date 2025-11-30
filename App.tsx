@@ -28,6 +28,28 @@ export default function App() {
   });
 
   useEffect(() => {
+    const checkForUpdates = async () => {
+      try {
+        // Skip update check in development or Expo Go
+        if (__DEV__) {
+          return;
+        }
+        
+        // Only check for updates in production builds
+        if (Updates.isEnabled) {
+          const update = await Updates.checkForUpdateAsync();
+          if (update.isAvailable) {
+            await Updates.fetchUpdateAsync();
+            await Updates.reloadAsync();
+          }
+        }
+      } catch (error) {
+        // Silently handle update errors - don't block app startup
+        // This is normal when using Expo Go or when updates service is unavailable
+        console.log("Update check skipped (normal in development/Expo Go)");
+      }
+    };
+
     const ensureLayoutForLanguage = async (lang: string) => {
       const desiredRTL = lang === "ar";
       const isRTLNow = I18nManager.isRTL;
@@ -54,6 +76,9 @@ export default function App() {
 
     const initLanguageAndLayout = async () => {
       try {
+        // Check for updates (will fail gracefully in development/Expo Go)
+        await checkForUpdates();
+
         const savedLang = await SecureStore.getItemAsync("appLanguage");
         const lang = savedLang || i18n.language || "en";
 
