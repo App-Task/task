@@ -538,8 +538,8 @@ export default function EditTaskScreen({ route, navigation }) {
               onPress={(e) => {
                 try {
                   if (e?.nativeEvent?.coordinate) {
-                    const { latitude, longitude } = e.nativeEvent.coordinate;
-                    setTempCoords({ latitude, longitude });
+                const { latitude, longitude } = e.nativeEvent.coordinate;
+                setTempCoords({ latitude, longitude });
                   }
                 } catch (err) {
                   console.error("Map press error:", err);
@@ -563,8 +563,8 @@ export default function EditTaskScreen({ route, navigation }) {
                   onDragEnd={(e) => {
                     try {
                       if (e?.nativeEvent?.coordinate) {
-                        const { latitude, longitude } = e.nativeEvent.coordinate;
-                        setTempCoords({ latitude, longitude });
+                    const { latitude, longitude } = e.nativeEvent.coordinate;
+                    setTempCoords({ latitude, longitude });
                       }
                     } catch (err) {
                       console.error("Marker drag error:", err);

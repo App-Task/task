@@ -83,14 +83,14 @@ export default function TaskerTaskDetailsScreen({ route }) {
           `https://task-kq94.onrender.com/api/tasks/${initialTask._id}`
         );
         if (res.data) {
-          setTask(res.data);
+        setTask(res.data);
         }
       } catch (err) {
         console.error("❌ Failed to fetch full task:", err.message);
       }
     };
     if (initialTask?._id) {
-      fetchFullTask();
+    fetchFullTask();
     }
   }, [initialTask?._id]);
 
@@ -161,13 +161,13 @@ export default function TaskerTaskDetailsScreen({ route }) {
   const formatDate = (dateString) => {
     if (!dateString) return t("taskerTaskDetails.dateNotAvailable") || "N/A";
     try {
-      const date = new Date(dateString);
+    const date = new Date(dateString);
       if (isNaN(date.getTime())) return t("taskerTaskDetails.dateNotAvailable") || "N/A";
-      return date.toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric"
-      });
+    return date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
     } catch (e) {
       return t("taskerTaskDetails.dateNotAvailable") || "N/A";
     }

@@ -86,17 +86,22 @@ if (!phoneRegex.test(phone.trim())) {
   
     try {
       // Step 1: Register the user
-  
-      await registerUser({ 
+      // Prepare registration data
+      const registrationData = { 
         name: name.trim(), 
         email: email.trim().toLowerCase(), 
         password, 
-        phone: `${callingCode}${phone.trim()}`, // full
-        role,
-        callingCode,
+        phone: `${callingCode}${phone.trim()}`.replace(/\s+/g, ''), // Remove any spaces
+        role: role || "client",
+        callingCode: callingCode || "+973",
         rawPhone: phone.trim(),
-        countryCode,
-      });
+        countryCode: countryCode || "BH",
+      };
+
+      // Log registration attempt (without password)
+      console.log("Registering user with data:", { ...registrationData, password: "***" });
+  
+      await registerUser(registrationData);
       
       
 
@@ -126,7 +131,34 @@ navigation.reset({
   ],
 });
   } catch (err) {
-    Alert.alert(t("common.errorTitle"), err.message || t("common.somethingWentWrong"));
+    // Show detailed error message including validation details
+    let errorMessage = err.message || t("common.somethingWentWrong");
+    
+    console.error("Registration error:", errorMessage);
+    console.error("Full error object:", err);
+    console.error("Error response:", err.response?.data);
+    
+    // Ensure error message is properly formatted for display
+    // The message from auth.js should already include formatted details with \n
+    // On Android, Alert.alert should display newlines correctly
+    
+    // Show alert with proper formatting
+    // Android's Alert.alert supports newlines (\n) in the message
+    Alert.alert(
+      t("common.errorTitle") || "Registration Error",
+      errorMessage,
+      [{ 
+        text: "OK", 
+        style: "default",
+        onPress: () => {
+          // Log that user acknowledged the error
+          console.log("User acknowledged registration error");
+        }
+      }],
+      { 
+        cancelable: true
+      }
+    );
   } finally {
     setIsRegistering(false); // ✅ hide popup
   }

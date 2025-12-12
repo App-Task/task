@@ -120,27 +120,78 @@ const [tempRegion, setTempRegion] = useState(null);   // MapView region while ed
 React.useEffect(() => {
   const getCurrentLocation = async () => {
     try {
+      // Request permissions first
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert(t("common.permissionNeeded"), t("common.locationPermissionRequired"));
+        console.log("Location permission not granted:", status);
+        Alert.alert(
+          t("common.permissionNeeded") || "Permission Needed",
+          t("common.locationPermissionRequired") || "Location permission is required to post tasks. Please enable it in settings."
+        );
         return;
       }
+
+      // Check if location services are enabled (Android specific)
+      if (Platform.OS === "android") {
+        const enabled = await Location.hasServicesEnabledAsync();
+        if (!enabled) {
+          Alert.alert(
+            t("common.locationServicesDisabled") || "Location Services Disabled",
+            t("common.enableLocationServices") || "Please enable location services in your device settings."
+          );
+          return;
+        }
+      }
       
+      // Get current position with Android-optimized settings
       const pos = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
+        accuracy: Platform.OS === "android" 
+          ? Location.Accuracy.High 
+          : Location.Accuracy.Balanced,
+        timeout: 15000, // 15 second timeout for Samsung devices
+        maximumAge: 10000, // Accept cached location up to 10 seconds old
       });
       
-      const { latitude, longitude } = pos.coords;
-      setCoords({ latitude, longitude });
-      setTempRegion({
-        latitude,
-        longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      });
+      if (pos && pos.coords) {
+        const { latitude, longitude } = pos.coords;
+        
+        // Validate coordinates before setting
+        if (typeof latitude === "number" && typeof longitude === "number" && 
+            !isNaN(latitude) && !isNaN(longitude) &&
+            latitude >= -90 && latitude <= 90 && 
+            longitude >= -180 && longitude <= 180) {
+          setCoords({ latitude, longitude });
+          setTempRegion({
+            latitude,
+            longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+          console.log("Location obtained successfully:", { latitude, longitude });
+        } else {
+          throw new Error("Invalid coordinates received");
+        }
+      } else {
+        throw new Error("No coordinates in position data");
+      }
     } catch (e) {
-      console.log("get location error", e);
-      Alert.alert(t("common.errorTitle"), t("common.couldNotGetLocation"));
+      console.error("get location error:", e);
+      console.error("Error details:", {
+        message: e.message,
+        code: e.code,
+        platform: Platform.OS
+      });
+      
+      // Provide more helpful error message
+      let errorMessage = t("common.couldNotGetLocation") || "Could not get your location.";
+      if (Platform.OS === "android") {
+        errorMessage += "\n\nPlease ensure:\n• Location services are enabled\n• GPS is turned on\n• You're in an area with good signal";
+      }
+      
+      Alert.alert(
+        t("common.errorTitle") || "Location Error",
+        errorMessage
+      );
     }
   };
   

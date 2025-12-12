@@ -115,27 +115,75 @@ export default function PostTaskPage2() {
   React.useEffect(() => {
     const getCurrentLocation = async () => {
       try {
+        // Request permissions first
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
-          Alert.alert(t("common.permissionNeeded"), t("common.locationPermissionRequired"));
+          console.log("Location permission not granted:", status);
+          Alert.alert(
+            t("common.permissionNeeded") || "Permission Needed",
+            t("common.locationPermissionRequired") || "Location permission is required to post tasks. Please enable it in settings."
+          );
           return;
         }
+
+        // Check if location services are enabled (Android specific)
+        if (Platform.OS === "android") {
+          const enabled = await Location.hasServicesEnabledAsync();
+          if (!enabled) {
+            Alert.alert(
+              t("common.locationServicesDisabled") || "Location Services Disabled",
+              t("common.enableLocationServices") || "Please enable location services in your device settings."
+            );
+            return;
+          }
+        }
         
+        // Get current position with Android-optimized settings
         const pos = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
+          accuracy: Platform.OS === "android" 
+            ? Location.Accuracy.High 
+            : Location.Accuracy.Balanced,
+          timeout: 15000, // 15 second timeout for Samsung devices
+          maximumAge: 10000, // Accept cached location up to 10 seconds old
         });
         
-        const { latitude, longitude } = pos.coords;
-        setCoords({ latitude, longitude });
-        setTempRegion({
-          latitude,
-          longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        });
+        if (pos && pos.coords) {
+          const { latitude, longitude } = pos.coords;
+          
+          // Validate coordinates before setting
+          if (validateCoordinates(latitude, longitude)) {
+            setCoords({ latitude, longitude });
+            setTempRegion({
+              latitude,
+              longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            });
+            console.log("Location obtained successfully:", { latitude, longitude });
+          } else {
+            throw new Error("Invalid coordinates received");
+          }
+        } else {
+          throw new Error("No coordinates in position data");
+        }
       } catch (e) {
-        console.log("get location error", e);
-        Alert.alert(t("common.errorTitle"), t("common.couldNotGetLocation"));
+        console.error("get location error:", e);
+        console.error("Error details:", {
+          message: e.message,
+          code: e.code,
+          platform: Platform.OS
+        });
+        
+        // Provide more helpful error message
+        let errorMessage = t("common.couldNotGetLocation") || "Could not get your location.";
+        if (Platform.OS === "android") {
+          errorMessage += "\n\nPlease ensure:\n• Location services are enabled\n• GPS is turned on\n• You're in an area with good signal";
+        }
+        
+        Alert.alert(
+          t("common.errorTitle") || "Location Error",
+          errorMessage
+        );
       }
     };
     
@@ -184,22 +232,62 @@ export default function PostTaskPage2() {
               longitudeDelta: 0.05,
             };
           } else {
-            // Permission granted, get current location
-            const pos = await Location.getCurrentPositionAsync({
-              accuracy: Location.Accuracy.Balanced,
-              timeout: 10000,
-            });
-            const { latitude, longitude } = pos.coords;
-            if (validateCoordinates(latitude, longitude)) {
-              validCoords = { latitude, longitude };
-              validRegion = {
-                latitude,
-                longitude,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              };
+            // Check if location services are enabled (Android specific)
+            if (Platform.OS === "android") {
+              const enabled = await Location.hasServicesEnabledAsync();
+              if (!enabled) {
+                Alert.alert(
+                  t("common.locationServicesDisabled") || "Location Services Disabled",
+                  t("common.enableLocationServices") || "Please enable location services in your device settings."
+                );
+                // Use default location if services disabled
+                validCoords = { latitude: 26.0667, longitude: 50.5577 };
+                validRegion = {
+                  latitude: 26.0667,
+                  longitude: 50.5577,
+                  latitudeDelta: 0.05,
+                  longitudeDelta: 0.05,
+                };
+              } else {
+                // Permission granted and services enabled, get current location
+                const pos = await Location.getCurrentPositionAsync({
+                  accuracy: Platform.OS === "android" 
+                    ? Location.Accuracy.High 
+                    : Location.Accuracy.Balanced,
+                  timeout: 15000, // 15 second timeout for Samsung devices
+                  maximumAge: 10000,
+                });
+                const { latitude, longitude } = pos.coords;
+                if (validateCoordinates(latitude, longitude)) {
+                  validCoords = { latitude, longitude };
+                  validRegion = {
+                    latitude,
+                    longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  };
+                } else {
+                  throw new Error("Invalid coordinates received");
+                }
+              }
             } else {
-              throw new Error("Invalid coordinates received");
+              // iOS - get current location
+              const pos = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.Balanced,
+                timeout: 10000,
+              });
+              const { latitude, longitude } = pos.coords;
+              if (validateCoordinates(latitude, longitude)) {
+                validCoords = { latitude, longitude };
+                validRegion = {
+                  latitude,
+                  longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                };
+              } else {
+                throw new Error("Invalid coordinates received");
+              }
             }
           }
         } catch (e) {
@@ -214,7 +302,7 @@ export default function PostTaskPage2() {
           };
         }
       }
-
+      
       // Ensure we have valid region before proceeding
       if (!validRegion || !validateCoordinates(validRegion.latitude, validRegion.longitude)) {
         throw new Error("Invalid map region");
@@ -553,16 +641,16 @@ export default function PostTaskPage2() {
              typeof tempRegion.longitude === "number" && 
              !isNaN(tempRegion.longitude) ? (
               <View style={styles.mapContainer}>
-                <MapView
-                  style={styles.map}
-                  initialRegion={tempRegion}
+              <MapView
+                style={styles.map}
+                initialRegion={tempRegion}
                   region={tempRegion}
-                  onPress={(e) => {
+                onPress={(e) => {
                     try {
                       if (e?.nativeEvent?.coordinate) {
-                        const { latitude, longitude } = e.nativeEvent.coordinate;
+                  const { latitude, longitude } = e.nativeEvent.coordinate;
                         if (validateCoordinates(latitude, longitude)) {
-                          setTempCoords({ latitude, longitude });
+                  setTempCoords({ latitude, longitude });
                         }
                       }
                     } catch (err) {
@@ -586,24 +674,24 @@ export default function PostTaskPage2() {
                 >
                   {tempCoords && 
                    validateCoordinates(tempCoords.latitude, tempCoords.longitude) && (
-                    <Marker
-                      coordinate={tempCoords}
-                      draggable
-                      onDragEnd={(e) => {
+                  <Marker
+                    coordinate={tempCoords}
+                    draggable
+                    onDragEnd={(e) => {
                         try {
                           if (e?.nativeEvent?.coordinate) {
-                            const { latitude, longitude } = e.nativeEvent.coordinate;
+                      const { latitude, longitude } = e.nativeEvent.coordinate;
                             if (validateCoordinates(latitude, longitude)) {
-                              setTempCoords({ latitude, longitude });
+                      setTempCoords({ latitude, longitude });
                             }
                           }
                         } catch (err) {
                           console.error("Marker drag error:", err);
                         }
-                      }}
-                    />
-                  )}
-                </MapView>
+                    }}
+                  />
+                )}
+              </MapView>
               </View>
             ) : (
               <View style={styles.mapLoadingContainer}>

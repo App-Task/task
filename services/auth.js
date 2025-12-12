@@ -16,8 +16,49 @@ export const registerUser = async (userData) => {
     return response.data;
   } catch (error) {
     // Forward a cleaner error message for alerts
-    const message =
-      error?.response?.data?.msg || "Something went wrong during registration.";
+    let message = error?.response?.data?.msg || "Something went wrong during registration.";
+    
+    // Include validation details if available - format for better Android display
+    if (error?.response?.data?.details && Array.isArray(error.response.data.details) && error.response.data.details.length > 0) {
+      // Format details in a more readable and user-friendly way
+      const formattedDetails = error.response.data.details
+        .map(detail => {
+          // Make error messages more user-friendly and clear
+          if (detail.includes("2 character") || detail.includes("at least 2")) {
+            return "Name must be at least 2 characters";
+          }
+          if (detail.includes("email") || detail.includes("Invalid email")) {
+            return "Please enter a valid email address";
+          }
+          if (detail.includes("8 character") || detail.includes("at least 8")) {
+            return "Password must be at least 8 characters";
+          }
+          if (detail.includes("5 character") || detail.includes("at least 5")) {
+            return "Phone number must be at least 5 characters";
+          }
+          if (detail.includes("max")) {
+            return detail;
+          }
+          return detail;
+        })
+        .join("\n");
+      
+      // Combine message and details with proper formatting
+      // Use simple newline format that works on both iOS and Android
+      if (message === "Invalid request") {
+        message = `Please fix the following errors:\n\n${formattedDetails}`;
+      } else {
+        message = `${message}\n\n${formattedDetails}`;
+      }
+    }
+    
+    console.error("Registration error:", {
+      status: error?.response?.status,
+      data: error?.response?.data,
+      formattedMessage: message,
+      userData: { ...userData, password: "***" }
+    });
+    
     throw new Error(message);
   }
 };

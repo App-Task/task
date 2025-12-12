@@ -414,9 +414,9 @@ export default function ExploreTasksScreen({ navigation }) {
                   }
                 : task;
 
-              if (currentUser && !currentUser.isVerified) {
-                setShowVerificationPopup(true);
-              } else {
+            if (currentUser && !currentUser.isVerified) {
+              setShowVerificationPopup(true);
+            } else {
                 // Add small delay on Android to ensure navigation state is ready
                 if (Platform.OS === "android") {
                   setTimeout(() => {

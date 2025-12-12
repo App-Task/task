@@ -47,6 +47,14 @@
           "backgroundColor": "#ffffff"
         }
       ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "We use your location to show where the task is.",
+          "locationAlwaysPermission": "We use your location to show where the task is.",
+          "locationWhenInUsePermission": "We use your location to show where the task is."
+        }
+      ],
       "expo-asset",
       "expo-localization",
       "expo-secure-store",
