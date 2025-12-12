@@ -129,8 +129,8 @@ export default function MessagesScreen({ navigation }) {
         <ActivityIndicator size="large" color="#000000" style={{ marginTop: 40 }} />
       ) : conversations.length === 0 ? (
         <EmptyState 
-          title="No Messages Yet" 
-          subtitle="Start conversations with taskers by posting tasks and accepting bids!"
+          title={t("clientMessages.emptyTitle")} 
+          subtitle={t("clientMessages.emptySubtitle")}
         />
       ) : (
 <FlatList

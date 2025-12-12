@@ -155,7 +155,9 @@
   "clientMessages": {
     "title": "الرسائل",
     "placeholder": "لا توجد رسائل بعد",
-    "search": "البحث"
+    "search": "البحث",
+    "emptyTitle": "لا توجد رسائل بعد",
+    "emptySubtitle": "ابدأ المحادثات مع المختصين من خلال نشر المهام وقبول العروض!"
   },
   "clientPayments": {
     "title": "مدفوعاتي",

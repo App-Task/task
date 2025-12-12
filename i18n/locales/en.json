@@ -136,7 +136,9 @@
   "clientMessages": {
     "title": "Messages",
     "placeholder": "No messages yet",
-    "search": "Search"
+    "search": "Search",
+    "emptyTitle": "No Messages Yet",
+    "emptySubtitle": "Start conversations with taskers by posting tasks and accepting bids!"
   },
   "clientPayments": {
     "title": "My Payments",
