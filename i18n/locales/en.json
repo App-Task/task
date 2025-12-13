@@ -333,8 +333,8 @@
   "chooseNewPhoto": "Choose New Photo",
   "removePhoto": "Remove Photo",
   "cancel": "Cancel",
-  "logoutConfirmTitle": "Are you sure you’d like to logout?",
-  "logoutConfirmMessage": "You will need to log in again to continue using the app."
+  "logoutConfirmTitle": "Logout",
+  "logoutConfirmMessage": "Are you sure you want to logout?"
   },
  "clientTaskDetails": {
   "description": "Description",
@@ -443,6 +443,7 @@
   },
 "clientReview": {
   "title": "Rate Your Tasker",
+  "rateYourExperience": "Rate your experience: {{rating}}/5",
   "commentPlaceholder": "Leave a comment...",
   "submit": "Submit Review",
   "submitting": "Submitting review...",

@@ -385,7 +385,7 @@
     "chooseNewPhoto": "اختر صورة جديدة",
     "removePhoto": "إزالة الصورة",
     "cancel": "إلغاء",
-    "logoutConfirmTitle": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+    "logoutConfirmTitle": "تسجيل الخروج",
     "logoutConfirmMessage": "هل أنت متأكد أنك تريد تسجيل الخروج؟"
   },
   "clientTaskDetails": {
@@ -450,6 +450,7 @@
   },
   "clientReview": {
     "title": "قيّم مقدم الخدمة",
+    "rateYourExperience": "قيّم تجربتك: {{rating}}/5",
     "commentPlaceholder": "اكتب تعليقاً...",
     "submit": "إرسال التقييم",
     "submitting": "جارٍ إرسال التقييم...",

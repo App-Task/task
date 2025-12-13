@@ -151,7 +151,7 @@ export default function MyTasksScreen({ navigation, route }) {
           textAlign: "center",
           fontWeight: "600"
         }}>
-          Rate your experience: {rating}/5
+          {t("clientReview.rateYourExperience", { rating })}
         </Text>
         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
           {renderStar(1)}
