@@ -182,6 +182,7 @@
   "reviewSubmittedMessage": "Your review was submitted.",
   "reviewFailedMessage": "Failed to submit review.",
   "submittingReport": "Submitting Report...",
+  "reportPlaceholder": "Describe the issue...",
   "charactersCount": "{{count}}/300 characters",
   "viewBids": "View Bids",
   "bid": "bid",

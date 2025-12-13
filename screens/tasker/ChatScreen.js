@@ -135,16 +135,39 @@ export default function TaskerChatScreen({ navigation, route }) {
         }
       }
 
+      // Ensure receiver ID is valid (24 characters for MongoDB ObjectId)
+      if (!otherUserId || otherUserId.length !== 24) {
+        throw new Error("Invalid receiver ID");
+      }
+
+      // Prepare message data - ensure text is properly handled
+      const messageData = {
+        receiver: otherUserId,
+      };
+
+      // Only include text if it exists and is not empty
+      if (message.trim()) {
+        messageData.text = message.trim();
+      } else if (imageUrl) {
+        // If no text but has image, use default text
+        messageData.text = "📷 Image";
+      } else {
+        // If neither text nor image, this shouldn't happen due to early return
+        throw new Error("Message text or image required");
+      }
+
+      // Include image if available
+      if (imageUrl) {
+        messageData.image = imageUrl;
+      }
+
       const res = await axios.post(
         `https://task-kq94.onrender.com/api/messages`,
-        {
-          receiver: otherUserId,
-          text: message.trim() || "📷 Image",
-          image: imageUrl,
-        },
+        messageData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
@@ -163,8 +186,9 @@ export default function TaskerChatScreen({ navigation, route }) {
       setMessage("");
       setSelectedImage(null);
     } catch (err) {
-      console.error("❌ Error sending message:", err.message);
-      Alert.alert("Error", "Failed to send message");
+      console.error("❌ Error sending message:", err.response?.data || err.message);
+      const errorMessage = err.response?.data?.error || err.response?.data?.msg || err.response?.data?.details?.join(", ") || err.message || "Failed to send message";
+      Alert.alert("Error", `Error sending message: ${errorMessage}`);
     } finally {
       setSending(false);
     }
@@ -255,8 +279,8 @@ export default function TaskerChatScreen({ navigation, route }) {
         </TouchableOpacity>
       </View>
     )}
-    <View style={[styles.inputRow, isRTL ? { flexDirection: "row-reverse" } : {}]}>
-      <TouchableOpacity style={styles.attachButton} onPress={pickImage}>
+    <View style={[styles.inputRow, isRTL && { flexDirection: "row-reverse" }]}>
+      <TouchableOpacity style={[styles.attachButton, isRTL && { marginRight: 0, marginLeft: 10 }]} onPress={pickImage}>
         <Ionicons name="image-outline" size={24} color="#215433" />
       </TouchableOpacity>
       <TextInput
@@ -268,7 +292,7 @@ export default function TaskerChatScreen({ navigation, route }) {
         placeholderTextAlign={isRTL ? "right" : "left"}
       />
       <TouchableOpacity
-        style={[styles.sendButton, isRTL ? { marginRight: 10 } : { marginLeft: 10 }, sending && { backgroundColor: "#888" }]}
+        style={[styles.sendButton, isRTL ? { marginRight: 10, marginLeft: 0 } : { marginLeft: 10, marginRight: 0 }, sending && { backgroundColor: "#888" }]}
         onPress={sendMessage}
         disabled={sending}
       >
@@ -355,7 +379,8 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    marginRight: 8,
+    marginRight: I18nManager.isRTL ? 0 : 8,
+    marginLeft: I18nManager.isRTL ? 8 : 0,
     backgroundColor: "#315052", // or any other plain color you like
     justifyContent: "center",
     alignItems: "center",
@@ -366,6 +391,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 20,
+    marginHorizontal: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -408,6 +434,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 14,
     color: "#333",
+    marginHorizontal: 8,
   },
   sendButton: {
     backgroundColor: "#215433",
@@ -427,6 +454,7 @@ const styles = StyleSheet.create({
   },
   attachButton: {
     padding: 8,
+    marginRight: 10,
   },
   imagePreviewContainer: {
     padding: 12,

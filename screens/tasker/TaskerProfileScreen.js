@@ -588,7 +588,7 @@ export default function TaskerProfileScreen({ route, navigation }) {
                 {reportReason.length}/300 {t("common.characters")}
               </Text>
 
-              <View style={styles.modalButtons}>
+              <View style={[styles.modalButtons, I18nManager.isRTL && styles.modalButtonsRTL]}>
                 <TouchableOpacity
                   style={styles.modalCancelButton}
                   onPress={() => {
@@ -878,12 +878,15 @@ const styles = StyleSheet.create({
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 12,
+  },
+  modalButtonsRTL: {
+    flexDirection: "row-reverse",
   },
   modalCancelButton: {
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 20,
-    marginRight: 10,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#ddd",

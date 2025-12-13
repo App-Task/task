@@ -201,6 +201,7 @@
     "reviewSubmittedMessage": "تم إرسال تقييمك.",
     "reviewFailedMessage": "فشل في إرسال التقييم.",
     "submittingReport": "جاري إرسال البلاغ...",
+    "reportPlaceholder": "وصف المشكلة...",
     "charactersCount": "{{count}}/300 حرف",
     "viewBids": "عرض العروض",
     "bid": "عرض",

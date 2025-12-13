@@ -234,11 +234,11 @@ export default function TaskerProfileScreen({ navigation }) {
     {isRTL ? (
       <>
         <Ionicons name="chevron-back" size={20} color="#999" />
-        <Text style={styles.rowText}>{t("taskerProfile.changePassword")}</Text>
+        <Text style={styles.rowText} numberOfLines={1}>{t("taskerProfile.changePassword")}</Text>
       </>
     ) : (
       <>
-        <Text style={styles.rowText}>{t("taskerProfile.changePassword")}</Text>
+        <Text style={styles.rowText} numberOfLines={1}>{t("taskerProfile.changePassword")}</Text>
         <Ionicons name="chevron-forward" size={20} color="#999" />
       </>
     )}
@@ -411,6 +411,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 16,
     color: "#215433",
+    flexShrink: 1,
   },
   logoutRow: {
     backgroundColor: "#c1ff72",

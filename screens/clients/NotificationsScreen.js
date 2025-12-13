@@ -133,17 +133,46 @@ export default function NotificationsScreen() {
     return text;
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const isArabic = i18n.language === "ar";
+    const locale = isArabic ? "ar-SA" : "en-GB";
+    
+    try {
+      if (isArabic) {
+        // Arabic format: use Arabic locale for dates and times
+        return date.toLocaleString(locale, {
+          hour: "2-digit",
+          minute: "2-digit",
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      } else {
+        return date.toLocaleString(locale, {
+          hour: "2-digit",
+          minute: "2-digit",
+          day: "numeric",
+          month: "short",
+        });
+      }
+    } catch (error) {
+      // Fallback to English if Arabic formatting fails
+      return date.toLocaleString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        day: "numeric",
+        month: "short",
+      });
+    }
+  };
+
   const renderItem = ({ item }) => (
     <View style={[styles.card, !item.isRead && styles.unreadCard]}>
       <Text style={styles.cardTitle}>{translateNotification(item.title)}</Text>
       <Text style={styles.cardDesc}>{translateNotification(item.message)}</Text>
       <Text style={styles.cardTime}>
-        {new Date(item.createdAt).toLocaleString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-          day: "numeric",
-          month: "short",
-        })}
+        {formatDate(item.createdAt)}
       </Text>
     </View>
   );

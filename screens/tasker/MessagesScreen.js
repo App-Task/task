@@ -95,7 +95,7 @@ export default function TaskerMessagesScreen({ navigation }) {
       >
         <View style={styles.row}>
   <View style={styles.avatar} /> 
-  <View style={{ flex: 1 }}>
+  <View style={{ flex: 1, marginHorizontal: 8 }}>
     <Text style={styles.name}>{item.name || t("taskerMessages.unnamedUser")}</Text>
 
             <Text style={styles.message} numberOfLines={1}>

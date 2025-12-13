@@ -17,6 +17,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import Modal from "react-native-modal";
@@ -34,6 +35,52 @@ export default function MyTasksScreen({ navigation, route }) {
     STARTED: "Started", 
     COMPLETED: "Completed",
     CANCELLED: "Cancelled"
+  };
+
+  // Format date function for Arabic support
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const isArabic = i18n.language === "ar";
+    const locale = isArabic ? "ar-SA" : "en-GB";
+    
+    try {
+      if (isArabic) {
+        // Arabic format: use Arabic locale for dates and times
+        const dateStr = date.toLocaleDateString(locale, {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+        const timeStr = date.toLocaleTimeString(locale, {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return `${dateStr} • ${timeStr}`;
+      } else {
+        const dateStr = date.toLocaleDateString(locale, {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+        const timeStr = date.toLocaleTimeString(locale, {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return `${dateStr} • ${timeStr}`;
+      }
+    } catch (error) {
+      // Fallback to English if Arabic formatting fails
+      const dateStr = date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+      const timeStr = date.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      return `${dateStr} • ${timeStr}`;
+    }
   };
 
   // Custom star rating component using Ionicons
@@ -344,16 +391,7 @@ allTasks.forEach((task) => {
         {/* ✅ Date Row with Report Icon */}
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <Text style={styles.cardDate}>
-            {new Date(item.createdAt).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })}{" "}
-            •{" "}
-            {new Date(item.createdAt).toLocaleTimeString("en-GB", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {formatDate(item.createdAt)}
           </Text>
           
           {/* Report Icon for Started Tab */}
@@ -711,7 +749,7 @@ allTasks.forEach((task) => {
               </Text>
 
               <TextInput
-                placeholder={t("clientMyTasks.reportPlaceholder", "Describe the issue...")}
+                placeholder={t("clientMyTasks.reportPlaceholder")}
                 placeholderTextColor="#999"
                 value={reportReason}
                 onChangeText={(text) => {
@@ -737,7 +775,7 @@ allTasks.forEach((task) => {
                 {reportReason.length}/300 {t("common.characters")}
               </Text>
 
-              <View style={{ flexDirection: "row", gap: 12 }}>
+              <View style={{ flexDirection: I18nManager.isRTL ? "row-reverse" : "row", gap: 12 }}>
                 <TouchableOpacity
                   style={{
                     flex: 1,

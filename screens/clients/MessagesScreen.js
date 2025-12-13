@@ -87,7 +87,7 @@ export default function MessagesScreen({ navigation }) {
       >
         <View style={styles.row}>
   <View style={styles.avatar} /> 
-  <View style={{ flex: 1 }}>
+  <View style={{ flex: 1, marginHorizontal: 8 }}>
     <Text style={styles.name}>{item.name || "Test User"}</Text>
     <Text style={styles.message} numberOfLines={1}>
       {item.lastMessage || "It is a long established fact that a reader..."}
@@ -172,11 +172,11 @@ const styles = StyleSheet.create({
     fontSize: 28, // ✅ larger like screenshot
     color: "#215432", // ✅ dark green
     marginBottom: 20,
-    textAlign: "left", // ✅ left aligned
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   
   card: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     paddingVertical: 16,
     paddingHorizontal: 0,
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   },
   
   row: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     flex: 1,
   },
@@ -211,8 +211,10 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   rightSide: {
-    alignItems: "flex-end",
-    marginLeft: 10,
+    alignItems: I18nManager.isRTL ? "flex-start" : "flex-end",
+    marginLeft: I18nManager.isRTL ? 0 : 10,
+    marginRight: I18nManager.isRTL ? 10 : 0,
+    minWidth: 60,
   },
   unreadBadge: {
     backgroundColor: "#215433",
@@ -246,7 +248,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: "#c1ff72", // ✅ lime green avatar
-    marginRight: 10,
+    marginRight: I18nManager.isRTL ? 0 : 10,
+    marginLeft: I18nManager.isRTL ? 10 : 0,
   },
 
   searchBar: {
