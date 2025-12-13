@@ -125,7 +125,7 @@ export default function PostTaskPage2() {
           );
           return;
         }
-
+        
         // Check if location services are enabled (Android specific)
         if (Platform.OS === "android") {
           const enabled = await Location.hasServicesEnabledAsync();
@@ -148,17 +148,17 @@ export default function PostTaskPage2() {
         });
         
         if (pos && pos.coords) {
-          const { latitude, longitude } = pos.coords;
+        const { latitude, longitude } = pos.coords;
           
           // Validate coordinates before setting
           if (validateCoordinates(latitude, longitude)) {
-            setCoords({ latitude, longitude });
-            setTempRegion({
-              latitude,
-              longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            });
+        setCoords({ latitude, longitude });
+        setTempRegion({
+          latitude,
+          longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        });
             console.log("Location obtained successfully:", { latitude, longitude });
           } else {
             throw new Error("Invalid coordinates received");
@@ -250,21 +250,21 @@ export default function PostTaskPage2() {
                 };
               } else {
                 // Permission granted and services enabled, get current location
-                const pos = await Location.getCurrentPositionAsync({
+          const pos = await Location.getCurrentPositionAsync({
                   accuracy: Platform.OS === "android" 
                     ? Location.Accuracy.High 
                     : Location.Accuracy.Balanced,
                   timeout: 15000, // 15 second timeout for Samsung devices
                   maximumAge: 10000,
-                });
-                const { latitude, longitude } = pos.coords;
+          });
+          const { latitude, longitude } = pos.coords;
                 if (validateCoordinates(latitude, longitude)) {
                   validCoords = { latitude, longitude };
                   validRegion = {
-                    latitude,
-                    longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
+            latitude,
+            longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
                   };
                 } else {
                   throw new Error("Invalid coordinates received");

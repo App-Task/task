@@ -192,10 +192,12 @@
   "clientNotifications": {
     "title": "Notifications",
     "none": "You have no notifications.",
-    "taskHired": "You’ve been hired!",
+    "emptyTitle": "No Notifications Yet",
+    "emptySubtitle": "You'll receive notifications about bids, messages, and task updates here.",
+    "taskHired": "You've been hired!",
     "taskHiredDesc": "A client has hired you for a task.",
     "newMessage": "New message received",
-    "newMessageDesc": "You’ve got a new message in your chat.",
+    "newMessageDesc": "You've got a new message in your chat.",
     "paymentSent": "Payment sent",
     "paymentSentDesc": "Your payment has been processed successfully."
   },
@@ -627,6 +629,8 @@
   "taskerNotifications": {
     "title": "Notifications",
     "empty": "No notifications at the moment",
+    "emptyTitle": "No Notifications Yet",
+    "emptySubtitle": "You'll receive notifications about bids, messages, and task updates here.",
     "types": {
       "hired": "You've been hired",
       "message": "New message"

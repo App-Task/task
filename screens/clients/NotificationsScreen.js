@@ -166,8 +166,8 @@ export default function NotificationsScreen() {
         <ActivityIndicator size="large" color="#315052" style={{ marginTop: 30 }} />
       ) : notifications.length === 0 ? (
         <EmptyState 
-          title="No Notifications Yet" 
-          subtitle="You'll receive notifications about bids, messages, and task updates here."
+          title={t("clientNotifications.emptyTitle")} 
+          subtitle={t("clientNotifications.emptySubtitle")}
         />
       ) : (
             <FlatList

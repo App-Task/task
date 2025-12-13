@@ -175,8 +175,8 @@ export default function TaskerNotificationsScreen({ navigation, setUnreadNotific
         <ActivityIndicator color="#213729" size="large" style={{ marginTop: 40 }} />
       ) : notifications.length === 0 ? (
         <EmptyState 
-          title="No Notifications Yet" 
-          subtitle="You'll receive notifications about bids, messages, and task updates here."
+          title={t("taskerNotifications.emptyTitle")} 
+          subtitle={t("taskerNotifications.emptySubtitle")}
         />
       ) : (
         <FlatList

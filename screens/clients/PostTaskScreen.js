@@ -130,7 +130,7 @@ React.useEffect(() => {
         );
         return;
       }
-
+      
       // Check if location services are enabled (Android specific)
       if (Platform.OS === "android") {
         const enabled = await Location.hasServicesEnabledAsync();
@@ -153,20 +153,20 @@ React.useEffect(() => {
       });
       
       if (pos && pos.coords) {
-        const { latitude, longitude } = pos.coords;
+      const { latitude, longitude } = pos.coords;
         
         // Validate coordinates before setting
         if (typeof latitude === "number" && typeof longitude === "number" && 
             !isNaN(latitude) && !isNaN(longitude) &&
             latitude >= -90 && latitude <= 90 && 
             longitude >= -180 && longitude <= 180) {
-          setCoords({ latitude, longitude });
-          setTempRegion({
-            latitude,
-            longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          });
+      setCoords({ latitude, longitude });
+      setTempRegion({
+        latitude,
+        longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
           console.log("Location obtained successfully:", { latitude, longitude });
         } else {
           throw new Error("Invalid coordinates received");
