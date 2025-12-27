@@ -93,7 +93,7 @@ export const fetchCurrentUser = async () => {
 export const updateUserProfile = async (data) => {
   const token = await getToken();
   const response = await axios.put(`${API_URL}/me`, data, {
-    headers: { Authorization: token },
+    headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 };

@@ -28,9 +28,18 @@ const { width, height } = Dimensions.get("window");
 
 export default function TaskDetailsScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { task: initialTask } = route.params;
+  const { task: initialTask } = route.params || {};
 
   const [task, setTask] = useState(initialTask);
+  
+  // Handle case where task is not provided or is invalid
+  useEffect(() => {
+    if (!initialTask || !initialTask._id) {
+      Alert.alert(t("common.errorTitle") || "Error", t("clientTaskDetails.taskNotFound") || "Task information is missing.", [
+        { text: t("common.ok") || "OK", onPress: () => navigation.goBack() }
+      ]);
+    }
+  }, [initialTask]);
   const [loading, setLoading] = useState(true);
   const isFocused = useIsFocused();
   const [bids, setBids] = useState([]);
@@ -47,6 +56,9 @@ export default function TaskDetailsScreen({ route, navigation }) {
 
   const fetchTask = async () => {
     try {
+      if (!initialTask || !initialTask._id) {
+        throw new Error("Task ID is missing");
+      }
       const freshTask = await getTaskById(initialTask._id);
       setTask(freshTask);
 
@@ -283,6 +295,13 @@ export default function TaskDetailsScreen({ route, navigation }) {
                   longitudeDelta: 0.01,
                 }}
                 pointerEvents="none"
+                onMapReady={() => {
+                  console.log("Map ready");
+                }}
+                onError={(error) => {
+                  console.error("MapView error:", error);
+                  // Don't show alert for read-only map, just log the error
+                }}
               >
                 <Marker coordinate={coords} />
               </MapView>
@@ -306,7 +325,26 @@ export default function TaskDetailsScreen({ route, navigation }) {
               {bids.length === 0 && (
                 <TouchableOpacity
                   style={styles.editButton}
-                  onPress={() => navigation.navigate("EditTask", { task })}
+                  onPress={() => {
+                    // On Android, serialize task object to prevent navigation crashes
+                    const taskToNavigate = Platform.OS === "android" 
+                      ? {
+                          _id: task._id,
+                          title: task.title || "",
+                          description: task.description || "",
+                          budget: task.budget || 0,
+                          category: task.category || "",
+                          status: task.status || "Pending",
+                          location: task.location || "",
+                          latitude: task.latitude || null,
+                          longitude: task.longitude || null,
+                          images: task.images || [],
+                          createdAt: task.createdAt || new Date().toISOString(),
+                          userId: task.userId || null,
+                        }
+                      : task;
+                    navigation.navigate("EditTask", { task: taskToNavigate });
+                  }}
                 >
                   <Text style={styles.editButtonText}>Edit Task</Text>
                 </TouchableOpacity>
@@ -338,9 +376,26 @@ export default function TaskDetailsScreen({ route, navigation }) {
                 onPress={() => {
                   const taskerId = task.assignedTo || task.taskerId || task.assignedTasker || task.tasker || task.assignedUser;
                   if (taskerId) {
+                    // On Android, serialize task object to prevent navigation crashes
+                    const taskToNavigate = Platform.OS === "android" 
+                      ? {
+                          _id: task._id,
+                          title: task.title || "",
+                          description: task.description || "",
+                          budget: task.budget || 0,
+                          category: task.category || "",
+                          status: task.status || "Pending",
+                          location: task.location || "",
+                          latitude: task.latitude || null,
+                          longitude: task.longitude || null,
+                          images: task.images || [],
+                          createdAt: task.createdAt || new Date().toISOString(),
+                          userId: task.userId || null,
+                        }
+                      : task;
                     navigation.navigate("TaskerProfile", { 
                       taskerId: taskerId,
-                      task: task,
+                      task: taskToNavigate,
                       taskId: task._id
                     });
                   } else {

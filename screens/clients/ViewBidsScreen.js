@@ -24,7 +24,18 @@ const { width } = Dimensions.get("window");
 
 export default function ViewBidsScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { taskId } = route.params;
+  const { taskId } = route.params || {};
+  
+  // Handle case where taskId is not provided
+  useEffect(() => {
+    if (!taskId) {
+      Alert.alert(
+        t("common.errorTitle") || "Error",
+        "Task information is missing.",
+        [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
+      );
+    }
+  }, [taskId]);
 
   const [bids, setBids] = useState([]);
   const [acceptedBidId, setAcceptedBidId] = useState(null);

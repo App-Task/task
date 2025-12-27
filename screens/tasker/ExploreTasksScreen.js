@@ -336,7 +336,24 @@ export default function ExploreTasksScreen({ navigation }) {
             Alert.alert(t("common.errorTitle") || "Error", t("taskerExplore.taskNotFound") || "Task information is missing. Please try again.");
             return;
           }
-          navigation.navigate("TaskerTaskDetails", { task });
+          // On Android, serialize task object to prevent navigation crashes
+          const taskToNavigate = Platform.OS === "android" 
+            ? {
+                _id: task._id,
+                title: task.title || "",
+                description: task.description || "",
+                budget: task.budget || 0,
+                category: task.category || "",
+                status: task.status || "Pending",
+                location: task.location || "",
+                latitude: task.latitude || null,
+                longitude: task.longitude || null,
+                images: task.images || [],
+                createdAt: task.createdAt || new Date().toISOString(),
+                userId: task.userId || null,
+              }
+            : task;
+          navigation.navigate("TaskerTaskDetails", { task: taskToNavigate });
         }}
         activeOpacity={0.7}
       >

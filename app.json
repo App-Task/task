@@ -55,6 +55,19 @@
           "locationWhenInUsePermission": "We use your location to show where the task is."
         }
       ],
+      [
+        "react-native-maps",
+        {
+          "googleMapsApiKey": ""
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "We need access to your photo library to upload images for tasks and your profile.",
+          "cameraPermission": "We use the camera to take photos for tasks and your profile."
+        }
+      ],
       "expo-asset",
       "expo-localization",
       "expo-secure-store",

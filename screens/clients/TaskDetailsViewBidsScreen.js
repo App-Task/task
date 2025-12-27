@@ -31,7 +31,18 @@ const { width, height } = Dimensions.get("window");
 
 export default function TaskDetailsViewBidsScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { task: initialTask, showProfileTabs = false, showOffersTab = false } = route.params;
+  const { task: initialTask, showProfileTabs = false, showOffersTab = false } = route.params || {};
+  
+  // Handle case where task is not provided
+  useEffect(() => {
+    if (!initialTask || !initialTask._id) {
+      Alert.alert(
+        t("common.errorTitle") || "Error",
+        "Task information is missing.",
+        [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
+      );
+    }
+  }, [initialTask]);
 
   const [task, setTask] = useState(initialTask);
   const [loading, setLoading] = useState(true);
@@ -626,7 +637,26 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                   {bids.length === 0 && (
                     <TouchableOpacity
                       style={styles.editButton}
-                      onPress={() => navigation.navigate("EditTask", { task })}
+                      onPress={() => {
+                        // On Android, serialize task object to prevent navigation crashes
+                        const taskToNavigate = Platform.OS === "android" 
+                          ? {
+                              _id: task._id,
+                              title: task.title || "",
+                              description: task.description || "",
+                              budget: task.budget || 0,
+                              category: task.category || "",
+                              status: task.status || "Pending",
+                              location: task.location || "",
+                              latitude: task.latitude || null,
+                              longitude: task.longitude || null,
+                              images: task.images || [],
+                              createdAt: task.createdAt || new Date().toISOString(),
+                              userId: task.userId || null,
+                            }
+                          : task;
+                        navigation.navigate("EditTask", { task: taskToNavigate });
+                      }}
                     >
                       <Text style={styles.editButtonText}>{t("clientTaskDetails.editTask")}</Text>
                     </TouchableOpacity>

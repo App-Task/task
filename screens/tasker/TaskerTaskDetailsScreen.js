@@ -7,6 +7,8 @@ import {
   StyleSheet,
   Image,
   I18nManager,
+  Alert,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
@@ -33,6 +35,17 @@ export default function TaskerTaskDetailsScreen({ route }) {
   const [showVerificationPopup, setShowVerificationPopup] = useState(false);
 
   const isBiddingAllowed = task?.status === "Pending";
+
+  // Handle case where task is not provided
+  useEffect(() => {
+    if (!initialTask || !initialTask._id) {
+      Alert.alert(
+        t("common.errorTitle") || "Error",
+        t("taskerTaskDetails.taskNotFound") || "Task information is missing.",
+        [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
+      );
+    }
+  }, [initialTask]);
 
   useEffect(() => {
     let isMounted = true;
@@ -348,10 +361,28 @@ export default function TaskerTaskDetailsScreen({ route }) {
                 setShowVerificationPopup(true);
                 return;
               }
+              // On Android, serialize task object to prevent navigation crashes
+              const taskToNavigate = Platform.OS === "android" 
+                ? {
+                    _id: task._id,
+                    title: task.title || "",
+                    description: task.description || "",
+                    budget: task.budget || 0,
+                    category: task.category || "",
+                    status: task.status || "Pending",
+                    location: task.location || "",
+                    latitude: task.latitude || null,
+                    longitude: task.longitude || null,
+                    images: task.images || [],
+                    createdAt: task.createdAt || new Date().toISOString(),
+                    userId: task.userId || null,
+                  }
+                : task;
+              
               if (existingBid) {
-                navigation.navigate("EditBid", { task, existingBid });
+                navigation.navigate("EditBid", { task: taskToNavigate, existingBid });
               } else {
-                navigation.navigate("SendBid", { task });
+                navigation.navigate("SendBid", { task: taskToNavigate });
               }
             }
           }}

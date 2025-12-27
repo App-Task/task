@@ -15,6 +15,7 @@ import {
   Image,
   I18nManager,
   RefreshControl,
+  Platform,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import i18n from "i18next";
@@ -383,9 +384,44 @@ allTasks.forEach((task) => {
     navigation.navigate("Chat", { name, otherUserId });
   };
 
-  const renderTask = ({ item }) => (
+  const renderTask = ({ item }) => {
+    const handleTaskPress = () => {
+      try {
+        if (!item || !item._id) {
+          Alert.alert(t("common.errorTitle") || "Error", t("clientMyTasks.taskNotFound") || "Task information is missing.");
+          return;
+        }
+        
+        // On Android, serialize task object to prevent navigation crashes
+        const taskToNavigate = Platform.OS === "android" 
+          ? {
+              _id: item._id,
+              title: item.title || "",
+              description: item.description || "",
+              budget: item.budget || 0,
+              category: item.category || "",
+              status: item.status || "Pending",
+              location: item.location || "",
+              latitude: item.latitude || null,
+              longitude: item.longitude || null,
+              images: item.images || [],
+              createdAt: item.createdAt || new Date().toISOString(),
+              userId: item.userId || null,
+              taskerId: item.taskerId || null,
+              cancelledBy: item.cancelledBy || null,
+            }
+          : item;
+        
+        navigation.navigate("TaskDetails", { task: taskToNavigate });
+      } catch (error) {
+        console.error("Task navigation error:", error);
+        Alert.alert(t("common.errorTitle") || "Error", t("clientMyTasks.navigationError") || "Failed to open task details.");
+      }
+    };
+    
+    return (
     <TouchableOpacity
-      onPress={() => navigation.navigate("TaskDetails", { task: item })}
+      onPress={handleTaskPress}
     >
       <View style={styles.card}>
         {/* ✅ Date Row with Report Icon */}
@@ -454,7 +490,27 @@ allTasks.forEach((task) => {
         {activeTab === STATUS.PENDING && (
           <TouchableOpacity
             style={styles.viewBidsBtn}
-            onPress={() => navigation.navigate("TaskDetails", { task: item, showOffersTab: true })}
+            onPress={() => {
+              const taskToNavigate = Platform.OS === "android" 
+                ? {
+                    _id: item._id,
+                    title: item.title || "",
+                    description: item.description || "",
+                    budget: item.budget || 0,
+                    category: item.category || "",
+                    status: item.status || "Pending",
+                    location: item.location || "",
+                    latitude: item.latitude || null,
+                    longitude: item.longitude || null,
+                    images: item.images || [],
+                    createdAt: item.createdAt || new Date().toISOString(),
+                    userId: item.userId || null,
+                    taskerId: item.taskerId || null,
+                    cancelledBy: item.cancelledBy || null,
+                  }
+                : item;
+              navigation.navigate("TaskDetails", { task: taskToNavigate, showOffersTab: true });
+            }}
           >
             <Text style={styles.viewBidsText}>
               {t("clientMyTasks.viewBids")} ({item.bidCount || 0} {item.bidCount === 1 ? t("clientMyTasks.bid") : t("clientMyTasks.bids")} {t("clientMyTasks.received")})

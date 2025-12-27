@@ -526,6 +526,13 @@ if (errorFlag) {
                 longitudeDelta: 0.01,
               }}
               pointerEvents="none"
+              onMapReady={() => {
+                console.log("Map ready");
+              }}
+              onError={(error) => {
+                console.error("MapView error:", error);
+                // Don't show alert for read-only map, just log the error
+              }}
             >
               <Marker coordinate={coords} />
             </MapView>
@@ -782,8 +789,28 @@ if (errorFlag) {
         style={{ flex: 1 }}
         initialRegion={tempRegion}
         onPress={(e) => {
-          const { latitude, longitude } = e.nativeEvent.coordinate;
-          setTempCoords({ latitude, longitude });
+          try {
+            if (e?.nativeEvent?.coordinate) {
+              const { latitude, longitude } = e.nativeEvent.coordinate;
+              setTempCoords({ latitude, longitude });
+            }
+          } catch (err) {
+            console.error("Map press error:", err);
+          }
+        }}
+        onMapReady={() => {
+          console.log("Map ready");
+        }}
+        onError={(error) => {
+          console.error("MapView error:", error);
+          if (Platform.OS === "android") {
+            // On Android, close modal on error to prevent crash
+            setMapVisible(false);
+          }
+          Alert.alert(
+            t("common.errorTitle") || "Error",
+            t("clientPostTask.mapError") || "Map failed to load. Please try again."
+          );
         }}
       >
         {tempCoords && (
@@ -791,8 +818,14 @@ if (errorFlag) {
             coordinate={tempCoords}
             draggable
             onDragEnd={(e) => {
-              const { latitude, longitude } = e.nativeEvent.coordinate;
-              setTempCoords({ latitude, longitude });
+              try {
+                if (e?.nativeEvent?.coordinate) {
+                  const { latitude, longitude } = e.nativeEvent.coordinate;
+                  setTempCoords({ latitude, longitude });
+                }
+              } catch (err) {
+                console.error("Marker drag error:", err);
+              }
             }}
           />
         )}

@@ -25,7 +25,18 @@ import * as ImagePicker from "expo-image-picker";
 
 export default function ChatScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { name, otherUserId } = route.params;
+  const { name, otherUserId } = route.params || {};
+  
+  // Handle case where required params are missing
+  useEffect(() => {
+    if (!otherUserId) {
+      Alert.alert(
+        t("common.errorTitle") || "Error",
+        "Chat information is missing.",
+        [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
+      );
+    }
+  }, [otherUserId]);
   const isRTL = i18n.language === "ar";
 
   const [message, setMessage] = useState("");

@@ -36,26 +36,13 @@ export const LanguageProvider = ({ children }) => {
       // Change language
       await i18n.changeLanguage(newLang);
 
-      // Show success message
+      // Show success message only (removed duplicate RTL message)
       Toast.show({
         type: "success",
         text1: newLang === "en" ? t("language.changedEn") : t("language.changedAr"),
         position: "bottom",
         visibilityTime: 2000,
       });
-
-      // Show info about RTL layout
-      setTimeout(() => {
-        Toast.show({
-          type: "info",
-          text1: newLang === "ar" ? "تم تغيير اللغة إلى العربية" : "Language changed to English",
-          text2: newLang === "ar" 
-            ? "سيتم تطبيق التخطيط من اليمين إلى اليسار عند إعادة تشغيل التطبيق" 
-            : "RTL layout will be applied on next app restart",
-          position: "bottom",
-          visibilityTime: 4000,
-        });
-      }, 2500);
 
       return true;
     } catch (error) {

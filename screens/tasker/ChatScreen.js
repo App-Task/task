@@ -28,7 +28,18 @@ const { width } = Dimensions.get("window");
 
 export default function TaskerChatScreen({ navigation, route }) {
   const { t } = useTranslation();
-  const { name, otherUserId } = route.params;
+  const { name, otherUserId } = route.params || {};
+  
+  // Handle case where required params are missing
+  useEffect(() => {
+    if (!otherUserId) {
+      Alert.alert(
+        t("common.errorTitle") || "Error",
+        "Chat information is missing.",
+        [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
+      );
+    }
+  }, [otherUserId]);
 
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");

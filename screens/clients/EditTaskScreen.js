@@ -43,7 +43,18 @@ const convertToWesternNumerals = (str) => {
 
 export default function EditTaskScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { task } = route.params;
+  const { task } = route.params || {};
+  
+  // Handle case where task is not provided
+  useEffect(() => {
+    if (!task || !task._id) {
+      Alert.alert(
+        t("common.errorTitle") || "Error",
+        t("clientEditTask1.taskNotFound") || "Task information is missing.",
+        [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
+      );
+    }
+  }, [task]);
   
   // Available services - using standardized category names
   const AVAILABLE_SERVICES = [
