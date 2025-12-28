@@ -1078,12 +1078,6 @@ const styles = StyleSheet.create({
     textAlign: I18nManager.isRTL ? "right" : "left", // ✅
   },
   
-  detailHintText: {
-    fontSize: 13,
-    fontFamily: "Inter",
-    color: "#555",
-  },
-  
   
   sectionTitle: {
     fontFamily: "InterBold",
