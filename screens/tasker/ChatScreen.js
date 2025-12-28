@@ -50,6 +50,37 @@ export default function TaskerChatScreen({ navigation, route }) {
   
   const isRTL = i18n.language === "ar";
 
+  // Format message date with date and time
+  const formatMessageDate = (dateString) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const isToday = date.toDateString() === now.toDateString();
+      const isArabic = i18n.language === "ar";
+      const locale = isArabic ? "ar-SA" : "en-GB";
+      
+      if (isToday) {
+        return date.toLocaleTimeString(locale, {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      } else {
+        const dateStr = date.toLocaleDateString(locale, {
+          day: "2-digit",
+          month: "short",
+        });
+        const timeStr = date.toLocaleTimeString(locale, {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return `${dateStr} ${timeStr}`;
+      }
+    } catch (e) {
+      return "";
+    }
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,
@@ -239,11 +270,7 @@ export default function TaskerChatScreen({ navigation, route }) {
           )}
           {item.text && <Text style={styles.messageText}>{item.text}</Text>}
           <Text style={styles.timestamp}>
-            {item.timestamp ||
-              new Date(item.createdAt).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}{" "}
+            {item.timestamp || formatMessageDate(item.createdAt)}{" "}
             {isMine && (item.status || "✓")}
           </Text>
         </View>

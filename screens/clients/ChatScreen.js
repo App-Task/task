@@ -46,6 +46,37 @@ export default function ChatScreen({ route, navigation }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [viewingImage, setViewingImage] = useState(null);
 
+  // Format message date with date and time
+  const formatMessageDate = (dateString) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const isToday = date.toDateString() === now.toDateString();
+      const isArabic = i18n.language === "ar";
+      const locale = isArabic ? "ar-SA" : "en-GB";
+      
+      if (isToday) {
+        return date.toLocaleTimeString(locale, {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      } else {
+        const dateStr = date.toLocaleDateString(locale, {
+          day: "2-digit",
+          month: "short",
+        });
+        const timeStr = date.toLocaleTimeString(locale, {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return `${dateStr} ${timeStr}`;
+      }
+    } catch (e) {
+      return "";
+    }
+  };
+
   const fetchMessages = async () => {
     try {
       const token = await getToken();
@@ -252,7 +283,7 @@ export default function ChatScreen({ route, navigation }) {
           )}
           {item.text && <Text style={styles.messageText}>{item.text}</Text>}
           <Text style={styles.timestamp}>
-            {item.timestamp || ""} {isMine && (item.status || "✓")}
+            {item.timestamp || formatMessageDate(item.createdAt)} {isMine && (item.status || "✓")}
           </Text>
         </View>
       </View>

@@ -28,18 +28,9 @@ const { width, height } = Dimensions.get("window");
 
 export default function TaskDetailsScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { task: initialTask } = route.params || {};
+  const { taskId } = route.params || {};
 
-  const [task, setTask] = useState(initialTask);
-  
-  // Handle case where task is not provided or is invalid
-  useEffect(() => {
-    if (!initialTask || !initialTask._id) {
-      Alert.alert(t("common.errorTitle") || "Error", t("clientTaskDetails.taskNotFound") || "Task information is missing.", [
-        { text: t("common.ok") || "OK", onPress: () => navigation.goBack() }
-      ]);
-    }
-  }, [initialTask]);
+  const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
   const isFocused = useIsFocused();
   const [bids, setBids] = useState([]);
@@ -49,29 +40,54 @@ export default function TaskDetailsScreen({ route, navigation }) {
   const [coords, setCoords] = useState(null);
 
   useEffect(() => {
-    if (isFocused) {
+    if (isFocused && taskId) {
       fetchTask();
     }
-  }, [isFocused]);
+  }, [isFocused, taskId]);
 
   const fetchTask = async () => {
     try {
-      if (!initialTask || !initialTask._id) {
+      if (!taskId) {
         throw new Error("Task ID is missing");
       }
-      const freshTask = await getTaskById(initialTask._id);
+      setLoading(true);
+      const freshTask = await getTaskById(taskId);
       setTask(freshTask);
 
-      const res = await fetch(`https://task-kq94.onrender.com/api/bids/task/${initialTask._id}`);
+      const res = await fetch(`https://task-kq94.onrender.com/api/bids/task/${taskId}`);
       const bidData = await res.json();
       setBids(bidData);
     } catch (err) {
       console.error("❌ Task fetch failed:", err.message);
-      Alert.alert(t("clientTaskDetails.errorTitle"), t("clientTaskDetails.loadTaskError"));
+      Alert.alert(
+        t("clientTaskDetails.errorTitle") || "Error", 
+        t("clientTaskDetails.loadTaskError") || "Failed to load task details.",
+        [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  // Handle case where taskId is not provided
+  useEffect(() => {
+    if (!taskId) {
+      Alert.alert(t("common.errorTitle") || "Error", t("clientTaskDetails.taskNotFound") || "Task information is missing.", [
+        { text: t("common.ok") || "OK", onPress: () => navigation.goBack() }
+      ]);
+    }
+  }, [taskId]);
+
+  // Show loading state until task is loaded
+  if (loading || !task) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#f8f6f7" }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#215432" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   // Derive coords from task
   useEffect(() => {
@@ -182,10 +198,13 @@ export default function TaskDetailsScreen({ route, navigation }) {
     );
   };
 
-  if (loading) {
+  // Show loading state until task is loaded
+  if (loading || !task) {
     return (
       <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="#000000" style={{ marginTop: 100 }} />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#215432" />
+        </View>
       </SafeAreaView>
     );
   }
@@ -326,24 +345,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
                 <TouchableOpacity
                   style={styles.editButton}
                   onPress={() => {
-                    // On Android, serialize task object to prevent navigation crashes
-                    const taskToNavigate = Platform.OS === "android" 
-                      ? {
-                          _id: task._id,
-                          title: task.title || "",
-                          description: task.description || "",
-                          budget: task.budget || 0,
-                          category: task.category || "",
-                          status: task.status || "Pending",
-                          location: task.location || "",
-                          latitude: task.latitude || null,
-                          longitude: task.longitude || null,
-                          images: task.images || [],
-                          createdAt: task.createdAt || new Date().toISOString(),
-                          userId: task.userId || null,
-                        }
-                      : task;
-                    navigation.navigate("EditTask", { task: taskToNavigate });
+                    navigation.navigate("EditTask", { taskId: task._id });
                   }}
                 >
                   <Text style={styles.editButtonText}>Edit Task</Text>
@@ -376,26 +378,8 @@ export default function TaskDetailsScreen({ route, navigation }) {
                 onPress={() => {
                   const taskerId = task.assignedTo || task.taskerId || task.assignedTasker || task.tasker || task.assignedUser;
                   if (taskerId) {
-                    // On Android, serialize task object to prevent navigation crashes
-                    const taskToNavigate = Platform.OS === "android" 
-                      ? {
-                          _id: task._id,
-                          title: task.title || "",
-                          description: task.description || "",
-                          budget: task.budget || 0,
-                          category: task.category || "",
-                          status: task.status || "Pending",
-                          location: task.location || "",
-                          latitude: task.latitude || null,
-                          longitude: task.longitude || null,
-                          images: task.images || [],
-                          createdAt: task.createdAt || new Date().toISOString(),
-                          userId: task.userId || null,
-                        }
-                      : task;
                     navigation.navigate("TaskerProfile", { 
                       taskerId: taskerId,
-                      task: taskToNavigate,
                       taskId: task._id
                     });
                   } else {

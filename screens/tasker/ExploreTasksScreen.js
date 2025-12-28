@@ -336,24 +336,8 @@ export default function ExploreTasksScreen({ navigation }) {
             Alert.alert(t("common.errorTitle") || "Error", t("taskerExplore.taskNotFound") || "Task information is missing. Please try again.");
             return;
           }
-          // On Android, serialize task object to prevent navigation crashes
-          const taskToNavigate = Platform.OS === "android" 
-            ? {
-                _id: task._id,
-                title: task.title || "",
-                description: task.description || "",
-                budget: task.budget || 0,
-                category: task.category || "",
-                status: task.status || "Pending",
-                location: task.location || "",
-                latitude: task.latitude || null,
-                longitude: task.longitude || null,
-                images: task.images || [],
-                createdAt: task.createdAt || new Date().toISOString(),
-                userId: task.userId || null,
-              }
-            : task;
-          navigation.navigate("TaskerTaskDetails", { task: taskToNavigate });
+          // Pass only taskId to prevent navigation crashes on Android
+          navigation.navigate("TaskerTaskDetails", { taskId: task._id });
         }}
         activeOpacity={0.7}
       >
@@ -412,36 +396,12 @@ export default function ExploreTasksScreen({ navigation }) {
                 Alert.alert(t("common.errorTitle") || "Error", t("taskerExplore.taskNotFound") || "Task information is missing. Please try again.");
                 return;
               }
-              
-              // On Android, ensure task object is properly serialized
-              const taskToNavigate = Platform.OS === "android" 
-                ? {
-                    _id: task._id,
-                    title: task.title || "",
-                    description: task.description || "",
-                    budget: task.budget || 0,
-                    category: task.category || "",
-                    status: task.status || "Pending",
-                    location: task.location || "",
-                    latitude: task.latitude || null,
-                    longitude: task.longitude || null,
-                    images: task.images || [],
-                    createdAt: task.createdAt || new Date().toISOString(),
-                    userId: task.userId || null,
-                  }
-                : task;
 
             if (currentUser && !currentUser.isVerified) {
               setShowVerificationPopup(true);
             } else {
-                // Add small delay on Android to ensure navigation state is ready
-                if (Platform.OS === "android") {
-                  setTimeout(() => {
-                    navigation.navigate("TaskerTaskDetails", { task: taskToNavigate });
-                  }, 100);
-                } else {
-                  navigation.navigate("TaskerTaskDetails", { task: taskToNavigate });
-                }
+                // Pass only taskId to prevent navigation crashes on Android
+                navigation.navigate("TaskerTaskDetails", { taskId: task._id });
               }
             } catch (error) {
               console.error("Bid button navigation error:", error);

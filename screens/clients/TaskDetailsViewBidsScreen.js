@@ -31,20 +31,9 @@ const { width, height } = Dimensions.get("window");
 
 export default function TaskDetailsViewBidsScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { task: initialTask, showProfileTabs = false, showOffersTab = false } = route.params || {};
+  const { taskId, showProfileTabs = false, showOffersTab = false, taskerId } = route.params || {};
   
-  // Handle case where task is not provided
-  useEffect(() => {
-    if (!initialTask || !initialTask._id) {
-      Alert.alert(
-        t("common.errorTitle") || "Error",
-        "Task information is missing.",
-        [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
-      );
-    }
-  }, [initialTask]);
-
-  const [task, setTask] = useState(initialTask);
+  const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
   const isFocused = useIsFocused();
   const [bids, setBids] = useState([]);
@@ -66,23 +55,49 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
   const [reportBid, setReportBid] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Handle case where taskId is not provided
   useEffect(() => {
-    if (isFocused) {
+    if (!taskId) {
+      Alert.alert(
+        t("common.errorTitle") || "Error",
+        "Task information is missing.",
+        [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
+      );
+    }
+  }, [taskId]);
+
+  // Show loading state until task is loaded
+  if (loading || !task) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#f8f6f7" }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#215432" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  useEffect(() => {
+    if (isFocused && taskId) {
       fetchTask();
       // If we're showing profile tabs and have a taskerId, fetch the profile and switch to profile tab
-      if (showProfileTabs && route.params?.taskerId) {
-        fetchTaskerProfile(route.params.taskerId);
+      if (showProfileTabs && taskerId) {
+        fetchTaskerProfile(taskerId);
         setActiveTab("profile"); // Automatically switch to profile tab
       }
     }
-  }, [isFocused, showProfileTabs, route.params?.taskerId]);
+  }, [isFocused, taskId, showProfileTabs, taskerId]);
 
   const fetchTask = async () => {
     try {
-      const freshTask = await getTaskById(initialTask._id);
+      if (!taskId) {
+        throw new Error("Task ID is missing");
+      }
+      setLoading(true);
+      const freshTask = await getTaskById(taskId);
       setTask(freshTask);
 
-      const res = await fetch(`https://task-kq94.onrender.com/api/bids/task/${initialTask._id}`);
+      const res = await fetch(`https://task-kq94.onrender.com/api/bids/task/${taskId}`);
       const bidData = await res.json();
       setBids(bidData);
 
@@ -446,10 +461,13 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
     }
   };
 
-  if (loading) {
+  // Show loading state until task is loaded
+  if (loading || !task) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <ActivityIndicator size="large" color="#000000" style={{ marginTop: 100 }} />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#215432" />
+        </View>
       </SafeAreaView>
     );
   }
@@ -638,24 +656,7 @@ export default function TaskDetailsViewBidsScreen({ route, navigation }) {
                     <TouchableOpacity
                       style={styles.editButton}
                       onPress={() => {
-                        // On Android, serialize task object to prevent navigation crashes
-                        const taskToNavigate = Platform.OS === "android" 
-                          ? {
-                              _id: task._id,
-                              title: task.title || "",
-                              description: task.description || "",
-                              budget: task.budget || 0,
-                              category: task.category || "",
-                              status: task.status || "Pending",
-                              location: task.location || "",
-                              latitude: task.latitude || null,
-                              longitude: task.longitude || null,
-                              images: task.images || [],
-                              createdAt: task.createdAt || new Date().toISOString(),
-                              userId: task.userId || null,
-                            }
-                          : task;
-                        navigation.navigate("EditTask", { task: taskToNavigate });
+                        navigation.navigate("EditTask", { taskId: task._id });
                       }}
                     >
                       <Text style={styles.editButtonText}>{t("clientTaskDetails.editTask")}</Text>

@@ -22,8 +22,8 @@ import EmptyIllustration from "../../components/EmptyIllustration";
 import VerificationPopup from "../../components/VerificationPopup";
 
 export default function TaskerTaskDetailsScreen({ route }) {
-  const { task: initialTask } = route.params || {};
-  const [task, setTask] = useState(initialTask || null);
+  const { taskId } = route.params || {};
+  const [task, setTask] = useState(null);
   const { t } = useTranslation();
   const navigation = useNavigation();
 
@@ -33,19 +33,50 @@ export default function TaskerTaskDetailsScreen({ route }) {
   const [coords, setCoords] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [showVerificationPopup, setShowVerificationPopup] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const isBiddingAllowed = task?.status === "Pending";
 
-  // Handle case where task is not provided
+  // Handle case where taskId is not provided
   useEffect(() => {
-    if (!initialTask || !initialTask._id) {
+    if (!taskId) {
       Alert.alert(
         t("common.errorTitle") || "Error",
         t("taskerTaskDetails.taskNotFound") || "Task information is missing.",
         [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
       );
     }
-  }, [initialTask]);
+  }, [taskId]);
+
+  // Fetch task by ID
+  useEffect(() => {
+    const fetchTask = async () => {
+      try {
+        if (!taskId) {
+          return;
+        }
+        setLoading(true);
+        const res = await axios.get(
+          `https://task-kq94.onrender.com/api/tasks/${taskId}`
+        );
+        if (res.data) {
+          setTask(res.data);
+        }
+      } catch (err) {
+        console.error("❌ Failed to fetch task:", err.message);
+        Alert.alert(
+          t("common.errorTitle") || "Error",
+          t("taskerTaskDetails.taskNotFound") || "Failed to load task details.",
+          [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (taskId) {
+      fetchTask();
+    }
+  }, [taskId]);
 
   useEffect(() => {
     let isMounted = true;
@@ -84,28 +115,6 @@ export default function TaskerTaskDetailsScreen({ route }) {
       isMounted = false;
     };
   }, [task?._id]);
-
-  useEffect(() => {
-    const fetchFullTask = async () => {
-      try {
-        if (!initialTask?._id) {
-          console.error("❌ No task ID provided");
-          return;
-        }
-        const res = await axios.get(
-          `https://task-kq94.onrender.com/api/tasks/${initialTask._id}`
-        );
-        if (res.data) {
-        setTask(res.data);
-        }
-      } catch (err) {
-        console.error("❌ Failed to fetch full task:", err.message);
-      }
-    };
-    if (initialTask?._id) {
-    fetchFullTask();
-    }
-  }, [initialTask?._id]);
 
   // Get task coordinates
   useEffect(() => {
@@ -186,8 +195,8 @@ export default function TaskerTaskDetailsScreen({ route }) {
     }
   };
 
-  // If no task data, show error and allow going back
-  if (!task) {
+  // Show loading state until task is loaded
+  if (loading || !task) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.backButtonContainer}>
@@ -202,12 +211,8 @@ export default function TaskerTaskDetailsScreen({ route }) {
             />
           </TouchableOpacity>
         </View>
-        <View style={styles.errorContainer}>
-          <EmptyIllustration />
-          <Text style={styles.errorText}>{t("common.errorTitle")}</Text>
-          <Text style={styles.errorSubtext}>
-            {t("taskerTaskDetails.taskNotFound") || "Task information is missing. Please try again."}
-          </Text>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#215432" />
         </View>
       </SafeAreaView>
     );
@@ -361,28 +366,11 @@ export default function TaskerTaskDetailsScreen({ route }) {
                 setShowVerificationPopup(true);
                 return;
               }
-              // On Android, serialize task object to prevent navigation crashes
-              const taskToNavigate = Platform.OS === "android" 
-                ? {
-                    _id: task._id,
-                    title: task.title || "",
-                    description: task.description || "",
-                    budget: task.budget || 0,
-                    category: task.category || "",
-                    status: task.status || "Pending",
-                    location: task.location || "",
-                    latitude: task.latitude || null,
-                    longitude: task.longitude || null,
-                    images: task.images || [],
-                    createdAt: task.createdAt || new Date().toISOString(),
-                    userId: task.userId || null,
-                  }
-                : task;
-              
+              // Pass only taskId to prevent navigation crashes on Android
               if (existingBid) {
-                navigation.navigate("EditBid", { task: taskToNavigate, existingBid });
+                navigation.navigate("EditBid", { taskId: task._id, existingBid });
               } else {
-                navigation.navigate("SendBid", { task: taskToNavigate });
+                navigation.navigate("SendBid", { taskId: task._id });
               }
             }
           }}

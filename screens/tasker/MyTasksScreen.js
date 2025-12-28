@@ -157,7 +157,7 @@ export default function TaskerMyTasksScreen() {
       }
       
       navigation.navigate("EditBid", { 
-        task: task, 
+        taskId: task._id, 
         existingBid: bid 
       });
       
@@ -283,25 +283,8 @@ export default function TaskerMyTasksScreen() {
       task.status = t("taskerMyTasks.statusTypes.pending"); // Default status
     }
     
-    // On Android, serialize task object to prevent navigation crashes
-    const taskToNavigate = Platform.OS === "android" 
-      ? {
-          _id: task._id,
-          title: task.title || "",
-          description: task.description || "",
-          budget: task.budget || 0,
-          category: task.category || "",
-          status: task.status || "Pending",
-          location: task.location || "",
-          latitude: task.latitude || null,
-          longitude: task.longitude || null,
-          images: task.images || [],
-          createdAt: task.createdAt || new Date().toISOString(),
-          userId: task.userId || null,
-        }
-      : task;
-    
-    navigation.navigate("TaskerTaskDetails", { task: taskToNavigate });
+    // Pass only taskId to prevent navigation crashes on Android
+    navigation.navigate("TaskerTaskDetails", { taskId: task._id });
   };
 
 

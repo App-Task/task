@@ -13,6 +13,7 @@ import {
   Platform,
   StatusBar,
   I18nManager,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,7 +22,7 @@ import i18n from "i18next";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import * as SecureStore from "expo-secure-store";
-import { updateTaskById } from "../../services/taskService";
+import { updateTaskById, getTaskById } from "../../services/taskService";
 import MapView, { Marker } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -43,18 +44,47 @@ const convertToWesternNumerals = (str) => {
 
 export default function EditTaskScreen({ route, navigation }) {
   const { t } = useTranslation();
-  const { task } = route.params || {};
+  const { taskId } = route.params || {};
   
-  // Handle case where task is not provided
+  const [task, setTask] = useState(null);
+  const [taskLoading, setTaskLoading] = useState(true);
+
+  // Fetch task by ID
   useEffect(() => {
-    if (!task || !task._id) {
+    const fetchTask = async () => {
+      try {
+        if (!taskId) {
+          throw new Error("Task ID is missing");
+        }
+        setTaskLoading(true);
+        const taskData = await getTaskById(taskId);
+        setTask(taskData);
+      } catch (err) {
+        console.error("❌ Failed to fetch task:", err.message);
+        Alert.alert(
+          t("common.errorTitle") || "Error",
+          t("clientEditTask1.taskNotFound") || "Task information is missing.",
+          [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
+        );
+      } finally {
+        setTaskLoading(false);
+      }
+    };
+    if (taskId) {
+      fetchTask();
+    }
+  }, [taskId]);
+  
+  // Handle case where taskId is not provided
+  useEffect(() => {
+    if (!taskId) {
       Alert.alert(
         t("common.errorTitle") || "Error",
         t("clientEditTask1.taskNotFound") || "Task information is missing.",
         [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
       );
     }
-  }, [task]);
+  }, [taskId]);
   
   // Available services - using standardized category names
   const AVAILABLE_SERVICES = [
@@ -82,12 +112,24 @@ export default function EditTaskScreen({ route, navigation }) {
     return config[category] || category;
   };
 
-  const [category, setCategory] = useState(task.category || "");
-  const [title, setTitle] = useState(task.title || "");
-  const [description, setDescription] = useState(task.description || "");
-  const [budget, setBudget] = useState(task.budget?.toString() || "");
-  const [address, setAddress] = useState(task.location || "");
-  const [images, setImages] = useState(task.images || []);
+  const [category, setCategory] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [budget, setBudget] = useState("");
+  const [address, setAddress] = useState("");
+  const [images, setImages] = useState([]);
+  
+  // Update form fields when task is loaded
+  useEffect(() => {
+    if (task) {
+      setCategory(task.category || "");
+      setTitle(task.title || "");
+      setDescription(task.description || "");
+      setBudget(task.budget?.toString() || "");
+      setAddress(task.location || "");
+      setImages(task.images || []);
+    }
+  }, [task]);
   const [loading, setLoading] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   
@@ -165,7 +207,11 @@ export default function EditTaskScreen({ route, navigation }) {
       const westernBudget = convertToWesternNumerals(budget);
       
       // Use the existing service method
-      await updateTaskById(task._id, {
+      if (!taskId || !task) {
+        Alert.alert(t("common.errorTitle"), "Task information is missing.");
+        return;
+      }
+      await updateTaskById(taskId, {
         category,
         title: title.trim(),
         description: description.trim(),
@@ -283,6 +329,17 @@ export default function EditTaskScreen({ route, navigation }) {
     
     setMapVisible(false);
   };
+
+  // Show loading state until task is loaded
+  if (taskLoading || !task) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#215432" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>

@@ -38,6 +38,28 @@ export default function WelcomeScreen({ navigation }) {
       await Asset.loadAsync(require("../../assets/images/2.png"));
       await Asset.loadAsync(require("../../assets/images/22.png"));
       await requestPermissions();
+      
+      // Check if user is already logged in
+      try {
+        const { getToken } = require("../../services/authStorage");
+        const token = await getToken();
+        const userId = await SecureStore.getItemAsync("userId");
+        const userRole = await SecureStore.getItemAsync("userRole");
+        
+        if (token && userId && userRole) {
+          // User is logged in, navigate to appropriate home
+          if (userRole === "tasker") {
+            navigation.replace("TaskerHome");
+          } else {
+            navigation.replace("ClientHome");
+          }
+          return;
+        }
+      } catch (err) {
+        console.log("Login check error:", err);
+        // Continue to welcome screen if check fails
+      }
+      
       setReady(true);
     };
     preload();

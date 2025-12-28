@@ -481,28 +481,11 @@ export default function TaskerProfileScreen({ route, navigation }) {
                     <TouchableOpacity
                       style={styles.editButton}
                       onPress={() => {
-                        if (!taskData) {
+                        if (!taskData || !taskData._id) {
                           Alert.alert(t("common.errorTitle") || "Error", "Task data is missing.");
                           return;
                         }
-                        // On Android, serialize task object to prevent navigation crashes
-                        const taskToNavigate = Platform.OS === "android" 
-                          ? {
-                              _id: taskData._id,
-                              title: taskData.title || "",
-                              description: taskData.description || "",
-                              budget: taskData.budget || 0,
-                              category: taskData.category || "",
-                              status: taskData.status || "Pending",
-                              location: taskData.location || "",
-                              latitude: taskData.latitude || null,
-                              longitude: taskData.longitude || null,
-                              images: taskData.images || [],
-                              createdAt: taskData.createdAt || new Date().toISOString(),
-                              userId: taskData.userId || null,
-                            }
-                          : taskData;
-                        navigation.navigate("EditTask", { task: taskToNavigate });
+                        navigation.navigate("EditTask", { taskId: taskData._id });
                       }}
                     >
                       <Text style={styles.editButtonText}>{t("taskerProfile.editTask")}</Text>

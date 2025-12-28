@@ -392,27 +392,8 @@ allTasks.forEach((task) => {
           return;
         }
         
-        // On Android, serialize task object to prevent navigation crashes
-        const taskToNavigate = Platform.OS === "android" 
-          ? {
-              _id: item._id,
-              title: item.title || "",
-              description: item.description || "",
-              budget: item.budget || 0,
-              category: item.category || "",
-              status: item.status || "Pending",
-              location: item.location || "",
-              latitude: item.latitude || null,
-              longitude: item.longitude || null,
-              images: item.images || [],
-              createdAt: item.createdAt || new Date().toISOString(),
-              userId: item.userId || null,
-              taskerId: item.taskerId || null,
-              cancelledBy: item.cancelledBy || null,
-            }
-          : item;
-        
-        navigation.navigate("TaskDetails", { task: taskToNavigate });
+        // Pass only taskId to prevent navigation crashes on Android
+        navigation.navigate("TaskDetails", { taskId: item._id });
       } catch (error) {
         console.error("Task navigation error:", error);
         Alert.alert(t("common.errorTitle") || "Error", t("clientMyTasks.navigationError") || "Failed to open task details.");
@@ -491,25 +472,7 @@ allTasks.forEach((task) => {
           <TouchableOpacity
             style={styles.viewBidsBtn}
             onPress={() => {
-              const taskToNavigate = Platform.OS === "android" 
-                ? {
-                    _id: item._id,
-                    title: item.title || "",
-                    description: item.description || "",
-                    budget: item.budget || 0,
-                    category: item.category || "",
-                    status: item.status || "Pending",
-                    location: item.location || "",
-                    latitude: item.latitude || null,
-                    longitude: item.longitude || null,
-                    images: item.images || [],
-                    createdAt: item.createdAt || new Date().toISOString(),
-                    userId: item.userId || null,
-                    taskerId: item.taskerId || null,
-                    cancelledBy: item.cancelledBy || null,
-                  }
-                : item;
-              navigation.navigate("TaskDetails", { task: taskToNavigate, showOffersTab: true });
+              navigation.navigate("TaskDetails", { taskId: item._id, showOffersTab: true });
             }}
           >
             <Text style={styles.viewBidsText}>

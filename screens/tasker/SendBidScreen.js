@@ -36,7 +36,7 @@ const convertToWesternNumerals = (str) => {
 export default function SendBidScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { task } = route.params || {};
+  const { taskId } = route.params || {};
   const { t } = useTranslation();
 
   const [bidAmount, setBidAmount] = useState("");
@@ -46,7 +46,7 @@ export default function SendBidScreen() {
   const isRTL = i18n.language === "ar";
 
   const handleSubmitBid = async () => {
-    if (!task || !task._id) {
+    if (!taskId) {
       Alert.alert("Error", "Task information is missing. Please try again.");
       return;
     }
@@ -87,9 +87,9 @@ export default function SendBidScreen() {
       
       // Navigate to success screen with bid data (don't save yet)
       navigation.replace("BidSentSuccess", { 
-        task, 
+        taskId, 
         bidData: {
-          taskId: task._id,
+          taskId: taskId,
           taskerId: user._id,
           amount: Number(westernBidAmount),
           message: message.trim(),

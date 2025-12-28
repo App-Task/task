@@ -36,7 +36,7 @@ const convertToWesternNumerals = (str) => {
 export default function EditBidScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { task, existingBid } = route.params || {};
+  const { taskId, existingBid } = route.params || {};
   const { t } = useTranslation();
 
   const [bidAmount, setBidAmount] = useState("");
@@ -96,7 +96,7 @@ export default function EditBidScreen() {
       setSubmitting(false);
       
       // Navigate to success screen
-      navigation.replace("BidUpdatedSuccess", { task });
+      navigation.replace("BidUpdatedSuccess", { taskId });
       
     } catch (err) {
       setSubmitting(false);
