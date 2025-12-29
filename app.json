@@ -31,8 +31,7 @@
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
       ],
-      "package": "com.taskbh.taskapp",
-      "versionCode": 3
+      "package": "com.taskbh.taskapp"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -53,12 +52,6 @@
           "locationAlwaysAndWhenInUsePermission": "We use your location to show where the task is.",
           "locationAlwaysPermission": "We use your location to show where the task is.",
           "locationWhenInUsePermission": "We use your location to show where the task is."
-        }
-      ],
-      [
-        "react-native-maps",
-        {
-          "googleMapsApiKey": ""
         }
       ],
       [
