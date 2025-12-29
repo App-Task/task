@@ -672,8 +672,7 @@ allTasks.forEach((task) => {
       </View>
     </TouchableOpacity>
   );
-  
-  
+  };
 
   return (
     <View style={styles.container}>
