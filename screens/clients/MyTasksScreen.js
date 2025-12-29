@@ -1055,7 +1055,6 @@ const styles = StyleSheet.create({
     fontSize: 17, // ✅ slightly larger
     color: "#215433",
     marginBottom: 6,
-    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   
 
@@ -1070,7 +1069,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Inter",
     color: "#555",
-    textAlign: I18nManager.isRTL ? "right" : "left", // ✅
   },
   
   
@@ -1079,7 +1077,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#215433",
     marginVertical: 12,
-    textAlign: I18nManager.isRTL ? "right" : "left", // ✅
   },
 
   subTabs: {
@@ -1121,7 +1118,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 8,           // ✅ proper spacing from previous content
     textDecorationLine: "underline", // ✅ underlined
-    textAlign: I18nManager.isRTL ? "right" : "left",
   },
 
   buttonsRow: {
