@@ -1189,5 +1189,5 @@ const styles = StyleSheet.create({
     fontFamily: "InterBold",
     fontSize: 12, // Slightly smaller font size
     textAlign: "center",
-  }
+  },
 });
